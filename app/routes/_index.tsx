@@ -118,23 +118,25 @@ const Index = () => {
     <PublicLayout>
       {/* Background Slideshow */}
       <div
-        className=" mt-10 h-[90vh] rounded-2xl w-full bg-cover bg-center transition-all duration-1000"
+        className=" mt-10 lg:h-[90vh] rounded-2xl w-full bg-cover bg-center transition-all duration-1000"
         style={{
           backgroundImage: `url(${backgroundImages[currentBackground]})`,
         }}
       >
-        <div className="flex flex-col rounded-2xl h-[90vh] px-60 justify-center bg-black/40 text-white">
+        <div className="flex flex-col gap-10 rounded-2xl h-[90vh] lg:px-60 justify-center px-4 bg-black/40 text-white">
+          <div>
           <p className="text-6xl font-nunito font-bold">Leading the Way in</p>
           <p className="text-6xl font-nunito font-bold"> Legal Tech </p>
           <p className="text-6xl font-nunito font-bold">  Solutions</p>
+          </div>
 
-          <div className="mt-10">
+          <div className="">
             <p className=" font-nunito font-bold text-[#05ECF2]">Transforming the legal landscape with state-of-the-art technology. </p>
             <p className=" font-nunito font-bold text-[#05ECF2]"> Our solutions are designed to enhance productivity and deliver </p>
             <p className=" font-nunito font-bold text-[#05ECF2]">  exceptional user experiences.</p>
           </div>
 
-          <div className="mt-10">
+          <div className="">
             <Link to="/about">
               <Button
                 color="default"
@@ -189,12 +191,12 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 mt-60 h-full flex  gap-20">
+      <div className="lg:grid lg:grid-cols-2 lg:mt-40 mt-10 h-full lg:flex  gap-20">
         <div className="">
           <img className="rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
-          <img className="lg:ml-60 lg:-mt-60 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img5} alt="" />
+          <img className="lg:ml-60 lg:-mt-60 mt-10 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img5} alt="" />
         </div>
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-10 mt-10 lg:mt-0">
           <p className="font-montserrat text-2xl font-bold text-white"> About Us</p>
           <p className="font-montserrat text-5xl font-bold text-white"> Customer-Centric Legal Tech Solutions</p>
           <p className="font-nunito text-md font-bold text-white "> At Addentech, our customer-centric approach sets us apart. We deliver innovative legal technology solutions that make legal services affordable and accessible. Our commitment to excellence ensures we create a supportive and innovative environment for our clients.</p>
@@ -208,14 +210,14 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="mt-40">
+      <div className="lg:mt-40 mt-20">
         <p className="font-nunito text-white text-xl font-bold text-[#F2059F]">Here is How We Can Help Your Business</p>
         <p className="font-nunito text-white text-4xl font-bold mt-8">Comprehensive Services Tailored </p>
         <p className="font-nunito text-white text-4xl font-bold">
           to Your Needs
         </p>
         <div className="lg:grid lg:grid-cols-3 gap-8 mt-20">
-          <div className=" w-full h-[25vh] border border-white/5 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div className=" w-full h-full  border border-white/5 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
             <div className="w-full flex  items-center justify-center">
               <div className="h-12 bg-[#0b0e13] w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border border-white/5">
                 <NetworkIcon className="text-[#05ECF2] h-8 w-8 " />
@@ -228,7 +230,7 @@ const Index = () => {
               Maximize digital presence with expert SEO, social media strategies, email campaigns, and performance analytics. We help you reach and engage your audience.            </p>
           </div>
 
-          <div className=" w-full h-[25vh] border border-white/5 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div className=" w-full h-[25vh] mt-10 lg:mt-0 border border-white/5 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
             <div className="w-full flex  items-center justify-center">
               <div className="h-12 bg-[#0b0e13] w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border border-white/5">
                 <CodingIcon className="text-[#05ECF2] h-8 w-8 " />
@@ -241,7 +243,7 @@ const Index = () => {
               Innovative website design and development, tailored to your business needs. We create intuitive and visually appealing sites that drive results.</p>
           </div>
 
-          <div className=" w-full h-[25vh] border border-white/5 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div className=" w-full mt-10 lg:mt-0  h-[25vh] border border-white/5 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
             <div className="w-full flex  items-center justify-center">
               <div className="h-12 bg-[#0b0e13] w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border border-white/5">
                 <CodingIcon className="text-[#05ECF2] h-8 w-8 " />
@@ -409,7 +411,7 @@ const Index = () => {
             </Button></Link>
         </div>
       </div> 
-      <div className="lg:grid lg:grid-cols-3 gap-10 mt-20">
+      <div className="lg:grid lg:grid-cols-3 gap-10 mt-40">
         {team.map((member, index) => (
           <div key={index} className="w-full h-[60vh] border border-white/5 rounded-2xl">
             <div className="w-full flex items-center justify-between px-10 h-28 border border-white/5 rounded-tr-2xl rounded-tl-2xl">
@@ -435,7 +437,7 @@ const Index = () => {
       </div>
 
       {/* Testimonials Section */}
-      <div className="mt-60 overflow-hidden relative">
+      <div className="mt-40 overflow-hidden relative">
         <p className="text-white font-montserrat text-4xl font-bold">Client experiences that</p>
         <p className="text-white font-montserrat text-4xl font-bold">inspire confidence</p>
 

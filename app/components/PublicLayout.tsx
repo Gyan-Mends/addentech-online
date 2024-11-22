@@ -1,6 +1,6 @@
 import { Button, Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/react"
 import { Link } from "@remix-run/react"
-import useTheme from "next-theme";
+import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
 import SunIcon from "./Icons/icons/SunIcon";
 import MoonIcon from "./Icons/icons/MoonIcon";
@@ -18,7 +18,7 @@ interface PublicLayoutProps {
 }
 const PublicLayout = ({ children }: PublicLayoutProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    // const { theme, setTheme } = useTheme()
+    const { theme, setTheme } = useTheme()
     const menuItems = [
         "Profile",
         "Dashboard",
@@ -37,13 +37,13 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                 className="top-0 z-50 py-2 bg-[#0b0e13]"
             >
                 <NavbarContent className="lg:hidden">
-                    <NavbarMenuToggle aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
+                    <NavbarMenuToggle className="text-white" aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
                 </NavbarContent>
 
                 <NavbarContent justify="start" className="">
                     <NavbarItem  >
                         <img className=" w-full" src={logo || "~/components/images/addentech_logo.png"} alt="Addentech Logo" />
-                        <p>Addentechnology</p>
+                        <p className="text-[#0b0e13]">Addentechnology</p>
                     </NavbarItem>
                 </NavbarContent>
 
@@ -69,13 +69,13 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
                 <NavbarContent justify="end" className="">
                     <NavbarItem  >
-                        {/* <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+                        <button className="text-white" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
                             {theme === "light" ? (
                                 <SunIcon className="text-white" />
                             ) : (
                                 <MoonIcon className="text-slate-950" />
                             )}
-                        </button>    */}
+                        </button>
                     </NavbarItem>
                 </NavbarContent>
 
