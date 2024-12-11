@@ -90,8 +90,8 @@ const Blog = () => {
     return (
         <PublicLayout>
             <div className="mt-20 lg:px-80 px-4">
-                <p className="font-montserrat font-bold text-4xl text-white text-center">News & Articles</p>
-                <p className="text-white text-center mt-4 font-nunito">Stay informed with the latest updates...</p>
+                <p className="font-montserrat font-bold text-4xl dark:text-white text-center">News & Articles</p>
+                <p className="dark:text-white text-center mt-4 font-nunito">Stay informed with the latest updates...</p>
             </div>
 
             <div className="lg:px-40 px-4 flex flex-col gap-10">
@@ -105,7 +105,7 @@ const Blog = () => {
                                 setSearchQuery(e.target.value);
                                 setCurrentPage(1);
                             }}
-                            className="w-full md:max-w-lg px-4 py-2 border border-white/20 text-white rounded-lg focus:outline-none bg-[#0b0e13] font-nunito"
+                            className="w-full md:max-w-lg px-4 py-2 border dark:border-white/20 border-black/20 dark:text-white rounded-lg focus:outline-none dark:bg-[#0b0e13] font-nunito"
                         />
                     </div>
 
@@ -113,7 +113,7 @@ const Blog = () => {
                         <select
                             value={selectedCategory}
                             onChange={handleCategoryChange}
-                            className="w-full md:max-w-lg px-4 py-2 border border-white/20 text-white rounded-lg focus:outline-none bg-[#0b0e13] font-nunito"
+                            className="w-full md:max-w-lg px-4 py-2 border dark:border-white/20 border-black/20 dark:text-white rounded-lg focus:outline-none dark:bg-[#0b0e13] font-nunito"
                         >
                             <option value="All">All Categories</option>
                             <option value="Tech">Tech</option>
@@ -127,7 +127,7 @@ const Blog = () => {
                 {currentBlogs.map((blog) => (
                     <div
                         key={blog.id}
-                        className={`w-full h-auto border border-white/30 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-6`}
+                        className={`w-full h-auto border dark:border-white/30 border-black/30 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-6`}
                     >
                         <div className="h-full overflow-hidden group">
                             <img
@@ -138,7 +138,7 @@ const Blog = () => {
                         </div>
                         <div className="p-6 flex flex-col justify-center gap-4">
                             <p className="text-sm text-[#05ECF2] font-nunito text-xl">{blog.category}</p>
-                            <h2 className="text-2xl font-bold text-white font-montserrat">{blog.title}</h2>
+                            <h2 className="text-2xl font-bold dark:text-white font-montserrat">{blog.title}</h2>
                             <p className="text-sm text-gray-400 font-nunito">{blog.description}</p>
                             <div className="flex justify-between items-center">
                                 <p className="text-gray-500">{blog.company}</p>
@@ -161,7 +161,7 @@ const Blog = () => {
                             disabled={currentPage === 1}
                             className={`px-4 py-2 rounded-lg ${currentPage === 1
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-blue-500 text-white"
+                                : "bg-blue-500 dark:text-white"
                                 }`}
                         >
                             Previous
@@ -174,7 +174,7 @@ const Blog = () => {
                             disabled={currentPage === totalPages}
                             className={`px-4 py-2 rounded-lg ${currentPage === totalPages
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-blue-500 text-white"
+                                : "bg-blue-500 dark:text-white"
                                 }`}
                         >
                             Next

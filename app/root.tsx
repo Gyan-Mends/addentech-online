@@ -1,5 +1,10 @@
 import { NextUIProvider } from "@nextui-org/react";
 import type { LinksFunction } from "@remix-run/node";
+import "aos/dist/aos.css";
+import AOS from "aos";
+import { ThemeProvider } from "next-themes";
+
+
 import {
   Links,
   LiveReload,
@@ -9,6 +14,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
+import { useEffect } from "react";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
@@ -16,6 +22,11 @@ export const links: LinksFunction = () => [
 
 
 export default function App() {
+  useEffect(() => {
+    AOS.init({
+      duration: 1000, // Customize as needed
+    });
+  }, []);
   return (
     <html lang="en">
       <head>
@@ -25,12 +36,14 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NextUIProvider>
-          <Outlet />
+        <ThemeProvider defaultTheme="dark" attribute="class">
+          <NextUIProvider>
+            <Outlet />
+          </NextUIProvider>
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
-        </NextUIProvider>
       </body>
     </html>
   );

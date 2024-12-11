@@ -1,6 +1,6 @@
 import { Button, Input, Textarea } from "@nextui-org/react";
 import { Form } from "@remix-run/react";
-import LocationIcon from "~/components/Icons/icons/locationIcon";
+// import LocationIcon from "~/components/Icons/icons/locationIcon";
 import PublicLayout from "~/components/PublicLayout";
 import service from "~/components/images/670c834d0c2d2d95eac92c3c_Contact Image.webp"
 
@@ -9,41 +9,41 @@ const Contact = () => {
         <PublicLayout>
             <div className="mt-6 lg:mt-20 lg:grid lg:grid-cols-2 gap-10">
                 <div className="flex flex-col gap-6 px-4">
-                    <p className="text-white font-nunito font-bold text-5xl">
+                    <p className="dark:text-white font-nunito font-bold text-5xl">
                         Ready to Take Your Business To That GIGANTIC New Level?
                     </p>
-                    <p className="font-nounito text-white">
+                    <p className="font-nounito dark:text-white">
                         Elevate your business to extraordinary heights with innovative solutions tailored for growth and success
                     </p>
                     <div className="flex gap-4">
                         <div className="flex items-center justify-center  gap-4">
-                            <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" />
+                            {/* <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
                         </div>
                         <div>
-                            <p className="text-primary-100 font-nunito">24/7 Customer Support</p>
+                            <p className="dark:text-primary-100 font-nunito">24/7 Customer Support</p>
                         </div>
                     </div>
                     <div className="flex gap-4">
                         <div className="flex items-center justify-center  gap-4">
-                            <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" />
+                            {/* <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
                         </div>
                         <div>
-                            <p className="text-primary-100 font-nunito">24/7 Customer Support</p>
+                            <p className="dack:text-primary-100 font-nunito">24/7 Customer Support</p>
                         </div>
                     </div>
                     <div className="flex gap-4">
                         <div className="flex items-center justify-center  gap-4">
-                            <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" />
+                            {/* <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
                         </div>
                         <div>
-                            <p className="text-primary-100 font-nunito">24/7 Customer Support</p>
+                            <p className="dark:text-primary-100 font-nunito">24/7 Customer Support</p>
                         </div>
                     </div>
                     <div>
                         <img className="rounded-xl" src={service} alt="" />
                     </div>
                 </div>
-                <div className="flex bg-[rgb(14,17,22)] shadow-lg mt-20 lg:mt-0 h-full rounded-2xl border border-white/30 px-8 py-8">
+                <div className="flex dark:bg-[rgb(14,17,22)] border border-black/10 shadow-lg mt-20 lg:mt-0 h-full rounded-2xl border border-white/30 px-8 py-8">
                     <Form className="w-full flex flex-col gap-8">
                         <div className="flex gap-4">
                             <Input
@@ -51,8 +51,8 @@ const Contact = () => {
                                 placeholder=" Mends"
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
-                                    label: "!text-white font-nunito text-md",
+                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
                             <Input
@@ -60,8 +60,8 @@ const Contact = () => {
                                 placeholder="Gyan "
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
-                                    label: "!text-white font-nunito text-md",
+                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
                         </div>
@@ -71,8 +71,8 @@ const Contact = () => {
                             placeholder="addentech@example.com "
                             labelPlacement="outside"
                             classNames={{
-                                inputWrapper: "flex-grow w-full border border-white/5 bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
-                                label: "!text-white font-nunito text-md",
+                                inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                label: "!dark:text-white font-nunito text-md",
                             }}
                         />
 
@@ -82,8 +82,8 @@ const Contact = () => {
                                 placeholder=" 0593125184"
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
-                                    label: "!text-white font-nunito text-md",
+                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
                             <Input
@@ -91,8 +91,8 @@ const Contact = () => {
                                 placeholder="Addentech "
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
-                                    label: "!text-white font-nunito text-md",
+                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
                         </div>
@@ -103,8 +103,8 @@ const Contact = () => {
                             placeholder=" Let's get in touch "
                             maxRows={8}
                             classNames={{
-                                inputWrapper: "resize-y flex-grow w-full border !h-48 border-white/5 bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13]",
-                                label: "!text-white font-nunito text-md",
+                                inputWrapper: "resize-y flex-grow w-full border !h-48 border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13]",
+                                label: "!dark:text-white font-nunito text-md",
 
                             }}
                         />
@@ -112,7 +112,7 @@ const Contact = () => {
 
 
                         <Button
-                            className="h-10 text-lg font-montserrat bg-[#05ECF2]  hover:bg-[#F2059F] hover:transition hover:duration-500 hover:text-white"
+                            className="h-10 text-lg font-montserrat bg-[#05ECF2]  hover:bg-[#F2059F] hover:transition hover:duration-500 hover:dark:text-white"
                         >
                             Submit
                         </Button>
@@ -121,8 +121,8 @@ const Contact = () => {
             </div>
             <div className="mt-20 flex flex-col gap-10">
                 <div>
-                    <p className="text-white text-center font-montserrat text-4xl font-bold">Visit Our Office And Start</p>
-                    <p className="text-white text-center font-montserrat text-4xl font-bold">Your Journey </p>
+                    <p className="dark:text-white text-center font-montserrat text-4xl font-bold">Visit Our Office And Start</p>
+                    <p className="dark:text-white text-center font-montserrat text-4xl font-bold">Your Journey </p>
                 </div>
 
                 <div className="w-full h-[80vh]  rounded-2xl ">
