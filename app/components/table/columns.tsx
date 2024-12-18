@@ -4,6 +4,13 @@ export const CategoryColumns = [
     { title: "action", label: "Action" },
 ];
 
+export const BlogColumns = [
+    { title: "Name", allowSort: true },
+    { title: "Category", allowSort: true },
+    { title: "Description", allowSort: true },
+    { title: "Action", allowSort: true }
+]
+
 export const ProductColumns = [
     { title: "Name", allowSort: true },
     { title: "Category", allowSort: true },

@@ -106,6 +106,33 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                             </li>
                         </Link>
                     </ul>
+                    <ul className=" pl-2 flex flex-col gap-2">
+                        <Link className="" to="/admin/category">
+                            <li className="text-md hover:bg-success  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                <UsersGroup className="text-success h-5 w-5 hover:text-white" />
+                                Blog Category
+                            </li>
+                        </Link>
+                    </ul>
+                    <ul className=" pl-2 flex flex-col gap-2">
+                        <Link className="" to="/admin/blog">
+                            <li className="text-md hover:bg-success  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                <UsersGroup className="text-success h-5 w-5 hover:text-white" />
+                                Blog
+                            </li>
+                        </Link>
+                    </ul>
+
+                    <ul className=" pl-2 flex flex-col gap-2">
+                        <Link className="" to="/admin/users">
+                            <li className="text-md hover:bg-success  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                <UsersGroup className="text-success h-5 w-5 hover:text-white" />
+                                Comments
+                            </li>
+                        </Link>
+                    </ul>
+
+
 
                 </div>
             </div>
@@ -148,18 +175,7 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                             Tickets
                         </li>
                     </Link>
-                    <Link className="" to="/user/ticket">
-                        <li className="hover:bg-primary-400 text-md hover:bg-white hover:text-primary font-nunito p-2 rounded-lg flex items-center gap-2">
-                            <DashboardIcon className="h-4 w-4" />
-                            Blog
-                        </li>
-                    </Link>
-                    <Link className="" to="/user/ticket">
-                        <li className="hover:bg-primary-400 text-md hover:bg-white hover:text-primary font-nunito p-2 rounded-lg flex items-center gap-2">
-                            <DashboardIcon className="h-4 w-4" />
-                            Comments
-                        </li>
-                    </Link>
+
 
                 </ul>
             </div>

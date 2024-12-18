@@ -1,7 +1,6 @@
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { useState, useEffect } from "react";
-// import EmailIcon from "~/components/Icons/icons/emailIcon";
-// import StarIcon from "~/components/Icons/icons/starIcon";
+
 import PublicLayout from "~/components/PublicLayout";
 import jl from "~/components/images/JL.png"
 import testimonial from "~/components/images/670c83518128ff5c009e4a93_Testimonail Image 3-p-500.webp"
@@ -12,13 +11,30 @@ import img5 from "~/components/images/about-five2.jpg"
 import img6 from "~/components/images/about-five1.jpg"
 import lineImage from "~/components/images/work-process-line.png"
 import { Button, User } from "@nextui-org/react";
-// import NetworkIcon from "~/components/Icons/icons/network";
-// import CodingIcon from "~/components/Icons/icons/coding";
 // import Support from "~/components/Icons/icons/Support";
-// import logo from "~/components/images/logo.png"
+import logo from "~/components/images/logo.png"
+import EmailIcon from "~/components/icons/EmailIcon";
+import StarIcon from "~/components/icons/StarIcon";
+import NetworkIcon from "~/components/icons/NetworkIcon";
+import { json, LoaderFunction } from "@remix-run/node";
+import { getSession } from "~/session";
+import usersController from "~/controller/Users";
+import { BlogInterface, RegistrationInterface } from "~/interface/interface";
+import Users from "./admin.users";
+import blog from "~/controller/blog";
 // import AWS from "~/components/Icons/icons/AWS";
 
 const Index = () => {
+
+  const {
+    // user,
+    users,
+    blogs
+  } = useLoaderData<{
+    // user: { _id: string },
+    users: RegistrationInterface[],
+    blogs: BlogInterface[]
+  }>()
   const testimonials = [
     {
       id: 1,
@@ -48,41 +64,41 @@ const Index = () => {
 
 
 
-  const blogs = [
-    {
-      id: 1,
-      date: "January 3, 2023",
-      comments: 0,
-      title: "Rethinking Server-Timing As A Critical Monitoring Tool",
-      author: "Addentech",
-      description:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vel quas vitae ab exercitationem dolor saepe! Esse ea, debitis...",
-      img: img5, // Replace with your actual image path
-      link: "/about",
-    },
-    {
-      id: 2,
-      date: "January 4, 2023",
-      comments: 2,
-      title: "Understanding the New Trends in Web Development",
-      author: "DevTech",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit, consequatur eveniet dolorum nemo quaerat laboriosam assumenda.",
-      img: img6,
-      link: "/blog/understanding-web-trends",
-    },
-    {
-      id: 3,
-      date: "January 5, 2023",
-      comments: 5,
-      title: "Boosting Your App's Performance with React",
-      author: "TechPro",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eu risus vitae odio interdum fermentum.",
-      img: img5,
-      link: "/blog/react-performance",
-    },
-  ];
+  // const blogs = [
+  //   {
+  //     id: 1,
+  //     date: "January 3, 2023",
+  //     comments: 0,
+  //     title: "Rethinking Server-Timing As A Critical Monitoring Tool",
+  //     author: "Addentech",
+  //     description:
+  //       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vel quas vitae ab exercitationem dolor saepe! Esse ea, debitis...",
+  //     img: img5, // Replace with your actual image path
+  //     link: "/about",
+  //   },
+  //   {
+  //     id: 2,
+  //     date: "January 4, 2023",
+  //     comments: 2,
+  //     title: "Understanding the New Trends in Web Development",
+  //     author: "DevTech",
+  //     description:
+  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit, consequatur eveniet dolorum nemo quaerat laboriosam assumenda.",
+  //     img: img6,
+  //     link: "/blog/understanding-web-trends",
+  //   },
+  //   {
+  //     id: 3,
+  //     date: "January 5, 2023",
+  //     comments: 5,
+  //     title: "Boosting Your App's Performance with React",
+  //     author: "TechPro",
+  //     description:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eu risus vitae odio interdum fermentum.",
+  //     img: img5,
+  //     link: "/blog/react-performance",
+  //   },
+  // ];
 
   const team = [
     {
@@ -121,6 +137,7 @@ const Index = () => {
     <PublicLayout>
       {/* Background Slideshow */}
       <div
+        data-aos="fade-up"
         className=" mt-10 lg:h-[90vh] rounded-2xl w-full bg-cover bg-center transition-all duration-1000"
         style={{
           backgroundImage: `url(${backgroundImages[currentBackground]})`,
@@ -152,14 +169,16 @@ const Index = () => {
       </div>
 
       <div className="mt-40">
-        <p className="font-nunito dark:text-white text-2xl font-bold text-[#F2059F]">Explore More Of Our Products</p>
-        <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Top-Notch Software Development and</p>
-        <p className="font-nunito dark:text-white text-4xl font-bold">
-          Digital Transformation
-        </p>
+        <div data-aos="fade-right" >
+          <p className="font-nunito dark:text-white text-2xl font-bold text-[#F2059F]">Explore more of our products</p>
+          <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Top-Notch Software Development and</p>
+          <p className="font-nunito dark:text-white text-4xl font-bold">
+            Digital Transformation
+          </p>
+        </div>
         <div className="lg:grid lg:grid-cols-3 gap-8 mt-10">
           <Link to="https://www.justicelocator.com/" >
-            <div className=" w-full  h-[80vh] border dark:border-white/10 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105">
+            <div data-aos="fade-right" className=" w-full  h-[80vh] border dark:border-white/10 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105">
               <div className="mt-10 px-4">
                 <img src={jl} alt="" />
                 <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Justice Locator</p>
@@ -170,20 +189,20 @@ const Index = () => {
 
           <div className="flex flex-col gap-10 mt-10 lg:mt-0 pb-10 lg:pb-0">
             <Link className="lg:h-full h-80" to="https://dennislawgh.com">
-              <div className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
+              <div data-aos="fade-down" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
                 <img src={dl} alt="" />
               </div>
             </Link>
 
             <Link to="https://dennislawgh.com">
-              <div className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
+              <div data-aos="fade-up" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
                 <img src={mr} alt="" />
               </div>
             </Link>
           </div>
 
           <Link to="https://dennislawnews.com/" >
-            <div className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-[80vh] border dark:border-white/10 border-black/20 shadow-md rounded-2xl">
+            <div data-aos="fade-left" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-[80vh] border dark:border-white/10 border-black/20 shadow-md rounded-2xl">
               <img src={news} alt="" className="rounded-tr-2xl rounded-tl-2xl h-60" />
               <div className="mt-10 px-4">
                 <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Denis Law News</p>
@@ -197,10 +216,10 @@ const Index = () => {
 
       <div className="lg:grid lg:grid-cols-2 lg:mt-40 mt-10 h-full lg:flex  gap-20">
         <div className="">
-          <img className="rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
-          <img className="lg:ml-60 lg:-mt-60 mt-10 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img5} alt="" />
+          <img data-aos="fade-right" className="rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
+          <img data-aos="fade-left" className="lg:ml-60 lg:-mt-60 mt-10 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img5} alt="" />
         </div>
-        <div className="flex flex-col gap-10 mt-10 lg:mt-0 pl-20 pt-10">
+        <div data-aos="zoom-in" className="flex flex-col gap-10 mt-10 lg:mt-0 pl-20 pt-10">
           <p className="font-montserrat text-2xl font-bold dark:text-white"> About Us</p>
           <p className="font-montserrat lg:text-5xl text-3xl font-bold dark:text-white"> Customer-Centric Legal Tech Solutions</p>
           <p className="font-nunito text-md font-bold dark:text-white "> At Addentech, our customer-centric approach sets us apart. We deliver innovative legal technology solutions that make legal services affordable and accessible. Our commitment to excellence ensures we create a supportive and innovative environment for our clients.</p>
@@ -215,16 +234,18 @@ const Index = () => {
       </div>
 
       <div className="lg:mt-40 mt-20">
+        <div data-aos="fade-right">
         <p className="font-nunito dark:text-white text-xl font-bold text-[#F2059F]">Here is How We Can Help Your Business</p>
         <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Comprehensive Services Tailored </p>
         <p className="font-nunito dark:text-white text-4xl font-bold">
           to Your Needs
         </p>
-        <div className="lg:grid lg:grid-cols-3 gap-8 mt-20">
+        </div>
+        <div data-aos="fade-down" className="lg:grid lg:grid-cols-3 gap-8 mt-20">
           <div className=" w-full h-full  border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
             <div className="w-full flex  items-center justify-center">
               <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-sm border dark:border-white/5 border-black/10">
-                {/* <NetworkIcon className="text-[#05ECF2] h-8 w-8 " /> */}
+                <NetworkIcon className="text-[#05ECF2] h-8 w-8 " />
               </div>
             </div>
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
@@ -261,12 +282,12 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="lg:grid lg:grid-cols-2 gap-16 mt-16">
+        <div data-aos="fade-up" className="lg:grid lg:grid-cols-2 gap-16 mt-16">
 
           <div className=" w-full h-[25vh] border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
             <div className="w-full flex  items-center justify-center">
               <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                {/* <img src={logo} className=" bg-[#05ECF2] h-8 w-8 " alt="" /> */}
+                <img src={logo} className=" bg-[#05ECF2] h-8 w-8 " alt="" />
               </div>
             </div>
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
@@ -295,35 +316,42 @@ const Index = () => {
       </div>
 
       <div className="mt-40">
-        <p className="font-nunito dark:text-white text-4xl font-bold mt-8">
+        <p data-aos="fade-right" className="font-nunito dark:text-white text-4xl font-bold mt-8">
           Latest Blog, News & Articles
         </p>
 
         <div className="lg:grid lg:grid-cols-3 gap-4 mt-20">
-          {blogs.map((blog) => (
+          {blogs.slice(0, 3).map((blog: BlogInterface, index: number) => (
             <div
+              data-aos="zoom-in"
               key={blog.id}
               className="h-[95vh] mt-16 lg:mt-0 shadow-md rounded-2xl border dark:border-white/5 border-black/10 dark:bg-[rgb(14,17,22)]"
             >
               <img
-                src={blog.img}
+                src={blog.image}
                 className="w-full rounded-tr-2xl rounded-tl-2xl h-[45vh]"
-                alt={blog.title}
+                alt={blog.name}
               />
               <div className="flex justify-between mt-6 px-6">
-                <p className="text-gray-400">{blog.date}</p>
-                <p className="text-gray-400">Comments ({blog.comments})</p>
+                <p className="text-gray-400">
+                  {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>                <p className="text-gray-400">Comments ({blog.comments})</p>
               </div>
               <div className="px-6 mt-6">
                 <p className="font-nunito dark:text-white text-2xl font-bold">
-                  {blog.title}
+                  {blog.name}
                 </p>
               </div>
-              <div className="px-6 mt-6 flex items-center">
+              <div className="px-6 mt-6 flex items-center flex justify-between">
                 {/* <User /> */}
+                Posted By
+                <p></p>
                 <p className="font-nunito text-gray-400">
-                  Posted By{" "}
-                  <span className="text-[#05ECF2]">{blog.author}</span>
+                  <span className="text-[#05ECF2]">{blog.admin?.firstName}</span>
                 </p>
               </div>
               <div className="px-6 mt-6 flex items-center">
@@ -346,14 +374,16 @@ const Index = () => {
       </div>
 
       <div className="mt-40">
+        <div data-aos="fade-right">
         <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Our Methodology Guarantees
         </p>
         <p className="font-nunito dark:text-white text-4xl font-bold">
           Your Success
         </p>
         <img src={lineImage} className=" mt-5" alt="" />
+        </div>
         <div className="lg:grid lg:grid-cols-5 gap-4 mt-20">
-          <div className=" w-full h-full border pb-6 dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div data-aos="fade-right" className=" w-full h-full border pb-6 dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
               Discover
             </p>
@@ -361,7 +391,7 @@ const Index = () => {
               We begin by understanding your needs, goals, and target audience through market research and competitor analysis. This helps us gather precise requirements to define the project scope effectively.          </p>
           </div>
 
-          <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div data-aos="fade-right" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
               Planning
@@ -370,7 +400,7 @@ const Index = () => {
               A detailed project plan is crafted, outlining tasks, timelines, resources, and milestones to ensure a clear roadmap for successful project execution.</p>
           </div>
 
-          <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div data-aos="fade-down" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
               Design & Development            </p>
@@ -378,7 +408,7 @@ const Index = () => {
               Our designers create visual elements while developers build the functionality. This stage brings your vision to life with innovative and user-friendly solutions</p>
           </div>
 
-          <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div data-aos="fade-left" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
               Testing
@@ -387,7 +417,7 @@ const Index = () => {
               Once the development phase is complete, rigorous testing is conducted to ensure the product or service functions as intended and meets quality standards.</p>
           </div>
 
-          <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+          <div data-aos="fade-left" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
             <p className="dark:text-white font-nunito font-bold text-xl mt-4">
               Project Delivery
@@ -402,13 +432,13 @@ const Index = () => {
 
       {/* Team Section */}
       <div className="lg:flex justify-between lg:mt-40 mt-20">
-        <div className="">
+        <div data-aos="fade-right" className="">
           <p className="font-montserrat text-4xl font-bold dark:text-white">Meet Our Dedicated Experts Behind
           </p>
           <p className="font-montserrat text-4xl font-bold dark:text-white"> Addentech  Success
           </p>
         </div>
-        <div className="">
+        <div data-aos="fade-left" className="">
           <Link to="/about">
             <Button
               color="default"
@@ -419,16 +449,16 @@ const Index = () => {
         </div>
       </div> 
       <div className="lg:grid lg:grid-cols-3 gap-10 lg:mt-40 ">
-        {team.map((member, index) => (
-          <div key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-0">
+        {users.slice(0, 3).map((member, index) => (
+          <div data-aos="zoom-in" key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-0">
             <div className="w-full flex items-center justify-between px-10  h-28  rounded-tr-2xl rounded-tl-2xl">
               <div>
-                <p className="font-nunito text-lg dark:text-white">{member.name}</p>
+                <p className="font-nunito text-lg dark:text-white">{member?.firstName + " " + member?.middleName + " " + member?.lastName}</p>
                 <p className="font-nunito text-md dark:text-white">{member.position}</p>
               </div>
               <div>
                 <Link to="">
-                  {/* <EmailIcon className="h-6 w-6 text-[#05ECF2]" /> */}
+                  <EmailIcon className="h-6 w-6 text-[#05ECF2]" />
                 </Link>
               </div>
             </div>
@@ -445,8 +475,10 @@ const Index = () => {
 
       {/* Testimonials Section */}
       <div className="mt-60 overflow-hidden relative">
+        <div data-aos="fade-right">
         <p className="dark:text-white font-montserrat text-4xl font-bold">Client experiences that</p>
         <p className="dark:text-white font-montserrat text-4xl font-bold">inspire confidence</p>
+        </div>
 
         <div className="mt-20 flex items-center relative  rounded-xl">
           <div
@@ -456,12 +488,12 @@ const Index = () => {
             }}
           >
             {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="min-w-full flex flex-col lg:flex-row gap-10">
+              <div data-aos="fade-left" key={testimonial.id} className="min-w-full flex flex-col lg:flex-row gap-10">
                 <div className="pr-10 lg:w-2/3">
                   <div className="flex gap-2">
-                    {/* {Array.from({ length: testimonial.stars }).map((_, i) => (
-                      // <StarIcon key={i} className="h-6 w-6 text-[#05ECF2]" />
-                    ))} */}
+                    {Array.from({ length: testimonial.stars }).map((_, i) => (
+                      <StarIcon key={i} className="h-6 w-6 text-[#05ECF2]" />
+                    ))}
                   </div>
 
                   <p className="text-nunito text-2xl dark:text-white mt-10">{testimonial.text}</p>
@@ -502,3 +534,30 @@ const Index = () => {
 };
 
 export default Index;
+
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") as string) || 1;
+  const search_term = url.searchParams.get("search_term") as string;
+
+  const session = await getSession(request.headers.get("Cookie"));
+  const token = session.get("email");
+  // if (!token) {
+  //     return redirect("/")
+  // }
+  const { user, users, totalPages } = await usersController.FetchUsers({
+    request,
+    page,
+    search_term
+  });
+  const { blogs } = await blog.getBlogs({
+    request,
+    page,
+    search_term
+  });
+
+  return json({ user, users, totalPages, blogs });
+}
+
+

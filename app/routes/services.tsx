@@ -6,6 +6,7 @@ import { image } from "@nextui-org/react";
 import PublicLayout from "~/components/PublicLayout";
 import lineImage from "~/components/images/work-process-line.png"
 import logo from "~/components/images/logo.png"
+import NetworkIcon from "~/components/icons/NetworkIcon";
 
 
 
@@ -15,16 +16,18 @@ const Services = () => {
     return (
         <PublicLayout>
             <div className="lg:mt-40 mt-20">
-                <p className="font-nunito dark:text-white text-xl font-bold text-[#F2059F]">Here is How We Can Help Your Business</p>
-                <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Comprehensive Services Tailored </p>
-                <p className="font-nunito dark:text-white text-4xl font-bold">
-                    to Your Needs
-                </p>
-                <div className="lg:grid lg:grid-cols-3 gap-8 mt-20">
+                <div data-aos="fade-right">
+                    <p className="font-nunito dark:text-white text-xl font-bold text-[#F2059F]">Here is How We Can Help Your Business</p>
+                    <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Comprehensive Services Tailored </p>
+                    <p className="font-nunito dark:text-white text-4xl font-bold">
+                        to Your Needs
+                    </p>
+                </div>
+                <div data-aos="fade-down" className="lg:grid lg:grid-cols-3 gap-8 mt-20">
                     <div className=" w-full h-full  border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
                         <div className="w-full flex  items-center justify-center">
                             <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-sm border dark:border-white/5 border-black/10">
-                                {/* <NetworkIcon className="text-[#05ECF2] h-8 w-8 " /> */}
+                                <NetworkIcon className="text-[#05ECF2] h-8 w-8 " />
                             </div>
                         </div>
                         <p className="dark:text-white font-nunito font-bold text-xl mt-4">
@@ -61,7 +64,7 @@ const Services = () => {
                     </div>
                 </div>
 
-                <div className="lg:grid lg:grid-cols-2 gap-16 mt-16">
+                <div data-aos="fade-up" className="lg:grid lg:grid-cols-2 gap-16 mt-16">
 
                     <div className=" w-full h-[25vh] border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
                         <div className="w-full flex  items-center justify-center">
@@ -96,14 +99,16 @@ const Services = () => {
 
 
             <div className="mt-40">
-                <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Our Methodology Guarantees
-                </p>
-                <p className="font-nunito dark:text-white text-4xl font-bold">
-                    Your Success
-                </p>
-                <img src={lineImage} className=" mt-5" alt="" />
+                <div data-aos="fade-right">
+                    <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Our Methodology Guarantees
+                    </p>
+                    <p className="font-nunito dark:text-white text-4xl font-bold">
+                        Your Success
+                    </p>
+                    <img src={lineImage} className=" mt-5" alt="" />
+                </div>
                 <div className="lg:grid lg:grid-cols-5 gap-4 mt-20">
-                    <div className=" w-full h-full border pb-6 dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+                    <div data-aos="fade-right" className=" w-full h-full border pb-6 dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
                         <p className="dark:text-white font-nunito font-bold text-xl mt-4">
                             Discover
                         </p>
@@ -111,7 +116,7 @@ const Services = () => {
                             We begin by understanding your needs, goals, and target audience through market research and competitor analysis. This helps us gather precise requirements to define the project scope effectively.          </p>
                     </div>
 
-                    <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+                    <div data-aos="fade-right" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
                         <p className="dark:text-white font-nunito font-bold text-xl mt-4">
                             Planning
@@ -120,7 +125,7 @@ const Services = () => {
                             A detailed project plan is crafted, outlining tasks, timelines, resources, and milestones to ensure a clear roadmap for successful project execution.</p>
                     </div>
 
-                    <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+                    <div data-aos="fade-down" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
                         <p className="dark:text-white font-nunito font-bold text-xl mt-4">
                             Design & Development            </p>
@@ -128,7 +133,7 @@ const Services = () => {
                             Our designers create visual elements while developers build the functionality. This stage brings your vision to life with innovative and user-friendly solutions</p>
                     </div>
 
-                    <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+                    <div data-aos="fade-left" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
                         <p className="dark:text-white font-nunito font-bold text-xl mt-4">
                             Testing
@@ -137,7 +142,7 @@ const Services = () => {
                             Once the development phase is complete, rigorous testing is conducted to ensure the product or service functions as intended and meets quality standards.</p>
                     </div>
 
-                    <div className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
+                    <div data-aos="fade-left" className=" w-full h-full border dark:border-white/30 border-black/10 mt-8 lg:mt-0 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
 
                         <p className="dark:text-white font-nunito font-bold text-xl mt-4">
                             Project Delivery

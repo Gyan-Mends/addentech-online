@@ -13,13 +13,25 @@ import mr from "~/components/images/mr-logo.png"
 import news from "~/components/images/DL-News-Logo.png"
 
 
-import { Link } from "@remix-run/react";
+import { json, Link, useLoaderData } from "@remix-run/react";
 import { Button } from "@nextui-org/react";
 // import EmailIcon from "~/components/Icons/icons/emailIcon";
 // import StarIcon from "~/components/Icons/icons/starIcon";
 import { useState } from "react";
+import EmailIcon from "~/components/icons/EmailIcon";
+import usersController from "~/controller/Users";
+import { getSession } from "~/session";
+import { LoaderFunction } from "@remix-run/node";
+import { RegistrationInterface } from "~/interface/interface";
 
 const About = () => {
+    const {
+        // user,
+        users,
+    } = useLoaderData<{
+        // user: { _id: string },
+        users: RegistrationInterface[],
+    }>()
     const testimonials = [
         {
             id: 1,
@@ -87,6 +99,7 @@ const About = () => {
     };
     return (
         <PublicLayout>
+            <div data-aos="fade-down">
             <div className="flex flex-col gap-4 mt-10 transition duration-500">
                 <p className="font-montserrat font-bold text-4xl text-center dark:text-white">
                     Transforming The Legal Landscape
@@ -106,18 +119,19 @@ const About = () => {
                     products at fair and competitive prices.
                 </p>
             </div>
-            <div className="mt-10 lg:grid lg:grid-cols-4 ">
+            </div>
+            <div data-aos="fade-up" className="mt-10 lg:grid lg:grid-cols-4 ">
                 <img src={img1} className="rounded-xl transition-transform duration-500 ease-in-out hover:scale-105  w-full" alt="" />
                 <img className="col-span-2 lg:mt-14 rounded-xl transition-transform duration-500 ease-in-out hover:scale-105 lg:mt-0 mt-8" src={img2} alt="" />
                 <img src={img3} className="lg:mt-0 mt-8 rounded-xl transition-transform duration-500 ease-in-out hover:scale-105 w-full" alt="" />
             </div>
 
             <div className="lg:grid lg:grid-cols-2 mt-20 h-[60vh] lg:flex items-center gap-20">
-                <div className="flex flex-col gap-4">
+                <div data-aos="fade-right" className="flex flex-col gap-4">
                     <p className="font-montserrat text-4xl font-bold dark:text-white">Learn More About Our Company Statistics</p>
                     <p className="dark:text-white">Discover key insights and data about our company, showcasing our growth, performance, and achievements.</p>
                 </div>
-                <div className="grid grid-cols-2 gap-10 mt-10 lg:mt-0">
+                <div data-aos="fade-left" className="grid grid-cols-2 gap-10 mt-10 lg:mt-0">
                     <div className=" flex flex-col gap-10">
                         <div className="w-full h-40 rounded-xl border border-black/10 dark:border-white/30  flex flex-col px-10 justify-center">
                             <p className="font-nunito text-4xl dark:text-white font-bold">21+</p>
@@ -138,17 +152,17 @@ const About = () => {
             </div>
 
             <div className="lg:grid lg:grid-cols-2 lg:flex items-center mt-40">
-                <div className="flex flex-col gap-4">
+                <div data-aos="fade-right" className="flex flex-col gap-4">
                     <p className="font-nunito text-4xl dark:text-white font-bold">Our Vission</p>
                     <p className="font-nunito text-lg dark:text-white ">To transform the legal landscape with technology</p>
                     <p className="font-nunito text-lg dark:text-white ">Revolutionizing the legal industry through innovative technology, making processes smarter, faster, and more accessible.</p>
                 </div>
-                <div className="">
+                <div data-aos="fade-left" className="">
                     <img className="transition-transform duration-500 ease-in-out hover:scale-105" src={img4} alt="" />
                 </div>
             </div>
 
-            <div className="lg:px-60 lg:py-20 mt-10 lg:mt-10">
+            <div data-aos="zoom-in" className="lg:px-60 lg:py-20 mt-10 lg:mt-10">
                 <div className="h-80 border border-black/10 dark:border-white/30 rounded-2xl py-10" >
                     <p className="font-nunito text-4xl dark:text-white font-bold text-center">Our Mission</p>
                     <p className="font-nunito text-md text-center dark:text-white mt-10">
@@ -183,10 +197,10 @@ const About = () => {
 
             <div className="lg:grid lg:grid-cols-2 mt-20 h-full lg:flex items-center gap-20">
                 <div className="">
-                    <img className="rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
-                    <img className="lg:ml-60 lg:-mt-60 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 mt-8" src={img5} alt="" />
+                    <img data-aos="fade-right" className="rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
+                    <img data-aos="fade-up" className="lg:ml-60 lg:-mt-60 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 mt-8" src={img5} alt="" />
                 </div>
-                <div className="flex flex-col gap-4 mt-10">
+                <div data-aos="fade-left" className="flex flex-col gap-4 mt-10">
                     <p className="font-montserrat text-4xl font-bold dark:text-white">Know More About Us</p>
                     <p className="dark:text-white">Adden Technology Company Limited (Addentech) is a leading, highly innovative software house, and technology provider, established to provide legal technology solutions to law firms, legal departments of institutions and government. We started as DennisLaw but to go beyond our mandate, we changed the name to Addens Technology Limited, embracing a wider range of legal technology products and projects. Addentech, being customer oriented, offers differentiated legal technology solutions. The legal technologies we provide makes legal services more affordable and easily accessible. We help our customers by developing innovative solutions and a relaxed working environment.</p>
                 </div>
@@ -194,13 +208,13 @@ const About = () => {
 
             {/* Team Section */}
             <div className="lg:flex justify-between lg:mt-40 mt-20">
-                <div className="">
+                <div className="" data-aos="fade-down">
                     <p className="font-montserrat text-4xl font-bold dark:text-white">Meet Our Dedicated Experts Behind
                     </p>
                     <p className="font-montserrat text-4xl font-bold dark:text-white"> Addentech  Success
                     </p>
                 </div>
-                <div className="">
+                <div className="" data-aos="fade-down">
                     <Link to="/about">
                         <Button
                             color="default"
@@ -211,11 +225,11 @@ const About = () => {
                 </div>
             </div> 
             <div className="lg:grid lg:grid-cols-3 gap-10 lg:mt-40 ">
-                {team.map((member, index) => (
-                    <div key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-0">
+                {users.slice(0, 3).map((member, index) => (
+                    <div data-aos="zoom-in" key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-0">
                         <div className="w-full flex items-center justify-between px-10  h-28  rounded-tr-2xl rounded-tl-2xl">
                             <div>
-                                <p className="font-nunito text-lg dark:text-white">{member.name}</p>
+                                <p className="font-nunito text-lg dark:text-white">{member?.firstName + " " + member?.middleName + " " + member?.lastName}</p>
                                 <p className="font-nunito text-md dark:text-white">{member.position}</p>
                             </div>
                             <div>
@@ -234,16 +248,17 @@ const About = () => {
                     </div>
                 ))}
             </div>
-
-            <div className="mt-40">
-                <p className="font-nunito dark:text-white text-2xl font-bold text-[#F2059F]">Why Choose us</p>
+            <div className="mt-60">
+                <div data-aos="fade-right" >
+                    <p className="font-nunito dark:text-white text-2xl font-bold text-[#F2059F]">Why Choose us</p>
                 <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Top-Notch Software Development and</p>
                 <p className="font-nunito dark:text-white text-4xl font-bold">
                     Digital Transformation
                 </p>
+                </div>
                 <div className="lg:grid lg:grid-cols-3 gap-8 mt-10">
                     <Link to="https://www.justicelocator.com/" >
-                        <div className=" w-full  h-[80vh] border dark:border-white/10 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105">
+                        <div data-aos="fade-right" className=" w-full  h-[80vh] border dark:border-white/10 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105">
                             <div className="mt-10 px-4">
                                 <img src={jl} alt="" />
                                 <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Justice Locator</p>
@@ -254,20 +269,20 @@ const About = () => {
 
                     <div className="flex flex-col gap-10 mt-10 lg:mt-0 pb-10 lg:pb-0">
                         <Link className="lg:h-full h-80" to="https://dennislawgh.com">
-                            <div className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
+                            <div data-aos="fade-down" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
                                 <img src={dl} alt="" />
                             </div>
                         </Link>
 
                         <Link to="https://dennislawgh.com">
-                            <div className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
+                            <div data-aos="fade-up" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
                                 <img src={mr} alt="" />
                             </div>
                         </Link>
                     </div>
 
                     <Link to="https://dennislawnews.com/" >
-                        <div className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-[80vh] border dark:border-white/10 border-black/20 shadow-md rounded-2xl">
+                        <div data-aos="fade-left" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-[80vh] border dark:border-white/10 border-black/20 shadow-md rounded-2xl">
                             <img src={news} alt="" className="rounded-tr-2xl rounded-tl-2xl h-60" />
                             <div className="mt-10 px-4">
                                 <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Denis Law News</p>
@@ -280,8 +295,10 @@ const About = () => {
             </div>
 
             <div className="mt-40 overflow-hidden relative">
-                <p className="dark:text-white font-montserrat text-4xl font-bold">Client experiences that</p>
-                <p className="dark:text-white font-montserrat text-4xl font-bold">inspire confidence</p>
+                <div data-aos="fade-right">
+                    <p className="dark:text-white font-montserrat text-4xl font-bold">Client experiences that</p>
+                    <p className="dark:text-white font-montserrat text-4xl font-bold">inspire confidence</p>
+                </div>
 
                 <div className="mt-20 flex items-center relative">
                     <div
@@ -291,8 +308,8 @@ const About = () => {
                         }}
                     >
                         {testimonials.map((testimonial, index) => (
-                            <div key={testimonial.id} className="min-w-full flex flex-col lg:flex-row gap-10">
-                                <div className="pr-10 lg:w-2/3">
+                            <div key={testimonial.id} data-aos="fade-left" className="min-w-full flex flex-col lg:flex-row gap-10">
+                                <div className="pr-10 lg:w-2/3 " >
                                     <div className="flex gap-2">
                                         {/* {Array.from({ length: testimonial.stars }).map((_, i) => (
                                             <StarIco key={i} className="h-6 w-6 text-[#05ECF2]" />
@@ -321,8 +338,8 @@ const About = () => {
                                         </button>
                                     </div>
                                 </div>
-                                <div className="lg:w-1/3">
-                                    <img src={testimonial.image} alt="testimonial" className="rounded-lg w-full h-[50vh] transition-transform duration-500 ease-in-out hover:scale-105" />
+                                <div className="">
+                                    <img src={testimonial.image} alt="testimonial" className="rounded-lg w-[30vw] h-[60vh] transition-transform duration-500 ease-in-out hover:scale-105" />
                                 </div>
                             </div>
                         ))}
@@ -339,3 +356,23 @@ const About = () => {
 }
 
 export default About
+
+export const loader: LoaderFunction = async ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") as string) || 1;
+    const search_term = url.searchParams.get("search_term") as string;
+
+    const session = await getSession(request.headers.get("Cookie"));
+    const token = session.get("email");
+    // if (!token) {
+    //     return redirect("/")
+    // }
+    const { user, users, totalPages } = await usersController.FetchUsers({
+        request,
+        page,
+        search_term
+    });
+
+
+    return json({ user, users, totalPages });
+}

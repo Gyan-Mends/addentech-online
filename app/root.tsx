@@ -1,7 +1,7 @@
 import { NextUIProvider } from "@nextui-org/react";
 import type { LinksFunction } from "@remix-run/node";
 import "aos/dist/aos.css";
-import AOS from "aos";
+import aosStyles from 'aos/dist/aos.css';
 import { ThemeProvider } from "next-themes";
 
 
@@ -15,16 +15,24 @@ import {
 } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
 import { useEffect } from "react";
+import AOS from "aos";
+
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
+  { rel: "stylesheet", href: aosStyles },
+
 ];
+
+
 
 
 
 export default function App() {
   useEffect(() => {
     AOS.init({
-      duration: 1000, // Customize as needed
+      duration: 2000,
+      once: false,
+      offset: 120,    
     });
   }, []);
   return (

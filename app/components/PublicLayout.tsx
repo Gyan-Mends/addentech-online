@@ -2,16 +2,16 @@ import { Button, Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, 
 import { Link } from "@remix-run/react"
 import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
-// import SunIcon from "./Icons/icons/SunIcon";
-// import MoonIcon from "./Icons/icons/MoonIcon";
-// import logo from "~/components/images/addentech_logo.png"
-// import FacebookIcon from "./Icons/icons/facebookIcon";
-// import InstagramIcon from "./Icons/icons/InstagramIcon";
-// import InIcon from "./Icons/icons/inIcon";
-// import XIcon from "./Icons/icons/xIcon";
-// import YouTubeIcon from "./Icons/icons/YouTubeIcon";
-// import LocationIcon from "./Icons/icons/locationIcon";
-// import PhoneIcon from "./Icons/icons/YouTubeIcon copy";
+import logo from "~/components/images/addentech_logo.png"
+import SunIcon from "./icons/SunIcon";
+import MoonIcon from "./icons/MoonIcon";
+import LocationIcon from "./icons/LocationIcon";
+import FacebookIcon from "./icons/FacebookIcon";
+import InstagramIcon from "./icons/InstagramIcon";
+import InIcon from "./icons/InIcon";
+import XIcon from "./icons/XIcon";
+import YouTubeIcon from "./icons/YoutubeIcon";
+
 
 interface PublicLayoutProps {
     children: ReactNode;
@@ -42,7 +42,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
                 <NavbarContent justify="start" className="">
                     <NavbarItem  >
-                        {/* <img className=" w-full" src={logo || "~/components/images/addentech_logo.png"} alt="Addentech Logo" /> */}
+                        <img className=" w-full" src={logo || "~/components/images/addentech_logo.png"} alt="Addentech Logo" />
                         <p className="dark:text-[#0b0e13] text-white">Addentechnology</p>
                     </NavbarItem>
                 </NavbarContent>
@@ -69,13 +69,13 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
                 <NavbarContent justify="end" className="">
                     <NavbarItem  >
-                        {/* <button className="text-white" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+                        <button className="text-white" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
                             {theme === "light" ? (
                                 <SunIcon className="text-[#0b0e13]" />
                             ) : (
                                     <MoonIcon className="text-white" />
                             )}
-                        </button> */}
+                        </button>
                     </NavbarItem>
                 </NavbarContent>
 
@@ -130,7 +130,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         <p className="dark:text-white font-poppins text-lg">Locate Us</p>
                         <div className="flex gap-4 mt-4">
                             <div className="flex items-center justify-center  gap-4">
-                                {/* <LocationIcon className="dark:text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
+                                <LocationIcon className="dark:text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" />
                             </div>
                             <div>
                                 <p className="dark:text-primary-100 font-nunito">No. 15 Netflix Street, Madina</p>
@@ -192,11 +192,11 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         <p className="dark:text-white font-nunito font-bold text-lg">Powered by <span className="text-[#05ECF2]">Addentech Dev</span></p>
                     </div>
                     <div className="dark:bg-[rgb(14,17,22)] h-20 lg:h-full mt-4 lg:mt-0 md:mt-0 flex gap-2 items-center justify-center  rounded-2xl border dark:border-white/30 border-black/10">
-                        {/* <FacebookIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
+                        <FacebookIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
                         <InstagramIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
                         <InIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
                         <XIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
-                        <YouTubeIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" /> */}
+                        <YouTubeIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
                     </div>
                 </div>
             </footer>
