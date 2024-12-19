@@ -9,6 +9,7 @@ export interface RegistrationInterface {
     phone: string,
     role: string,
     admin: string,
+    position: string,
     image: string,
 }
 export interface ContactInterface {
@@ -26,6 +27,12 @@ export interface CategoryInterface {
     name: string
     description: string
     seller: string
+}
+export interface DepartmentInterface {
+    _id: string;
+    name: string
+    description: string
+    admin: string
 }
 export interface BlogInterface {
     _id: string

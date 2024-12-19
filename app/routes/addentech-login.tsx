@@ -17,6 +17,7 @@ import {
 } from "react";
 import { EyeSlashFilledIcon } from "~/components/icons/EyeFilled";
 import { EyeFilledIcon } from "~/components/icons/EyeSlash";
+import logo from "~/components/images/addentech_logo.png"
 
 import login from "~/controller/login";
 
@@ -42,7 +43,10 @@ const Login = () => {
     }
 
     return (
-        <div className={`flex justify-center items-center h-[100vh] bg-[#0b0e13] overflow-y-hidden bg-[#191919]`}>
+        <div className={`flex flex-col justify-center items-center h-[100vh] bg-[#0b0e13] overflow-y-hidden bg-[#191919]`}>
+            <div className="pt-10">
+                <img src={logo} className="h-40 w-80" alt="" />
+            </div>
             <div className="h-[100vh] w-full flex items-center justify-center ">
                 <div className="dark:bg-[#333] bg-[#333] shadow-sm p-6 rounded-2xl lg:w-[30vw] border dark:border-white/5 border-white/5 relative">
                     <p className="font-montserrat font-semibold text-3xl text-white">Login To</p>
@@ -105,7 +109,7 @@ const Login = () => {
 
                         <div className="flex justify-between mt-4 gap-4">
                             <Checkbox type="checkbox" name="rememberMe"><p className="font-nunito text-sm text-[#05ECF2]">Remember me</p></Checkbox>
-                            <input type="text" name="intent" value="create" id="" />
+                            <input type="text" name="intent" hidden value="create" id="" />
                             <Link to=""><p className="text-danger font-nunito text-sm">Forgot password?</p></Link>
                         </div>
                         <button className="font-nunito bg-[#F2059F] text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl">Login</button>

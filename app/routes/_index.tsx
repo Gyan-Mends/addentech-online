@@ -453,7 +453,7 @@ const Index = () => {
           <div data-aos="zoom-in" key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-0">
             <div className="w-full flex items-center justify-between px-10  h-28  rounded-tr-2xl rounded-tl-2xl">
               <div>
-                <p className="font-nunito text-lg dark:text-white">{member?.firstName + " " + member?.middleName + " " + member?.lastName}</p>
+                <p className="font-nunito text-lg dark:text-white font-bold">{member?.firstName + " " + member?.middleName + " " + member?.lastName}</p>
                 <p className="font-nunito text-md dark:text-white">{member.position}</p>
               </div>
               <div>

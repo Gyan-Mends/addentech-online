@@ -34,6 +34,10 @@ const RegistrationSchema = new mongoose.Schema({
     require: true,
     type: String,
   },
+  position: {
+    require: true,
+    type: String,
+  },
   image: {
     require: true,
     type: String,

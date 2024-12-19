@@ -15,8 +15,9 @@ import { UserColumns } from "~/components/table/columns"
 import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
 import CustomInput from "~/components/ui/CustomInput"
+import department from "~/controller/departments"
 import usersController from "~/controller/Users"
-import { RegistrationInterface } from "~/interface/interface"
+import { DepartmentInterface, RegistrationInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
 
@@ -35,11 +36,13 @@ const Users = () => {
     const {
         user,
         users,
-        totalPages
+        totalPages,
+        categories
     } = useLoaderData<{
         user: { _id: string },
         users: RegistrationInterface[],
-        totalPages: number
+        totalPages: number,
+        categories: DepartmentInterface[]
     }>()
 
     const handleCreateModalClosed = () => {
@@ -81,7 +84,7 @@ const Users = () => {
                     <Button size="sm" onClick={() => {
                         navigate(-1)
                     }} color="primary" className="font-nunito text-sm  border-b-white dark:border-primary  dark:text-white dark:bg-[#333]">
-                        <BackIcon className="h-[20px] w-[20px] dark:text-success" /><p >Back</p>
+                        <BackIcon className="h-[20px] w-[20px] dark:text-[#05ECF2]" /><p >Back</p>
                     </Button>
                 </div>
                 <div className="flex gap-4">
@@ -141,7 +144,7 @@ const Users = () => {
                         <TableCell>{user.phone}</TableCell>
                         <TableCell>{user.role}</TableCell>
                         <TableCell className="relative flex items-center gap-4">
-                            <Button size="sm" color="success" variant="flat" onClick={() => {
+                            <Button size="sm" className="bg-[#05ECF2] bg-opacity-40" variant="flat" onClick={() => {
                                 setIsEditModalOpened(true)
                                 setDataValue(user)
                             }}>
@@ -268,7 +271,7 @@ const Users = () => {
                             <Button className="font-montserrat font-semibold" color="danger" size="sm" variant="flat" onPress={onClose}>
                                 Close
                             </Button>
-                            <Button size="sm" type="submit" color="success" className="  bg-opacity-20 text-success text-sm font-montserrat font-semibold px-4" onClick={() => {
+                            <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
                                 setIsEditModalOpened(false)
                             }}>
                                 Update
@@ -369,6 +372,37 @@ const Users = () => {
                             </Select>
                         </div>
 
+                        <div className="flex gap-4">
+                            <Select
+                                label="Role"
+                                labelPlacement="outside"
+                                placeholder=" "
+                                isRequired
+                                name="role"
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
+                                }}
+                            >
+                                {Categories.map((department: DepartmentInterface, index: number) => (
+                                    <SelectItem key={index}>{department.name}</SelectItem>
+                                ))}
+                            </Select>
+
+                            <CustomInput
+                                label=" Position"
+                                isRequired
+                                name="position"
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+
+                            />
+                        </div>
+
+
                         <div className=" ">
                             <label className="font-nunito block text-sm" htmlFor="">Image</label>
                             <input
@@ -398,7 +432,7 @@ const Users = () => {
                             <Button color="danger" variant="flat" onPress={onClose}>
                                 Close
                             </Button>
-                            <button type="submit" className="bg-primary-400 rounded-xl bg-opacity-20 text-primary text-sm font-nunito px-4">
+                            <button type="submit" className="rounded-xl bg-[#05ECF2] bg-opacity-20 text-[#05ECF2] text-sm font-nunito px-4">
                                 Submit
                             </button>
                         </div>
@@ -422,6 +456,7 @@ export const action: ActionFunction = async ({ request }) => {
     const base64Image = formData.get("base64Image") as string;
     const role = formData.get("role") as string;
     const admin = formData.get("admin") as string;
+    const position = formData.get("position") as string;
     const intent = formData.get("intent") as string;
     const id = formData.get("id") as string;
 
@@ -437,6 +472,7 @@ export const action: ActionFunction = async ({ request }) => {
                 phone,
                 role,
                 intent,
+                position,
                 base64Image
             })
             return user
@@ -488,8 +524,13 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term
     });
+    const { categories } = await department.getCategories({
+        request,
+        page,
+        search_term
+    });
 
-    return json({ user, users, totalPages });
+    return json({ user, users, totalPages, categories });
 }
 
 export const meta: MetaFunction = () => {

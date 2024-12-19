@@ -16,6 +16,7 @@ class UsersController {
             phone,
             role,
             intent,
+            position,
             base64Image
         }: {
             firstName: string,
@@ -27,6 +28,7 @@ class UsersController {
             phone: string,
             role: string,
             intent: string,
+                position: string,
             base64Image: string
         }) {
 
@@ -60,6 +62,7 @@ class UsersController {
                         password: hashedPassword,
                         phone,
                         role,
+                        position,
                         image: base64Image
                     })
 
