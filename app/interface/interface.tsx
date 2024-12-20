@@ -10,6 +10,7 @@ export interface RegistrationInterface {
     role: string,
     admin: string,
     position: string,
+    department: string,
     image: string,
 }
 export interface ContactInterface {

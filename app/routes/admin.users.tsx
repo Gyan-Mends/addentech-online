@@ -37,12 +37,12 @@ const Users = () => {
         user,
         users,
         totalPages,
-        categories
+        departments
     } = useLoaderData<{
         user: { _id: string },
         users: RegistrationInterface[],
         totalPages: number,
-        categories: DepartmentInterface[]
+        departments: DepartmentInterface[]
     }>()
 
     const handleCreateModalClosed = () => {
@@ -374,19 +374,19 @@ const Users = () => {
 
                         <div className="flex gap-4">
                             <Select
-                                label="Role"
+                                label="Departments"
                                 labelPlacement="outside"
                                 placeholder=" "
                                 isRequired
-                                name="role"
+                                name="departments"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
                                     trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
                                 }}
                             >
-                                {Categories.map((department: DepartmentInterface, index: number) => (
-                                    <SelectItem key={index}>{department.name}</SelectItem>
+                                {departments.map((department: DepartmentInterface, index: number) => (
+                                    <SelectItem key={department._id}>{department.name}</SelectItem>
                                 ))}
                             </Select>
 
@@ -458,7 +458,10 @@ export const action: ActionFunction = async ({ request }) => {
     const admin = formData.get("admin") as string;
     const position = formData.get("position") as string;
     const intent = formData.get("intent") as string;
+    const departments = formData.get("departments") as string;
     const id = formData.get("id") as string;
+    console.log(departments);
+
 
     switch (intent) {
         case "create":
@@ -473,6 +476,7 @@ export const action: ActionFunction = async ({ request }) => {
                 role,
                 intent,
                 position,
+                departments,
                 base64Image
             })
             return user
@@ -524,13 +528,13 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term
     });
-    const { categories } = await department.getCategories({
+    const { departments } = await department.getCategories({
         request,
         page,
         search_term
     });
 
-    return json({ user, users, totalPages, categories });
+    return json({ user, users, totalPages, departments });
 }
 
 export const meta: MetaFunction = () => {

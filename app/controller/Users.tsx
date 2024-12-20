@@ -17,6 +17,7 @@ class UsersController {
             role,
             intent,
             position,
+            departments,
             base64Image
         }: {
             firstName: string,
@@ -28,6 +29,7 @@ class UsersController {
             phone: string,
             role: string,
             intent: string,
+                departments: string,
                 position: string,
             base64Image: string
         }) {
@@ -63,6 +65,7 @@ class UsersController {
                         phone,
                         role,
                         position,
+                        departments,
                         image: base64Image
                     })
 

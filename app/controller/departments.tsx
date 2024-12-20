@@ -126,7 +126,10 @@ class DepartmentController {
                 .limit(limit)
                 .exec();
 
-            return { user, departments, totalPages };
+            const department = await Departments.find()
+
+
+            return { user, departments, department, totalPages };
         } catch (error: any) {
             return {
                 message: error.message,

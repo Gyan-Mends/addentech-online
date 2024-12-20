@@ -1,3 +1,4 @@
+import { Schema } from "mongoose";
 import { RegistrationInterface } from "~/interface/interface";
 import mongoose from "~/mongoose.server";
 
@@ -37,6 +38,11 @@ const RegistrationSchema = new mongoose.Schema({
   position: {
     require: true,
     type: String,
+  },
+  department: {
+    ref: "departments",
+    require: true,
+    type: Schema.Types.ObjectId,
   },
   image: {
     require: true,
