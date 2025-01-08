@@ -18,7 +18,7 @@ import { DeleteIcon } from "~/components/icons/DeleteIcon";
 import { getSession } from "~/session";
 import BackIcon from "~/components/icons/BackIcon";
 import NewCustomTable from "~/components/table/newTable";
-import { CategoryInterface } from "~/interface/interface";
+import { CategoryInterface, DepartmentInterface } from "~/interface/interface";
 import category from "~/controller/categoryController";
 import usersController from "~/controller/Users";
 import department from "~/controller/departments";
@@ -30,7 +30,7 @@ type SessionData = {
 };
 
 const Category = () => {
-    const { categories, user, totalPages } = useLoaderData<{ categories: CategoryInterface[], user: { user: string }, totalPages: number | any }>()
+    const { departments, user, totalPages } = useLoaderData<{ departments: DepartmentInterface[], user: { user: string }, totalPages: number | any }>()
     const actionData = useActionData<any>()
     const [rowsPerPage, setRowsPerPage] = useState(13);
     const submit = useSubmit()
@@ -135,7 +135,7 @@ const Category = () => {
                     setPage={(page) => (
                         navigate(`?page=${page}`)
                     )}>
-                    {categories.map((categories: CategoryInterface, index: number) => (
+                    {departments.map((categories: DepartmentInterface, index: number) => (
                         <TableRow key={index}>
                             <TableCell>{categories.name}</TableCell>
                             <TableCell>{categories.description}</TableCell>
@@ -309,8 +309,8 @@ export const loader: LoaderFunction = async ({ request }) => {
         return redirect("/")
     }
 
-    const { categories, user, totalPages } = await department.getCategories({ request, page, search_term })
-    return { categories, user, totalPages }
+    const { departments, user, totalPages } = await department.getDepartments({ request, page, search_term })
+    return { departments, user, totalPages }
 };
 
 export const action: ActionFunction = async ({ request }) => {

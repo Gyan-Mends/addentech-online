@@ -73,7 +73,7 @@ class DepartmentController {
 
 
 
-    async getCategories({
+    async getDepartments({
         request,
         page,
         search_term,

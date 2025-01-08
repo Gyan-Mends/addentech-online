@@ -145,9 +145,9 @@ const Index = () => {
       >
         <div className="flex flex-col gap-10 rounded-2xl h-[90vh] lg:px-60 justify-center px-4 dark:bg-black/40 bg-black/10 text-white">
           <div>
-          <p className="text-6xl font-nunito font-bold">Leading the Way in</p>
-          <p className="text-6xl font-nunito font-bold"> Legal Tech </p>
-          <p className="text-6xl font-nunito font-bold">  Solutions</p>
+                      <p className="text-6xl font-montserrat font-bold">Leading the Way in</p>
+                      <p className="text-6xl mt-1 font-montserrat font-bold"> Legal Tech </p>
+                      <p className="text-6xl mt-1 font-montserrat font-bold">  Solutions</p>
           </div>
 
           <div className="">

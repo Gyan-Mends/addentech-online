@@ -528,7 +528,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term
     });
-    const { departments } = await department.getCategories({
+    const { departments } = await department.getDepartments({
         request,
         page,
         search_term

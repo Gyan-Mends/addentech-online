@@ -20,10 +20,12 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { theme, setTheme } = useTheme()
     const menuItems = [
-        "Home",
-        "Dashboard",
-        "Activity",
+        { text: "Home", href: "/" },
+        { text: "About", href: "/about" },
+        { text: "Services", href: "/services" },
+        { text: "Contact", href: "/contact" },
     ];
+
 
     return (
         <div className={`transition duration-500  px-4 lg:px-40 overflow-x-hidden ${theme === "light" ? "bg-white " : "bg-[#0b0e13]"}`}>
@@ -37,7 +39,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                 className="top-0 z-50 py-2 dark:bg-[#0b0e13] bg-white"
             >
                 <NavbarContent className="lg:hidden">
-                    <NavbarMenuToggle className="text-white" aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
+                    <NavbarMenuToggle className="text-black dark:text-white" aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
                 </NavbarContent>
 
                 <NavbarContent justify="start" className="">
@@ -81,17 +83,17 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
                 <NavbarMenu>
                     {menuItems.map((item, index) => (
-                        <NavbarMenuItem key={`${item}-${index}`}>
+                        <NavbarMenuItem key={`${item.text}-${index}`}>
                             <Link
                                 className="w-full"
-                                href="#"
-                                size="lg"
+                                to={item.href}
                             >
-                                {item}
+                                {item.text}
                             </Link>
                         </NavbarMenuItem>
                     ))}
                 </NavbarMenu>
+
             </Navbar>
 
             <div className="">
@@ -123,10 +125,10 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                 </div>
 
 
-                <div className="mt-10 lg:grid lg:grid-cols-3 md:grid md:grid-cols-3 gap-8 py-8 dark:bg-[rgb(14,17,22)] shadow-sm lg:h-80 h-full px-8 rounded-2xl border dark:border-white/30 border-black/10  lg:px-20">
+                <div className="mt-10 lg:grid lg:grid-cols-3 md:grid md:grid-cols-3 gap-8 py-8 dark:bg-[rgb(14,17,22)] shadow-sm lg:h-80  h-full px-8 rounded-2xl border dark:border-white/30 border-black/10  lg:px-20">
                     {/* location */}
                     {/* location */}
-                    <div>
+                    <div className="lg:mt-10">
                         <p className="dark:text-white font-poppins text-lg">Locate Us</p>
                         <div className="flex gap-4 mt-4">
                             <div className="flex items-center justify-center  gap-4">
@@ -149,7 +151,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                     {/* pages */}
                     {/* pages */}
                     <div className="mt-10 lg:mt-10">
-                        <p className="text-white font-poppins text-lg">Services</p>
+                        <p className="dark:text-white font-poppins text-lg">Services</p>
                         <div className="mt-4 flex flex-col gap-2">
                             <Link to=" ">
                                 <p className="dark:text-primary-100 font-nunito hover:text-[#05ECF2] hover:transition hover:duration-500">Brand & Product Design</p>
@@ -169,7 +171,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         </div>
                     </div>
                     <div className="mt-10 lg:mt-10">
-                        <p className="text-white font-poppins text-lg">Pages</p>
+                        <p className="dark:text-white font-poppins text-lg">Pages</p>
                         <div className="mt-4 flex flex-col gap-2">
                             <Link to="/">
                                 <p className="dark:text-primary-100 font-nunito hover:text-[#05ECF2] hover:transition hover:duration-500">Home</p>
