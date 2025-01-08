@@ -17,6 +17,7 @@ import SupplierIcon from '~/components/icons/SupplierIcon';
 import CategoryIcon from '~/components/icons/CatIcon';
 import SaleIcon from '~/components/icons/Sales';
 import SalesIcon from '~/components/icons/SalesIcon';
+import UserIcon from '~/components/icons/UserIcon';
 
 
 
@@ -47,9 +48,9 @@ const Admin = () => {
         <   AdminLayout pageName="Dashboard">
 
             <div className='mt-6 lg:grid lg:grid-cols-4 gap-4'>
-                <Link to="/admin/products">
+                <Link to="/admin/departments">
                     <CustomedCard
-                        title='Total Product'
+                        title='Total Departments'
                         // total={productCount}
                         icon={
                             <ProductIcon className="h-[20px] w-[20px] text-success" />
@@ -60,23 +61,23 @@ const Admin = () => {
                     <CustomedCard
                         title='Total Users'
                     // total={usersCount}
-                    // icon={
-                    //     // <UserIcon className="h-[20px] w-[20px] text-success" />
-                    // }
+                        icon={
+                            <UserIcon className="h-[20px] w-[20px] text-success" />
+                        }
                     />
                 </Link>
-                <Link to="/admin/suppliers">
+                <Link to="/admin/cetegories">
                     <CustomedCard
-                        title='Total Suppliers'
+                        title='Blog Categories'
                         // total={suppliersCount}
                         icon={
                             <SupplierIcon className="h-[20px] w-[20px] text-success" />
                         }
                     />
                 </Link>
-                <Link to="/admin/suppliers">
+                <Link to="/admin/blogs">
                     <CustomedCard
-                        title=' Categories'
+                        title=' Blogs'
                         // total={categoryCount}
                         icon={
                             <CategoryIcon className="h-[20px] w-[20px] text-success" />
@@ -115,11 +116,11 @@ const Admin = () => {
                 <div className='flex flex-col gap-2 '>
                     <div>
                         <div className='h-[26vh] py-2 px-4  bg-[#333] shadow-md rounded-xl border border-white/5  dark:bg-[#333] dark:border-white/5 mt-2'>
-                            <p className='font-nunito text-white'>Recent Sales</p>
+                            <p className='font-nunito text-white'>Report</p>
 
                         </div>
                     </div>
-                    <div className='flex flex-col gap-6 mt-6'>
+                    {/* <div className='flex flex-col gap-6 mt-6'>
                         <div className='lg:grid lg:grid-cols-2 gap-6'>
                             <Link to="/admin/products">
                                 <CustomedCard
@@ -156,12 +157,12 @@ const Admin = () => {
                                 />
                             </Link>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div className='mb-5'>
-                <div className='h-[54vh] py-4 px-2  mt-4 shadow-md rounded-xl  '>
-                    <p className='font-nunito text-white'>Recent Sales</p>
+                <div className='rounded-2xl transition-all h-[54vh] mt-10  duration-200 dark:bg-[#333] border border-white/5 shadow-md  dark:border-white/5 py-2 px-4 flex flex-col gap-2'>
+                    <p className='font-nunito text-white'>Recent Activities</p>
 
                     {/* <CustomTable
                         columns={SalesColumns}
