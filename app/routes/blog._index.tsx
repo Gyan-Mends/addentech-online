@@ -57,6 +57,14 @@ const Blog = () => {
         navigate(`?page=1&search_term=${value}&category=${selectedCategory}`);
     };
 
+    const truncateText = (text, wordLimit) => {
+        const words = text.split(" ");
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(" ") + "...";
+        }
+        return text;
+    };
+
     return (
         <PublicLayout>
             <div className="mt-20 lg:px-80 px-4">
@@ -95,36 +103,36 @@ const Blog = () => {
                 </div>
 
                 {blogs.map((blog: BlogInterface, index: number) => (
-                    <div
-                        key={index}
-                        className={`w-full h-auto border dark:border-white/30 border-black/30 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-6`}
+                    <Link
+                        to={`/blog/${blog._id}`}
                     >
-                        <div className="h-full overflow-hidden group">
-                            <img
-                                src={blog?.image}
-                                alt={blog?.name}
-                                className="w-full h-80 object-cover rounded-l-2xl transition-transform duration-300 ease-in-out group-hover:scale-105"
-                            />
-                        </div>
-                        <div className="p-6 flex flex-col justify-center gap-4">
-                            <h2 className="text-2xl font-bold dark:text-white font-montserrat">{blog?.name}</h2>
-                            <p className="text-sm text-gray-400 font-nunito">{blog?.description}</p>
-                            <div className="flex justify-between items-center">
-                                <p className="text-gray-500">Uploaded At</p>
-                                <p className="text-gray-500">{blog?.createdAt}</p>
+                        <div
+                            key={index}
+                            className={`w-full h-auto border dark:border-white/30 border-black/30 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-6`}
+                        >
+                            <div className="h-full overflow-hidden group">
+                                <img
+                                    src={blog?.image}
+                                    alt={blog?.name}
+                                    className="w-full h-80 object-cover rounded-l-2xl transition-transform duration-300 ease-in-out group-hover:scale-105"
+                                />
                             </div>
-                            <div className="flex justify-between items-center">
-                                <p className="text-gray-500">Uploaded By</p>
-                                <p className="text-gray-500">{blog?.admin?.firstName}</p>
+                            <div className="p-6 flex flex-col justify-center gap-4">
+                                <h2 className="text-2xl font-bold dark:text-white font-montserrat">{blog?.name}</h2>
+                                <p className="text-sm text-gray-400 font-nunito">
+                                    {truncateText(blog?.description, 20)} {/* Limit to 20 words */}
+                                </p>                                <div className="flex justify-between items-center">
+                                    <p className="text-gray-500">Uploaded At</p>
+                                    <p className="text-gray-500">{blog?.createdAt}</p>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <p className="text-gray-500">Uploaded By</p>
+                                    <p className="text-gray-500">{blog?.admin?.firstName}</p>
+                                </div>
+
                             </div>
-                            <Link
-                                to={`/blog/${blog.id}`}
-                                className="mt-4 px-4 py-2 text-center bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                            >
-                                View Details
-                            </Link>
                         </div>
-                    </div>
+                    </Link>
                 ))}
 
                 {totalPages > 1 && (
