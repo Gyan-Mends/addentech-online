@@ -53,7 +53,7 @@ const BlogDetail = () => {
                     />
                 </div>
 
-                <div className="dark:text-white text-justify mt-6 font-nunito leading-relaxed space-y-4">
+                <div className="dark:text-white text-justify text-md mt-6 font-nunito leading-relaxed space-y-4">
                     {BlogDetail?.description
                         ? BlogDetail.description.split("\n").map((paragraph, index) => (
                             <p key={index}>{paragraph}</p>
