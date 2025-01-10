@@ -114,7 +114,7 @@ const Blog = () => {
                                 <img
                                     src={blog?.image}
                                     alt={blog?.name}
-                                    className="w-full h-80 object-cover rounded-l-2xl transition-transform duration-300 ease-in-out group-hover:scale-105"
+                                    className="w-full h-80 object-cover rounded-l-2xl hover:rounded-l-2xl transition-transform duration-300 ease-in-out group-hover:scale-105"
                                 />
                             </div>
                             <div className="p-6 flex flex-col justify-center gap-4">

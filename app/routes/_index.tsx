@@ -334,7 +334,7 @@ const Index = () => {
             <div
               data-aos="zoom-in"
               key={blog.id}
-              className="h-full pb-6 mt-16 lg:mt-0 shadow-md rounded-2xl border dark:border-white/5 border-black/10 dark:bg-[rgb(14,17,22)]"
+              className="h-[94vh] pb-6 mt-16 lg:mt-0 shadow-md rounded-2xl border dark:border-white/5 border-black/10 dark:bg-[rgb(14,17,22)]"
             >
               <img
                 src={blog.image}
@@ -352,7 +352,7 @@ const Index = () => {
               </div>
               <div className="px-6 mt-6">
                 <p className="font-nunito dark:text-white text-2xl font-bold">
-                  {blog.name}
+                  {truncateText(blog?.name, 10)} {/* Limit to 20 words */}
                 </p>
               </div>
               <div className="px-6 mt-6 flex items-center flex justify-between">
@@ -367,7 +367,7 @@ const Index = () => {
                 {truncateText(blog?.description, 20)} {/* Limit to 20 words */}
               </div>
               <div className="px-6 mt-6 flex items-center">
-                <Link to={blog.link}>
+                <Link to={`/blog/${blog._id}`}>
                   <Button
                     size="sm"
                     color="default"

@@ -24,6 +24,8 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
         { text: "About", href: "/about" },
         { text: "Services", href: "/services" },
         { text: "Contact", href: "/contact" },
+        { text: "blog", href: "/blog" },
+        { text: "team", href: "/team" },
     ];
 
 
@@ -65,6 +67,9 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         </Link>
                         <Link className="font-nunito" to="/blog">
                             Blog
+                        </Link>
+                        <Link className="font-nunito" to="/team">
+                            Team
                         </Link>
                     </NavbarItem>
                 </NavbarContent>
