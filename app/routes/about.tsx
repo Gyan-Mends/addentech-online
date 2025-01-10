@@ -215,7 +215,7 @@ const About = () => {
                     </p>
                 </div>
                 <div className="" data-aos="fade-down">
-                    <Link to="/about">
+                    <Link to="/team">
                         <Button
                             color="default"
                             className="font-nunito bg-[#F2059F] mt-8 lg:mt-0 text-lg hover:transition hover:duration-500  hover:-translate-y-2  text-white"

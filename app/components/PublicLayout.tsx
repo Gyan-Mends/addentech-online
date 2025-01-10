@@ -134,14 +134,14 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                     {/* location */}
                     {/* location */}
                     <div className="lg:mt-10">
-                        <p className="dark:text-white font-poppins text-lg">Locate Us</p>
+                        <p className="dark:text-default-500 font-poppins text-lg">Locate Us</p>
                         <div className="flex gap-4 mt-4">
                             <div className="flex items-center justify-center  gap-4">
                                 <LocationIcon className="dark:text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" />
                             </div>
                             <div>
-                                <p className="dark:text-primary-100 font-nunito">No. 15 Netflix Street, Madina</p>
-                                <p className="dark:text-primary-100 font-nunito">Estates</p>
+                                <p className="dark:text-white font-nunito">No. 15 Netflix Street, Madina</p>
+                                <p className="dark:text-white font-nunito">Estates</p>
                             </div>
                         </div>
                         <div className="flex gap-4 mt-4">
@@ -149,46 +149,46 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                                 {/* <PhoneIcon className="dark:text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" /> */}
                             </div>
                             <div>
-                                <p className="dark:text-primary-100 font-nunito">+233-30-291-4988 </p>
+                                <p className="dark:text-white font-nunito">+233-30-291-4988 </p>
                             </div>
                         </div>
                     </div>
                     {/* pages */}
                     {/* pages */}
                     <div className="mt-10 lg:mt-10">
-                        <p className="dark:text-white font-poppins text-lg">Services</p>
+                        <p className="dark:text-default-500 font-poppins text-lg">Services</p>
                         <div className="mt-4 flex flex-col gap-2">
                             <Link to=" ">
-                                <p className="dark:text-primary-100 font-nunito hover:text-[#05ECF2] hover:transition hover:duration-500">Brand & Product Design</p>
+                                <p className="dark:text-white font-nunito hover:text-[#05ECF2] hover:transition hover:duration-500">Brand & Product Design</p>
                             </Link>
                             <Link to=" ">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Design & Development</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Design & Development</p>
                             </Link>
                             <Link to=" ">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Cloud Services</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Cloud Services</p>
                             </Link>
                             <Link to=" ">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Digital Marketing and Consultation</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Digital Marketing and Consultation</p>
                             </Link>
                             <Link to=" ">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">IT Services</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">IT Services</p>
                             </Link>
                         </div>
                     </div>
                     <div className="mt-10 lg:mt-10">
-                        <p className="dark:text-white font-poppins text-lg">Pages</p>
+                        <p className="dark:text-default-500 font-poppins text-lg">Pages</p>
                         <div className="mt-4 flex flex-col gap-2">
                             <Link to="/">
-                                <p className="dark:text-primary-100 font-nunito hover:text-[#05ECF2] hover:transition hover:duration-500">Home</p>
+                                <p className="dark:text-white font-nunito hover:text-[#05ECF2] hover:transition hover:duration-500">Home</p>
                             </Link>
                             <Link to="/contact">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Contact</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Contact</p>
                             </Link>
                             <Link to="/about">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">About Us</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">About Us</p>
                             </Link>
                             <Link to="/blog">
-                                <p className="dark:text-primary-100 font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Blog</p>
+                                <p className="dark:text-white font-nunito hover:transition hover:duration-500 hover:text-[#05ECF2]">Blog</p>
                             </Link>
 
                         </div>
