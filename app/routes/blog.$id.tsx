@@ -36,7 +36,11 @@ const BlogDetail = () => {
                         Uploaded By: {BlogDetail?.admin?.firstName || "Unknown"}
                     </p>
                     <p className="text-gray-500 font-bold text-md font-nunito">
-                        Published At: {BlogDetail?.createdAt || "Unknown date"}
+                        Published At: {new Date(BlogDetail.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        })}
                     </p>
                     <p className="text-gray-500 font-bold text-md font-nunito">
                         {BlogDetail?.category?.name || "Uncategorized"}

@@ -123,7 +123,11 @@ const Blog = () => {
                                     {truncateText(blog?.description, 20)} {/* Limit to 20 words */}
                                 </p>                                <div className="flex justify-between items-center">
                                     <p className="text-gray-500">Uploaded At</p>
-                                    <p className="text-gray-500">{blog?.createdAt}</p>
+                                    <p className="text-gray-500">{new Date(blog.createdAt).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}</p>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <p className="text-gray-500">Uploaded By</p>

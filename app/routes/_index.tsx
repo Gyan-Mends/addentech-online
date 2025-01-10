@@ -133,6 +133,15 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [backgroundImages.length]);
 
+  const truncateText = (text, wordLimit) => {
+    const words = text.split(" ");
+    if (words.length > wordLimit) {
+      return words.slice(0, wordLimit).join(" ") + "...";
+    }
+    return text;
+  };
+
+
   return (
     <PublicLayout>
       {/* Background Slideshow */}
@@ -325,7 +334,7 @@ const Index = () => {
             <div
               data-aos="zoom-in"
               key={blog.id}
-              className="h-[95vh] mt-16 lg:mt-0 shadow-md rounded-2xl border dark:border-white/5 border-black/10 dark:bg-[rgb(14,17,22)]"
+              className="h-full pb-6 mt-16 lg:mt-0 shadow-md rounded-2xl border dark:border-white/5 border-black/10 dark:bg-[rgb(14,17,22)]"
             >
               <img
                 src={blog.image}
@@ -355,7 +364,7 @@ const Index = () => {
                 </p>
               </div>
               <div className="px-6 mt-6 flex items-center">
-                <p className="font-nunito text-gray-400">{blog.description}</p>
+                {truncateText(blog?.description, 20)} {/* Limit to 20 words */}
               </div>
               <div className="px-6 mt-6 flex items-center">
                 <Link to={blog.link}>
