@@ -75,12 +75,12 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
     };
 
     return (
-        <div className=" bg-[#191919] h-[100vh] w-full p-8 overflow-y-hidden">
+        <div className=" bg-[#18181B] h-[100vh] w-full  overflow-y-hidden">
 
 
             {/* Desktop navigation bar */}
             {/* Desktop navigation bar */}
-            <div className={`rounded-xl hidden lg:block md:block w-64 bg-[#333] h-[88vh] shadow-md dark:text-white fixed transition-transform duration-500 p-6 ${desktopNav ? "transform-none" : "-translate-x-full"}`}>
+            <div className={`hidden lg:block md:block w-64 h-[100vh] shadow-md dark:text-white fixed transition-transform duration-500 p-6 ${desktopNav ? "transform-none" : "-translate-x-full"}`}>
                 {/* logo */}
                 <div >
                     <div>
@@ -91,7 +91,7 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                 <div className="flex flex-col gap-4">
                     <ul className="mt-6 pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin">
-                            <li className="text-md hover:bg-[#05ECF2]  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                            <li className="text-sm hover:bg-[#05ECF2]  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <DashboardIcon className="text-[#05ECF2] h-5 w-5 hover:text-white" />
                                 Dashboard
                             </li>
@@ -99,7 +99,7 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/departments">
-                            <li className="text-md hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <DepartmentIcon className="text-[#05ECF2] h-5 w-5 hover:text-white" />
                                 Departments
                             </li>
@@ -107,15 +107,15 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/users">
-                            <li className="text-md hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
-                                Users
+                                Team
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/category">
-                            <li className="text-md hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
                                 Blog Category
                             </li>
@@ -123,7 +123,7 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/blog">
-                            <li className="text-md hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
                                 Blog
                             </li>
@@ -132,9 +132,25 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
 
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/users">
-                            <li className="text-md hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
                                 Comments
+                            </li>
+                        </Link>
+                    </ul>
+                    <ul className=" pl-2 flex flex-col gap-2">
+                        <Link className="" to="/admin/users">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                Contacts
+                            </li>
+                        </Link>
+                    </ul>
+                    <ul className=" pl-2 flex flex-col gap-2">
+                        <Link className="" to="/admin/task">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                Tasks
                             </li>
                         </Link>
                     </ul>
@@ -190,17 +206,7 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
             <div className={`h-full p-4 transition-all duration-500 overflow-x-hidden  z-1 ${desktopNav ? "lg:ml-64 md:ml-64" : ""}`}>
                 {/* Main Content */}
                 <div className="">
-                    <div className="flex gap-3 items-center justify-center bg-[#333] h-16 rounded-xl  px-10 ">
 
-                        <div className="flex justify-between items-center w-full">
-                            <div>
-                                <p className="text-white text-xl">{pageName}</p>
-                            </div>
-
-                        </div>
-
-
-                    </div>
                     {children}
                 </div>
             </div>

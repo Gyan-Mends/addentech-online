@@ -1,4 +1,4 @@
-import { Button, Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/react"
+import { Button, Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle, Switch } from "@nextui-org/react"
 import { Link } from "@remix-run/react"
 import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
@@ -38,7 +38,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                 onMenuOpenChange={setIsMenuOpen}
                 isBlurred
                 position="sticky"
-                className="top-0 z-50 py-2 dark:bg-[#0b0e13] bg-white"
+                className="top-0 z-50 py-4 dark:bg-[#0b0e13] bg-white flex"
             >
                 <NavbarContent className="lg:hidden">
                     <NavbarMenuToggle className="text-black dark:text-white" aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
@@ -46,13 +46,14 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
                 <NavbarContent justify="start" className="">
                     <NavbarItem  >
-                        <img className=" w-full" src={logo || "~/components/images/addentech_logo.png"} alt="Addentech Logo" />
-                        <p className="dark:text-[#0b0e13] text-white">Addentechnology</p>
+                        <div className="w-40 h-10">
+                            <img className=" w-40 h-10" src={logo || "~/components/images/addentech_logo.png"} alt="Addentech Logo" />
+                        </div>
                     </NavbarItem>
                 </NavbarContent>
 
                 <NavbarContent justify="center" className="hidden lg:flex w-full">
-                    <NavbarItem className="flex gap-10 ml-10 dark:text-white">
+                    <NavbarItem className="flex gap-6 ml-10 dark:text-white">
                         <Link className="font-nunito" to="/">
                             Home
                         </Link>
@@ -76,13 +77,15 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
                 <NavbarContent justify="end" className="">
                     <NavbarItem  >
-                        <button className="text-white" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-                            {theme === "light" ? (
-                                <SunIcon className="text-[#0b0e13]" />
-                            ) : (
-                                    <MoonIcon className="text-white" />
-                            )}
-                        </button>
+                        <Switch
+                            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                            size="md"
+                            thumbIcon={({ className }) =>
+                                theme === "light" ? <SunIcon className={className} /> : <MoonIcon className={className} />
+                            }
+                        >
+                        </Switch>
+
                     </NavbarItem>
                 </NavbarContent>
 

@@ -1,4 +1,4 @@
-import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react"
+import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, Textarea, User } from "@nextui-org/react"
 import { ActionFunction, json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { useEffect, useState } from "react"
@@ -9,6 +9,7 @@ import { EditIcon } from "~/components/icons/EditIcon"
 import NotificationIcon from "~/components/icons/NotificationIcon"
 import PlusIcon from "~/components/icons/PlusIcon"
 import { SearchIcon } from "~/components/icons/SearchIcon"
+import TaskIcon from "~/components/icons/TaskIcon"
 import UserIcon from "~/components/icons/UserIcon"
 import ConfirmModal from "~/components/modal/confirmModal"
 import CreateModal from "~/components/modal/createModal"
@@ -18,6 +19,7 @@ import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
 import CustomInput from "~/components/ui/CustomInput"
 import department from "~/controller/departments"
+import taskController from "~/controller/task"
 import usersController from "~/controller/Users"
 import { DepartmentInterface, RegistrationInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
@@ -79,21 +81,21 @@ const Users = () => {
     return (
         <AdminLayout pageName="Users Management">
             <div className="flex justify-between">
-                    {/* search */}
-                    {/* search */}
-                    <Input
+                {/* search */}
+                {/* search */}
+                <Input
                     size="md"
-                        placeholder="Search user..."
-                        startContent={<SearchIcon className="" />}
-                        onValueChange={(value) => {
-                            const timeoutId = setTimeout(() => {
-                                navigate(`?search_term=${value}`);
-                            }, 100);
-                            return () => clearTimeout(timeoutId);
-                        }} classNames={{
-                            inputWrapper: " shadow-sm w-[50vw]  text-sm font-nunito dark:bg-[#18181B] border border-2 border-white/10",
-                        }}
-                    />
+                    placeholder="Search user..."
+                    startContent={<SearchIcon className="" />}
+                    onValueChange={(value) => {
+                        const timeoutId = setTimeout(() => {
+                            navigate(`?search_term=${value}`);
+                        }, 100);
+                        return () => clearTimeout(timeoutId);
+                    }} classNames={{
+                        inputWrapper: " shadow-sm w-[50vw]  text-sm font-nunito dark:bg-[#18181B] border border-2 border-white/10",
+                    }}
+                />
 
                 <div className="flex gap-4 items-center">
                     <div className="border h-full w-full flex items-center justify-center rounded-full px-2 py-1">
@@ -154,7 +156,7 @@ const Users = () => {
                             setIsCreateModalOpened(true)
                         }}
                         className="font-nunito  flex text-sm px-8">
-                        <UserIcon className="text-defaul-200 h-4 w-4" /> Create User
+                        <TaskIcon className="text-defaul-200 h-4 w-4" /> Create Task
                     </Button>
                 </div>
             </div>
@@ -327,161 +329,127 @@ const Users = () => {
             {/* Create Modal */}
             <CreateModal
                 className="bg-gray-200 dark:bg-[#333]"
-                modalTitle="Create New User"
+                modalTitle="Create New Task"
                 isOpen={isCreateModalOpened}
                 onOpenChange={handleCreateModalClosed}
             >
                 {(onClose) => (
                     <Form method="post" className="flex flex-col gap-4">
                         <CustomInput
-                            label="First name"
+                            label="Task Title"
                             isRequired
+                            name="title"
                             isClearable
-                            name="firstname"
-                            placeholder=" "
+                            placeholder="Enter task title"
                             type="text"
                             labelPlacement="outside"
                         />
-                        <div className="flex gap-4">
-                            <CustomInput
-                                label="Middle Name"
-                                name="middlename"
-                                placeholder=" "
-                                isClearable
-                                type="text"
-                                labelPlacement="outside"
 
-                            />
-                            <CustomInput
-                                label="Last Name"
-                                isRequired
-                                name="lastname"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-                            />
-                        </div>
-                        <CustomInput
-                            label="Email"
+                        <Textarea
+                            label="Description"
                             isRequired
-                            name="email"
-                            isClearable
-                            placeholder=" "
+                            name="description"
+                            placeholder="Enter task description"
                             type="text"
                             labelPlacement="outside"
+                            classNames={{
+                                inputWrapper: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-success hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm"
+                            }}
                         />
+
                         <div className="flex gap-4">
-                            <CustomInput
-                                label=" Phone"
-                                isRequired
-                                name="phone"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
-                            <CustomInput
-                                label=" Password"
-                                isRequired
-                                name="password"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
-                        </div>
-                        <div className="">
                             <Select
-                                label="Role"
+                                label="Status"
                                 labelPlacement="outside"
-                                placeholder=" "
+                                placeholder="Select task status"
                                 isRequired
-                                name="role"
+                                name="status"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
+                                    popoverContent:
+                                        "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                    trigger:
+                                        "bg-white shadow-sm dark:bg-[#333] border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
                                 }}
                             >
                                 {[
-                                    { key: "admin", value: "admin", display_name: "Admin" },
-                                    { key: "attendant", value: "attendant", display_name: "Attendant" },
-                                ].map((role) => (
-                                    <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                                    { key: "unclaimed", value: "nnclaimed", display_name: "Unclaimed" },
+                                    { key: "assigned", value: "assigned", display_name: "Assigned" },
+                                ].map((status) => (
+                                    <SelectItem key={status.key}>{status.display_name}</SelectItem>
                                 ))}
                             </Select>
-                        </div>
 
-                        <div className="flex gap-4">
                             <Select
-                                label="Departments"
+                                label="Priority"
                                 labelPlacement="outside"
-                                placeholder=" "
+                                placeholder="Select task priority"
                                 isRequired
-                                name="departments"
+                                name="priority"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
+                                    popoverContent:
+                                        "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                    trigger:
+                                        "bg-white shadow-sm dark:bg-[#333] border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
                                 }}
                             >
-                                {departments.map((department: DepartmentInterface, index: number) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                {[
+                                    { key: "low", value: "low", display_name: "low" },
+                                    { key: "medium", value: "medium", display_name: "medium" },
+                                    { key: "high", value: "high", display_name: "high" },
+                                ].map((priority) => (
+                                    <SelectItem key={priority.key}>{priority.display_name}</SelectItem>
                                 ))}
                             </Select>
-
-                            <CustomInput
-                                label=" Position"
-                                isRequired
-                                name="position"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
                         </div>
 
+                        <Select
+                            label="Department"
+                            labelPlacement="outside"
+                            placeholder="Select department"
+                            isRequired
+                            name="department"
+                            classNames={{
+                                label: "font-nunito text-sm text-default-100",
+                                popoverContent:
+                                    "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                trigger:
+                                    "bg-white shadow-sm dark:bg-[#333] border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                            }}
+                        >
+                            {departments.map((department: DepartmentInterface, index: number) => (
+                                <SelectItem key={department._id}>{department.name}</SelectItem>
+                            ))}
+                        </Select>
 
-                        <div className=" ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
-                            <input
-                                name="image"
-                                required
-                                placeholder=" "
-                                className="bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   h-10 w-[25vw] rounded-xl"
-                                type="file"
-                                onChange={(event: any) => {
-                                    const file = event.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader()
-                                        reader.onloadend = () => {
-                                            setBase64Image(reader.result)
-                                        }
-                                        reader.readAsDataURL(file)
-                                    }
-                                }}
-                            />
-                        </div>
+                        <CustomInput
+                            label="Due Date"
+                            isRequired
+                            name="dueDate"
+                            isClearable
+                            placeholder="Select due date"
+                            type="date"
+                            labelPlacement="outside"
+                        />
 
-                        {/* <input name="admin" value={user?._id} type="hidden" /> */}
                         <input name="intent" value="create" type="hidden" />
-                        <input name="base64Image" value={base64Image} type="hidden" />
-
+                        <input name="createdby" value={user._id} type="hidden" />
                         <div className="flex justify-end gap-2 mt-10 font-nunito">
                             <Button color="danger" variant="flat" onPress={onClose}>
                                 Close
                             </Button>
-                            <button type="submit" className="rounded-xl bg-[#05ECF2] bg-opacity-20 text-[#05ECF2] text-sm font-nunito px-4">
+                            <button
+                                type="submit"
+                                className="rounded-xl bg-[#05ECF2] bg-opacity-20 text-[#05ECF2] text-sm font-nunito px-4"
+                            >
                                 Submit
                             </button>
                         </div>
                     </Form>
                 )}
             </CreateModal>
+
         </AdminLayout>
     )
 }
@@ -490,37 +458,30 @@ export default Users
 
 export const action: ActionFunction = async ({ request }) => {
     const formData = await request.formData();
-    const firstName = formData.get("firstname") as string;
-    const lastName = formData.get("lastname") as string;
-    const middleName = formData.get("middlename") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const phone = formData.get("phone") as string;
-    const base64Image = formData.get("base64Image") as string;
-    const role = formData.get("role") as string;
-    const admin = formData.get("admin") as string;
-    const position = formData.get("position") as string;
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const department = formData.get("department") as string;
+    const priority = formData.get("priority") as string;
+    const dueDate = formData.get("dueDate") as string;
+    const status = formData.get("status") as string;
     const intent = formData.get("intent") as string;
-    const departments = formData.get("departments") as string;
+    const createdBy = formData.get("createdby") as string;
     const id = formData.get("id") as string;
-    console.log(departments);
+
+
 
 
     switch (intent) {
         case "create":
-            const user = await usersController.CreateUser({
-                firstName,
-                middleName,
-                lastName,
-                email,
-                admin,
-                password,
-                phone,
-                role,
+            const user = await taskController.CreateTask({
+                createdBy,
+                department,
+                title,
+                description,
+                priority,
+                dueDate,
+                status,
                 intent,
-                position,
-                departments,
-                base64Image
             })
             return user
 

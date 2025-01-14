@@ -1,6 +1,6 @@
 import { Button, Input, Select, SelectItem, Skeleton, TableCell, TableRow, Textarea, User } from "@nextui-org/react"
 import { ActionFunction, json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
+import { Form, Link, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import BackIcon from "~/components/icons/BackIcon"
@@ -106,14 +106,15 @@ const Users = () => {
                     />
                     {/* button to add new user */}
                     {/* button to add new user */}
-                    <Button size="sm"
-                        variant="flat"
-                        onClick={() => {
-                            setIsCreateModalOpened(true)
-                        }}
+                    <Link to="/admin/add">
+                        <button
+                    // onClick={() => {
+                    //     setIsCreateModalOpened(true)
+                    // }}
                         className="font-nunito dark:bg-[#333]  text-sm px-8">
                         Create Blog
-                    </Button>
+                        </button>
+                    </Link>
                 </div>
             </div>
 

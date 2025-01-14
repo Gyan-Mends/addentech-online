@@ -211,7 +211,7 @@ class UsersController {
         request,
         page,
         search_term,
-        limit = 8,
+        limit = 7,
     }: {
         request?: Request;
         page: number;

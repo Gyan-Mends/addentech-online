@@ -147,35 +147,47 @@ const Index = () => {
       {/* Background Slideshow */}
       <div
         data-aos="fade-up"
-        className=" mt-10 lg:h-[90vh] rounded-2xl w-full bg-cover bg-center transition-all duration-1000"
+        className=" lg:h-[90vh] rounded-2xl w-full bg-cover transition-all duration-1000"
         style={{
           backgroundImage: `url(${backgroundImages[currentBackground]})`,
+          backgroundSize: 'cover', // Ensures the image covers the full width and height
+          backgroundPosition: 'center', // Centers the image
+          backgroundRepeat: 'no-repeat', // Prevents tiling
         }}
       >
-        <div className="flex flex-col gap-10 rounded-2xl h-[90vh] lg:px-60 justify-center px-4 dark:bg-black/40 bg-black/10 text-white">
+        <div className="flex flex-col gap-10 rounded-2xl h-full lg:px-60 justify-center px-4 dark:bg-black/40 bg-black/10 text-white">
           <div>
-                      <p className="text-6xl font-montserrat font-bold">Leading the Way in</p>
-                      <p className="text-6xl mt-1 font-montserrat font-bold"> Legal Tech </p>
-                      <p className="text-6xl mt-1 font-montserrat font-bold">  Solutions</p>
+            <p className="text-6xl font-montserrat font-bold">Leading the Way in</p>
+            <p className="text-6xl mt-1 font-montserrat font-bold">Legal Tech</p>
+            <p className="text-6xl mt-1 font-montserrat font-bold">Solutions</p>
           </div>
 
-          <div className="">
-            <p className=" font-nunito font-bold text-[#05ECF2]">Transforming the legal landscape with state-of-the-art technology. </p>
-            <p className=" font-nunito font-bold text-[#05ECF2]"> Our solutions are designed to enhance productivity and deliver </p>
-            <p className=" font-nunito font-bold text-[#05ECF2]">  exceptional user experiences.</p>
+          <div className="text-[#05ECF2]">
+            <p className="font-nunito font-bold ">
+              Transforming the legal landscape with state-of-the-art technology.
+            </p>
+            <p className="font-nunito font-bold ">
+              Our solutions are designed to enhance productivity and deliver
+            </p>
+            <p className="font-nunito font-bold ">
+              exceptional user experiences.
+            </p>
           </div>
 
-          <div className="">
+          <div>
             <Link to="/about">
               <Button
-                color="default"
-                className="font-nunito  bg-[#F2059F] text-lg hover:transition hover:duration-500  hover:-translate-y-2  text-white"
+
+                className="font-nunito bg-[#F2059F] shadow-sm text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white"
               >
                 Learn More
-              </Button></Link>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
+
+
 
       <div className="mt-40">
         <div data-aos="fade-right" >
@@ -196,23 +208,28 @@ const Index = () => {
             </div>
           </Link>
 
-          <div className="flex flex-col gap-10 mt-10 lg:mt-0 pb-10 lg:pb-0">
+          <div className="flex flex-col gap-4 mt-10 lg:mt-0 pb-10 lg:pb-0">
             <Link className="lg:h-full h-80" to="https://dennislawgh.com">
-              <div data-aos="fade-down" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
-                <img src={dl} alt="" />
+              <div data-aos="fade-down" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex flex-col items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl  p-4">
+                <img src={dl} alt="" className="h-20 w-80" />
+                <div>
+                  <p className="font-nunito dark:text-white mt-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis nihil possimus commodi id odio magni harum assumenda deserunt, voluptas laborum! Dolore ea, sint ullam quos molestiae consequuntur aut optio provident? </p>
               </div>
+              </div>
+
             </Link>
 
             <Link to="https://dennislawgh.com">
-              <div data-aos="fade-up" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
-                <img src={mr} alt="" />
+              <div data-aos="fade-up" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex flex-col items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
+                <img src={mr} alt="" className="h-40 w-80" />
+                <p className="font-nunito dark:text-white mt-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo maxime quis dicta inventore perspiciatis sit, consequuntur rem fugiat magnam esse saepe, deleniti error atque earum, eaque praesentium ea autem nesciunt? </p>
               </div>
             </Link>
           </div>
 
           <Link to="https://dennislawnews.com/" >
             <div data-aos="fade-left" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-[80vh] border dark:border-white/10 border-black/20 shadow-md rounded-2xl">
-              <img src={news} alt="" className="rounded-tr-2xl rounded-tl-2xl h-60" />
+              <img src={news} alt="" className="rounded-tr-2xl rounded-tl-2xl h-40" />
               <div className="mt-10 px-4">
                 <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Denis Law News</p>
                 <p className="font-nunito dark:text-white mt-4">Denis Law News is an online news platform that provides up-to-date coverage of legal, national, and international events. With a focus on accuracy, impartiality, and relevance,  insightful articles, and in-depth analysis across a wide range of topics including politics, business, leagl, sports, technology, and more. Denis Law News aims to keep its audience well-informed with timely updates and a commitment to journalistic excellence. Whether you're looking for the latest headlines or comprehensive features, Denis Law News is a trusted source for news and information. </p>

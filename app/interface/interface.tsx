@@ -42,3 +42,13 @@ export interface BlogInterface {
     category: string
     admin: string
 }
+export interface TaskInterface {
+    _id: string
+    title: string
+    description: string
+    status: string
+    priority: string
+    department: string
+    createdBy: string
+    dueDate: string
+}

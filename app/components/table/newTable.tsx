@@ -30,10 +30,10 @@ export default function NewCustomTable(
         <div className="z-0">
             <Table className="mt-6 " aria-label="Example table with custom cells"
                 classNames={{
-                    base: "h-[76vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none",
+                    base: "h-[68vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none",
                     wrapper:
-                        "dark:bg-[#333] vertical-scrollbar horizontal-scrollbar shadow-none bg-white rounded-2xl dark:border border-white/5",
-                    th: "dark: bg-[#191919]",
+                        "dark:bg-default-100 vertical-scrollbar horizontal-scrollbar shadow-md bg-white rounded-2xl dark:border border-white/5",
+                    th: "dark: bg-[#18181B]",
                     td: "font-nunito text-xs text-slate-500 dark:text-slate-200 ",
                 }}
             >
