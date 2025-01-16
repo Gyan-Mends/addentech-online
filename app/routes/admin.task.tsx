@@ -14,14 +14,14 @@ import UserIcon from "~/components/icons/UserIcon"
 import ConfirmModal from "~/components/modal/confirmModal"
 import CreateModal from "~/components/modal/createModal"
 import EditModal from "~/components/modal/EditModal"
-import { UserColumns } from "~/components/table/columns"
+import { taskColumn, UserColumns } from "~/components/table/columns"
 import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
 import CustomInput from "~/components/ui/CustomInput"
 import department from "~/controller/departments"
 import taskController from "~/controller/task"
 import usersController from "~/controller/Users"
-import { DepartmentInterface, RegistrationInterface } from "~/interface/interface"
+import { DepartmentInterface, RegistrationInterface, TaskInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
 
@@ -30,7 +30,7 @@ const Users = () => {
     const [base64Image, setBase64Image] = useState<any>()
     const [isConfirmModalOpened, setIsConfirmModalOpened] = useState(false)
     const [isEditModalOpened, setIsEditModalOpened] = useState(false)
-    const [dataValue, setDataValue] = useState<RegistrationInterface>()
+    const [dataValue, setDataValue] = useState<TaskInterface>()
     const [isLoading, setIsLoading] = useState(false)
     const submit = useSubmit()
     const actionData = useActionData<any>()
@@ -39,12 +39,12 @@ const Users = () => {
     const navigation = useNavigation()
     const {
         user,
-        users,
+        tasks,
         totalPages,
         departments
     } = useLoaderData<{
         user: { _id: string },
-        users: RegistrationInterface[],
+        tasks: TaskInterface[],
         totalPages: number,
         departments: DepartmentInterface[]
     }>()
@@ -76,6 +76,14 @@ const Users = () => {
         }, 1000)
         return () => clearTimeout(timeOut)
     }, [])
+
+    const truncateText = (text, wordLimit) => {
+        const words = text.split(" ");
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(" ") + "...";
+        }
+        return text;
+    };
 
 
     return (
@@ -164,44 +172,49 @@ const Users = () => {
             {/* table  */}
             {/* table  */}
             <NewCustomTable
-                columns={UserColumns}
+                columns={taskColumn}
                 loadingState={navigation.state === "loading" ? "loading" : "idle"}
                 totalPages={totalPages}
                 page={1}
-                setPage={(page) => (
-                    navigate(`?page=${page}`)
-                )}>
-                {users?.map((user, index: number) => (
+                setPage={(page) => navigate(`?page=${page}`)}
+            >
+                {tasks?.map((task: TaskInterface, index: number) => (
                     <TableRow key={index}>
+                        <TableCell className="text-xs">{task.title}</TableCell>
+                        <TableCell className="text-xs">{truncateText(task.description, 5)}</TableCell>
                         <TableCell className="text-xs">
-                            <p className="!text-xs">
-                                <User
-                                    avatarProps={{ radius: "sm", src: user.image }}
-                                    name={
-                                        <p className="font-nunito text-xs">
-                                            {user.firstName + ' ' + user.middleName + ' ' + user.lastName}
-                                        </p>
-                                    }
-                                />
-                            </p>
+                            <button
+                                className={`text-xs p-1 rounded ${task.status === "unclaimed" ? "text-red-500 bg-red-500 bg-opacity-20" : "text-green-500 bg-green-500 bg-opacity-20"}`}
+
+                            >
+                                {task.status}
+                            </button>
                         </TableCell>
-                        <TableCell className="text-xs">{user.email}</TableCell>
-                        <TableCell>{user.phone}</TableCell>
-                        <TableCell>{user.role}</TableCell>
+                        <TableCell className="text-xs">{task.priority}</TableCell>
+                        <TableCell className="text-xs">{task.department.name}</TableCell>
+                        <TableCell className="text-xs">
+                            {task.createdBy.firstName + " " + task.createdBy.middleName + " " + task.createdBy.lastName}
+                        </TableCell>
+                        <TableCell className="text-xs">{task.dueDate}</TableCell>
                         <TableCell className="relative flex items-center gap-4">
-                            <button className="text-primary " onClick={() => {
-                                setIsEditModalOpened(true)
-                                setDataValue(user)
-                            }}>
+                            <button
+                                className="text-primary"
+                                onClick={() => {
+                                    setIsEditModalOpened(true);
+                                    setDataValue(task)
+                                }}
+                            >
                                 <EditIcon />
                             </button>
-                            <button className="text-danger" onClick={() => {
-                                setIsConfirmModalOpened(true)
-                                setDataValue(user)
-                            }}>
+                            <button
+                                className="text-danger"
+                                onClick={() => {
+                                    setIsConfirmModalOpened(true);
+                                    setDataValue(task)
+                                }}
+                            >
                                 <DeleteIcon />
                             </button>
-
                         </TableCell>
                     </TableRow>
                 ))}
@@ -233,98 +246,147 @@ const Users = () => {
             {/* Create Modal */}
             {/* Create Modal */}
             <EditModal
-                className="bg-gray-200 dark:bg-[#333] "
-                modalTitle="Update user details"
+                className="bg-gray-200 dark:bg-[#333]"
+                modalTitle="Update Task Details"
                 isOpen={isEditModalOpened}
                 onOpenChange={handleEditModalClosed}
             >
                 {(onClose) => (
                     <Form method="post" className="flex flex-col gap-4">
                         <CustomInput
-                            label="First name"
+                            label="Task Title"
                             isRequired
+                            name="title"
                             isClearable
-                            name="firstname"
-                            placeholder=" "
-                            defaultValue={dataValue?.firstName}
+                            placeholder="Enter task title"
+                            defaultValue={dataValue?.title}
                             type="text"
                             labelPlacement="outside"
-                            className=""
                         />
+
+                        <Textarea
+                            label="Description"
+                            isRequired
+                            name="description"
+                            placeholder="Enter task description"
+                            defaultValue={dataValue?.description}
+                            type="text"
+                            labelPlacement="outside"
+                            classNames={{
+                                inputWrapper:
+                                    "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] hover:border-b-success hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm",
+                            }}
+                        />
+
                         <div className="flex gap-4">
-                            <CustomInput
-                                label="Middle Name"
-                                name="middlename"
-                                placeholder=" "
-                                isClearable
-                                defaultValue={dataValue?.middleName}
-                                type="text"
+                            {/* Status Select */}
+                            <Select
+                                label="Status"
                                 labelPlacement="outside"
-                                className=""
-                            />
-                            <CustomInput
-                                label="Last Name"
+                                placeholder="Select task status"
                                 isRequired
-                                name="lastname"
-                                defaultValue={dataValue?.lastName}
-                                isClearable
-                                placeholder=" "
-                                type="text"
+                                name="status"
+                                defaultValue={dataValue?.status} // Existing value from database
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent:
+                                        "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                    trigger:
+                                        "bg-white shadow-sm dark:bg-[#333] border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                }}
+                            >
+                                {[
+                                    { key: "unclaimed", value: "unclaimed", display_name: "Unclaimed" },
+                                    { key: "assigned", value: "assigned", display_name: "Assigned" },
+                                ].map((status) => (
+                                    <SelectItem key={status.key} value={status.value}>
+                                        {status.display_name}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+
+                            {/* Priority Select */}
+                            <Select
+                                label="Priority"
                                 labelPlacement="outside"
-                                className=""
-                            />
+                                placeholder="Select task priority"
+                                isRequired
+                                name="priority"
+                                defaultValue={dataValue?.priority} // Existing value from database
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent:
+                                        "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                    trigger:
+                                        "bg-white shadow-sm dark:bg-[#333] border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                }}
+                            >
+                                {[
+                                    { key: "low", value: "low", display_name: "Low" },
+                                    { key: "medium", value: "medium", display_name: "Medium" },
+                                    { key: "high", value: "high", display_name: "High" },
+                                ].map((priority) => (
+                                    <SelectItem key={priority.key} value={priority.value}>
+                                        {priority.display_name}
+                                    </SelectItem>
+                                ))}
+                            </Select>
                         </div>
-                        <CustomInput
-                            label="Email"
-                            isRequired
-                            name="email"
-                            defaultValue={dataValue?.email}
-                            isClearable
-                            placeholder=" "
-                            type="text"
+
+                        {/* Department Select */}
+                        <Select
+                            label="Department"
                             labelPlacement="outside"
-                            className=""
-                        />
-                        <CustomInput
-                            label=" Phone"
+                            placeholder="Select department"
                             isRequired
-                            name="phone"
-                            defaultValue={dataValue?.phone}
+                            name="department"
+                            defaultValue={dataValue?.department} // Existing value from database
+                            classNames={{
+                                label: "font-nunito text-sm text-default-100",
+                                popoverContent:
+                                    "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                trigger:
+                                    "bg-white shadow-sm dark:bg-[#333] border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                            }}
+                        >
+                            {departments.map((department: DepartmentInterface, index: number) => (
+                                <SelectItem key={department._id} value={department._id}>
+                                    {department.name}
+                                </SelectItem>
+                            ))}
+                        </Select>
+
+                        <CustomInput
+                            label="Due Date"
+                            isRequired
+                            name="dueDate"
                             isClearable
-                            placeholder=" "
-                            type="text"
+                            placeholder="Select due date"
+                            defaultValue={dataValue?.dueDate}
+                            type="date"
                             labelPlacement="outside"
                         />
 
-                        <CustomInput
-                            label=" Role"
-                            isRequired
-                            name="role"
-                            defaultValue={dataValue?.role}
-                            isClearable
-                            placeholder=" "
-                            type="text"
-                            labelPlacement="outside"
-                        />
-
-
-                        <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
+                        <input name="updatedby" value={user?._id} type="hidden" />
                         <input name="id" value={dataValue?._id} type="hidden" />
 
-                        <div className="flex justify-end gap-2 mt-10 ">
-                            <Button className="font-montserrat font-semibold" color="danger" size="sm" variant="flat" onPress={onClose}>
+                        <div className="flex justify-end gap-2 mt-10 font-nunito">
+                            <Button color="danger" variant="flat" onPress={onClose}>
                                 Close
                             </Button>
-                            <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
-                                setIsEditModalOpened(false)
-                            }}>
+                            <button
+                                type="submit"
+                                className="rounded-xl bg-[#05ECF2] bg-opacity-20 text-[#05ECF2] text-sm font-nunito px-4"
+                            >
                                 Update
-                            </Button>
+                            </button>
                         </div>
                     </Form>
                 )}
             </EditModal>
+
+
 
             {/* Create Modal */}
             <CreateModal
@@ -491,23 +553,6 @@ export const action: ActionFunction = async ({ request }) => {
                 id
             })
             return deleteUser
-
-        case "update":
-            const updateUser = await usersController.UpdateUser({
-                firstName,
-                middleName,
-                lastName,
-                email,
-                admin,
-                phone,
-                id,
-                role,
-                intent,
-            })
-            return updateUser
-        case "logout":
-            const logout = await usersController.logout(intent)
-            return logout
         default:
             return json({
                 message: "Bad request",
@@ -527,7 +572,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     // if (!token) {
     //     return redirect("/")
     // }
-    const { user, users, totalPages } = await usersController.FetchUsers({
+    const { user, tasks, totalPages } = await taskController.FetchTasks({
         request,
         page,
         search_term
@@ -537,8 +582,10 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term
     });
+    console.log(tasks);
 
-    return json({ user, users, totalPages, departments });
+
+    return json({ user, tasks, totalPages, departments });
 }
 
 export const meta: MetaFunction = () => {

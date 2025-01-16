@@ -26,6 +26,17 @@ export const UserColumns = [
     { title: "Phone", allowSort: true },
     { title: "Role", allowSort: true },
     { title: "Action", allowSort: true }
+
+]
+export const taskColumn = [
+    { title: "Title", allowSort: true },
+    { title: "description", allowSort: true },
+    { title: "status", allowSort: true },
+    { title: "priority", allowSort: true },
+    { title: "department", allowSort: true },
+    { title: "createdBy", allowSort: true },
+    { title: "dueDate", allowSort: true },
+    { title: "Action", allowSort: true }
 ]
 export const SuppliersColumns = [
     { title: "Name", allowSort: true },

@@ -69,7 +69,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         <Link className="font-nunito" to="/blog">
                             Blog
                         </Link>
-                        <Link className="font-nunito" to="/team">
+                        <Link className="font-nunito" to="/s">
                             Team
                         </Link>
                     </NavbarItem>

@@ -1,5 +1,7 @@
 import { json } from "@remix-run/node";
+import Registration from "~/modal/registration";
 import Task from "~/modal/task";
+import { getSession } from "~/session";
 
 class TaskController {
     async CreateTask({
@@ -30,44 +32,44 @@ class TaskController {
                     return json({
                         message: "Task with this name already exists",
                         success: false,
-                        status: 500,
+                        status: 400,
                     });
-                } else {
-                    // Create new task
-                    const task = new Task({
-                        createdBy,
-                        title,
-                        description,
-                        priority,
-                        department,
-                        dueDate,
-                        status,
-                    });
-
-                    // Save task details
-                    const saveTaskDetails = await task.save();
-
-                    if (saveTaskDetails) {
-                        return json({
-                            message: "Task created successfully",
-                            success: true,
-                            status: 200,
-                        });
-                    } else {
-                        return json({
-                            message: "Unable to create task",
-                            success: false,
-                            status: 500,
-                        });
-                    }
                 }
-            } else {
+
+                // Create new task
+                const task = new Task({
+                    createdBy,
+                    title,
+                    description,
+                    priority,
+                    department,
+                    dueDate,
+                    status,
+                });
+
+                // Save task details
+                const saveTaskDetails = await task.save();
+
+                if (saveTaskDetails) {
+                    return json({
+                        message: "Task created successfully",
+                        success: true,
+                        status: 200,
+                    });
+                }
+
                 return json({
-                    message: "Wrong intent",
+                    message: "Unable to create task",
                     success: false,
-                    status: 400,
+                    status: 500,
                 });
             }
+
+            return json({
+                message: "Invalid intent",
+                success: false,
+                status: 400,
+            });
         } catch (error: any) {
             return json({
                 message: error.message,
@@ -77,7 +79,247 @@ class TaskController {
         }
     }
 
+    async AssignTask({
+        id,
+        team,
+        lead,
+        assignee,
+        description,
+        priority,
+        dueDate,
+        status,
+        createdBy,
+    }: {
+        id: string;
+        team: string;
+        lead: string;
+        assignee: string;
+        description: string;
+        priority: string;
+        dueDate: string;
+        status: string;
+        createdBy: string;
+    }) {
+        try {
+            // Update task with assignment details
+            const assign = await Task.findByIdAndUpdate(
+                id,
+                {
+                    $push: {
+                        assignment: {
+                            lead,
+                            description,
+                            team,
+                            priority,
+                            dueDate,
+                            status,
+                            createdBy,
+                            assignee,
+                        },
+                    },
+                },
+                { new: true }
+            );
+
+            if (assign) {
+                return json({
+                    message: "Task assigned successfully",
+                    success: true,
+                    status: 200,
+                });
+            }
+
+            return json({
+                message: "Unable to assign task",
+                success: false,
+                status: 500,
+            });
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500,
+            });
+        }
+    }
+    async comment({
+        id,
+        comment,
+        createdBy,
+    }: {
+        id: string;
+        comment: string
+        createdBy: string;
+    }) {
+        try {
+            // Update task with assignment details
+            const comments = await Task.findByIdAndUpdate(
+                id,
+                {
+                    $push: {
+                        comments: {
+                            comment,
+                            createdBy,
+                        },
+                    },
+                },
+                { new: true }
+            );
+
+            if (comments) {
+                return json({
+                    message: "comment created successfully",
+                    success: true,
+                    status: 200,
+                });
+            }
+
+            return json({
+                message: "Unable to create comment",
+                success: false,
+                status: 500,
+            });
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500,
+            });
+        }
+    }
+
+    async assignmentComment({
+        id,
+        comment,
+        createdBy,
+        assignmentId,
+    }: {
+        id: string;
+        comment: string;
+        createdBy: string;
+        assignmentId: string;
+    }) {
+        try {
+            const updatedTask = await Task.findByIdAndUpdate(
+                id,
+                {
+                    $push: {
+                        "assignment.$[assignment].comments": {
+                            comment,
+                            createdBy,
+                            createdAt: new Date(), // Automatically set createdAt to now
+                        },
+                    },
+                },
+                {
+                    new: true,
+                    arrayFilters: [{ "assignment._id": assignmentId }], // Ensure comment is added to the correct assignment
+                }
+            );
+
+            if (updatedTask) {
+                return json({
+                    message: "Comment created successfully",
+                    success: true,
+                    status: 200,
+                });
+            }
+
+            return json({
+                message: "Unable to create comment",
+                success: false,
+                status: 500,
+            });
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500,
+            });
+        }
+    }
+
+
+    async FetchTasks({
+        request,
+        page,
+        search_term,
+        limit = 7,
+    }: {
+        request?: Request;
+        page: number;
+        search_term?: string;
+        limit?: number;
+    } = { page: 1 }) {
+        const skipCount = (page - 1) * limit;
+
+        const searchFilter = search_term
+            ? {
+                $or: [
+                    {
+                        title: {
+                            $regex: new RegExp(
+                                search_term
+                                    .split(" ")
+                                    .map((term) => `(?=.*${term})`)
+                                    .join(""),
+                                "i"
+                            ),
+                        },
+                    },
+                ],
+            }
+            : {};
+
+        try {
+            console.log("Search Filter:", searchFilter);
+
+            const session = request
+                ? await getSession(request.headers.get("Cookie"))
+                : null;
+            const token = session?.get("email");
+            const user = token
+                ? await Registration.findOne({ email: token })
+                : null;
+
+            const selectByDepartment = await Registration.find({
+                department: user?.department,
+            });
+
+            const taskCount = await Task.countDocuments(searchFilter).exec();
+            const totalPages = Math.ceil(taskCount / limit);
+
+            console.log("Task Count:", taskCount, "Total Pages:", totalPages);
+
+            const tasks = await Task.find(searchFilter)
+                .skip(skipCount)
+                .limit(limit)
+                .populate("department")
+                .populate("comments")
+                .populate({
+                    path: "comments.createdBy", // Populate the createdBy field inside comments
+                    select: "firstName middleName image lastName", // Select only the fields you need
+                })
+                .populate("createdBy")
+                .exec();
+
+            return {
+                user,
+                tasks,
+                selectByDepartment,
+                totalPages,
+            };
+        } catch (error: any) {
+            console.error("Error Fetching Tasks:", error.message);
+
+            return {
+                message: error.message,
+                success: false,
+                status: 500,
+            };
+        }
+    }
 }
 
-const taskController = new TaskController
-export default taskController
+const taskController = new TaskController();
+export default taskController;

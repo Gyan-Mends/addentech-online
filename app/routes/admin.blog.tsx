@@ -74,6 +74,14 @@ const Users = () => {
         return () => clearTimeout(timeOut)
     }, [])
 
+    const truncateText = (text, wordLimit) => {
+        const words = text.split(" ");
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(" ") + "...";
+        }
+        return text;
+    };
+
 
     return (
         <AdminLayout pageName="Users Management">
@@ -136,14 +144,14 @@ const Users = () => {
                                     avatarProps={{ radius: "sm", src: blog?.image }}
                                     name={
                                         <p className="font-nunito text-xs">
-                                            {blog?.name}
+                                            {truncateText(blog.name, 10)}
                                         </p>
                                     }
                                 />
                             </p>
                         </TableCell>
                         <TableCell className="text-xs">{blog.category.name}</TableCell>
-                        <TableCell>{blog.description}</TableCell>
+                        <TableCell>{truncateText(blog.description, 15)}</TableCell>
                         <TableCell className="relative flex items-center gap-4">
                             <Button size="sm" color="success" variant="flat" onClick={() => {
                                 setIsEditModalOpened(true)

@@ -408,7 +408,7 @@ const Users = () => {
                             >
                                 {[
                                     { key: "admin", value: "admin", display_name: "Admin" },
-                                    { key: "attendant", value: "attendant", display_name: "Attendant" },
+                                    { key: "hod", value: "hod", display_name: "HOD" },
                                 ].map((role) => (
                                     <SelectItem key={role.key}>{role.display_name}</SelectItem>
                                 ))}
@@ -421,7 +421,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder=" "
                                 isRequired
-                                name="departments"
+                                name="department"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
@@ -467,7 +467,7 @@ const Users = () => {
                             />
                         </div>
 
-                        {/* <input name="admin" value={user?._id} type="hidden" /> */}
+                        <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="create" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
 
@@ -501,9 +501,8 @@ export const action: ActionFunction = async ({ request }) => {
     const admin = formData.get("admin") as string;
     const position = formData.get("position") as string;
     const intent = formData.get("intent") as string;
-    const departments = formData.get("departments") as string;
+    const department = formData.get("department") as string;
     const id = formData.get("id") as string;
-    console.log(departments);
 
 
     switch (intent) {
@@ -519,7 +518,7 @@ export const action: ActionFunction = async ({ request }) => {
                 role,
                 intent,
                 position,
-                departments,
+                department,
                 base64Image
             })
             return user
