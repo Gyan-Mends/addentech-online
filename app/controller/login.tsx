@@ -43,6 +43,8 @@ class LoginController {
                 return redirect("/admin", { headers: { "Set-Cookie": cookie } });
             } else if (userCheck.role === "hod") {
                 return redirect("/hod", { headers: { "Set-Cookie": cookie } });
+            } else if (userCheck.role === "staff") {
+                return redirect("/staff", { headers: { "Set-Cookie": cookie } });
             } else {
                 return json({
                     success: false,

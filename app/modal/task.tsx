@@ -15,9 +15,11 @@ const TaskSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["unclaimed", "assigned"],
+            enum: ["Unclaimed", "Approved"],
             required: true,
+            default: "Unclaimed",
         },
+
         priority: {
             type: String,
             enum: ["low", "medium", "high"],
@@ -66,7 +68,7 @@ const TaskSchema = new mongoose.Schema(
                 },
                 status: {
                     type: String,
-                    enum: ["unclaimed", "assigned"],
+                    enum: ["Pending", "Onhold", "Inprogress", "Needs Approval", "Completed"],
                     required: true,
                 },
                 lead: {

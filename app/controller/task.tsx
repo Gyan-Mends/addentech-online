@@ -101,6 +101,26 @@ class TaskController {
         createdBy: string;
     }) {
         try {
+            // Check if the task exists and has the required priority
+            const task = await Task.findById(id);
+
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404, // Not Found
+                });
+            }
+
+            // Validate the priority
+            if (task.status !== "Approved") {
+                return json({
+                    message: "Task cannot be assigned because the priority is not 'Approved'",
+                    success: false,
+                    status: 400, // Bad Request
+                });
+            }
+
             // Update task with assignment details
             const assign = await Task.findByIdAndUpdate(
                 id,
@@ -142,6 +162,8 @@ class TaskController {
             });
         }
     }
+
+
     async comment({
         id,
         comment,
@@ -189,16 +211,17 @@ class TaskController {
     }
 
     async assignmentComment({
+        AssignmentId,
         id,
         comment,
         createdBy,
-        assignmentId,
     }: {
+            AssignmentId: string
         id: string;
         comment: string;
-        createdBy: string;
-        assignmentId: string;
+            createdBy: string;
     }) {
+
         try {
             const updatedTask = await Task.findByIdAndUpdate(
                 id,
@@ -207,13 +230,13 @@ class TaskController {
                         "assignment.$[assignment].comments": {
                             comment,
                             createdBy,
-                            createdAt: new Date(), // Automatically set createdAt to now
+                            createdAt: new Date(),
                         },
                     },
                 },
                 {
                     new: true,
-                    arrayFilters: [{ "assignment._id": assignmentId }], // Ensure comment is added to the correct assignment
+                    arrayFilters: [{ "assignment._id": AssignmentId }],
                 }
             );
 
@@ -231,6 +254,7 @@ class TaskController {
                 status: 500,
             });
         } catch (error: any) {
+
             return json({
                 message: error.message,
                 success: false,
@@ -238,7 +262,6 @@ class TaskController {
             });
         }
     }
-
 
     async FetchTasks({
         request,
@@ -291,6 +314,29 @@ class TaskController {
 
             console.log("Task Count:", taskCount, "Total Pages:", totalPages);
 
+            const staffTasks = await Task.find({ department: user?.department }, searchFilter)
+                .skip(skipCount)
+                .limit(limit)
+                .populate("department")
+                .populate("comments")
+                .populate({
+                    path: "comments.createdBy", // Populate the createdBy field inside comments
+                    select: "firstName middleName image lastName", // Select only the fields you need
+                })
+                .populate("createdBy")
+                .exec();
+            const hodTasks = await Task.find({ department: user?.department }, searchFilter)
+                .skip(skipCount)
+                .limit(limit)
+                .populate("department")
+                .populate("comments")
+                .populate({
+                    path: "comments.createdBy", // Populate the createdBy field inside comments
+                    select: "firstName middleName image lastName", // Select only the fields you need
+                })
+                .populate("createdBy")
+                .exec();
+
             const tasks = await Task.find(searchFilter)
                 .skip(skipCount)
                 .limit(limit)
@@ -308,6 +354,8 @@ class TaskController {
                 tasks,
                 selectByDepartment,
                 totalPages,
+                hodTasks,
+                staffTasks
             };
         } catch (error: any) {
             console.error("Error Fetching Tasks:", error.message);
@@ -319,7 +367,161 @@ class TaskController {
             };
         }
     }
+
+    async UpdateProjectkStatus(
+        {
+            status,
+            id,
+        }: {
+            id: string,
+            status: string
+        }
+    ) {
+        try {
+            // Validate status against schema enum values
+            const validStatuses = ["Unclaimed", "Approved"];
+            if (!validStatuses.includes(status)) {
+                return json({
+                    message: "Invalid status value. Allowed values are 'Unclaimed' and 'Approved'.",
+                    success: false,
+                    status: 400, // Bad Request
+                });
+            }
+
+            const updateUser = await Task.findByIdAndUpdate(
+                id,
+                { status },
+                { new: true } // Return the updated document
+            );
+
+            if (updateUser) {
+                return json({
+                    message: "Task Status Updated Successfully",
+                    success: true,
+                    status: 200, // Success
+                });
+            } else {
+                return json({
+                    message: "Unable to update this record",
+                    success: false,
+                    status: 404, // Not Found
+                });
+            }
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500, // Internal Server Error
+            });
+        }
+    }
+    async UpdateTaskkStatus(
+        {
+            status,
+            id,
+        }: {
+            id: string,
+            status: string
+        }
+    ) {
+        try {
+            // Validate status against schema enum values
+
+
+            const updateUser = await Task.findByIdAndUpdate(
+                id,
+                { status },
+                { new: true } // Return the updated document
+            );
+
+            if (updateUser) {
+                return json({
+                    message: "Task Status Updated Successfully",
+                    success: true,
+                    status: 200, // Success
+                });
+            } else {
+                return json({
+                    message: "Unable to update this record",
+                    success: false,
+                    status: 404, // Not Found
+                });
+            }
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500, // Internal Server Error
+            });
+        }
+    }
+
+    async UpdatePriority(
+        {
+            priority,
+            id,
+        }: {
+            id: string,
+            priority: string
+        }
+    ) {
+        try {
+
+
+            const updateUser = await Task.findByIdAndUpdate(
+                id,
+                { priority },
+                { new: true } // Return the updated document
+            );
+
+            if (updateUser) {
+                return json({
+                    message: "Task Status Updated Successfully",
+                    success: true,
+                    status: 200, // Success
+                });
+            } else {
+                return json({
+                    message: "Unable to update this record",
+                    success: false,
+                    status: 404, // Not Found
+                });
+            }
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500, // Internal Server Error
+            });
+        }
+    }
+
+    async DeleteProject(
+        {
+            id,
+        }: {
+            id: string,
+        }
+    ) {
+        const deleteUser = await Task.findByIdAndDelete(id);
+        if (deleteUser) {
+            return json({
+                message: "Project delete successfully",
+                success: true,
+                status: 500,
+            })
+        } else {
+            return json({
+                message: "Unable to delete project",
+                success: false,
+                status: 500
+            })
+        }
+    }
 }
+
+
+
 
 const taskController = new TaskController();
 export default taskController;

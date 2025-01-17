@@ -409,6 +409,7 @@ const Users = () => {
                                 {[
                                     { key: "admin", value: "admin", display_name: "Admin" },
                                     { key: "hod", value: "hod", display_name: "HOD" },
+                                    { key: "staff", value: "staff", display_name: "Staff" },
                                 ].map((role) => (
                                     <SelectItem key={role.key}>{role.display_name}</SelectItem>
                                 ))}

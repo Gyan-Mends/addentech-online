@@ -150,7 +150,15 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                         <Link className="" to="/admin/task">
                             <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
                                 <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
-                                Tasks
+                                Projects
+                            </li>
+                        </Link>
+                    </ul>
+                    <ul className=" pl-2 flex flex-col gap-2">
+                        <Link className="" to="/admin/task">
+                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                Memorandum
                             </li>
                         </Link>
                     </ul>

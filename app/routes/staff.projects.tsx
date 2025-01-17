@@ -29,6 +29,7 @@ import usersController from "~/controller/Users"
 import { DepartmentInterface, RegistrationInterface, TaskInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
 import HODLayout from "~/layout/hodLayout"
+import StaffLayout from "~/layout/staffLayout"
 import { getSession } from "~/session"
 
 const Users = () => {
@@ -58,13 +59,13 @@ const Users = () => {
 
     const {
         user,
-        hodTasks,
+        staffTasks,
         totalPages,
         departments,
         selectByDepartment
     } = useLoaderData<{
         user: { _id: string },
-        hodTasks: TaskInterface[],
+        staffTasks: TaskInterface[],
         totalPages: number,
         departments: DepartmentInterface[]
         selectByDepartment: RegistrationInterface
@@ -127,7 +128,7 @@ const Users = () => {
 
 
     return (
-        <HODLayout pageName="Users Management">
+        <StaffLayout pageName="Users Management">
             <div>
                 <div className="z-1">
                     <div className="flex justify-between">
@@ -228,17 +229,17 @@ const Users = () => {
                     {/* table  */}
                     {/* table  */}
                     <div className="grid grid-cols-4 mt-4 gap-8">
-                        {hodTasks?.map((task: TaskInterface, index: number) => (
+                        {staffTasks?.map((task: TaskInterface, index: number) => (
                             <div
                                 className="h-full border bg-default-100 w-full rounded-xl dark:border-default-200 p-2"
                                 key={index}
                             >
                                 <div className="flex justify-between">
                                     <Button
-                                        onClick={() => {
-                                            setDataValue(task)
-                                            setIsPriorityConfirmModalOpened(true)
-                                        }}
+                                        // onClick={() => {
+                                        //     setDataValue(task)
+                                        //     setIsPriorityConfirmModalOpened(true)
+                                        // }}
                                         variant="flat"
                                         size="sm"
                                         color="success"
@@ -258,7 +259,7 @@ const Users = () => {
 
 
 
-                                    <Dropdown placement="bottom-end">
+                                    {/* <Dropdown placement="bottom-end">
                                         <DropdownTrigger>
                                             <button>
                                                 <ElipIcon className="h-4 w-4" />
@@ -283,7 +284,7 @@ const Users = () => {
                                                 </button>
                                             </DropdownItem>
                                         </DropdownMenu>
-                                    </Dropdown>
+                                    </Dropdown> */}
                                 </div>
                                 <p className="mt-2 font-bold font-montserrat">{task.title}</p>
                                 <p className="mt-2 text-xs font-nunito">{truncateText(task.description, 20)}</p><hr className="border dark:border-default-200 border-1 mt-4" />
@@ -326,14 +327,7 @@ const Users = () => {
                                         </button>
                                     </div>
 
-                                    <div>
-                                        <Button onClick={() => {
-                                            setDataValue(task);
-                                            assignDrawer();
-                                        }} size="sm">
-                                            Assign Task
-                                        </Button>
-                                    </div>
+
                                 </div>
                             </div>
                         ))}
@@ -949,7 +943,7 @@ const Users = () => {
 
                 </div>
             </div>
-        </HODLayout>
+        </StaffLayout>
     )
 }
 
@@ -1081,7 +1075,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     // if (!token) {
     //     return redirect("/")
     // }
-    const { user, hodTasks, totalPages, selectByDepartment } = await taskController.FetchTasks({
+    const { user, staffTasks, totalPages, selectByDepartment } = await taskController.FetchTasks({
         request,
         page,
         search_term
@@ -1091,10 +1085,10 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term
     });
-    console.log(hodTasks);
+    console.log(staffTasks);
 
 
-    return json({ user, hodTasks, totalPages, departments, selectByDepartment });
+    return json({ user, staffTasks, totalPages, departments, selectByDepartment });
 }
 
 export const meta: MetaFunction = () => {

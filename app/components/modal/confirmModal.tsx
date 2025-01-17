@@ -15,7 +15,7 @@ export default function ConfirmModal({isOpen,onOpenChange,children,content,heade
   return (
     <>
       <Modal className={className} isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent className="dark:bg-[#333]">
+        <ModalContent className="dark:bg-default-100">
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center justify-center gap-1 font-montserrat font-semibold text-2xl text-danger">{header}</ModalHeader>
