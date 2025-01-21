@@ -1,8 +1,8 @@
 import { Button, Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle, Switch } from "@nextui-org/react"
-import { Link } from "@remix-run/react"
+import { Link, useLocation } from "@remix-run/react"
 import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
-import logo from "~/components/images/addentech_logo.png"
+import logo from "~/components/images/header-logo-blue.svg"
 import SunIcon from "./icons/SunIcon";
 import MoonIcon from "./icons/MoonIcon";
 import LocationIcon from "./icons/LocationIcon";
@@ -19,6 +19,7 @@ interface PublicLayoutProps {
 const PublicLayout = ({ children }: PublicLayoutProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { theme, setTheme } = useTheme()
+    const location = useLocation()
     const menuItems = [
         { text: "Home", href: "/" },
         { text: "About", href: "/about" },
@@ -30,78 +31,103 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
 
     return (
-        <div className={`transition duration-500  px-4 lg:px-40 overflow-x-hidden ${theme === "light" ? "bg-white " : "bg-[#0b0e13]"}`}>
+        <div className={`transition duration-500    overflow-x-hidden ${theme === "light" ? "bg-white " : "bg-[#0b0e13]"}`}>
             {/* navigation bar */}
             <Navbar
                 isBordered={false}
                 isMenuOpen={isMenuOpen}
                 onMenuOpenChange={setIsMenuOpen}
                 isBlurred
-                position="sticky"
-                className="top-0 z-50 py-4 dark:bg-[#0b0e13] bg-white flex"
+                className="top-0 left-0 w-full py-1 flex fixed z-50"
             >
                 <NavbarContent className="lg:hidden">
-                    <NavbarMenuToggle className="text-black dark:text-white" aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
+                    <NavbarMenuToggle
+                        className="text-black dark:text-white"
+                        aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+                    />
                 </NavbarContent>
 
-                <NavbarContent justify="start" className="">
-                    <NavbarItem  >
-                        <div className="w-40 h-10">
-                            <img className=" w-40 h-10" src={logo || "~/components/images/addentech_logo.png"} alt="Addentech Logo" />
+                <NavbarContent justify="start">
+                    <NavbarItem>
+                        <div className="w-40 h-10 text-white">
+                            <img
+                                className="w-40 h-10 text-white"
+                                src={logo || "~/components/images/addentech_logo.png"}
+                                alt="Addentech Logo"
+                            />
                         </div>
                     </NavbarItem>
                 </NavbarContent>
 
                 <NavbarContent justify="center" className="hidden lg:flex w-full">
                     <NavbarItem className="flex gap-6 ml-10 dark:text-white">
-                        <Link className="font-nunito" to="/">
+                        <Link
+                            className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/' ? 'bg-primary rounded-lg' : ''
+                                }`}
+                            to="/"
+                        >
                             Home
                         </Link>
-                        <Link className="font-nunito" to="/contact">
+                        <Link
+                            className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/contact' ? 'bg-primary rounded-lg' : ''
+                                }`}
+                            to="/contact"
+                        >
                             Contact
                         </Link>
-                        <Link className="font-nunito" to="/services">
+                        <Link
+                            className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/services' ? 'bg-primary rounded-lg' : ''
+                                }`}
+                            to="/services"
+                        >
                             Services
                         </Link>
-                        <Link className="font-nunito" to="/about">
+                        <Link
+                            className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/about' ? 'bg-primary rounded-lg' : ''
+                                }`}
+                            to="/about"
+                        >
                             About
                         </Link>
-                        <Link className="font-nunito" to="/blog">
+                        <Link
+                            className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/blog' ? 'bg-primary rounded-lg' : ''
+                                }`}
+                            to="/blog"
+                        >
                             Blog
                         </Link>
-                        <Link className="font-nunito" to="/s">
+                        <Link
+                            className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/s' ? 'bg-primary rounded-lg' : ''
+                                }`}
+                            to="/s"
+                        >
                             Team
                         </Link>
                     </NavbarItem>
                 </NavbarContent>
 
-                <NavbarContent justify="end" className="">
-                    <NavbarItem  >
+                <NavbarContent justify="end">
+                    <NavbarItem>
                         <Switch
+                            className=""
                             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                             size="md"
                             thumbIcon={({ className }) =>
                                 theme === "light" ? <SunIcon className={className} /> : <MoonIcon className={className} />
                             }
-                        >
-                        </Switch>
-
+                        />
                     </NavbarItem>
                 </NavbarContent>
 
                 <NavbarMenu>
                     {menuItems.map((item, index) => (
                         <NavbarMenuItem key={`${item.text}-${index}`}>
-                            <Link
-                                className="w-full"
-                                to={item.href}
-                            >
+                            <Link className="w-full" to={item.href}>
                                 {item.text}
                             </Link>
                         </NavbarMenuItem>
                     ))}
                 </NavbarMenu>
-
             </Navbar>
 
             <div className="">

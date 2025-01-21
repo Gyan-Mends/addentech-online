@@ -1,18 +1,21 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
 import PublicLayout from "~/components/PublicLayout";
+import { Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle, Switch } from "@nextui-org/react"
+
 import jl from "~/components/images/JL.png"
 import testimonial from "~/components/images/670c83518128ff5c009e4a93_Testimonail Image 3-p-500.webp"
 import dl from "~/components/images/Dennislaw-Logo.svg"
 import mr from "~/components/images/mr-logo.png"
 import news from "~/components/images/DL-News-Logo.png"
-import img5 from "~/components/images/about-five2.jpg"
+import img5 from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
 import img6 from "~/components/images/about-five1.jpg"
 import lineImage from "~/components/images/work-process-line.png"
 import { Button, User } from "@nextui-org/react";
 // import Support from "~/components/Icons/icons/Support";
-import logo from "~/components/images/logo.png"
+import logo2 from "~/components/images/addentech_logo.png"
+import logo from "~/components/images/header-logo-blue.svg"
 import EmailIcon from "~/components/icons/EmailIcon";
 import StarIcon from "~/components/icons/StarIcon";
 import NetworkIcon from "~/components/icons/NetworkIcon";
@@ -22,6 +25,10 @@ import usersController from "~/controller/Users";
 import { BlogInterface, RegistrationInterface } from "~/interface/interface";
 import Users from "./admin.users";
 import blog from "~/controller/blog";
+import { useTheme } from "next-themes";
+import SunIcon from "~/components/icons/SunIcon";
+import MoonIcon from "~/components/icons/MoonIcon";
+
 // import AWS from "~/components/Icons/icons/AWS";
 
 const Index = () => {
@@ -35,6 +42,7 @@ const Index = () => {
     users: RegistrationInterface[],
     blogs: BlogInterface[]
   }>()
+  const location = useLocation();
   const testimonials = [
     {
       id: 1,
@@ -140,52 +148,168 @@ const Index = () => {
     }
     return text;
   };
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme()
+  const menuItems = [
+    { text: "Home", href: "/" },
+    { text: "About", href: "/about" },
+    { text: "Services", href: "/services" },
+    { text: "Contact", href: "/contact" },
+    { text: "blog", href: "/blog" },
+    { text: "team", href: "/team" },
+  ];
+
 
 
   return (
-    <PublicLayout>
+    <div className="overflow-x-hidden">
       {/* Background Slideshow */}
       <div
-        data-aos="fade-up"
-        className=" lg:h-[90vh] rounded-2xl w-full bg-cover transition-all duration-1000"
         style={{
-          backgroundImage: `url(${backgroundImages[currentBackground]})`,
-          backgroundSize: 'cover', // Ensures the image covers the full width and height
-          backgroundPosition: 'center', // Centers the image
-          backgroundRepeat: 'no-repeat', // Prevents tiling
+          backgroundImage: `url(${img5})`,
+          backgroundPosition: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
         }}
       >
-        <div className="flex flex-col gap-10 rounded-2xl h-full lg:px-60 justify-center px-4 dark:bg-black/40 bg-black/10 text-white">
-          <div>
-            <p className="text-6xl font-montserrat font-bold">Leading the Way in</p>
-            <p className="text-6xl mt-1 font-montserrat font-bold">Legal Tech</p>
-            <p className="text-6xl mt-1 font-montserrat font-bold">Solutions</p>
+        {/* Navbar */}
+        <Navbar
+          isBordered={false}
+          isMenuOpen={isMenuOpen}
+          onMenuOpenChange={setIsMenuOpen}
+          isBlurred
+          className="top-0 left-0 w-full py-1 flex fixed z-50"
+        >
+          <NavbarContent className="lg:hidden">
+            <NavbarMenuToggle
+              className="text-black dark:text-white"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            />
+          </NavbarContent>
+
+          <NavbarContent justify="start">
+            <NavbarItem>
+              <div className="w-40 h-10 text-white">
+                <img
+                  className="w-40 h-10 text-white"
+                  src={logo || "~/components/images/addentech_logo.png"}
+                  alt="Addentech Logo"
+                />
           </div>
+            </NavbarItem>
+          </NavbarContent>
 
-          <div className="text-[#05ECF2]">
-            <p className="font-nunito font-bold ">
-              Transforming the legal landscape with state-of-the-art technology.
-            </p>
-            <p className="font-nunito font-bold ">
-              Our solutions are designed to enhance productivity and deliver
-            </p>
-            <p className="font-nunito font-bold ">
-              exceptional user experiences.
-            </p>
-          </div>
-
-          <div>
-            <Link to="/about">
-              <Button
-
-                className="font-nunito bg-[#F2059F] shadow-sm text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white"
+          <NavbarContent justify="center" className="hidden lg:flex w-full">
+            <NavbarItem className="flex gap-6 ml-10 dark:text-white">
+              <Link
+                className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/' ? 'bg-primary rounded-lg' : ''
+                  }`}
+                to="/"
               >
+                Home
+              </Link>
+              <Link
+                className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/contact' ? 'bg-primary rounded-lg' : ''
+                  }`}
+                to="/contact"
+              >
+                Contact
+              </Link>
+              <Link
+                className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/services' ? 'bg-primary rounded-lg' : ''
+                  }`}
+                to="/services"
+              >
+                Services
+              </Link>
+              <Link
+                className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/about' ? 'bg-primary rounded-lg' : ''
+                  }`}
+                to="/about"
+              >
+                About
+              </Link>
+              <Link
+                className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/blog' ? 'bg-primary rounded-lg' : ''
+                  }`}
+                to="/blog"
+              >
+                Blog
+              </Link>
+              <Link
+                className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/s' ? 'bg-primary rounded-lg' : ''
+                  }`}
+                to="/s"
+              >
+                Team
+              </Link>
+            </NavbarItem>
+          </NavbarContent>
+
+          <NavbarContent justify="end">
+            <NavbarItem>
+              <Switch
+                className=""
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                size="md"
+                thumbIcon={({ className }) =>
+                  theme === "light" ? <SunIcon className={className} /> : <MoonIcon className={className} />
+                }
+              />
+            </NavbarItem>
+          </NavbarContent>
+
+          <NavbarMenu>
+            {menuItems.map((item, index) => (
+              <NavbarMenuItem key={`${item.text}-${index}`}>
+                <Link className="w-full" to={item.href}>
+                  {item.text}
+                </Link>
+              </NavbarMenuItem>
+            ))}
+          </NavbarMenu>
+        </Navbar>
+
+        {/* Hero Section */}
+        <div className="flex flex-col gap-10 min-h-screen lg:px-40 justify-center px-4 text-white text-center lg:text-left">
+          {/* Main Headline */}
+          <div>
+            <p className="text-6xl font-extrabold font-montserrat leading-tight">
+              Transforming the{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-orange-500">
+                Legal
+              </span>
+            </p>
+            <p className="text-6xl font-extrabold font-montserrat mt-2"> Landscape</p>
+            <p className="text-6xl font-extrabold font-montserrat mt-2">
+              with <span className="text-[#F2059F]">Dennis Law</span>
+            </p>
+          </div>
+
+          {/* Subheadline */}
+          <div className="text-lg font-nunito text-gray-300 max-w-2xl mx-auto lg:mx-0">
+            <p>Transform the digital landscape with cutting-edge solutions.</p>
+            <p>Designed for **SaaS, Fintech, CRM,** and **Tech startups**.</p>
+            <p>Customize and boost your online presence.</p>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex gap-6 justify-center lg:justify-start">
+            <Link to="/about">
+              <Button className="font-nunito bg-primary shadow-lg text-lg text-white px-6 py-3 rounded-xl transition-transform transform hover:-translate-y-2 duration-1000">
                 Learn More
               </Button>
             </Link>
           </div>
         </div>
       </div>
+
+
+
 
 
 
@@ -555,7 +679,7 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </PublicLayout>
+    </div>
   );
 };
 

@@ -19,6 +19,7 @@
     "aos": "^2.3.4",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "crypto-browserify": "^3.12.1",
     "dotenv": "^16.4.7",
     "framer-motion": "^11.11.17",
     "isbot": "^4.1.0",
@@ -31,7 +32,8 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-quill": "^2.0.0",
-    "swiper": "^11.1.14"
+    "swiper": "^11.1.14",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.14.0",

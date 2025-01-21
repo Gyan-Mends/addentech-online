@@ -115,7 +115,7 @@ class TaskController {
             // Validate the priority
             if (task.status !== "Approved") {
                 return json({
-                    message: "Task cannot be assigned because the priority is not 'Approved'",
+                    message: "Task cannot be assigned because is not Approved",
                     success: false,
                     status: 400, // Bad Request
                 });
