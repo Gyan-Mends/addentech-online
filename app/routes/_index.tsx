@@ -34,6 +34,7 @@ import InIcon from "~/components/icons/InIcon";
 import XIcon from "~/components/icons/XIcon";
 import YouTubeIcon from "~/components/icons/YoutubeIcon";
 import LocationIcon from "~/components/icons/LocationIcon";
+import { AnimatedTestimonials } from "~/components/acternity/carosel";
 
 // import AWS from "~/components/Icons/icons/AWS";
 
@@ -163,6 +164,44 @@ const Index = () => {
     { text: "Contact", href: "/contact" },
     { text: "blog", href: "/blog" },
     { text: "team", href: "/team" },
+  ];
+
+  const testimonial = [
+    {
+      quote:
+        "The attention to detail and innovative features have completely transformed our workflow. This is exactly what we've been looking for.",
+      name: "Sarah Chen",
+      designation: "Product Manager at TechFlow",
+      src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=3560&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote:
+        "Implementation was seamless and the results exceeded our expectations. The platform's flexibility is remarkable.",
+      name: "Michael Rodriguez",
+      designation: "CTO at InnovateSphere",
+      src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote:
+        "This solution has significantly improved our team's productivity. The intuitive interface makes complex tasks simple.",
+      name: "Emily Watson",
+      designation: "Operations Director at CloudScale",
+      src: "https://images.unsplash.com/photo-1623582854588-d60de57fa33f?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote:
+        "Outstanding support and robust features. It's rare to find a product that delivers on all its promises.",
+      name: "James Kim",
+      designation: "Engineering Lead at DataPro",
+      src: "https://images.unsplash.com/photo-1636041293178-808a6762ab39?q=80&w=3464&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+    {
+      quote:
+        "The scalability and performance have been game-changing for our organization. Highly recommend to any growing business.",
+      name: "Lisa Thompson",
+      designation: "VP of Technology at FutureNet",
+      src: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?q=80&w=2592&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
   ];
 
 
@@ -352,7 +391,7 @@ const Index = () => {
 
               <Link to="https://dennislawgh.com">
                 <div data-aos="fade-up" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex flex-col items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
-                  <img src={mr} alt="" className="h-40 w-80" />
+                  <img src={mr} alt="" className="h-40 w-[20vw]" />
                   <p className="font-nunito dark:text-white mt-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo maxime quis dicta inventore perspiciatis sit, consequuntur rem fugiat magnam esse saepe, deleniti error atque earum, eaque praesentium ea autem nesciunt? </p>
                 </div>
               </Link>
@@ -371,8 +410,19 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="lg:grid lg:grid-cols-2 lg:mt-40 mt-10 h-full lg:flex  gap-20">
-          <div className="">
+        <div style={{
+          backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+          backgroundPosition: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
+        }} className="lg:grid lg:grid-cols-2 lg:mt-40 mt-10 h-full lg:flex  gap-20">
+          <div
+
+            className="">
             <img data-aos="fade-right" className="rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
             <img data-aos="fade-left" className="lg:ml-60 lg:-mt-60 mt-10 rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105" src={img6} alt="" />
           </div>
@@ -479,53 +529,26 @@ const Index = () => {
 
           <div className="lg:grid lg:grid-cols-3 gap-4 mt-20">
             {blogs.slice(0, 3).map((blog: BlogInterface, index: number) => (
-              <div
-                data-aos="zoom-in"
-                key={blog.id}
-                className="h-[94vh] pb-6 mt-16 lg:mt-0 shadow-md rounded-2xl border dark:border-white/5 border-black/10 dark:bg-[rgb(14,17,22)]"
-              >
-                <img
-                  src={blog.image}
-                  className="w-full rounded-tr-2xl rounded-tl-2xl h-[45vh]"
-                  alt={blog.name}
-                />
-                <div className="flex justify-between mt-6 px-6">
-                  <p className="text-gray-400">
-                    {new Date(blog.createdAt).toLocaleDateString("en-US", {
+              <Link to={`/blog/${blog._id}`}>
+                <div data-aos="fade-in" data-aos-duration="100000" className="mt-4">
+                  <img className="h-80 w-full  rounded-xl" src={blog.image} alt="" />
+                  <span className="flex gap-8 mt-4">
+                    <p className="font-nunito text-gray-600"> {new Date(blog.createdAt).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
-                    })}
-                  </p>                <p className="text-gray-400">Comments ({blog.comments})</p>
-                </div>
-                <div className="px-6 mt-6">
-                  <p className="font-nunito dark:text-white text-2xl font-bold">
-                    {truncateText(blog?.name, 10)} {/* Limit to 20 words */}
+                    })}</p>
+                    <p className="font-nunito text-gray-600">{blog.admin?.firstName}</p>
+                  </span>
+                  <p className="mt-4 font-nunito font-bold text-xl">{truncateText(blog?.name, 10)}
                   </p>
-                </div>
-                <div className="px-6 mt-6 flex items-center flex justify-between">
-                  {/* <User /> */}
-                  Posted By
-                  <p></p>
-                  <p className="font-nunito text-gray-400">
-                    <span className="text-[#05ECF2]">{blog.admin?.firstName}</span>
+                  <p className="mt-4 font-nunito">
+                    {truncateText(blog?.description, 30)}
+
                   </p>
+
                 </div>
-                <div className="px-6 mt-6 flex items-center">
-                  {truncateText(blog?.description, 20)} {/* Limit to 20 words */}
-                </div>
-                <div className="px-6 mt-6 flex items-center">
-                  <Link to={`/blog/${blog._id}`}>
-                    <Button
-                      size="sm"
-                      color="default"
-                      className="font-nunito bg-[#F2059F] text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white"
-                    >
-                      Read More
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -605,29 +628,33 @@ const Index = () => {
               </Button></Link>
           </div>
         </div>
-        <div className="lg:grid lg:grid-cols-3 gap-10 lg:mt-40 ">
-          {users.slice(0, 3).map((member, index) => (
-            <div data-aos="zoom-in" key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-0">
-              <div className="w-full flex items-center justify-between px-10  h-28  rounded-tr-2xl rounded-tl-2xl">
-                <div>
-                  <p className="font-nunito text-lg dark:text-white font-bold">{member?.firstName + " " + member?.middleName + " " + member?.lastName}</p>
-                  <p className="font-nunito text-md dark:text-white">{member.position}</p>
-                </div>
-                <div>
-                  <Link to="">
-                    <EmailIcon className="h-6 w-6 text-[#05ECF2]" />
-                  </Link>
-                </div>
-              </div>
-              <div className="h-[60vh] overflow-hidden rounded-bl-2xl rounded-br-2xl">
+        <div className="lg:grid lg:grid-cols-4 gap-10 lg:mt-40 ">
+          {users.slice(0, 4).map((member, index) => (
+            <div
+              data-aos="zoom-in"
+              key={index}
+              className={`w-full h-[50vh] rounded-2xl ${index === 1 || index === 3 ? 'mt-20' : 'mt-40 lg:mt-0'}`}
+            >
+              <div className="h-[50vh] overflow-hidden rounded-2xl relative group">
+                {/* Image */}
                 <img
                   className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
                   src={member.image}
                   alt={member.name}
                 />
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center">
+                  {/* Name */}
+                  <p className="text-white font-nunito text-lg">{member.firstName + " " + member.middleName + " " + member.lastName}</p>
+                  <p className="text-white font-nunito text-lg">{member.phone}</p>
+                </div>
               </div>
             </div>
           ))}
+
+
+
         </div>
 
         {/* Testimonials Section */}
@@ -637,54 +664,7 @@ const Index = () => {
             <p className="dark:text-white font-montserrat text-4xl font-bold">inspire confidence</p>
           </div>
 
-          <div className="mt-20 flex items-center relative  rounded-xl">
-            <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{
-                transform: `translateX(-${currentBackground * 100}%)`,
-              }}
-            >
-              {testimonials.map((testimonial) => (
-                <div data-aos="fade-left" key={testimonial.id} className="min-w-full flex flex-col lg:flex-row gap-10">
-                  <div className="pr-10 lg:w-2/3">
-                    <div className="flex gap-2">
-                      {Array.from({ length: testimonial.stars }).map((_, i) => (
-                        <StarIcon key={i} className="h-6 w-6 text-[#05ECF2]" />
-                      ))}
-                    </div>
-
-                    <p className="text-nunito text-2xl dark:text-white mt-10">{testimonial.text}</p>
-                    <p className="text-nunito text-xl dark:text-white mt-10">
-                      {testimonial.author} - <span className="text-sm">{testimonial.position}</span>
-                    </p>
-
-                    {/* Navigation Buttons */}
-                    <div className="flex gap-4 mt-10">
-                      <button
-                        className="bg-[#05ECF2] text-black px-4 py-2 rounded-md hover:bg-[#03c1c7]"
-                        onClick={() =>
-                          setCurrentBackground((currentBackground - 1 + testimonials.length) % testimonials.length)
-                        }
-                      >
-                        Previous
-                      </button>
-                      <button
-                        className="bg-[#05ECF2] text-black px-4 py-2 rounded-md hover:bg-[#03c1c7]"
-                        onClick={() =>
-                          setCurrentBackground((currentBackground + 1) % testimonials.length)
-                        }
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                  <div className="lg:w-1/3">
-                    <img src={testimonial.image} alt="testimonial" className="rounded-lg w-full h-[50vh]" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <AnimatedTestimonials testimonials={testimonial} />
         </div>
 
         <footer className="mt-10 lg:mt-40">
