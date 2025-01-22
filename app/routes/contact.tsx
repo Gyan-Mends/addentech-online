@@ -1,5 +1,5 @@
 import { Button, Input, Textarea } from "@nextui-org/react";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, Link, useActionData } from "@remix-run/react";
 // import LocationIcon from "~/components/Icons/icons/locationIcon";
 import PublicLayout from "~/components/PublicLayout";
 import service from "~/components/images/670c834d0c2d2d95eac92c3c_Contact Image.webp"
@@ -8,6 +8,8 @@ import contactController from "~/controller/contact";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { errorToast, successToast } from "~/components/toast";
+import img5 from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
+
 
 const Contact = () => {
     const actionData = useActionData<any>()
@@ -23,7 +25,8 @@ const Contact = () => {
     }, [actionData])
     return (
         <PublicLayout>
-            <div className="mt-6 lg:mt-20 lg:grid lg:grid-cols-2 gap-10">
+
+            <div className="mt-6 lg:mt-40 lg:grid lg:grid-cols-2 gap-10">
                 <Toaster position="top-right" />
                 <div data-aos="fade-right" className="flex flex-col gap-6 px-4">
                     <p className="dark:text-white font-nunito font-bold text-5xl">
@@ -37,7 +40,7 @@ const Contact = () => {
                             {/* <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
                         </div>
                         <div>
-                            <p className="dark:text-primary-100 font-nunito">24/7 Customer Support</p>
+                            <p className=" font-nunito">24/7 Customer Support</p>
                         </div>
                     </div>
                     <div className="flex gap-4">
@@ -45,22 +48,15 @@ const Contact = () => {
                             {/* <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
                         </div>
                         <div>
-                            <p className="dack:text-primary-100 font-nunito">24/7 Customer Support</p>
+                            <p className=" font-nunito">24/7 Customer Support</p>
                         </div>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="flex items-center justify-center  gap-4">
-                            {/* <LocationIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F] hover:transition hover:duration-500" /> */}
-                        </div>
-                        <div>
-                            <p className="dark:text-primary-100 font-nunito">24/7 Customer Support</p>
-                        </div>
-                    </div>
+
                     <div>
                         <img className="rounded-xl" src={service} alt="" />
                     </div>
                 </div>
-                <div data-aos="fade-left" className="flex dark:bg-[rgb(14,17,22)] border border-black/10 shadow-sm mt-20 lg:mt-0 h-full rounded-2xl border dark:border-white/30 border-black/20  px-8 py-8">
+                <div data-aos="fade-left" className="flex border border-black/10 shadow-sm mt-20 lg:mt-0 h-full rounded-2xl border dark:border-white/30 border-black/20  px-8 py-8">
                     <Form method="post" className="w-full flex flex-col gap-8">
                         <div className="flex gap-4">
                             <Input
@@ -69,7 +65,7 @@ const Contact = () => {
                                 placeholder=" Mends"
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    inputWrapper: "flex-grow w-full border border-white/5 hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
                                     label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
@@ -79,7 +75,7 @@ const Contact = () => {
                                 placeholder="Gyan "
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    inputWrapper: "flex-grow w-full border border-white/5  hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
                                     label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
@@ -91,7 +87,7 @@ const Contact = () => {
                             placeholder="addentech@example.com "
                             labelPlacement="outside"
                             classNames={{
-                                inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                inputWrapper: "flex-grow w-full border border-white/5  hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
                                 label: "!dark:text-white font-nunito text-md",
                             }}
                         />
@@ -103,7 +99,7 @@ const Contact = () => {
                                 placeholder=" 0593125184"
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    inputWrapper: "flex-grow w-full border border-white/5  hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
                                     label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
@@ -113,7 +109,7 @@ const Contact = () => {
                                 placeholder="Addentech "
                                 labelPlacement="outside"
                                 classNames={{
-                                    inputWrapper: "flex-grow w-full border border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
+                                    inputWrapper: "flex-grow w-full border border-white/5  hover:bg-[#0b0e13] focus:bg-[#0b0e13] h-12",
                                     label: "!dark:text-white font-nunito text-md",
                                 }}
                             />
@@ -126,7 +122,7 @@ const Contact = () => {
                             placeholder=" Let's get in touch "
                             maxRows={8}
                             classNames={{
-                                inputWrapper: "resize-y flex-grow w-full border !h-48 border-white/5 dark:bg-[#0b0e13] hover:bg-[#0b0e13] focus:bg-[#0b0e13]",
+                                inputWrapper: "resize-y flex-grow w-full border !h-48 border-white/5  hover:bg-[#0b0e13] focus:bg-[#0b0e13]",
                                 label: "!dark:text-white font-nunito text-md",
 
                             }}
@@ -136,7 +132,7 @@ const Contact = () => {
 
 
                         <button
-                            className="h-10 rounded-lg text-lg font-montserrat bg-[#05ECF2]  hover:bg-[#F2059F] hover:transition hover:duration-500 hover:dark:text-white"
+                            className="h-10 rounded-lg text-lg font-montserrat bg-primary  hover:transition hover:duration-500 hover:dark:text-white"
                         >
                             Submit
                         </button>

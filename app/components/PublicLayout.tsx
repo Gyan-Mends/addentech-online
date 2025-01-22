@@ -31,7 +31,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
 
 
     return (
-        <div className={`transition duration-500    overflow-x-hidden ${theme === "light" ? "bg-white " : "bg-[#0b0e13]"}`}>
+        <div className={`transition duration-500  px-40  overflow-x-hidden ${theme === "light" ? "bg-white " : ""}`}>
             {/* navigation bar */}
             <Navbar
                 isBordered={false}
@@ -99,7 +99,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         <Link
                             className={`font-nunito p-2 hover:rounded-lg ${location.pathname === '/s' ? 'bg-primary rounded-lg' : ''
                                 }`}
-                            to="/s"
+                            to="/team"
                         >
                             Team
                         </Link>
@@ -134,8 +134,9 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                 {children}
             </div>
 
+
             <footer className="mt-10 lg:mt-40">
-                <div className="lg:flex dark:bg-[rgb(14,17,22)] shadow-sm lg:h-40 h-full py-4 rounded-2xl border dark:border-white/30 border-black/10 items-center lg:px-20 px-4  justify-between">
+                <div className="lg:flex  shadow-sm lg:h-40 h-full py-4 rounded-2xl border dark:border-white/30 border-black/10 items-center lg:px-20 px-4  justify-between">
                     <div>
                         <p className="dark:text-white font-montserrat font-bold lg:text-4xl text-2xl">Transform your business  </p>
                         <p className="dark:text-white font-montserrat font-bold lg:text-4xl mt-2 text-2xl">with us effortlessly</p>
@@ -159,7 +160,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                 </div>
 
 
-                <div className="mt-10 lg:grid lg:grid-cols-3 md:grid md:grid-cols-3 gap-8 py-8 dark:bg-[rgb(14,17,22)] shadow-sm lg:h-80  h-full px-8 rounded-2xl border dark:border-white/30 border-black/10  lg:px-20">
+                <div className="mt-10 lg:grid lg:grid-cols-3 md:grid md:grid-cols-3 gap-8 py-8  shadow-sm lg:h-80  h-full px-8 rounded-2xl border dark:border-white/30 border-black/10  lg:px-20">
                     {/* location */}
                     {/* location */}
                     <div className="lg:mt-10">
@@ -223,18 +224,7 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                         </div>
                     </div>
                 </div>
-                <div className="mt-10 lg:grid lg:grid-cols-6 md:grid md:grid-cols-6 gap-10 pb-10">
-                    <div className="dark:bg-[rgb(14,17,22)]   rounded-2xl h-20 flex items-center border dark:border-white/30 border-black/10  px-20 col-span-5">
-                        <p className="dark:text-white font-nunito font-bold text-lg">Powered by <span className="text-[#05ECF2]">Addentech Dev</span></p>
-                    </div>
-                    <div className="dark:bg-[rgb(14,17,22)] h-20 lg:h-full mt-4 lg:mt-0 md:mt-0 flex gap-2 items-center justify-center  rounded-2xl border dark:border-white/30 border-black/10">
-                        <FacebookIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
-                        <InstagramIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
-                        <InIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
-                        <XIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
-                        <YouTubeIcon className="text-[#05ECF2] h-6 w-6 hover:text-[#F2059F]" />
-                    </div>
-                </div>
+
             </footer>
         </div>
     );

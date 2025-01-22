@@ -7,15 +7,57 @@ import PublicLayout from "~/components/PublicLayout";
 import lineImage from "~/components/images/work-process-line.png"
 import logo from "~/components/images/logo.png"
 import NetworkIcon from "~/components/icons/NetworkIcon";
+import { HoverEffect } from "~/components/acternity/card";
 
 
 
 const Services = () => {
+    const projects = [
+        {
+            title: "Digital Marketing & Consultation",
+            description:
+                "Maximize digital presence with expert SEO, social media strategies, email campaigns, and performance analytics. We help you reach and engage your audience.",
+            link: "https://stripe.com",
+        },
+        {
+            title: "Design & Development",
+            description:
+                "Innovative website design and development, tailored to your business needs. We create intuitive and visually appealing sites that drive results.",
+            link: "https://netflix.com",
+        },
+        {
+            title: "IT Services",
+            description:
+                "Support and management of IT systems, including hardware, software, networks, and security. We ensure your technology infrastructure is robust and efficient.",
+            link: "https://google.com",
+        },
+        {
+            title: "Brand & Product Design",
+            description:
+                "Creating strong brand identities through thoughtful design of logos, packaging, and overall brand aesthetics. We help your brand connect with customers.",
+            link: "https://meta.com",
+        },
+        {
+            title: "Cloud Services",
+            description:
+                "Robust cloud services providing scalable computing resources and secure data storage solutions. We enable flexibility and efficiency in your operations.",
+            link: "https://amazon.com",
+        },
 
+    ];
 
     return (
         <PublicLayout>
-            <div className="lg:mt-40 mt-20">
+            <div style={{
+                backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+                backgroundPosition: '100%',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '500px',
+                position: 'relative',
+            }} className="lg:mt-40 mt-20">
                 <div data-aos="fade-right">
                     <p className="font-nunito dark:text-white text-xl font-bold text-[#F2059F]">Here is How We Can Help Your Business</p>
                     <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Comprehensive Services Tailored </p>
@@ -23,82 +65,21 @@ const Services = () => {
                         to Your Needs
                     </p>
                 </div>
-                <div data-aos="fade-down" className="lg:grid lg:grid-cols-3 gap-8 mt-20">
-                    <div className=" w-full h-full  border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-                        <div className="w-full flex  items-center justify-center">
-                            <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-sm border dark:border-white/5 border-black/10">
-                                <NetworkIcon className="text-[#05ECF2] h-8 w-8 " />
-                            </div>
-                        </div>
-                        <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                            Digital Marketing & Consultation
-                        </p>
-                        <p className=" font-nunito text-gray-400  mt-4">
-                            Maximize digital presence with expert SEO, social media strategies, email campaigns, and performance analytics. We help you reach and engage your audience.            </p>
-                    </div>
+                <HoverEffect items={projects} />
 
-                    <div className=" w-full h-[25vh] mt-10 lg:mt-0 border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-                        <div className="w-full flex  items-center justify-center">
-                            <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                                {/* <CodingIcon className="text-[#05ECF2] h-8 w-8 " /> */}
-                            </div>
-                        </div>
-                        <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                            Design & Development
-                        </p>
-                        <p className=" font-nunito text-gray-400  mt-4">
-                            Innovative website design and development, tailored to your business needs. We create intuitive and visually appealing sites that drive results.</p>
-                    </div>
-
-                    <div className=" w-full mt-10 lg:mt-0  h-[25vh] border dark:border-white/5 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-                        <div className="w-full flex  items-center justify-center">
-                            <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                                {/* <Support className="text-[#05ECF2] h-8 w-8 " /> */}
-                            </div>
-                        </div>
-                        <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                            IT Services
-                        </p>
-                        <p className=" font-nunito text-gray-400  mt-4">
-                            Support and management of IT systems, including hardware, software, networks, and security. We ensure your technology infrastructure is robust and efficient.</p>
-                    </div>
-                </div>
-
-                <div data-aos="fade-up" className="lg:grid lg:grid-cols-2 gap-16 mt-16">
-
-                    <div className=" w-full h-[25vh] border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-                        <div className="w-full flex  items-center justify-center">
-                            <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                                <img src={logo} className=" bg-[#05ECF2] h-8 w-8 " alt="" />
-                            </div>
-                        </div>
-                        <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                            Brand & Product Design
-                        </p>
-                        <p className=" font-nunito text-gray-400  mt-4">
-                            Creating strong brand identities through thoughtful design of logos, packaging, and overall brand aesthetics. We help your brand connect with customers.
-
-
-                        </p>
-                    </div>
-
-                    <div className=" w-full h-[25vh] border  dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10 lg:mt-0 mt-16">
-                        <div className="w-full flex  items-center justify-center">
-                            <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                                {/* <AWS className="text-[#05ECF2] h-8 w-8 " /> */}
-                            </div>
-                        </div>
-                        <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                            Cloud Services
-                        </p>
-                        <p className=" font-nunito text-gray-400  mt-4">
-                            Robust cloud services providing scalable computing resources and secure data storage solutions. We enable flexibility and efficiency in your operations.</p>
-                    </div>
-                </div>
             </div>
 
 
-            <div className="mt-40">
+            <div style={{
+                backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+                backgroundPosition: '100%',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '500px',
+                position: 'relative',
+            }} className="mt-40">
                 <div data-aos="fade-right">
                     <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Our Methodology Guarantees
                     </p>

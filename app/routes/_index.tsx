@@ -36,6 +36,7 @@ import YouTubeIcon from "~/components/icons/YoutubeIcon";
 import LocationIcon from "~/components/icons/LocationIcon";
 import { AnimatedTestimonials } from "~/components/acternity/carosel";
 import { CardBody, CardContainer, CardItem } from "~/components/acternity/3d";
+import { HoverEffect } from "~/components/acternity/card";
 
 // import AWS from "~/components/Icons/icons/AWS";
 
@@ -51,103 +52,40 @@ const Index = () => {
     blogs: BlogInterface[]
   }>()
   const location = useLocation();
-  const testimonials = [
+
+  const projects = [
     {
-      id: 1,
-      stars: 5,
-      text: "This CRM has transformed our sales process! Our team's productivity has skyrocketed, and we’ve closed more deals than ever before. The intuitive interface made onboarding a breeze.",
-      author: "Johnathan Doe",
-      position: "CEO at Addentech",
-      image: img6
+      title: "Digital Marketing & Consultation",
+      description:
+        "Maximize digital presence with expert SEO, social media strategies, email campaigns, and performance analytics. We help you reach and engage your audience.",
+      link: "https://stripe.com",
     },
     {
-      id: 2,
-      stars: 5,
-      text: "The best investment we’ve made! Managing customer interactions has never been easier. The insights we get are invaluable.",
-      author: "Sarah Lee",
-      position: "Marketing Manager at MarketPro",
-      image: img5
+      title: "Design & Development",
+      description:
+        "Innovative website design and development, tailored to your business needs. We create intuitive and visually appealing sites that drive results.",
+      link: "https://netflix.com",
     },
     {
-      id: 3,
-      stars: 5,
-      text: "A fantastic tool that has streamlined our workflows and increased our team's efficiency. Highly recommend it!",
-      author: "Michael Smith",
-      position: "Sales Lead at InnovateX",
-      image: img6
+      title: "IT Services",
+      description:
+        "Support and management of IT systems, including hardware, software, networks, and security. We ensure your technology infrastructure is robust and efficient.",
+      link: "https://google.com",
     },
+    {
+      title: "Brand & Product Design",
+      description:
+        "Creating strong brand identities through thoughtful design of logos, packaging, and overall brand aesthetics. We help your brand connect with customers.",
+      link: "https://meta.com",
+    },
+    {
+      title: "Cloud Services",
+      description:
+        "Robust cloud services providing scalable computing resources and secure data storage solutions. We enable flexibility and efficiency in your operations.",
+      link: "https://amazon.com",
+    },
+
   ];
-
-
-
-  // const blogs = [
-  //   {
-  //     id: 1,
-  //     date: "January 3, 2023",
-  //     comments: 0,
-  //     title: "Rethinking Server-Timing As A Critical Monitoring Tool",
-  //     author: "Addentech",
-  //     description:
-  //       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vel quas vitae ab exercitationem dolor saepe! Esse ea, debitis...",
-  //     img: img5, // Replace with your actual image path
-  //     link: "/about",
-  //   },
-  //   {
-  //     id: 2,
-  //     date: "January 4, 2023",
-  //     comments: 2,
-  //     title: "Understanding the New Trends in Web Development",
-  //     author: "DevTech",
-  //     description:
-  //       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit, consequatur eveniet dolorum nemo quaerat laboriosam assumenda.",
-  //     img: img6,
-  //     link: "/blog/understanding-web-trends",
-  //   },
-  //   {
-  //     id: 3,
-  //     date: "January 5, 2023",
-  //     comments: 5,
-  //     title: "Boosting Your App's Performance with React",
-  //     author: "TechPro",
-  //     description:
-  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eu risus vitae odio interdum fermentum.",
-  //     img: img5,
-  //     link: "/blog/react-performance",
-  //   },
-  // ];
-
-  const team = [
-    {
-      name: "Micheal Brown",
-      position: "Sales Director",
-      image: img5, // Real online image for team
-    },
-    {
-      name: "Jane Doe",
-      position: "Marketing Manager",
-      image: img6, // Real online image for team
-    },
-    {
-      name: "Alex Smith",
-      position: "Operations Lead",
-      image: img5,
-    },
-  ];
-
-  // Online images for background slideshow
-  const backgroundImages = [
-    img5,
-    img6,
-    img5,
-  ];
-  const [currentBackground, setCurrentBackground] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBackground((prev) => (prev + 1) % backgroundImages.length);
-    }, 9000); // Change every 9 seconds
-    return () => clearInterval(interval);
-  }, [backgroundImages.length]);
 
   const truncateText = (text, wordLimit) => {
     const words = text.split(" ");
@@ -355,10 +293,6 @@ const Index = () => {
       </div>
 
 
-
-
-
-
       <div className="lg:px-40 px-2">
         <div style={{
           backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
@@ -551,7 +485,16 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="lg:mt-40 mt-20">
+        <div style={{
+          backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+          backgroundPosition: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
+        }} className="lg:mt-40 mt-20">
           <div data-aos="fade-right">
             <p className="font-nunito dark:text-white text-xl font-bold text-[#F2059F]">Here is How We Can Help Your Business</p>
             <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Comprehensive Services Tailored </p>
@@ -559,81 +502,20 @@ const Index = () => {
               to Your Needs
             </p>
           </div>
-          <div data-aos="fade-down" className="lg:grid lg:grid-cols-3 gap-8 mt-20">
-            <div className=" w-full h-full  border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-              <div className="w-full flex  items-center justify-center">
-                <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-sm border dark:border-white/5 border-black/10">
-                  <NetworkIcon className="text-[#05ECF2] h-8 w-8 " />
-                </div>
-              </div>
-              <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                Digital Marketing & Consultation
-              </p>
-              <p className=" font-nunito text-gray-400  mt-4">
-                Maximize digital presence with expert SEO, social media strategies, email campaigns, and performance analytics. We help you reach and engage your audience.            </p>
-            </div>
+          <HoverEffect items={projects} />
 
-            <div className=" w-full h-[25vh] mt-10 lg:mt-0 border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-              <div className="w-full flex  items-center justify-center">
-                <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                  {/* <CodingIcon className="text-[#05ECF2] h-8 w-8 " /> */}
-                </div>
-              </div>
-              <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                Design & Development
-              </p>
-              <p className=" font-nunito text-gray-400  mt-4">
-                Innovative website design and development, tailored to your business needs. We create intuitive and visually appealing sites that drive results.</p>
-            </div>
-
-            <div className=" w-full mt-10 lg:mt-0  h-[25vh] border dark:border-white/5 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-              <div className="w-full flex  items-center justify-center">
-                <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                  {/* <Support className="text-[#05ECF2] h-8 w-8 " /> */}
-                </div>
-              </div>
-              <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                IT Services
-              </p>
-              <p className=" font-nunito text-gray-400  mt-4">
-                Support and management of IT systems, including hardware, software, networks, and security. We ensure your technology infrastructure is robust and efficient.</p>
-            </div>
-          </div>
-
-          <div data-aos="fade-up" className="lg:grid lg:grid-cols-2 gap-16 mt-16">
-
-            <div className=" w-full h-[25vh] border dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10">
-              <div className="w-full flex  items-center justify-center">
-                <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                  <img src={logo} className=" bg-[#05ECF2] h-8 w-8 " alt="" />
-                </div>
-              </div>
-              <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                Brand & Product Design
-              </p>
-              <p className=" font-nunito text-gray-400  mt-4">
-                Creating strong brand identities through thoughtful design of logos, packaging, and overall brand aesthetics. We help your brand connect with customers.
-
-
-              </p>
-            </div>
-
-            <div className=" w-full h-[25vh] border  dark:border-white/5 border-black/20 shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 px-10 lg:mt-0 mt-16">
-              <div className="w-full flex  items-center justify-center">
-                <div className="h-12 dark:bg-[#0b0e13] bg-white w-12 flex items-center justify-center rounded-full -mt-6 shadow-md border dark:border-white/5 border-black/10">
-                  {/* <AWS className="text-[#05ECF2] h-8 w-8 " /> */}
-                </div>
-              </div>
-              <p className="dark:text-white font-nunito font-bold text-xl mt-4">
-                Cloud Services
-              </p>
-              <p className=" font-nunito text-gray-400  mt-4">
-                Robust cloud services providing scalable computing resources and secure data storage solutions. We enable flexibility and efficiency in your operations.</p>
-            </div>
-          </div>
         </div>
 
-        <div className="mt-40">
+        <div style={{
+          backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+          backgroundPosition: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
+        }} className="mt-40">
           <p data-aos="fade-right" className="font-nunito dark:text-white text-4xl font-bold mt-8">
             Latest Blog, News & Articles
           </p>
@@ -641,9 +523,10 @@ const Index = () => {
           <div className="lg:grid lg:grid-cols-3 gap-4 mt-20">
             {blogs.slice(0, 3).map((blog: BlogInterface, index: number) => (
               <Link to={`/blog/${blog._id}`}>
-                <div data-aos="fade-in" data-aos-duration="100000" className="mt-4">
-                  <img className="h-80 w-full  rounded-xl" src={blog.image} alt="" />
-                  <span className="flex gap-8 mt-4">
+                <div data-aos="fade-in" data-aos-duration="100000" className="mt-4  bg-neutral  border rounded-xl dark:border-white/30 border-black/10">
+                  <img className="h-80 w-full  rounded-tl-xl rounded-tr-xl" src={blog.image} alt="" />
+                  <div className="px-4 pb-4">
+                    <span className="flex gap-8 mt-4 ">
                     <p className="font-nunito text-gray-600"> {new Date(blog.createdAt).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
@@ -658,13 +541,23 @@ const Index = () => {
 
                   </p>
 
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
         </div>
 
-        <div className="mt-40">
+        <div style={{
+          backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+          backgroundPosition: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
+        }} className="mt-40">
           <div data-aos="fade-right">
             <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Our Methodology Guarantees
             </p>
@@ -739,7 +632,16 @@ const Index = () => {
               </Button></Link>
           </div>
         </div>
-        <div className="lg:grid lg:grid-cols-4 gap-10 lg:mt-40 ">
+        <div style={{
+          backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+          backgroundPosition: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
+        }} className="lg:grid lg:grid-cols-4 gap-10 lg:mt-40 ">
           {users.slice(0, 4).map((member, index) => (
             <div
               data-aos="zoom-in"
@@ -779,7 +681,7 @@ const Index = () => {
         </div>
 
         <footer className="mt-10 lg:mt-40">
-          <div className="lg:flex dark:bg-[rgb(14,17,22)] shadow-sm lg:h-40 h-full py-4 rounded-2xl border dark:border-white/30 border-black/10 items-center lg:px-20 px-4  justify-between">
+          <div className="lg:flex  shadow-sm lg:h-40 h-full py-4 rounded-2xl border dark:border-white/30 border-black/10 items-center lg:px-20 px-4  justify-between">
             <div>
               <p className="dark:text-white font-montserrat font-bold lg:text-4xl text-2xl">Transform your business  </p>
               <p className="dark:text-white font-montserrat font-bold lg:text-4xl mt-2 text-2xl">with us effortlessly</p>
@@ -803,7 +705,7 @@ const Index = () => {
           </div>
 
 
-          <div className="mt-10 lg:grid lg:grid-cols-3 md:grid md:grid-cols-3 gap-8 py-8 dark:bg-[rgb(14,17,22)] shadow-sm lg:h-80  h-full px-8 rounded-2xl border dark:border-white/30 border-black/10  lg:px-20">
+          <div className="mt-10 lg:grid lg:grid-cols-3 md:grid md:grid-cols-3 gap-8 py-8  shadow-sm lg:h-80  h-full px-8 rounded-2xl border dark:border-white/30 border-black/10  lg:px-20">
             {/* location */}
             {/* location */}
             <div className="lg:mt-10">

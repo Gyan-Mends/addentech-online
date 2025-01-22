@@ -48,42 +48,44 @@ const Index = () => {
     return (
         <PublicLayout>
 
-            {/* Team Section */}
-            <div className="lg:flex justify-between lg:mt-40 mt-20">
-                <div data-aos="fade-right" className="">
-                    <p className="font-montserrat text-4xl font-bold dark:text-white">Meet Our Dedicated Experts Behind
-                    </p>
-                    <p className="font-montserrat text-4xl font-bold dark:text-white"> Addentech  Success
-                    </p>
-                </div>
-
-            </div>
-            <div className="lg:grid lg:grid-cols-3 gap-10  ">
-                {users.map((member, index) => (
-                    <div data-aos="zoom-in" key={index} className="w-full h-[60vh] border border-black/10 dark:border-white/5 rounded-2xl mt-40 lg:mt-40">
-                        <div className="w-full flex items-center justify-between px-10  h-28  rounded-tr-2xl rounded-tl-2xl">
-                            <div>
-                                <p className="font-nunito text-lg dark:text-white font-bold">{member?.firstName + " " + member?.middleName + " " + member?.lastName}</p>
-                                <p className="font-nunito text-md dark:text-white">{member.position}</p>
-                            </div>
-                            <div>
-                                <Link to="">
-                                    <EmailIcon className="h-6 w-6 text-[#05ECF2]" />
-                                </Link>
-                            </div>
-                        </div>
-                        <div className="h-[60vh] overflow-hidden rounded-bl-2xl rounded-br-2xl">
+            <div style={{
+                backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+                backgroundPosition: '50%',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '500px',
+                position: 'relative',
+            }} className="lg:grid lg:grid-cols-4 gap-10 lg:mt-40 ">
+                {users.slice(0, 4).map((member, index) => (
+                    <div
+                        data-aos="zoom-in"
+                        key={index}
+                        className={`w-full h-[50vh] rounded-2xl ${index === 1 || index === 3 ? 'mt-20' : 'mt-40 lg:mt-0'}`}
+                    >
+                        <div className="h-[50vh] overflow-hidden rounded-2xl relative group">
+                            {/* Image */}
                             <img
                                 className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
                                 src={member.image}
                                 alt={member.name}
                             />
-                        </div>
-                    </div>
-                ))}
+
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center">
+                          {/* Name */}
+                          <p className="text-white font-nunito text-lg">{member.firstName + " " + member.middleName + " " + member.lastName}</p>
+                          <p className="text-white font-nunito text-lg">{member.phone}</p>
+                      </div>
+                  </div>
+              </div>
+          ))}
+
+
+
             </div>
 
-            {/* Testimonials Section */}
 
         </PublicLayout>
     );
