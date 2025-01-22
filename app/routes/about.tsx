@@ -99,7 +99,8 @@ const About = () => {
     };
     return (
         <PublicLayout>
-            <div data-aos="fade-down">
+            <div className="px-40">
+                <div data-aos="fade-down">
             <div className="flex flex-col gap-4 mt-10 transition duration-500">
                 <p className="font-montserrat font-bold text-4xl text-center dark:text-white">
                     Transforming The Legal Landscape
@@ -349,6 +350,7 @@ const About = () => {
 
             </div>
 
+            </div>
 
 
         </PublicLayout>
