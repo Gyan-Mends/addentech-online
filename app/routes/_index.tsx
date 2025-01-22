@@ -35,6 +35,7 @@ import XIcon from "~/components/icons/XIcon";
 import YouTubeIcon from "~/components/icons/YoutubeIcon";
 import LocationIcon from "~/components/icons/LocationIcon";
 import { AnimatedTestimonials } from "~/components/acternity/carosel";
+import { CardBody, CardContainer, CardItem } from "~/components/acternity/3d";
 
 // import AWS from "~/components/Icons/icons/AWS";
 
@@ -359,7 +360,16 @@ const Index = () => {
 
 
       <div className="lg:px-40 px-2">
-        <div className="mt-40">
+        <div style={{
+          backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
+          backgroundPosition: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '500px',
+          position: 'relative',
+        }} className="mt-40">
           <div data-aos="fade-right" >
             <p className="font-nunito dark:text-white text-2xl font-bold text-[#F2059F]">Explore more of our products</p>
             <p className="font-nunito dark:text-white text-4xl font-bold mt-8">Top-Notch Software Development and</p>
@@ -367,48 +377,149 @@ const Index = () => {
               Digital Transformation
             </p>
           </div>
-          <div className="lg:grid lg:grid-cols-3 gap-8 mt-10">
-            <Link to="https://www.justicelocator.com/" >
-              <div data-aos="fade-right" className=" w-full  h-[80vh] border dark:border-white/10 border-black/20  shadow-md rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105">
-                <div className="mt-10 px-4">
-                  <img src={jl} alt="" />
-                  <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Justice Locator</p>
-                  <p className="font-nunito dark:text-white mt-4">Justice Locator App provides users with the location of the courts in Ghana and helps users to navigate to the court with ease. The App also provides information on cases to be heard in the court and serves as a case tracker showing all the dates that the case came on. </p>
-                </div>
-              </div>
-            </Link>
+          <div className="lg:grid lg:grid-cols-2 gap-10 mt-10">
+            <div>
+              <Link to="https://www.justicelocator.com/" >
+                <CardContainer className="inter-var">
+                  <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
+                    <CardItem
+                      translateZ="50"
+                      className="text-xl font-bold text-neutral-600 dark:text-white"
+                    >
+                      Justice Locator
+                    </CardItem>
+                    <CardItem
+                      as="p"
+                      translateZ="60"
+                      className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                    >
+                      Hover over this card to unleash the power of CSS perspective
+                    </CardItem>
+                    <CardItem
+                      translateZ="100"
+                      rotateX={20}
+                      rotateZ={-10}
+                      className="w-full mt-4"
+                    >
+                      <img
+                        src={jl}
+                        className="h-80 w-full  rounded-xl group-hover/card:shadow-xl"
+                        alt="thumbnail"
+                      />
+                    </CardItem>
 
-            <div className="flex flex-col gap-4 mt-10 lg:mt-0 pb-10 lg:pb-0">
-              <Link className="lg:h-full h-80" to="https://dennislawgh.com">
-                <div data-aos="fade-down" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-full flex flex-col items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl  p-4">
-                  <img src={dl} alt="" className="h-20 w-80" />
-                  <div>
-                    <p className="font-nunito dark:text-white mt-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis nihil possimus commodi id odio magni harum assumenda deserunt, voluptas laborum! Dolore ea, sint ullam quos molestiae consequuntur aut optio provident? </p>
-                  </div>
-                </div>
-
-              </Link>
-
-              <Link to="https://dennislawgh.com">
-                <div data-aos="fade-up" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full py-2 h-full flex flex-col items-center justify-center px-2 border dark:border-white/10 border-black/20 rounded-2xl">
-                  <img src={mr} alt="" className="h-40 w-[20vw]" />
-                  <p className="font-nunito dark:text-white mt-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo maxime quis dicta inventore perspiciatis sit, consequuntur rem fugiat magnam esse saepe, deleniti error atque earum, eaque praesentium ea autem nesciunt? </p>
-                </div>
+                  </CardBody>
+                </CardContainer>
               </Link>
             </div>
+            <div>
+              <Link to="https://www.justicelocator.com/" >
+                <CardContainer className="inter-var">
+                  <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
+                    <CardItem
+                      translateZ="50"
+                      className="text-xl font-bold text-neutral-600 dark:text-white"
+                    >
+                      Justice Locator
+                    </CardItem>
+                    <CardItem
+                      as="p"
+                      translateZ="60"
+                      className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                    >
+                      Hover over this card to unleash the power of CSS perspective
+                    </CardItem>
+                    <CardItem
+                      translateZ="100"
+                      rotateX={20}
+                      rotateZ={-10}
+                      className="w-full mt-4"
+                    >
+                      <img
+                        src={dl}
+                        className="h-80 w-full  rounded-xl group-hover/card:shadow-xl"
+                        alt="thumbnail"
+                      />
+                    </CardItem>
 
-            <Link to="https://dennislawnews.com/" >
-              <div data-aos="fade-left" className="transition-transform duration-500 ease-in-out hover:scale-105 w-full h-[80vh] border dark:border-white/10 border-black/20 shadow-md rounded-2xl">
-                <img src={news} alt="" className="rounded-tr-2xl rounded-tl-2xl h-40" />
-                <div className="mt-10 px-4">
-                  <p className="font-nunito  text-xl font-bold text-[#05ECF2]">Denis Law News</p>
-                  <p className="font-nunito dark:text-white mt-4">Denis Law News is an online news platform that provides up-to-date coverage of legal, national, and international events. With a focus on accuracy, impartiality, and relevance,  insightful articles, and in-depth analysis across a wide range of topics including politics, business, leagl, sports, technology, and more. Denis Law News aims to keep its audience well-informed with timely updates and a commitment to journalistic excellence. Whether you're looking for the latest headlines or comprehensive features, Denis Law News is a trusted source for news and information. </p>
-                </div>
-              </div>
-            </Link>
+                  </CardBody>
+                </CardContainer>
+              </Link>
+            </div>
+          </div>
+          <div className="lg:grid lg:grid-cols-2 gap-10 mt-10">
+            <div>
+              <Link to="https://www.justicelocator.com/" >
+                <CardContainer className="inter-var">
+                  <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
+                    <CardItem
+                      translateZ="50"
+                      className="text-xl font-bold text-neutral-600 dark:text-white"
+                    >
+                      Justice Locator
+                    </CardItem>
+                    <CardItem
+                      as="p"
+                      translateZ="60"
+                      className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                    >
+                      Hover over this card to unleash the power of CSS perspective
+                    </CardItem>
+                    <CardItem
+                      translateZ="100"
+                      rotateX={20}
+                      rotateZ={-10}
+                      className="w-full mt-4"
+                    >
+                      <img
+                        src={mr}
+                        className="h-80 w-full  rounded-xl group-hover/card:shadow-xl"
+                        alt="thumbnail"
+                      />
+                    </CardItem>
 
+                  </CardBody>
+                </CardContainer>
+              </Link>
+            </div>
+            <div>
+              <Link to="https://www.justicelocator.com/" >
+                <CardContainer className="inter-var">
+                  <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border  ">
+                    <CardItem
+                      translateZ="50"
+                      className="text-xl font-bold text-neutral-600 dark:text-white"
+                    >
+                      Justice Locator
+                    </CardItem>
+                    <CardItem
+                      as="p"
+                      translateZ="60"
+                      className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+                    >
+                      Hover over this card to unleash the power of CSS perspective
+                    </CardItem>
+                    <CardItem
+                      translateZ="100"
+                      rotateX={20}
+                      rotateZ={-10}
+                      className="w-full mt-4 h-80"
+                    >
+                      <img
+                        src={news}
+                        className="h-60 w-full  rounded-xl group-hover/card:shadow-xl"
+                        alt="thumbnail"
+                      />
+                    </CardItem>
+
+                  </CardBody>
+                </CardContainer>
+              </Link>
+            </div>
           </div>
         </div>
+
+
 
         <div style={{
           backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
