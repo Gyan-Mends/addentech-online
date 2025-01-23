@@ -9,7 +9,8 @@ import {
 import {
     Form,
     Link,
-    useActionData
+    useActionData,
+    useNavigation
 } from "@remix-run/react";
 import {
     useEffect,
@@ -26,28 +27,28 @@ const Login = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const navigation = useNavigation();
+
+    const isSubmitting = navigation.state === "submitting";
 
     useEffect(() => {
         if (actionData) {
-            if (actionData.emailError) {
-                setEmailError(actionData.emailError.email);
-            } else {
-                setPasswordError(actionData.passwordError.password);
-            }
+            setEmailError(actionData.emailError?.email || "");
+            setPasswordError(actionData.passwordError?.password || "");
         }
     }, [actionData]);
 
-    const handleVisibility = (event: any) => {
+    const handleVisibility = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         setIsVisible(!isVisible);
-    }
+    };
 
     return (
         <div className={`flex flex-col justify-center items-center h-[100vh] bg-[#0b0e13] overflow-y-hidden bg-[#191919]`}>
             <div className="pt-10">
-                <img src={logo} className="h-40 w-80" alt="" />
+                <img src={logo} className="h-40 w-80" alt="Addentech Logo" />
             </div>
-            <div className="h-[100vh] w-full flex items-center justify-center ">
+            <div className="h-[100vh] w-full flex items-center justify-center">
                 <div className="dark:bg-[#333] bg-[#333] shadow-sm p-6 rounded-2xl lg:w-[30vw] border dark:border-white/5 border-white/5 relative">
                     <p className="font-montserrat font-semibold text-3xl text-white">Login To</p>
                     <p className="font-montserrat font-semibold text-3xl mt-2 text-white">Your Account</p>
@@ -63,11 +64,11 @@ const Login = () => {
                                 type="email"
                                 classNames={{
                                     label: `${emailError ? "text-danger" : "text-white "} font-nunito text-sm !text-white`,
-                                    inputWrapper: `${emailError ? "border-b-danger border-2 hover:border-b-danger text-danger" : "border-[#F2059F] hover:border-success"} text-sm font-nunito  border-b-1 mt-4 bg-[#333] border border-[#05ECF2]`
+                                    inputWrapper: `${emailError ? "border-b-danger border-2 hover:border-b-danger text-danger" : "border-[#F2059F] hover:border-success"} text-sm font-nunito border-b-1 mt-4 bg-[#333] border border-[#05ECF2]`
                                 }}
                             />
                             {emailError && (
-                                <p className="text-danger font-nuito text-md mt-2 ">
+                                <p className="text-danger font-nunito text-md mt-2">
                                     {actionData?.emailErrorMessage}
                                 </p>
                             )}
@@ -84,9 +85,8 @@ const Login = () => {
                                 placeholder=" "
                                 classNames={{
                                     label: `${passwordError ? "text-danger" : "text-white "} font-nunito text-sm !text-white`,
-                                    inputWrapper: `${passwordError ? "border-b-danger border-2 hover:border-b-danger text-danger" : "border-[#05ECF2] hover:border-[#05ECF2]"} text-sm font-nunito  border-b-1 mt-4 bg-[#333] border border-[#05ECF2]`
+                                    inputWrapper: `${passwordError ? "border-b-danger border-2 hover:border-b-danger text-danger" : "border-[#05ECF2] hover:border-[#05ECF2]"} text-sm font-nunito border-b-1 mt-4 bg-[#333] border border-[#05ECF2]`
                                 }}
-
                                 endContent={
                                     <button
                                         className="focus:outline-none"
@@ -101,25 +101,33 @@ const Login = () => {
                                 }
                             />
                             {passwordError && (
-                                <p className="text-danger font-nuito text-md mt-2 ">
+                                <p className="text-danger font-nunito text-md mt-2">
                                     {actionData?.passwordErrorMessage}
                                 </p>
                             )}
                         </div>
 
                         <div className="flex justify-between mt-4 gap-4">
-                            <Checkbox type="checkbox" name="rememberMe"><p className="font-nunito text-sm text-[#05ECF2]">Remember me</p></Checkbox>
-                            <input type="text" name="intent" hidden value="create" id="" />
-                            <Link to=""><p className="text-danger font-nunito text-sm">Forgot password?</p></Link>
+                            <Checkbox type="checkbox" name="rememberMe">
+                                <p className="font-nunito text-sm text-[#05ECF2]">Remember me</p>
+                            </Checkbox>
+                            <input type="text" name="intent" hidden value="create" />
+                            <Link to="">
+                                <p className="text-danger font-nunito text-sm">Forgot password?</p>
+                            </Link>
                         </div>
-                        <button className="font-nunito bg-[#F2059F] text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl">Login</button>
+                        <button
+                            className="font-nunito bg-[#F2059F] text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? "Loggin in..." : "Login"}
+                        </button>
                     </Form>
                 </div>
             </div>
-
         </div>
-    )
-}
+    );
+};
 
 export default Login;
 
@@ -132,6 +140,4 @@ export const action: ActionFunction = async ({ request }) => {
     const signin = await login.Logins({ request, email, password, rememberMe });
 
     return signin;
-}
-
-
+};
