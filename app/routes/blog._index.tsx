@@ -102,42 +102,32 @@ const Blog = () => {
                     </div>
                 </div>
 
-                {blogs.map((blog: BlogInterface, index: number) => (
-                    <Link
-                        to={`/blog/${blog._id}`}
-                    >
-                        <div
-                            key={index}
-                            className={`w-full h-auto border dark:border-white/30 border-black/30 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-6`}
-                        >
-                            <div className="h-full overflow-hidden group">
-                                <img
-                                    src={blog?.image}
-                                    alt={blog?.name}
-                                    className="w-full h-80 object-cover rounded-l-2xl hover:rounded-l-2xl transition-transform duration-300 ease-in-out group-hover:scale-105"
-                                />
-                            </div>
-                            <div className="p-6 flex flex-col justify-center gap-4">
-                                <h2 className="text-2xl font-bold dark:text-white font-montserrat">{blog?.name}</h2>
-                                <p className="text-sm text-gray-400 font-nunito">
-                                    {truncateText(blog?.description, 20)} {/* Limit to 20 words */}
-                                </p>                                <div className="flex justify-between items-center">
-                                    <p className="text-gray-500">Uploaded At</p>
-                                    <p className="text-gray-500">{new Date(blog.createdAt).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    })}</p>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <p className="text-gray-500">Uploaded By</p>
-                                    <p className="text-gray-500">{blog?.admin?.firstName}</p>
-                                </div>
+                <div className="lg:grid lg:grid-cols-3 gap-4 mt-20">
+                    {blogs.slice(0, 3).map((blog: BlogInterface, index: number) => (
+                        <Link to={`/blog/${blog._id}`}>
+                            <div data-aos="fade-in" data-aos-duration="100000" className="mt-4  bg-neutral  border rounded-xl dark:border-white/30 border-black/10">
+                                <img className="h-60 w-full  rounded-tl-xl rounded-tr-xl" src={blog.image} alt="" />
+                                <div className="px-4 pb-4">
+                                    <span className="flex gap-8 mt-4 ">
+                                        <p className="font-nunito text-gray-600"> {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                        })}</p>
+                                        <p className="font-nunito text-gray-600">{blog.admin?.firstName}</p>
+                                    </span>
+                                    <p className="mt-4 font-nunito font-bold text-xl">{truncateText(blog?.name, 10)}
+                                    </p>
+                                    <p className="mt-4 font-nunito">
+                                        {truncateText(blog?.description, 20)}
 
+                                    </p>
+
+                                </div>
                             </div>
-                        </div>
-                    </Link>
-                ))}
+                        </Link>
+                    ))}
+                </div>
 
                 {totalPages > 1 && (
                     <div className="flex justify-center gap-4 mt-6">
