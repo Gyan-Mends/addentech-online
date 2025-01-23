@@ -11,6 +11,8 @@ import testimonial from "~/components/images/670c83518128ff5c009e4a93_Testimonai
 import dl from "~/components/images/Dennislaw-Logo.svg"
 import mr from "~/components/images/mr-logo.png"
 import news from "~/components/images/DL-News-Logo.png"
+import { motion } from "framer-motion";
+
 
 
 import { json, Link, useLoaderData } from "@remix-run/react";
@@ -25,6 +27,7 @@ import { LoaderFunction } from "@remix-run/node";
 import { RegistrationInterface } from "~/interface/interface";
 import { CardBody, CardContainer, CardItem } from "~/components/acternity/3d";
 import { AnimatedTestimonials } from "~/components/acternity/carosel";
+import { LampContainer } from "~/components/acternity/lamp";
 
 const About = () => {
     const {
@@ -184,6 +187,7 @@ const About = () => {
                     minHeight: '500px',
                     position: 'relative',
                 }} className="lg:grid lg:grid-cols-2 lg:flex items-center mt-40">
+
                     <div data-aos="fade-right" className="flex flex-col gap-4">
                         <p className="font-nunito text-4xl dark:text-white font-bold">Our Vission</p>
                         <p className="font-nunito text-lg dark:text-white ">To transform the legal landscape with technology</p>

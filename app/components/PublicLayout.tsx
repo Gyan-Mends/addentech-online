@@ -1,5 +1,5 @@
 import { Button, Navbar, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle, Switch } from "@nextui-org/react"
-import { Link, useLocation } from "@remix-run/react"
+import { Link, useLocation, useNavigation } from "@remix-run/react"
 import { useTheme } from "next-themes";
 import { ReactNode, useState } from "react";
 import logo from "~/components/images/header-logo-blue.svg"
@@ -28,12 +28,17 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
         { text: "blog", href: "/blog" },
         { text: "team", href: "/team" },
     ];
+    const navigation = useNavigation();
+
+    // Determine if the page is currently transitioning
+    const isLoading = navigation.state === "loading";
 
 
     return (
-        <div className={`transition duration-500  px-40  overflow-x-hidden ${theme === "light" ? "bg-white " : ""}`}>
+        <div className={`transition duration-500  px-40  overflow-x-hidden  ${theme === "light" ? "bg-white " : ""}`}>
             {/* navigation bar */}
-            <Navbar
+            <div className="relative">
+                <Navbar
                 isBordered={false}
                 isMenuOpen={isMenuOpen}
                 onMenuOpenChange={setIsMenuOpen}
@@ -129,6 +134,13 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
                     ))}
                 </NavbarMenu>
             </Navbar>
+            </div>
+            {/* Loading overlay */}
+            {isLoading && (
+                <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="loader border-t-4 border-blue-500 rounded-full w-16 h-16 animate-spin"></div>
+                </div>
+            )}
 
             <div className="">
                 {children}

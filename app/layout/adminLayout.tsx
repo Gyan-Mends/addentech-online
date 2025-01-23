@@ -33,7 +33,7 @@ import RestockIcon from "~/components/icons/restock";
 import SaleIcon from "~/components/icons/Sales";
 import usersController from "~/controller/Users";
 import { RegistrationInterface } from "~/interface/interface";
-import logo from "~/components/images/addentech_logo.png"
+import logo from "~/components/images/header-logo-blue.svg"
 import { DepartmentIcon } from "~/components/icons/departmentIcon";
 
 interface UserLayoutProps {
@@ -47,7 +47,9 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
     const [mobileNavOpen, setMobileNavOpen] = useState(false); // Hide mobile nav by default
     const [isLogoutConfirmModalOpened, setIsLogoutConfirmModalOpened] = useState(false)
     const submit = useSubmit()
-    const [isLoading, setIsLoading] = useState(false)
+    const navigation = useNavigation()
+    const isLoading = navigation.state === "loading";
+
     // const { user } = useLoaderData<{
     //     user: RegistrationInterface[];
     // }>();
@@ -55,13 +57,7 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
     // const { theme, setTheme } = useTheme()
 
     // const { user } = useLoaderData<{ user: { user: string } }>()
-    useEffect(() => {
-        const timeOut = setTimeout(() => {
-            setIsLoading(true)
-        }, 1000)
 
-        return () => clearTimeout(timeOut)
-    }, [])
 
 
     const desktopNavToggle = () => {
@@ -75,17 +71,17 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
     };
 
     return (
-        <div className=" bg-[#18181B] h-[100vh] w-full  overflow-y-hidden">
-
+        <div className="  h-[100vh] w-full  overflow-y-hidden">
 
             {/* Desktop navigation bar */}
             {/* Desktop navigation bar */}
-            <div className={`hidden lg:block md:block w-64 h-[100vh] shadow-md dark:text-white fixed transition-transform duration-500 p-6 ${desktopNav ? "transform-none" : "-translate-x-full"}`}>
+            <div className="relativ">
+                <div className={`hidden lg:block md:block w-64 h-[100vh] shadow-md dark:text-white fixed transition-transform duration-500 p-6 bg-default-50 ${desktopNav ? "transform-none" : "-translate-x-full"}`}>
                 {/* logo */}
                 <div >
-                    <div>
+                        <Link to="/admin">
                         <img src={logo} className="h-16 w-40" alt="" />
-                    </div>
+                        </Link>
                 </div>
                 {/* Side Nav Content */}
                 <div className="flex flex-col gap-4">
@@ -210,6 +206,15 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
 
                 </ul>
             </div>
+            </div>
+
+
+            {/* Loading overlay */}
+            {isLoading && (
+                <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="loader border-t-4 border-blue-500 rounded-full w-16 h-16 animate-spin"></div>
+                </div>
+            )}
 
             <div className={`h-full p-4 transition-all duration-500 overflow-x-hidden  z-1 ${desktopNav ? "lg:ml-64 md:ml-64" : ""}`}>
                 {/* Main Content */}
