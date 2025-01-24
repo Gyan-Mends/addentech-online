@@ -285,7 +285,8 @@ class UsersController {
             const users = await Registration.find(searchFilter)
                 .skip(skipCount)
                 .limit(limit || 9)
-                .exec();
+                .exec()
+                ;
 
             return { user, users, totalPages };
         } catch (error: any) {

@@ -61,3 +61,11 @@ export const AdminDashboardSalesColumns = [
     { key: "balance", label: "Balance" },
     { key: "action", label: "Action" }
 ]
+export const MemoColumns = [
+    { key: "refNumber", label: "Ref" },
+    { key: "fromDepartment", label: "fromDepartment" },
+    { key: "fromName", label: "fromName" },
+    { key: "toDepartment", label: "toDepartment" },
+    { key: "toName", label: "toName" },
+
+]

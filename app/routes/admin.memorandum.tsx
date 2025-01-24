@@ -14,18 +14,20 @@ import UserIcon from "~/components/icons/UserIcon";
 import ConfirmModal from "~/components/modal/confirmModal";
 import CreateModal from "~/components/modal/createModal";
 import EditModal from "~/components/modal/EditModal";
-import { UserColumns } from "~/components/table/columns";
+import { MemoColumns, UserColumns } from "~/components/table/columns";
 import NewCustomTable from "~/components/table/newTable";
 import { errorToast, successToast } from "~/components/toast";
 import CustomInput from "~/components/ui/CustomInput";
 import department from "~/controller/departments";
 import taskController from "~/controller/task";
 import usersController from "~/controller/Users";
-import { DepartmentInterface, RegistrationInterface } from "~/interface/interface";
+import { DepartmentInterface, MemoInterface, RegistrationInterface } from "~/interface/interface";
 import AdminLayout from "~/layout/adminLayout";
 import { getSession } from "~/session";
 import { v4 as uuidv4 } from "uuid";
 import { FileUploader } from "~/components/icons/uploader";
+import memo from "~/controller/memeo";
+import memoController from "~/controller/memeo";
 export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
@@ -44,14 +46,21 @@ const Users = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [referenceNumber, setReferenceNumber] = useState('');
     console.log("This is the ref:" + referenceNumber);
+    const [content, setContent] = useState("");
+    const [contentTwo, setContentTow] = useState("");
+
 
     const {
 
         departments,
+        memos,
+        totalPages,
         users
     } = useLoaderData<{
         departments: DepartmentInterface[]
         users: RegistrationInterface[]
+        memos: MemoInterface[]
+        totalPages: number
     }>()
 
     useEffect(() => {
@@ -178,6 +187,29 @@ const Users = () => {
                     </div>
                 </div>
 
+                <NewCustomTable
+                    columns={MemoColumns}
+                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                    totalPages={totalPages}
+                    page={1}
+                    setPage={(page) => (
+                        navigate(`?page=${page}`)
+                    )}>
+                    {memos?.map((user, index: number) => (
+                        <TableRow key={index}>
+
+                            <TableCell>{user.refNumber}</TableCell>
+                            <TableCell>{user.fromDepartment?.name}</TableCell>
+                            <TableCell>{user.fromName?.firstName}</TableCell>
+                            <TableCell>{user.toDepartment?.name}</TableCell>
+                            <TableCell>{user.toName?.firstName}</TableCell>
+                        </TableRow>
+                    ))}
+                </NewCustomTable>
+
+
+                {/* Creeat memo drawer */}
+                {/* Creeat memo drawer */}
                 <div
                     className={`w-[40vw] h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isDrawerOpen ? "transform-none" : "translate-x-full"}`}
                 >
@@ -279,9 +311,12 @@ const Users = () => {
                         </div>
 
                         <div>
-                            <input name="subject" hidden type="text" />
                             <label htmlFor="" className="font-nunito">Subject</label>
+                            <input type="hidden" name="subject" value={content} />
                             <ReactQuill
+                                value={content}
+                                onChange={setContent}
+
                                 modules={modules}
                                 className='md:!h-[20vh] mt-2 font-nunito rounded w-full mb-12 !font-nunito'
                             />
@@ -343,9 +378,12 @@ const Users = () => {
                         </Select>
 
                         <div>
-                            <input name="remark" hidden type="text" />
                             <label htmlFor="" className="font-nunito">Remarks</label>
+                            <input type="hidden" name="remark" value={contentTwo} />
                             <ReactQuill
+                                value={contentTwo}
+                                onChange={setContentTow}
+
                                 modules={modules}
                                 className='md:!h-[20vh] mt-2 font-nunito rounded w-full mb-12 !font-nunito'
                             />
@@ -415,9 +453,12 @@ const Users = () => {
                         <Checkbox name="emailCheck" className="font-nunito" defaultSelected>Send Email Notification</Checkbox>
 
                         <div className="flex gap-6 mt-6">
-                            <Button color="primary" className="font-montserrat w-40">Send Memo</Button>
-                            <Button color="success" className="font-montserrat w-40 text-white">Draft Memo</Button>
+                            <button color="primary" className="font-montserrat w-40">Send Memo</button>
                         </div>
+
+                        <input name="admin" value="{user?._id}" type="hidden" />
+                        <input name="intent" value="create" type="hidden" />
+                        <input name="base64Image" value={base64Image} type="hidden" />
 
                     </Form>
                 </div>
@@ -443,13 +484,41 @@ export const action: ActionFunction = async ({ request }) => {
     const remark = formData.get("remark") as string;
     const ccDepartment = formData.get("ccDepartment") as string;
     const ccName = formData.get("ccName") as string;
-    const image = formData.get("image") as File; // File input
-    const emailCheck = formData.get("emailCheck") === "on"; // Checkbox value
+    const base64Image = formData.get("base64Image") as string
+    const emailCheck = formData.get("emailCheck") === "on";
+    const intent = formData.get("intent") as string
+
+
+    switch (intent) {
+        case "create":
+            const memo = await memoController.Memo({
+                refNumber,
+                fromDepartment,
+                fromName,
+                memoDate,
+                toDepartment,
+                toName,
+                subject,
+                memoType,
+                dueDate,
+                frequency,
+                remark,
+                ccDepartment,
+                ccName,
+                emailCheck,
+                base64Image,
+            })
+            return memo
+            break;
+
+        default:
+            break;
+    }
 
 
 
 
-    return new Response("Memo submitted successfully", { status: 200 });
+
 };
 
 
@@ -465,13 +534,19 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term,
     });
+
     const { users } = await usersController.FetchUsers({
         request,
         page,
         search_term,
     });
+    const { memos, totalPages } = await memoController.FetchMemo({
+        request,
+        page,
+        search_term,
+    });
 
-    return json({ departments, users });
+    return json({ departments, memos, totalPages, users });
 };
 
 
