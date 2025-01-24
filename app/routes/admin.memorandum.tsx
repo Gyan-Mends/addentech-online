@@ -1,4 +1,4 @@
-import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react";
+import { Avatar, Button, Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react";
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -25,6 +25,7 @@ import { DepartmentInterface, RegistrationInterface } from "~/interface/interfac
 import AdminLayout from "~/layout/adminLayout";
 import { getSession } from "~/session";
 import { v4 as uuidv4 } from "uuid";
+import { FileUploader } from "~/components/icons/uploader";
 export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
@@ -41,7 +42,7 @@ const Users = () => {
     const navigate = useNavigate();
     const navigation = useNavigation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [referenceNumber, setReferenceNumber] = useState(0);
+    const [referenceNumber, setReferenceNumber] = useState('');
     console.log("This is the ref:" + referenceNumber);
 
     const {
@@ -69,6 +70,16 @@ const Users = () => {
         }, 1000);
         return () => clearTimeout(timeOut);
     }, []);
+
+    const generateRandomReference = () => {
+        return 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    };
+
+    const handleClick = () => {
+        setIsDrawerOpen(!isDrawerOpen)
+        const randomRef = generateRandomReference();
+        setReferenceNumber(randomRef);
+    };
 
     const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
     const modules = {
@@ -155,9 +166,7 @@ const Users = () => {
                         </div>
                         <div className="flex gap-4">
                             <Button
-                                onClick={() => {
-                                    setIsDrawerOpen(!isDrawerOpen)
-                                }}
+                                onClick={handleClick}
                                 color="primary"
                                 size="md"
                                 className="font-nunito flex text-sm px-8"
@@ -185,14 +194,10 @@ const Users = () => {
                     <hr className="mt-4 border border-default-400" />
 
                     <Form className="flex flex-col gap-6 pt-4" method="post">
-                        <CustomInput
-                            label="Reference Number"
-                            isRequired
-                            name="referenceNumber"
-                            type="text"
-                            placeholder=" "
-                            labelPlacement="outside"
-                        />
+                        <input
+                            name="refNumber"
+                            className="text-sm dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
+                            value={referenceNumber} type="text" />
 
                         <div className="flex gap-6">
                             <Select
@@ -200,7 +205,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
-                                name="department"
+                                name="fromDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -216,7 +221,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
-                                name="department"
+                                name="fromName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -232,7 +237,7 @@ const Users = () => {
                         <CustomInput
                             label="Memo Date"
                             isRequired
-                            name="referenceNumber"
+                            name="memoDate"
                             type="Date"
                             placeholder=" "
                             labelPlacement="outside"
@@ -244,7 +249,7 @@ const Users = () => {
                             labelPlacement="outside"
                             placeholder="Select department"
                             isRequired
-                            name="department"
+                                name="toDepartment"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
                                 popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -260,7 +265,7 @@ const Users = () => {
                             labelPlacement="outside"
                             placeholder="Select department"
                             isRequired
-                            name="department"
+                                name="toName"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
                                 popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -274,7 +279,7 @@ const Users = () => {
                         </div>
 
                         <div>
-                            <input hidden type="text" />
+                            <input name="subject" hidden type="text" />
                             <label htmlFor="" className="font-nunito">Subject</label>
                             <ReactQuill
                                 modules={modules}
@@ -290,7 +295,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
-                                name="department"
+                                name="memoType"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -308,7 +313,7 @@ const Users = () => {
                             <CustomInput
                                 label="Due Date"
                             isRequired
-                            name="referenceNumber"
+                                name="dueDate"
                             type="Date"
                             placeholder=" "
                             labelPlacement="outside"
@@ -321,7 +326,7 @@ const Users = () => {
                             labelPlacement="outside"
                             placeholder="Select department"
                             isRequired
-                            name="department"
+                            name="frequency"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
                                 popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -338,7 +343,7 @@ const Users = () => {
                         </Select>
 
                         <div>
-                            <input hidden type="text" />
+                            <input name="remark" hidden type="text" />
                             <label htmlFor="" className="font-nunito">Remarks</label>
                             <ReactQuill
                                 modules={modules}
@@ -352,7 +357,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
-                                name="department"
+                                name="ccDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -368,7 +373,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
-                                name="department"
+                                name="ccName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
@@ -381,6 +386,39 @@ const Users = () => {
                             </Select>
                         </div>
 
+                        <div className=" ">
+                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                            <input name="image" type="text" hidden />
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
+                                <input
+                                    name="image"
+                                    required
+                                    placeholder=" "
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    type="file"
+                                    onChange={(event: any) => {
+                                        const file = event.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader()
+                                            reader.onloadend = () => {
+                                                setBase64Image(reader.result)
+                                            }
+                                            reader.readAsDataURL(file)
+                                        }
+                                    }}
+                                />
+                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"><FileUploader className="h-20 w-20 text-white" /></span>
+                            </div>
+                        </div>
+
+
+                        <Checkbox name="emailCheck" className="font-nunito" defaultSelected>Send Email Notification</Checkbox>
+
+                        <div className="flex gap-6 mt-6">
+                            <Button color="primary" className="font-montserrat w-40">Send Memo</Button>
+                            <Button color="success" className="font-montserrat w-40 text-white">Draft Memo</Button>
+                        </div>
+
                     </Form>
                 </div>
             </div>
@@ -389,6 +427,7 @@ const Users = () => {
 };
 
 export default Users;
+
 
 export const loader: LoaderFunction = async ({ request }) => {
     const url = new URL(request.url);
