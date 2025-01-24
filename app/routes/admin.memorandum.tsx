@@ -427,6 +427,30 @@ const Users = () => {
 };
 
 export default Users;
+export const action: ActionFunction = async ({ request }) => {
+    const formData = await request.formData();
+
+    const refNumber = formData.get("refNumber") as string;
+    const fromDepartment = formData.get("fromDepartment") as string;
+    const fromName = formData.get("fromName") as string;
+    const memoDate = formData.get("memoDate") as string;
+    const toDepartment = formData.get("toDepartment") as string;
+    const toName = formData.get("toName") as string;
+    const subject = formData.get("subject") as string;
+    const memoType = formData.get("memoType") as string;
+    const dueDate = formData.get("dueDate") as string;
+    const frequency = formData.get("frequency") as string;
+    const remark = formData.get("remark") as string;
+    const ccDepartment = formData.get("ccDepartment") as string;
+    const ccName = formData.get("ccName") as string;
+    const image = formData.get("image") as File; // File input
+    const emailCheck = formData.get("emailCheck") === "on"; // Checkbox value
+
+
+
+
+    return new Response("Memo submitted successfully", { status: 200 });
+};
 
 
 export const loader: LoaderFunction = async ({ request }) => {
