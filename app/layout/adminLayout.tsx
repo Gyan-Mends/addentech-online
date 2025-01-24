@@ -75,8 +75,8 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
 
             {/* Desktop navigation bar */}
             {/* Desktop navigation bar */}
-            <div className="relativ">
-                <div className={`hidden lg:block md:block w-64 h-[100vh] shadow-md dark:text-white fixed transition-transform duration-500 p-6 bg-default-50 ${desktopNav ? "transform-none" : "-translate-x-full"}`}>
+            <div className="relative">
+                <div className={`hidden border dark:border-white/10  lg:block md:block w-64 h-[100vh] shadow-md dark:text-white fixed transition-transform duration-500 p-6 bg-default-50 ${desktopNav ? "transform-none" : "-translate-x-full"}`}>
                 {/* logo */}
                 <div >
                         <Link to="/admin">
@@ -87,40 +87,40 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
                 <div className="flex flex-col gap-4">
                     <ul className="mt-6 pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin">
-                            <li className="text-sm hover:bg-[#05ECF2]  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <DashboardIcon className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0]  hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <DashboardIcon className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Dashboard
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/departments">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <DepartmentIcon className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <DepartmentIcon className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Departments
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/users">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Team
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/category">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Blog Category
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/blog">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Blog
                             </li>
                         </Link>
@@ -128,32 +128,32 @@ const AdminLayout = ({ children, pageName }: UserLayoutProps) => {
 
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/users">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Comments
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/users">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Contacts
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/task">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Projects
                             </li>
                         </Link>
                     </ul>
                     <ul className=" pl-2 flex flex-col gap-2">
                         <Link className="" to="/admin/memorandum">
-                            <li className="text-sm hover:bg-[#05ECF2] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
-                                <UsersGroup className="text-[#05ECF2] h-5 w-5 hover:text-white" />
+                                <li className="text-sm hover:bg-[#249DD0] hover:border-r-4 hover:border-r-white hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out text-gray-200">
+                                    <UsersGroup className="text-[#249DD0] h-5 w-5 hover:text-white" />
                                 Memorandum
                             </li>
                         </Link>
