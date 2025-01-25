@@ -7,48 +7,48 @@ const TaskSchema = new mongoose.Schema(
     {
         title: {
             type: String,
-            required: true,
+            require: true,
         },
         description: {
             type: String,
-            required: true,
+            require: true,
         },
         status: {
             type: String,
             enum: ["Unclaimed", "Approved"],
-            required: true,
+            require: true,
             default: "Unclaimed",
         },
 
         priority: {
             type: String,
             enum: ["low", "medium", "high"],
-            required: true,
+            require: true,
         },
         department: {
             type: Schema.Types.ObjectId,
             ref: "departments",
-            required: true,
+            require: true,
         },
         createdBy: {
             type: Schema.Types.ObjectId,
             ref: "registration",
-            required: true,
+            require: true,
         },
         dueDate: {
             type: Date,
-            required: true,
+            require: true,
         },
         comments: [
             {
                 createdBy: {
                     type: Schema.Types.ObjectId,
                     ref: "registration", // User reference
-                    required: true,
+                    require: true,
                 },
                 comment: {
                     type: String,
-                    required: true,
+                    require: true,
                 }, createdAt: {
                     type: Date,
                     default: Date.now,
@@ -60,16 +60,16 @@ const TaskSchema = new mongoose.Schema(
             {
                 team: {
                     type: String,
-                    required: true,
+                    require: true,
                 },
                 description: {
                     type: String,
-                    required: true,
+                    require: true,
                 },
                 status: {
                     type: String,
                     enum: ["Pending", "Onhold", "Inprogress", "Needs Approval", "Completed"],
-                    required: true,
+                    require: true,
                 },
                 lead: {
                     type: Schema.Types.ObjectId,
@@ -88,11 +88,11 @@ const TaskSchema = new mongoose.Schema(
                         createdBy: {
                             type: Schema.Types.ObjectId,
                             ref: "registration", // User reference
-                            required: true,
+                            require: true,
                         },
                         comment: {
                             type: String,
-                            required: true,
+                            require: true,
                         }, createdAt: {
                             type: Date,
                             default: Date.now,

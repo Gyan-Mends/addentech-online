@@ -125,6 +125,8 @@ class MemoController {
                 .populate("toDepartment")
                 .populate("toName")
                 .populate("fromName")
+                .populate("ccDepartment")
+                .populate("ccName")
                 .exec();
 
             return { user, memos, totalPages };
@@ -135,6 +137,31 @@ class MemoController {
                 status: 500
             };
         }
+    }
+
+    async DeleteMemo(
+        {
+            id,
+        }: {
+            id: string,
+        }
+    ) {
+
+        const deleteMemo = await Memo.findByIdAndDelete(id);
+        if (deleteMemo) {
+            return json({
+                message: "memo delete successfully",
+                success: true,
+                status: 500,
+            })
+        } else {
+            return json({
+                message: "Unable to delete memo",
+                success: false,
+                status: 500
+            })
+        }
+
     }
 }
 

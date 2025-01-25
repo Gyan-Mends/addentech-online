@@ -7,7 +7,7 @@ const MemoSchema: Schema = new mongoose.Schema(
     {
         refNumber: {
             type: String,
-            required: true,
+            require: true,
             unique: true
 
         },
@@ -25,7 +25,7 @@ const MemoSchema: Schema = new mongoose.Schema(
         },
         memoDate: {
             type: Date,
-            required: true
+            require: true
 
         },
         toDepartment: {
@@ -41,12 +41,12 @@ const MemoSchema: Schema = new mongoose.Schema(
         },
         subject: {
             type: String,
-            required: true
+            require: true
 
         },
         memoType: {
             type: String,
-            required: true
+            require: true
 
         },
         dueDate: {
@@ -60,18 +60,22 @@ const MemoSchema: Schema = new mongoose.Schema(
             type: String
         },
         ccDepartment: {
-            type: String
+            ref: "departments",
+            require: true,
+            type: Schema.Types.ObjectId,
 
         },
         ccName: {
-            type: String
+            ref: "registration",
+            require: true,
+            type: Schema.Types.ObjectId,
         },
         image: {
             type: String
         },
         emailCheck: {
             type: Boolean,
-            required: true
+            require: true
 
         },
         createdAt: {
@@ -83,10 +87,7 @@ const MemoSchema: Schema = new mongoose.Schema(
             type: Date
 
         },
-        status: {
-            type: String,
-            required: true
-        },
+
     },
     { timestamps: true }
 );

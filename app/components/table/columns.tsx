@@ -62,10 +62,13 @@ export const AdminDashboardSalesColumns = [
     { key: "action", label: "Action" }
 ]
 export const MemoColumns = [
-    { key: "refNumber", label: "Ref" },
-    { key: "fromDepartment", label: "fromDepartment" },
-    { key: "fromName", label: "fromName" },
-    { key: "toDepartment", label: "toDepartment" },
-    { key: "toName", label: "toName" },
+    { title: "RefNum", allowSort: true },
+    { title: "From Department", allowSort: true },
+    { title: "From Name", allowSort: true },
+    { title: "To Department", allowSort: true },
+    { title: "To Name", allowSort: true },
+    { title: "Memo Date", allowSort: true },
+    { title: "Due Date", allowSort: true },
+    { title: "Action", allowSort: true },
 
 ]

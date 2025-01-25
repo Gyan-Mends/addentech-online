@@ -56,22 +56,29 @@ export interface TaskInterface {
 
 export interface MemoInterface {
     _id: string;
-    refNumber: string;           // Reference number of the memo
-    fromDepartment: string;      // Department sending the memo
-    fromName: string;            // Name of the person sending the memo
-    memoDate: string;            // Date the memo is created
-    toDepartment: string;        // Department receiving the memo
+    refNumber: string;
+    fromDepartment: string;
+    fromName: string;
+    memoDate: string;
+    toDepartment: string;        
     toName: string;              // Name of the recipient
     subject: string;             // Subject of the memo
     memoType: string;            // Type of the memo
-    dueDate?: string;            // Optional due date
-    frequency?: string;          // Optional frequency (e.g., daily, weekly)
-    remark?: string;             // Optional remarks
-    ccDepartment?: string;       // Optional CC department
-    ccName?: string;             // Optional CC recipient name
-    image?: File;                // Optional image attachment
+    dueDate: string;            // Optional due date
+    frequency: string;          // Optional frequency (e.g., daily, weekly)
+    remark: string;             // Optional remarks
+    ccDepartment: string;       // Optional CC department
+    ccName: string;             // Optional CC recipient name
+    image: File;                // Optional image attachment
     emailCheck: boolean;         // Whether to send via email
     createdAt: string;           // Timestamp for when the memo is created
-    updatedAt?: string;          // Optional, for tracking updates
-    status?: string;             // Optional, e.g., "draft" or "sent"
+    updatedAt: string;          // Optional, for tracking updates
+    status: string;             // Optional, e.g., "draft" or "sent"
+}
+
+export interface ComplaintInterface {
+    description: string;
+    attachment: string;
+    unique_id: string;
+    status: string
 }
