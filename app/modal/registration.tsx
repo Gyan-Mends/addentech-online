@@ -4,48 +4,48 @@ import mongoose from "~/mongoose.server";
 
 const RegistrationSchema = new mongoose.Schema({
   firstName: {
-    require: true,
+    required: true,
     type: String,
   },
   middleName: {
-    require: true,
+    required: true,
     type: String,
   },
   lastName: {
-    require: true,
+    required: true,
     type: String,
   },
   email: {
-    require: true,
+    required: true,
     type: String,
   },
   password: {
-    require: true,
+    required: true,
     type: String,
   },
   phone: {
-    require: true,
+    required: true,
     type: String,
   },
   role: {
-    require: true,
+    required: true,
     type: String,
   },
   admin: {
-    require: true,
+    required: true,
     type: String,
   },
   position: {
-    require: true,
+    required: true,
     type: String,
   },
   department: {
     ref: "departments",
-    require: true,
+    required: true,
     type: Schema.Types.ObjectId,
   },
   image: {
-    require: true,
+    required: true,
     type: String,
   },
 }, {

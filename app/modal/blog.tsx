@@ -5,25 +5,25 @@ import mongoose from "~/mongoose.server";
 
 const BlogSchema = new mongoose.Schema({
     name: {
-        require: true,
+        required: true,
         type: String,
     },
     description: {
-        require: true,
+        required: true,
         type: String,
     },
     image: {
-        require: true,
+        required: true,
         type: String,
     },
     category: {
         ref: "category",
-        require: true,
+        required: true,
         type: Schema.Types.ObjectId,
     },
     admin: {
         ref: "registration",
-        require: true,
+        required: true,
         type: Schema.Types.ObjectId,
     },
 }, {

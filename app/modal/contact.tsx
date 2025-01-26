@@ -5,27 +5,27 @@ import mongoose from "~/mongoose.server";
 
 const ContacSchema = new mongoose.Schema({
     firstName: {
-        require: true,
+        required: true,
         type: String,
     },
     middleName: {
-        require: false,
+        required: false,
         type: String,
     },
     lastName: {
-        require: true,
+        required: true,
         type: String,
     },
     number: {
-        require: true,
+        required: true,
         type: String,
     },
     comapny: {
-        require: false,
+        required: false,
         type: String,
     },
     description: {
-        require: true,
+        required: true,
         type: String,
     },
 

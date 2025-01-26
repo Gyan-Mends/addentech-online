@@ -64,7 +64,7 @@ class ComplaintController {
 
             // Saving data if category does not exist
             const complaint = new Complaint({
-                image: base64Image,
+                attachment: base64Image,
                 description,
                 unique_id
             });
@@ -81,7 +81,7 @@ class ComplaintController {
 
 
 
-    async getCategories({
+    async getComplaints({
         request,
         page,
         search_term,
@@ -91,11 +91,7 @@ class ComplaintController {
         page: number;
         search_term: string;
         limit?: number;
-    }): Promise<{
-        user: RegistrationInterface[],
-        categories: CategoryInterface[],
-        totalPages: number
-    } | any> {
+        }) {
         const skipCount = (page - 1) * limit; // Calculate the number of documents to skip
 
         // Define the search filter only once
@@ -103,7 +99,16 @@ class ComplaintController {
             ? {
                 $or: [
                     {
-                        name: {
+                        unique_id: {
+                            $regex: new RegExp(
+                                search_term
+                                    .split(" ")
+                                    .map((term) => `(?=.*${term})`)
+                                    .join(""),
+                                "i"
+                            ),
+                        },
+                        status: {
                             $regex: new RegExp(
                                 search_term
                                     .split(" ")
@@ -119,22 +124,18 @@ class ComplaintController {
             : {};
 
         try {
-            // Get session and user information
-            const session = await getSession(request.headers.get("Cookie"));
-            const token = session.get("email");
-            const user = await Registration.findOne({ email: token });
 
             // Get total employee count and calculate total pages       
-            const totalEmployeeCount = await Category.countDocuments(searchFilter).exec();
-            const totalPages = Math.ceil(totalEmployeeCount / limit);
+            const complaintCount = await Complaint.countDocuments(searchFilter).exec();
+            const totalPages = Math.ceil(complaintCount / limit);
 
             // Find users with pagination and search filter
-            const categories = await Category.find(searchFilter)
+            const complaint = await Complaint.find(searchFilter)
                 .skip(skipCount)
                 .limit(limit)
                 .exec();
 
-            return { user, categories, totalPages };
+            return { complaint, totalPages };
         } catch (error: any) {
             return {
                 message: error.message,
@@ -142,6 +143,31 @@ class ComplaintController {
                 status: 500
             };
         }
+    }
+
+    async DeleteComplaint(
+        {
+            id,
+        }: {
+            id: string,
+        }
+    ) {
+
+        const deleteMemo = await Complaint.findByIdAndDelete(id);
+        if (deleteMemo) {
+            return json({
+                message: "Complaint delete successfully",
+                success: true,
+                status: 500,
+            })
+        } else {
+            return json({
+                message: "Unable to delete complaint",
+                success: false,
+                status: 500
+            })
+        }
+
     }
 }
 

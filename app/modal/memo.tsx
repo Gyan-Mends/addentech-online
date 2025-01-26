@@ -7,46 +7,46 @@ const MemoSchema: Schema = new mongoose.Schema(
     {
         refNumber: {
             type: String,
-            require: true,
+            required: true,
             unique: true
 
         },
         fromDepartment: {
             ref: "departments",
-            require: true,
+            required: true,
             type: Schema.Types.ObjectId,
 
         },
         fromName: {
             ref: "registration",
-            require: true,
+            required: true,
             type: Schema.Types.ObjectId,
 
         },
         memoDate: {
             type: Date,
-            require: true
+            required: true
 
         },
         toDepartment: {
             ref: "departments",
-            require: true,
+            required: true,
             type: Schema.Types.ObjectId,
         },
         toName: {
             ref: "registration",
-            require: true,
+            required: true,
             type: Schema.Types.ObjectId,
 
         },
         subject: {
             type: String,
-            require: true
+            required: true
 
         },
         memoType: {
             type: String,
-            require: true
+            required: true
 
         },
         dueDate: {
@@ -61,13 +61,13 @@ const MemoSchema: Schema = new mongoose.Schema(
         },
         ccDepartment: {
             ref: "departments",
-            require: true,
+            required: true,
             type: Schema.Types.ObjectId,
 
         },
         ccName: {
             ref: "registration",
-            require: true,
+            required: true,
             type: Schema.Types.ObjectId,
         },
         image: {
@@ -75,7 +75,7 @@ const MemoSchema: Schema = new mongoose.Schema(
         },
         emailCheck: {
             type: Boolean,
-            require: true
+            required: true
 
         },
         createdAt: {

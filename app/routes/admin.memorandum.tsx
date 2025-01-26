@@ -503,6 +503,7 @@ const Users = () => {
 
                     </Form>
                 </div>
+
                 <div
                     className={`w-[20vw] h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isViewDrawerOpen ? "transform-none" : "translate-x-full"}`}
                 >

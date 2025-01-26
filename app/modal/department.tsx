@@ -4,16 +4,16 @@ import mongoose from "~/mongoose.server";
 
 const DepartmentSchema = new mongoose.Schema({
     name: {
-        require: true,
+        required: true,
         type: String,
     },
     description: {
-        require: true,
+        required: true,
         type: String,
     },
     admin: {
         ref: "registration",
-        require: true,
+        required: true,
         type: Schema.Types.ObjectId,
     },
 })

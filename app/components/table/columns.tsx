@@ -72,3 +72,11 @@ export const MemoColumns = [
     { title: "Action", allowSort: true },
 
 ]
+export const ComplaintColumns = [
+    { title: "Unique_Id", allowSort: true },
+    { title: "Image", allowSort: true },
+    { title: "description", allowSort: true },
+    { title: "Status", allowSort: true },
+    { title: "Action", allowSort: true },
+
+]

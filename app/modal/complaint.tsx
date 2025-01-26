@@ -4,33 +4,32 @@ import mongoose from "~/mongoose.server";
 
 const ComplaintSchema = new mongoose.Schema({
     description: {
-        require: true,
+        required: true, // Fixed `require` to `required`
         type: String,
     },
     attachment: {
-        require: true,
+        required: true, // Fixed `require` to `required`
         type: String,
     },
     unique_id: {
-        require: true,
+        required: true, // Fixed `require` to `required`
         type: String,
-        unique: true
+        unique: true,
     },
     status: {
-        require: true,
+        type: String, // Added `type` to ensure it's a string
         enum: ["New", "Under Review", "Resolved"],
-        default: "New"
+        default: "New",
+        required: true, // Added `required` if this field is mandatory
     },
+});
 
-})
-
-let Complaint: mongoose.Model<ComplaintInterface>
+let Complaint: mongoose.Model<ComplaintInterface>;
 
 try {
-    Complaint = mongoose.model<ComplaintInterface>("complaint")
+    Complaint = mongoose.model<ComplaintInterface>("complaint");
 } catch (error) {
-    Complaint = mongoose.model<ComplaintInterface>("complaint", ComplaintSchema)
-
+    Complaint = mongoose.model<ComplaintInterface>("complaint", ComplaintSchema);
 }
 
-export default Complaint
+export default Complaint;
