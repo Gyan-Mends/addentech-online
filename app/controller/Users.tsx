@@ -138,9 +138,11 @@ class UsersController {
             email,
             admin,
             phone,
-            id,
             role,
-            intent,
+            id,
+            position,
+            department,
+            base64Image
         }: {
             firstName: string,
             middleName: string,
@@ -150,10 +152,12 @@ class UsersController {
             phone: string,
             role: string,
             id: string,
-            intent: string,
+                position: string,
+                department: string,
+                base64Image: string
         }) {
         try {
-            if (intent === "update") {
+
                 const updateUser = await Registration.findByIdAndUpdate(id, {
                     firstName,
                     middleName,
@@ -162,6 +166,9 @@ class UsersController {
                     phone,
                     role,
                     admin,
+                    position,
+                    department,
+                    image: base64Image
                 })
 
                 if (updateUser) {
@@ -177,13 +184,7 @@ class UsersController {
                         status: 500
                     })
                 }
-            } else {
-                return json({
-                    message: "Spelling of role must be Admin or Attendant",
-                    success: false,
-                    status: 500
-                })
-            }
+
 
 
         } catch (error: any) {

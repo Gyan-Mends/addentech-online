@@ -21,6 +21,8 @@ import NewCustomTable from "~/components/table/newTable";
 import { CategoryInterface } from "~/interface/interface";
 import category from "~/controller/categoryController";
 import usersController from "~/controller/Users";
+import CloseIcon from "~/components/icons/CloseIcon";
+import CustomInput from "~/components/ui/CustomInput";
 
 type SessionData = {
     sessionId: {
@@ -34,13 +36,14 @@ const Category = () => {
     const [rowsPerPage, setRowsPerPage] = useState(13);
     const submit = useSubmit()
     const [editModalOpened, setEditModalOpened] = useState(false)
-    const [selectedCategory, setSelectedCategory] = useState<CategoryInterface>();
+    const [dataValue, setDataValue] = useState<CategoryInterface>();
     const [createModalOpened, setCreateModalOpened] = useState(false)
     const [viewModalOpened, setViewModalOpened] = useState(false)
     const [confirmModalOpened, setConfirmModalOpened] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
     const navigation = useNavigation()
+
 
 
     const handleRowsPerPageChange = (newRowsPerPage: number) => {
@@ -58,22 +61,14 @@ const Category = () => {
         setConfirmModalOpened(false)
     }
 
-    const handleCreateModalOpened = () => {
+    const handleCreateModalClosed = () => {
         setCreateModalOpened(false)
+    }
+    const handleClick = () => {
+        setCreateModalOpened(true)
     }
 
 
-
-
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message)
-            } else {
-                errorToast(actionData.message)
-            }
-        }
-    }, [actionData])
 
     useEffect(() => {
         const timeOut = setTimeout(() => {
@@ -84,46 +79,7 @@ const Category = () => {
     }, [])
 
     return (
-        <AdminLayout pageName="Categories">
-            <div className="flex z-0 mt-6 justify-between gap-2 overflow-y-hidden">
-                <Toaster position="top-right" />
-                <div className="flex items-center justify-center gap-2">
-                    {/* back */}
-                    {/* back */}
-                    <Button size="sm" onClick={() => {
-                        navigate(-1)
-                    }} color="primary" className="font-nunito text-sm  border-b-white dark:border-primary  dark:text-white dark:bg-[#333]">
-                        <BackIcon className="h-[20px] w-[20px] dark:text-success" /><p >Back</p>
-                    </Button>
-                </div>
-                <div className="flex gap-4">
-                    {/* search */}
-                    {/* search */}
-                    <Input
-                        size="sm"
-                        placeholder="Search user..."
-                        startContent={<SearchIcon className="" />}
-                        onValueChange={(value) => {
-                            const timeoutId = setTimeout(() => {
-                                navigate(`?search_term=${value}`);
-                            }, 100);
-                            return () => clearTimeout(timeoutId);
-                        }} classNames={{
-                            inputWrapper: "bg-white shadow-sm text-sm font-nunito dark:bg-[#333] border border-white/5 ",
-                        }}
-                    />
-                    {/* button to add new user */}
-                    {/* button to add new user */}
-                    <Button size="sm"
-                        variant="flat"
-                        onClick={() => {
-                            setCreateModalOpened(true)
-                        }}
-                        className="font-nunito dark:bg-[#333]  text-sm px-8">
-                        <PlusIcon className="" /> Create Category
-                    </Button>
-                </div>
-            </div>
+        <AdminLayout buttonName="Create Category" handleOnClick={handleClick} pageName="Categories">
 
             <div className="">
                 <NewCustomTable
@@ -141,13 +97,13 @@ const Category = () => {
                             <TableCell className="relative flex items-center gap-4">
                                 <Button size="sm" color="success" variant="flat" onClick={() => {
                                     setEditModalOpened(true)
-                                    setSelectedCategory(categories)
+                                    setDataValue(categories)
 
                                 }}>
                                     <EditIcon /> Edit
                                 </Button >
                                 <Button size="sm" color="danger" variant="flat" onClick={() => {
-                                    setSelectedCategory(categories)
+                                    setDataValue(categories)
                                     setConfirmModalOpened(true)
                                 }}>
                                     <DeleteIcon /> Delete
@@ -159,18 +115,28 @@ const Category = () => {
                 </NewCustomTable>
             </div>
 
-            <EditModal
-                className="dark:bg-slate-950 bg-gray-200"
-                modalTitle="Edit Category"
-                isOpen={editModalOpened}
-                onOpenChange={handleEditModalClose}
-            >
-                {(onClose) => (
+            {dataValue && (
+                <div
+                    className={`w-[20vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${editModalOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
+                        }`}
+                >
+                    <div className="flex justify-between gap-10 ">
+                        <p className="font-nunito">Edit  Category</p>
+                        <button
+                            onClick={() => {
+                                handleEditModalClose()
+                            }}
+                        >
+                            <CloseIcon className="h-4 w-4" />
+                        </button>
+                    </div>
+                    <hr className=" border border-default-400 " />
+
                     <Form method="post">
                         <Input
                             label="Name"
                             name="name"
-                            defaultValue={selectedCategory?.name}
+                            defaultValue={setDataValue?.name}
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
@@ -181,8 +147,7 @@ const Category = () => {
                         />
                         <input name="seller" value={user?._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
-                        <input name="id" value={selectedCategory?._id} type="hidden" />
-
+                        <input name="id" value={setDataValue?._id} type="hidden" />
                         <Textarea
                             autoFocus
                             label="Product description"
@@ -190,7 +155,7 @@ const Category = () => {
                             placeholder=" "
                             name="description"
                             className="mt-4 font-nunito text-sm"
-                            defaultValue={selectedCategory?.description}
+                            defaultValue={setDataValue?.description}
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
                                 inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
@@ -198,41 +163,32 @@ const Category = () => {
                         />
 
 
-                        <div className="flex justify-end gap-2 mt-10 font-nunito">
-                            <Button color="danger" onPress={onClose}>
-                                Close
-                            </Button>
-                            <button type="submit" className="text-white bg-primary-400 rounded-xl font-nunito px-4">
-                                Submit
-                            </button>
-                        </div>
+
+                        <button onClick={() => {
+                        }} type="submit" className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4">
+                            Update
+                        </button>
                     </Form>
-                )}
-            </EditModal>
-
-
-            <ViewModal className="" modalTitle="Category Dateails" isOpen={viewModalOpened} onOpenChange={handleViewModalClosed}>
-                <div >
-                    <p className="font-nunito text-md">Category Name</p>
-                    <p>{selectedCategory?.name}</p>
-
-                    <p className="font-nunito text-md mt-6">Category Description</p>
-                    <p>{selectedCategory?.description}</p>
-
                 </div>
-            </ViewModal>
+            )}
 
-            <ConfirmModal className="dark:bg-slate-950 bg-gray-200"
+
+
+
+
+
+
+            <ConfirmModal className="dark:bg-[#333] border border-white/5" 
                 content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
                         No
                     </Button>
                     <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
-                        if (selectedCategory) {
+                        if (setDataValue) {
                             submit({
                                 intent: "delete",
-                                id: selectedCategory?._id
+                                id: setDataValue?._id
 
                             }, {
                                 method: "post"
@@ -244,15 +200,23 @@ const Category = () => {
                 </div>
             </ConfirmModal>
 
-            <CreateModal
-                className=" bg-gray-200"
-                modalTitle="Add new category"
-                isOpen={createModalOpened}
-                onOpenChange={handleCreateModalOpened}
+            <div
+                className={`w-[20vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${createModalOpened ? "transform-none" : "translate-x-full"}`}
             >
-                {(onClose) => (
-                    <Form method="post">
-                        <Input
+                <div className="flex justify-between gap-10 ">
+                    <p className="font-nunito">Create  Category</p>
+                    <button
+                        onClick={() => {
+                            handleCreateModalClosed()
+                        }}
+                    >
+                        <CloseIcon className="h-4 w-4" />
+                    </button>
+                </div>
+                <hr className=" border border-default-400 " />
+
+                <Form method="post">
+                    <CustomInput
                             label="Name"
                             name="name"
                             placeholder=" "
@@ -268,28 +232,26 @@ const Category = () => {
 
                         <Textarea
                             autoFocus
-                            label="Product description"
+                        label="Category description"
                             labelPlacement="outside"
                             placeholder=" "
                             name="description"
                             className="mt-4 font-nunito text-sm"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
+                                inputWrapper: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                             }}
                         />
 
-                        <div className="flex justify-end gap-2 mt-10 font-nunito">
-                            <Button color="danger" onPress={onClose}>
-                                Close
-                            </Button>
-                            <button type="submit" className=" text-white bg-primary-400 rounded-xl font-nunito px-4">
-                                Submit
-                            </button>
-                        </div>
+
+                    <button onClick={() => {
+                    }} type="submit" className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4">
+                        Submit
+                    </button>
                     </Form>
-                )}
-            </CreateModal>
+            </div>
+
+
 
         </AdminLayout>
     );

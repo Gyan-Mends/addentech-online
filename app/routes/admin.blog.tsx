@@ -1,13 +1,15 @@
 import { Button, Input, Select, SelectItem, Skeleton, TableCell, TableRow, Textarea, User } from "@nextui-org/react"
-import { ActionFunction, json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import BackIcon from "~/components/icons/BackIcon"
+import CloseIcon from "~/components/icons/CloseIcon"
 import { DeleteIcon } from "~/components/icons/DeleteIcon"
 import { EditIcon } from "~/components/icons/EditIcon"
 import PlusIcon from "~/components/icons/PlusIcon"
 import { SearchIcon } from "~/components/icons/SearchIcon"
+import { FileUploader } from "~/components/icons/uploader"
 import ConfirmModal from "~/components/modal/confirmModal"
 import CreateModal from "~/components/modal/createModal"
 import EditModal from "~/components/modal/EditModal"
@@ -21,6 +23,9 @@ import usersController from "~/controller/Users"
 import { BlogInterface, CategoryInterface, RegistrationInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
+export const links: LinksFunction = () => {
+    return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
+};
 
 const Users = () => {
     const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
@@ -28,11 +33,9 @@ const Users = () => {
     const [isConfirmModalOpened, setIsConfirmModalOpened] = useState(false)
     const [isEditModalOpened, setIsEditModalOpened] = useState(false)
     const [dataValue, setDataValue] = useState<BlogInterface>()
-    const [isLoading, setIsLoading] = useState(false)
     const submit = useSubmit()
-    const actionData = useActionData<any>()
-    const { mobileNumberApi } = useLoaderData<typeof loader>()
     const navigate = useNavigate()
+    const [content, setContent] = useState("");
     const navigation = useNavigation()
     const {
         user,
@@ -49,6 +52,9 @@ const Users = () => {
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
+    const handleClick = () => {
+        setIsCreateModalOpened(true)
+    }
     const handleConfirmModalClosed = () => {
         setIsConfirmModalOpened(false)
     }
@@ -57,23 +63,6 @@ const Users = () => {
     }
 
 
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message)
-            } else {
-                errorToast(actionData.message)
-            }
-        }
-    }, [actionData])
-
-    useEffect(() => {
-        const timeOut = setTimeout(() => {
-            setIsLoading(true)
-        }, 1000)
-        return () => clearTimeout(timeOut)
-    }, [])
-
     const truncateText = (text, wordLimit) => {
         const words = text.split(" ");
         if (words.length > wordLimit) {
@@ -81,50 +70,30 @@ const Users = () => {
         }
         return text;
     };
+    const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
+    const modules = {
+        toolbar: [
+            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }],
+            ['link', 'image', 'video'],
+            ['clean']
+        ],
+    };
+
+    useEffect(() => {
+        // Set the initial content from dataValue.description
+        if (dataValue?.description) {
+            setContent(dataValue.description);
+        }
+    }, [dataValue]);
 
 
     return (
-        <AdminLayout pageName="Users Management">
-            <div className="flex z-0 mt-6 justify-between gap-2 overflow-y-hidden">
-                <Toaster position="top-right" />
-                <div className="flex items-center justify-center gap-2">
-                    {/* back */}
-                    {/* back */}
-                    <Button size="sm" onClick={() => {
-                        navigate(-1)
-                    }} color="primary" className="font-nunito text-sm  border-b-white dark:border-primary  dark:text-white dark:bg-[#333]">
-                        <BackIcon className="h-[20px] w-[20px] dark:text-success" /><p >Back</p>
-                    </Button>
-                </div>
-                <div className="flex gap-4">
-                    {/* search */}
-                    {/* search */}
-                    <Input
-                        size="sm"
-                        placeholder="Search user..."
-                        startContent={<SearchIcon className="" />}
-                        onValueChange={(value) => {
-                            const timeoutId = setTimeout(() => {
-                                navigate(`?search_term=${value}`);
-                            }, 100);
-                            return () => clearTimeout(timeoutId);
-                        }} classNames={{
-                            inputWrapper: "bg-white shadow-sm text-sm font-nunito dark:bg-[#333] border border-white/5 ",
-                        }}
-                    />
-                    {/* button to add new user */}
-                    {/* button to add new user */}
-                    <Link to="/admin/add">
-                        <button
-                    // onClick={() => {
-                    //     setIsCreateModalOpened(true)
-                    // }}
-                        className="font-nunito dark:bg-[#333]  text-sm px-8">
-                        Create Blog
-                        </button>
-                    </Link>
-                </div>
-            </div>
+        <AdminLayout buttonName="Create new blog" handleOnClick={handleClick} pageName="Users Management">
+
 
             {/* table  */}
             {/* table  */}
@@ -144,27 +113,29 @@ const Users = () => {
                                     avatarProps={{ radius: "sm", src: blog?.image }}
                                     name={
                                         <p className="font-nunito text-xs">
-                                            {truncateText(blog.name, 10)}
+                                            {truncateText(blog?.name, 10)}
                                         </p>
                                     }
                                 />
                             </p>
                         </TableCell>
-                        <TableCell className="text-xs">{blog.category.name}</TableCell>
-                        <TableCell>{truncateText(blog.description, 15)}</TableCell>
-                        <TableCell className="relative flex items-center gap-4">
-                            <Button size="sm" color="success" variant="flat" onClick={() => {
+                        <TableCell className="text-xs">{blog.category?.name}</TableCell>
+                        <TableCell>
+                            <div dangerouslySetInnerHTML={{ __html: truncateText(blog.description, 15) }} />
+                        </TableCell>
+                        <TableCell className="relative flex items-center gap-4 text-primary">
+                            <button onClick={() => {
                                 setIsEditModalOpened(true)
                                 setDataValue(blog)
                             }}>
-                                <EditIcon /> Edit
-                            </Button>
-                            <Button size="sm" color="danger" variant="flat" onClick={() => {
+                                <EditIcon className="text-primary" />
+                            </button>
+                            <button onClick={() => {
                                 setIsConfirmModalOpened(true)
                                 setDataValue(blog)
                             }}>
-                                <DeleteIcon /> Delete
-                            </Button>
+                                <DeleteIcon className="text-danger" />
+                            </button>
 
                         </TableCell>
                     </TableRow>
@@ -196,7 +167,7 @@ const Users = () => {
 
             {/* Create Modal */}
             {/* Create Modal */}
-            <EditModal
+            {/* <EditModal
                 className="bg-gray-200 dark:bg-[#333] "
                 modalTitle="Update user details"
                 isOpen={isEditModalOpened}
@@ -269,6 +240,7 @@ const Users = () => {
                                     }
                                 }}
                             />
+
                         </div>
 
                         <input name="admin" value={user?._id} type="hidden" />
@@ -285,21 +257,32 @@ const Users = () => {
                         </div>
                     </Form>
                 )}
-            </EditModal>
+            </EditModal> */}
 
-            {/* Create Modal */}
-            <CreateModal
-                className="bg-gray-200 dark:bg-[#333]"
-                modalTitle="Create New User"
-                isOpen={isCreateModalOpened}
-                onOpenChange={handleCreateModalClosed}
-            >
-                {(onClose) => (
+
+            {dataValue && (
+                <div
+                    className={`w-[40vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${isEditModalOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
+                        }`}
+                >
+                    <div className="flex justify-between gap-10 ">
+                        <p className="font-nunito">Edit Blog</p>
+                        <button
+                            onClick={() => {
+                                handleEditModalClosed()
+                            }}
+                        >
+                            <CloseIcon className="h-4 w-4" />
+                        </button>
+                    </div>
+                    <hr className=" border border-default-400 " />
+
                     <Form method="post" className="flex flex-col gap-4">
                         <CustomInput
                             label="Name"
                             isRequired
                             isClearable
+                            defaultValue={dataValue?.name}
                             name="name"
                             placeholder=" "
                             type="text"
@@ -310,43 +293,152 @@ const Users = () => {
                             <Select
                                 label="Category"
                                 labelPlacement="outside"
+                                defaultSelectedKeys={[dataValue.category]}
                                 placeholder=" "
                                 isRequired
                                 name="category"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
+                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
                                 }}
                             >
                                 {categories.map((cat) => (
-                                    <SelectItem key={cat._id}>{cat.name}</SelectItem>
+                                    <SelectItem key={cat._id}>{cat?.name}</SelectItem>
                                 ))}
                             </Select>
                         </div>
 
-                        <Textarea
-                            autoFocus
-                            label="Product description"
+                        <div>
+                            <label htmlFor="" className="font-nunito">Subject</label>
+                            <input type="hidden" name="description" value={content} />
+                            <ReactQuill
+                                value={content} // Bind editor content to state
+                                onChange={setContent} // Update state on change
+                                modules={modules}
+                                className="md:!h-[30vh] mt-2 font-nunito rounded w-full mb-12 !font-nunito"
+                            />
+                        </div>
+
+
+
+                        <div className="mt-4 ">
+                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
+                                <input
+                                    name="image"
+                                    required
+                                    placeholder=" "
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    type="file"
+                                    onChange={(event: any) => {
+                                        const file = event.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader()
+                                            reader.onloadend = () => {
+                                                setBase64Image(reader.result)
+                                            }
+                                            reader.readAsDataURL(file)
+                                        }
+                                    }}
+                                />
+                                {base64Image ? (
+                                    <img
+                                        src={base64Image}
+                                        alt="Preview"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                    />
+                                ) : (
+                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <FileUploader className="h-20 w-20 text-white" />
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <input hidden name="admin" value={user?._id} type="" />
+                        <input name="intent" value="update" type="hidden" />
+                        <input name="base64Image" value={base64Image} type="hidden" />
+                        <input name="id" value={dataValue?._id} type="hidden" />
+
+
+                        <div className="flex gap-6 mt-6">
+                            <button className="font-montserrat w-40 bg-primary h-10 rounded-lg">Upload blog</button>
+                        </div>
+                    </Form>
+                </div>
+            )}
+
+            {/* Create Modal */}
+
+
+            <div
+                className={`w-[40vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isCreateModalOpened ? "transform-none" : "translate-x-full"}`}
+            >
+                <div className="flex justify-between gap-10 ">
+                    <p className="font-nunito">Create a new Blog</p>
+                    <button
+                        onClick={() => {
+                            handleCreateModalClosed()
+                        }}
+                    >
+                        <CloseIcon className="h-4 w-4" />
+                    </button>
+                </div>
+                <hr className=" border border-default-400 " />
+
+                <Form method="post" className="flex flex-col gap-4">
+                    <CustomInput
+                        label="Name"
+                        isRequired
+                        isClearable
+                        name="name"
+                        placeholder=" "
+                        type="text"
+                        labelPlacement="outside"
+                    />
+
+                    <div className="">
+                        <Select
+                            label="Category"
                             labelPlacement="outside"
                             placeholder=" "
-                            name="description"
-                            className="mt-4 font-nunito text-sm"
+                            isRequired
+                            name="category"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "h- 80 bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
+                                popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
+                                trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
                             }}
+                        >
+                            {categories.map((cat) => (
+                                <SelectItem key={cat._id}>{cat.name}</SelectItem>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div>
+                        <label htmlFor="" className="font-nunito">Subject</label>
+                        <input type="hidden" name="description" value={content} />
+                        <ReactQuill
+                            value={content}
+                            onChange={setContent}
+
+                            modules={modules}
+                            className='md:!h-[30vh] mt-2 font-nunito rounded w-full mb-12 !font-nunito'
                         />
+                    </div>
 
 
 
-                        <div className=" ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                    <div className="mt-4 ">
+                        <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                        <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
                                 name="image"
                                 required
                                 placeholder=" "
-                                className="bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   h-10 w-[25vw] rounded-xl"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 type="file"
                                 onChange={(event: any) => {
                                     const file = event.target.files[0];
@@ -359,23 +451,29 @@ const Users = () => {
                                     }
                                 }}
                             />
+                            {base64Image ? (
+                                <img
+                                    src={base64Image}
+                                    alt="Preview"
+                                    className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                />
+                            ) : (
+                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                    <FileUploader className="h-20 w-20 text-white" />
+                                </span>
+                            )}
                         </div>
+                    </div>
 
-                        <input name="admin" value={user?._id} type="" />
+                    <input hidden name="admin" value={user?._id} type="" />
                         <input name="intent" value="create" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
 
-                        <div className="flex justify-end gap-2 mt-10 font-nunito">
-                            <Button color="danger" variant="flat" onPress={onClose}>
-                                Close
-                            </Button>
-                            <button type="submit" className="bg-primary-400 rounded-xl bg-opacity-20 text-primary text-sm font-nunito px-4">
-                                Submit
-                            </button>
+                    <div className="flex gap-6 mt-6">
+                        <button className="font-montserrat w-40 bg-primary h-10 rounded-lg">Upload blog</button>
                         </div>
                     </Form>
-                )}
-            </CreateModal>
+            </div>
         </AdminLayout>
     )
 }
@@ -412,19 +510,15 @@ export const action: ActionFunction = async ({ request }) => {
             })
             return deleteUser
 
-        // case "update":
-        //     const updateUser = await usersController.UpdateUser({
-        //         firstName,
-        //         middleName,
-        //         lastName,
-        //         email,
-        //         admin,
-        //         phone,
-        //         id,
-        //         role,
-        //         intent,
-        //     })
-        //     return updateUser
+        case "update":
+            const updateUser = await blog.UpdateCat({
+                name,
+                base64Image,
+                category,
+                description,
+                admin, id
+            })
+            return updateUser
         case "logout":
             const logout = await usersController.logout(intent)
             return logout

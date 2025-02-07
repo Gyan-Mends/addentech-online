@@ -122,86 +122,9 @@ const Users = () => {
 
 
     return (
-        <AdminLayout pageName="Users Management">
+        <AdminLayout handleOnClick={handleClick} pageName="Users Management">
             <div>
-                <div className="z-1">
-                    <div className="flex justify-between">
-                        <Input
-                            size="md"
-                            placeholder="Search user..."
-                            startContent={<SearchIcon className="" />}
-                            onValueChange={(value) => {
-                                const timeoutId = setTimeout(() => {
-                                    navigate(`?search_term=${value}`);
-                                }, 100);
-                                return () => clearTimeout(timeoutId);
-                            }}
-                            classNames={{
-                                inputWrapper: "shadow-sm w-[50vw] text-sm font-nunito dark:bg-[#18181B] border border-2 border-white/10",
-                            }}
-                        />
 
-                        <div className="flex gap-4 items-center">
-                            <div className="border h-full w-full flex items-center justify-center rounded-full px-2 py-1">
-                                <NotificationIcon className="h-6 w-6 text-default-500" />
-                            </div>
-                            <div>
-                                <Dropdown placement="bottom-end">
-                                    <DropdownTrigger>
-                                        <Avatar
-                                            isBordered
-                                            as="button"
-                                            className="transition-transform"
-                                            color="secondary"
-                                            name="Jason Hughes"
-                                            size="sm"
-                                            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                                        />
-                                    </DropdownTrigger>
-                                    <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                        <DropdownItem key="profile" className="h-14 gap-2">
-                                            <p className="font-semibold">Signed in as</p>
-                                            <p className="font-semibold">zoey@example.com</p>
-                                        </DropdownItem>
-                                        <DropdownItem key="logout" color="danger">
-                                            Log Out
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </Dropdown>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex z-0 mt-6 justify-between items-center px-6 border dark:border-white/10 bg-default-50 shadow-md h-20 rounded-2xl gap-2 overflow-y-hidden">
-                        <Toaster position="top-right" />
-
-                        <div className="">
-                            <Button
-                                size="md"
-                                variant="bordered"
-                                onClick={() => {
-                                    navigate(-1);
-                                }}
-                                color="primary"
-                                className="font-nunito text-sm"
-                            >
-                                <BackIcon className="h-[20px] w-[20px]" />
-                                <p>Back</p>
-                            </Button>
-                        </div>
-                        <div className="flex gap-4">
-                            <Button
-                                onClick={handleClick}
-                                color="primary"
-                                size="md"
-                                className="font-nunito flex text-sm px-8"
-                            >
-                                <UserIcon className="text-defaul-200 h-4 w-4" /> Create Memo
-                            </Button>
-
-                        </div>
-                    </div>
-                </div>
 
                 <NewCustomTable
                     columns={MemoColumns}

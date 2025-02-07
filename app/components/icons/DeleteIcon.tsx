@@ -1,5 +1,6 @@
-export const DeleteIcon = () => (
+export const DeleteIcon = ({ className }: { className: string }) => (
   <svg
+    className={className}
     aria-hidden="true"
     fill="none"
     focusable="false"

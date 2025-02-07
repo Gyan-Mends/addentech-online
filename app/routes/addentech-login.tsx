@@ -18,7 +18,7 @@ import {
 } from "react";
 import { EyeSlashFilledIcon } from "~/components/icons/EyeFilled";
 import { EyeFilledIcon } from "~/components/icons/EyeSlash";
-import logo from "~/components/images/addentech_logo.png"
+import logo from "~/components/images/Dennislaw-Logo.svg"
 
 import login from "~/controller/login";
 
@@ -64,7 +64,7 @@ const Login = () => {
                                 type="email"
                                 classNames={{
                                     label: `${emailError ? "text-danger" : "text-white "} font-nunito text-sm !text-white`,
-                                    inputWrapper: `${emailError ? "border-b-danger border-2 hover:border-b-danger text-danger" : "border-[#F2059F] hover:border-success"} text-sm font-nunito border-b-1 mt-4 bg-[#333] border border-[#05ECF2]`
+                                    inputWrapper: `${emailError ? "border-b-danger border-2 hover:border-b-danger text-danger" : " hover:border-primary"} border-white/30 text-sm font-nunito border-b-1 mt-4 bg-[#333] border `
                                 }}
                             />
                             {emailError && (
@@ -85,7 +85,7 @@ const Login = () => {
                                 placeholder=" "
                                 classNames={{
                                     label: `${passwordError ? "text-danger" : "text-white "} font-nunito text-sm !text-white`,
-                                    inputWrapper: `${passwordError ? "border-b-danger border-2 hover:border-b-danger text-danger" : "border-[#05ECF2] hover:border-[#05ECF2]"} text-sm font-nunito border-b-1 mt-4 bg-[#333] border border-[#05ECF2]`
+                                    inputWrapper: `${passwordError ? "border-b-danger border-2 hover:border-b-danger text-danger" : " hover:border-primary"} border-white/30 text-sm font-nunito border-b-1 mt-4 bg-[#333] border `
                                 }}
                                 endContent={
                                     <button
@@ -109,7 +109,7 @@ const Login = () => {
 
                         <div className="flex justify-between mt-4 gap-4">
                             <Checkbox type="checkbox" name="rememberMe">
-                                <p className="font-nunito text-sm text-[#05ECF2]">Remember me</p>
+                                <p className="font-nunito text-sm ">Remember me</p>
                             </Checkbox>
                             <input type="text" name="intent" hidden value="create" />
                             <Link to="">
@@ -117,7 +117,7 @@ const Login = () => {
                             </Link>
                         </div>
                         <button
-                            className="font-nunito bg-[#F2059F] text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl"
+                            className="font-nunito bg-primary text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? "Loggin in..." : "Login"}

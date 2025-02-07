@@ -1,5 +1,6 @@
-export const EditIcon = () => (
+export const EditIcon = ({ className }: { className: string }) => (
   <svg
+    className={className}
     aria-hidden="true"
     fill="none"
     focusable="false"

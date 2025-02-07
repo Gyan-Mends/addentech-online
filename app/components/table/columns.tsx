@@ -80,3 +80,12 @@ export const ComplaintColumns = [
     { title: "Action", allowSort: true },
 
 ]
+export const ContactColumns = [
+    { title: "FirstName", allowSort: true },
+    { title: "MiddleName", allowSort: true },
+    { title: "LastName", allowSort: true },
+    { title: "Number", allowSort: true },
+    { title: "Dsecription", allowSort: true },
+    { title: "Action", allowSort: true },
+
+]

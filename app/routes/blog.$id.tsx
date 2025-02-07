@@ -49,20 +49,15 @@ const BlogDetail = () => {
             </div>
 
             <div className="px-4 mt-10">
-                <div className="lg:px-40">
-                    <img
-                        src={BlogDetail?.image || "/default-image.png"}
-                        alt={BlogDetail?.name || "Blog image"}
-                        className="w-full h-96 object-cover rounded-lg"
-                    />
-                </div>
+
 
                 <div className="dark:text-white text-justify text-md mt-6 font-nunito leading-relaxed space-y-4">
-                    {BlogDetail?.description
-                        ? BlogDetail.description.split("\n").map((paragraph, index) => (
-                            <p key={index}>{paragraph}</p>
-                        ))
-                        : "No description available."}
+                    {BlogDetail?.description ? (
+                        <div dangerouslySetInnerHTML={{ __html: BlogDetail.description }} />
+                    ) : (
+                        "No description available."
+                    )}
+
                 </div>
             </div>
         </PublicLayout>

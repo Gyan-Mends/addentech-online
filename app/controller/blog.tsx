@@ -23,27 +23,36 @@ class BlogController {
     }
 
     async UpdateCat({
-        intent,
-        id,
         name,
+        base64Image,
+        category,
         description,
+        admin,
+        id
     }: {
-        intent: string,
-        id: string,
-        name: string,
-        description: string,
-    }) {
-        // Update Logic
-        if (intent === "update") {
+            name: string,
+            base64Image: string,
+            category: string,
+            description: string,
+            admin: string,
+            id: string
+        }) {    
 
-            const updateCategory = await Category.findByIdAndUpdate(id, { name, description });
-            if (updateCategory) {
-                return json({ message: "Category updated successfully", success: true }, { status: 200 });
+        const updateBlog = await Blog.findByIdAndUpdate(id, {
+            name,
+            image: base64Image,
+            category,
+            description,
+            admin,
+
+        });
+        if (updateBlog) {
+            return json({ message: "Blog updated successfully", success: true }, { status: 200 });
             } else {
-                return json({ message: "Category not found", success: false }, { status: 404 });
+            return json({ message: "Blog not found", success: false }, { status: 404 });
             }
 
-        }
+
     }
 
     async BlogAdd({

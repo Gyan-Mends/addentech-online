@@ -118,10 +118,7 @@ const Blog = () => {
                                     </span>
                                     <p className="mt-4 font-nunito font-bold text-xl">{truncateText(blog?.name, 10)}
                                     </p>
-                                    <p className="mt-4 font-nunito">
-                                        {truncateText(blog?.description, 20)}
 
-                                    </p>
 
                                 </div>
                             </div>

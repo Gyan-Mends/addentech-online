@@ -43,12 +43,12 @@ class DepartmentController {
         }
     }
 
-    async CategoryAdd(request: Request, name: string, description: string, seller: string, intent: string, id: string) {
+    async CategoryAdd(request: Request, name: string, description: string, admin: string, intent: string, id: string) {
         try {
 
             if (intent === "create") {
                 // Checking if category already exists
-                const categoryExistCheck = await Departments.findOne({ seller, name });
+                const categoryExistCheck = await Departments.findOne({ admin, name });
                 if (categoryExistCheck) {
                     return json({ message: "Department already exists", success: false }, { status: 400 });
                 }
@@ -57,7 +57,7 @@ class DepartmentController {
                 const category = new Departments({
                     name,
                     description,
-                    seller
+                    admin
                 });
 
                 const response = await category.save();
@@ -111,10 +111,7 @@ class DepartmentController {
             : {};
 
         try {
-            // Get session and user information
-            const session = await getSession(request.headers.get("Cookie"));
-            const token = session.get("email");
-            const user = await Registration.findOne({ email: token });
+
 
             // Get total employee count and calculate total pages       
             const totalEmployeeCount = await Departments.countDocuments(searchFilter).exec();
@@ -129,7 +126,7 @@ class DepartmentController {
             const department = await Departments.find()
 
 
-            return { user, departments, department, totalPages };
+            return { departments, department, totalPages };
         } catch (error: any) {
             return {
                 message: error.message,

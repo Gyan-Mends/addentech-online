@@ -4,11 +4,13 @@ import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubm
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import BackIcon from "~/components/icons/BackIcon"
+import CloseIcon from "~/components/icons/CloseIcon"
 import { DeleteIcon } from "~/components/icons/DeleteIcon"
 import { EditIcon } from "~/components/icons/EditIcon"
 import NotificationIcon from "~/components/icons/NotificationIcon"
 import PlusIcon from "~/components/icons/PlusIcon"
 import { SearchIcon } from "~/components/icons/SearchIcon"
+import { FileUploader } from "~/components/icons/uploader"
 import UserIcon from "~/components/icons/UserIcon"
 import ConfirmModal from "~/components/modal/confirmModal"
 import CreateModal from "~/components/modal/createModal"
@@ -28,6 +30,7 @@ const Users = () => {
     const [base64Image, setBase64Image] = useState<any>()
     const [isConfirmModalOpened, setIsConfirmModalOpened] = useState(false)
     const [isEditModalOpened, setIsEditModalOpened] = useState(false)
+    const [isEditDrawerOpened, setIsEditDrawerOpened] = useState(false)
     const [dataValue, setDataValue] = useState<RegistrationInterface>()
     const [isLoading, setIsLoading] = useState(false)
     const submit = useSubmit()
@@ -46,7 +49,11 @@ const Users = () => {
         totalPages: number,
         departments: DepartmentInterface[]
     }>()
+    const [selectedRole, setSelectedRole] = useState();
 
+    const handleClick = () => {
+        setIsCreateModalOpened(true)
+    }
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
@@ -56,17 +63,12 @@ const Users = () => {
     const handleEditModalClosed = () => {
         setIsEditModalOpened(false)
     }
+    const handleEditDrawerClosed = () => {
+        setIsEditDrawerOpened(false)
+    }
 
 
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message)
-            } else {
-                errorToast(actionData.message)
-            }
-        }
-    }, [actionData])
+
 
     useEffect(() => {
         const timeOut = setTimeout(() => {
@@ -75,89 +77,34 @@ const Users = () => {
         return () => clearTimeout(timeOut)
     }, [])
 
+    useEffect(() => {
+        if (dataValue?.department) {
+            setDataValue(dataValue.department);
+        }
+    }, [dataValue]);
 
+    const handleDepartmentChange = (value) => {
+        setDataValue(value); // Update state with the new value
+    };
+
+    const animals = [
+        { key: "cat", label: "Cat" },
+        { key: "dog", label: "Dog" },
+        { key: "elephant", label: "Elephant" },
+        { key: "lion", label: "Lion" },
+        { key: "tiger", label: "Tiger" },
+        { key: "giraffe", label: "Giraffe" },
+        { key: "dolphin", label: "Dolphin" },
+        { key: "penguin", label: "Penguin" },
+        { key: "zebra", label: "Zebra" },
+        { key: "shark", label: "Shark" },
+        { key: "whale", label: "Whale" },
+        { key: "otter", label: "Otter" },
+        { key: "crocodile", label: "Crocodile" },
+    ];
     return (
-        <AdminLayout pageName="Users Management">
-            <div className="flex justify-between">
-                    {/* search */}
-                    {/* search */}
-                    <Input
-                    size="md"
-                        placeholder="Search user..."
-                        startContent={<SearchIcon className="" />}
-                        onValueChange={(value) => {
-                            const timeoutId = setTimeout(() => {
-                                navigate(`?search_term=${value}`);
-                            }, 100);
-                            return () => clearTimeout(timeoutId);
-                        }} classNames={{
-                            inputWrapper: " shadow-sm w-[50vw]  text-sm font-nunito dark:bg-[#18181B] border border-2 border-white/10",
-                        }}
-                    />
+        <AdminLayout redirect="/admin/users" redirectDelay={1000} handleOnClick={handleClick} buttonName="Create User" pageName="Users Management">
 
-                <div className="flex gap-4 items-center">
-                    <div className="border h-full w-full flex items-center justify-center rounded-full px-2 py-1">
-                        <NotificationIcon className="h-6 w-6 text-default-500" />
-
-                    </div>
-                    <div>
-                        <Dropdown placement="bottom-end">
-                            <DropdownTrigger>
-                                <Avatar
-                                    isBordered
-                                    as="button"
-                                    className="transition-transform"
-                                    color="secondary"
-                                    name="Jason Hughes"
-                                    size="sm"
-                                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                                />
-                            </DropdownTrigger>
-                            <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                <DropdownItem key="profile" className="h-14 gap-2">
-                                    <p className="font-semibold">Signed in as</p>
-                                    <p className="font-semibold">zoey@example.com</p>
-                                </DropdownItem>
-                                <DropdownItem key="logout" color="danger">
-                                    Log Out
-                                </DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex z-0 mt-6 justify-between items-center px-6 bg-default-100 shadow-md h-20 rounded-2xl gap-2 overflow-y-hidden">
-                <Toaster position="top-right" />
-
-                <div className="">
-                    {/* back */}
-                    {/* back */}
-                    <Button
-                        size="md"
-                        variant="bordered"
-                        onClick={() => {
-                            navigate(-1)
-                        }} color="primary" className="font-nunito text-sm  ">
-                        <BackIcon className="h-[20px] w-[20px] " /><p >Back</p>
-                    </Button>
-                </div>
-                <div className="flex gap-4">
-
-                    {/* button to add new user */}
-                    {/* button to add new user */}
-                    <Button
-                        color="primary"
-                        size="md"
-
-                        onClick={() => {
-                            setIsCreateModalOpened(true)
-                        }}
-                        className="font-nunito  flex text-sm px-8">
-                        <UserIcon className="text-defaul-200 h-4 w-4" /> Create User
-                    </Button>
-                </div>
-            </div>
 
             {/* table  */}
             {/* table  */}
@@ -188,8 +135,10 @@ const Users = () => {
                         <TableCell>{user.role}</TableCell>
                         <TableCell className="relative flex items-center gap-4">
                             <button className="text-primary " onClick={() => {
-                                setIsEditModalOpened(true)
+                                setIsEditDrawerOpened(true)
                                 setDataValue(user)
+                                console.log(dataValue);
+
                             }}>
                                 <EditIcon />
                             </button>
@@ -230,109 +179,214 @@ const Users = () => {
 
             {/* Create Modal */}
             {/* Create Modal */}
-            <EditModal
-                className="bg-gray-200 dark:bg-[#333] "
-                modalTitle="Update user details"
-                isOpen={isEditModalOpened}
-                onOpenChange={handleEditModalClosed}
+            {dataValue && (
+
+                <div
+                    className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${isEditDrawerOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
+                        }`}
             >
-                {(onClose) => (
+                    <div className="flex justify-between gap-10 ">
+                        <p className="font-nunito">Create new User</p>
+                        <button
+                            onClick={() => {
+                                handleEditDrawerClosed()
+                            }}
+                        >
+                            <CloseIcon className="h-4 w-4" />
+                        </button>
+                    </div>
+                    <hr className=" border border-default-400 " />
+
                     <Form method="post" className="flex flex-col gap-4">
                         <CustomInput
                             label="First name"
                             isRequired
+                            defaultValue={dataValue.firstName}
                             isClearable
                             name="firstname"
                             placeholder=" "
-                            defaultValue={dataValue?.firstName}
                             type="text"
                             labelPlacement="outside"
-                            className=""
                         />
                         <div className="flex gap-4">
                             <CustomInput
                                 label="Middle Name"
                                 name="middlename"
+                                defaultValue={dataValue.middleName}
                                 placeholder=" "
                                 isClearable
-                                defaultValue={dataValue?.middleName}
                                 type="text"
                                 labelPlacement="outside"
-                                className=""
+
                             />
                             <CustomInput
                                 label="Last Name"
                                 isRequired
                                 name="lastname"
-                                defaultValue={dataValue?.lastName}
+                                defaultValue={dataValue.lastName}
                                 isClearable
                                 placeholder=" "
                                 type="text"
                                 labelPlacement="outside"
-                                className=""
                             />
                         </div>
                         <CustomInput
                             label="Email"
                             isRequired
+                            defaultValue={dataValue.email}
                             name="email"
-                            defaultValue={dataValue?.email}
-                            isClearable
-                            placeholder=" "
-                            type="text"
-                            labelPlacement="outside"
-                            className=""
-                        />
-                        <CustomInput
-                            label=" Phone"
-                            isRequired
-                            name="phone"
-                            defaultValue={dataValue?.phone}
                             isClearable
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
                         />
+                        <div className=" gap-4">
+                            <CustomInput
+                                label=" Phone"
+                                isRequired
+                                name="phone"
+                                defaultValue={dataValue.phone}
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
 
-                        <CustomInput
-                            label=" Role"
-                            isRequired
-                            name="role"
-                            defaultValue={dataValue?.role}
-                            isClearable
-                            placeholder=" "
-                            type="text"
-                            labelPlacement="outside"
-                        />
+                            />
+                            {/* <CustomInput
+                                label=" Password"
+                                isRequired
+                                name="password"
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+
+                            /> */}
+                        </div>
+                        <div className="">
+                            <Select
+                                label="Role"
+                                labelPlacement="outside"
+                                placeholder=" "
+                                isRequired
+                                defaultSelectedKeys={[dataValue.role]}
+                                name="role"
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
+                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
+                                }}
+                            >
+                                {[
+                                    { key: "admin", value: "admin", display_name: "Admin" },
+                                    { key: "hod", value: "hod", display_name: "HOD" },
+                                    { key: "staff", value: "staff", display_name: "Staff" },
+                                ].map((role) => (
+                                    <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                                ))}
+                            </Select>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <Select
+                                isRequired
+                                className="max-w-xs"
+                                defaultSelectedKeys={[dataValue.department]}
+                                label="Department"
+                                placeholder=" "
+                                labelPlacement="outside"
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
+                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
+                                }}
+                            >
+                                {departments.map((animal) => (
+                                    <SelectItem key={animal._id}>{animal.name}</SelectItem>
+                                ))}
+                            </Select>
+
+                            <CustomInput
+                                label=" Position"
+                                isRequired
+                                name="position"
+                                defaultValue={dataValue.role}
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+
+                            />
+                        </div>
+                        <div className=" ">
+                            <input name="base64Image" value={base64Image} type="hidden" />
+                            <label className="font-nunito block text-sm" htmlFor="">
+                                Image
+                            </label>
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
+                                <input
+                                    name="image"
+                                    placeholder=" "
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    type="file"
+                                    onChange={(event: any) => {
+                                        const file = event.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setBase64Image(reader.result);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                                {/* Display the default image or the uploaded image */}
+                                {base64Image ? (
+                                    <img
+                                        src={base64Image}
+                                        alt="Preview"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                    />
+                                ) : (
+                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <FileUploader className="h-20 w-20 text-white" />
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
 
 
                         <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="id" value={dataValue?._id} type="hidden" />
 
-                        <div className="flex justify-end gap-2 mt-10 ">
-                            <Button className="font-montserrat font-semibold" color="danger" size="sm" variant="flat" onPress={onClose}>
-                                Close
-                            </Button>
                             <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
                                 setIsEditModalOpened(false)
                             }}>
                                 Update
-                            </Button>
-                        </div>
+                        </Button>
                     </Form>
-                )}
-            </EditModal>
+                </div>
+            )}
 
-            {/* Create Modal */}
-            <CreateModal
-                className="bg-gray-200 dark:bg-[#333]"
-                modalTitle="Create New User"
-                isOpen={isCreateModalOpened}
-                onOpenChange={handleCreateModalClosed}
+
+            <div
+                className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isCreateModalOpened ? "transform-none" : "translate-x-full"}`}
             >
-                {(onClose) => (
-                    <Form method="post" className="flex flex-col gap-4">
+                <div className="flex justify-between gap-10 ">
+                    <p className="font-nunito">Create new User</p>
+                    <button
+                        onClick={() => {
+                            handleCreateModalClosed()
+                        }}
+                    >
+                        <CloseIcon className="h-4 w-4" />
+                    </button>
+                </div>
+                <hr className=" border border-default-400 " />
+
+                <Form method="post" className="flex flex-col gap-4">
                         <CustomInput
                             label="First name"
                             isRequired
@@ -402,8 +456,8 @@ const Users = () => {
                                 name="role"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
+                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
                                 }}
                             >
                                 {[
@@ -425,8 +479,8 @@ const Users = () => {
                                 name="department"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
+                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface, index: number) => (
@@ -444,16 +498,15 @@ const Users = () => {
                                 labelPlacement="outside"
 
                             />
-                        </div>
-
-
+                    </div>
                         <div className=" ">
                             <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                        <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
                                 name="image"
                                 required
                                 placeholder=" "
-                                className="bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   h-10 w-[25vw] rounded-xl"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 type="file"
                                 onChange={(event: any) => {
                                     const file = event.target.files[0];
@@ -466,23 +519,20 @@ const Users = () => {
                                     }
                                 }}
                             />
+                            <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"><FileUploader className="h-20 w-20 text-white" /></span>
+                        </div>
                         </div>
 
                         <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="create" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
 
-                        <div className="flex justify-end gap-2 mt-10 font-nunito">
-                            <Button color="danger" variant="flat" onPress={onClose}>
-                                Close
-                            </Button>
-                            <button type="submit" className="rounded-xl bg-[#05ECF2] bg-opacity-20 text-[#05ECF2] text-sm font-nunito px-4">
+
+                    <button type="submit" className="rounded-xl bg-primary text-sm font-nunito h-10 w-40 px-4">
                                 Submit
-                            </button>
-                        </div>
+                    </button>
                     </Form>
-                )}
-            </CreateModal>
+            </div>
         </AdminLayout>
     )
 }
@@ -539,9 +589,11 @@ export const action: ActionFunction = async ({ request }) => {
                 email,
                 admin,
                 phone,
-                id,
                 role,
-                intent,
+                position,
+                department,
+                base64Image,
+                id
             })
             return updateUser
         case "logout":
