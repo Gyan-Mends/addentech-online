@@ -105,14 +105,12 @@ class UsersController {
 
     async DeleteUser(
         {
-            intent,
             id,
         }: {
-            intent: string,
             id: string,
         }
     ) {
-        if (intent === "delete") {
+
             const deleteUser = await Registration.findByIdAndDelete(id);
             if (deleteUser) {
                 return json({
@@ -127,7 +125,6 @@ class UsersController {
                     status: 500
                 })
             }
-        }
     }
 
     async UpdateUser(

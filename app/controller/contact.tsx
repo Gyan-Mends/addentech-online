@@ -93,6 +93,18 @@ class ContactController {
             };
         }
     }
+
+    async DeleteCat(id: string) {
+        // Delete Logic
+
+        const deleteCategory = await Contact.findByIdAndDelete(id);
+        if (deleteCategory) {
+            return json({ message: "Contact deleted successfully", success: true }, { status: 200 });
+        } else {
+            return json({ message: "Contact not found", success: false }, { status: 404 });
+        }
+
+    }
 }
 
 

@@ -140,13 +140,13 @@ const Users = () => {
                                 console.log(dataValue);
 
                             }}>
-                                <EditIcon />
+                                <EditIcon className="" />
                             </button>
                             <button className="text-danger" onClick={() => {
                                 setIsConfirmModalOpened(true)
                                 setDataValue(user)
                             }}>
-                                <DeleteIcon />
+                                <DeleteIcon className="" />
                             </button>
 
                         </TableCell>
@@ -576,7 +576,6 @@ export const action: ActionFunction = async ({ request }) => {
 
         case "delete":
             const deleteUser = await usersController.DeleteUser({
-                intent,
                 id
             })
             return deleteUser

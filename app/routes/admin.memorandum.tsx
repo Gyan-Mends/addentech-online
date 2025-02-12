@@ -540,7 +540,7 @@ const Users = () => {
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                    <SelectItem key={department._id}>{department?.name}</SelectItem>
                                 ))}
                             </Select>
                             <Select

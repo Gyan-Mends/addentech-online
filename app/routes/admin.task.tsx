@@ -81,15 +81,7 @@ const Users = () => {
     }
 
 
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message)
-            } else {
-                errorToast(actionData.message)
-            }
-        }
-    }, [actionData])
+
 
     useEffect(() => {
         const timeOut = setTimeout(() => {
@@ -127,13 +119,9 @@ const Users = () => {
 
 
     return (
-        <AdminLayout handleOnClick={commentDrawer} pageName="Users Management">
+        <AdminLayout buttonName="Create Task" handleOnClick={commentDrawer} pageName="Users Management">
             <div>
                 <div className="z-1">
-
-
-
-
 
                     {/* table  */}
                     {/* table  */}

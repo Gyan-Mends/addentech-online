@@ -113,10 +113,10 @@ const Category = () => {
                         No
                     </Button>
                     <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
-                        if (setDataValue) {
+                        if (dataValue) {
                             submit({
                                 intent: "delete",
-                                id: setDataValue?._id
+                                id: dataValue?._id
 
                             }, {
                                 method: "post"
@@ -163,23 +163,13 @@ export const action: ActionFunction = async ({ request }) => {
 
 
         switch (intent) {
-            case 'create':
-                const categories = await category.CategoryAdd(request, name, description, seller, intent, id);
-                return categories;
+
             case "logout":
                 const logout = await usersController.logout(intent)
                 return logout
             case "delete":
-                const deleteCat = await category.DeleteCat(intent, id)
+                const deleteCat = await contactController.DeleteCat(id)
                 return deleteCat
-            case "update":
-                const updateCat = await category.UpdateCat({
-                    intent,
-                    id,
-                    name,
-                    description
-                })
-                return updateCat
             default:
                 break;
         }
