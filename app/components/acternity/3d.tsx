@@ -86,7 +86,7 @@ export const CardBody = ({
     return (
         <div
             className={cn(
-                "h-96 w-96 [transform-style:preserve-3d]  [&>*]:[transform-style:preserve-3d]",
+                "lg:!h-[57vh] lg:!w-[20vw] [transform-style:preserve-3d]  [&>*]:[transform-style:preserve-3d]",
                 className
             )}
         >
@@ -111,11 +111,11 @@ export const CardItem = ({
     children: React.ReactNode;
     className?: string;
     translateX?: number | string;
-    translateY?: number | string;
-    translateZ?: number | string;
-    rotateX?: number | string;
-    rotateY?: number | string;
-    rotateZ?: number | string;
+        translateY?: number | string;
+        translateZ?: number | string;
+        rotateX?: number | string;
+        rotateY?: number | string;
+        rotateZ?: number | string;
     [key: string]: any;
 }) => {
     const ref = useRef<HTMLDivElement>(null);

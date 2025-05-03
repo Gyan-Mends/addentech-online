@@ -1,116 +1,68 @@
-import { Link, useLoaderData } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { TeamMember } from "~/components/team"
+import PublicLayout from "~/layout/PublicLayout"
 
-import PublicLayout from "~/components/PublicLayout";
-import jl from "~/components/images/JL.png"
-import testimonial from "~/components/images/670c83518128ff5c009e4a93_Testimonail Image 3-p-500.webp"
-import dl from "~/components/images/Dennislaw-Logo.svg"
-import mr from "~/components/images/mr-logo.png"
-import news from "~/components/images/DL-News-Logo.png"
-import img5 from "~/components/images/about-five2.jpg"
-import img6 from "~/components/images/about-five1.jpg"
-import lineImage from "~/components/images/work-process-line.png"
-import { Button, User } from "@nextui-org/react";
-// import Support from "~/components/Icons/icons/Support";
-import logo from "~/components/images/logo.png"
-import EmailIcon from "~/components/icons/EmailIcon";
-import StarIcon from "~/components/icons/StarIcon";
-import NetworkIcon from "~/components/icons/NetworkIcon";
-import { json, LoaderFunction } from "@remix-run/node";
-import { getSession } from "~/session";
-import usersController from "~/controller/Users";
-import { BlogInterface, RegistrationInterface } from "~/interface/interface";
-import Users from "./admin.users";
-import blog from "~/controller/blog";
-// import AWS from "~/components/Icons/icons/AWS";
-
-const Index = () => {
-
-    const {
-        // user,
-        users,
-        blogs
-    } = useLoaderData<{
-        // user: { _id: string },
-        users: RegistrationInterface[],
-        blogs: BlogInterface[]
-    }>()
-
-    const truncateText = (text, wordLimit) => {
-        const words = text.split(" ");
-        if (words.length > wordLimit) {
-            return words.slice(0, wordLimit).join(" ") + "...";
-        }
-        return text;
-    };
-
-
+const Team = () => {
     return (
         <PublicLayout>
+            <section className="py-16 bg-gradient-to-br from-black to-gray-900 lg:px-[125px]">
+                <div className="container">
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="aspect-[3/4] overflow-hidden rounded-lg">
+                                <img
+                                    src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
+                                    alt="Team member"
+                                    width={300}
+                                    height={400}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                            <div className="aspect-[3/4] overflow-hidden rounded-lg mt-8">
+                                <img
+                                    src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
+                                    alt="Team member"
+                                    width={300}
+                                    height={400}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-6">
+                            <div className="bg-blue-500/10 text-blue-500 w-28 p-1 font-monstserrat m-auto text-center rounded hover:bg-blue-500/20">Our Team</div>
+                            <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Meet Our Dedicated Experts Behind Addentech Success</h2>
+                            <p className="text-muted-foreground font-nunito">
+                                Our team combines deep legal knowledge with technical expertise to create solutions that truly address
+                                the needs of modern legal practice.
+                            </p>
 
-            <div style={{
-                backgroundImage: `url("https://cdn.prod.website-files.com/66614d9079739759bbd5e68e/668d0c2f28f1313d27252c3d_service-shape-bg-2.svg")`,
-                backgroundPosition: '50%',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '500px',
-                position: 'relative',
-            }} className="lg:grid lg:grid-cols-4 gap-10 lg:mt-40 ">
-                {users.slice(0, 4).map((member, index) => (
-                    <div
-                        data-aos="zoom-in"
-                        key={index}
-                        className={`w-full h-[50vh] rounded-2xl ${index === 1 || index === 3 ? 'mt-20' : 'mt-40 lg:mt-0'}`}
-                    >
-                        <div className="h-[50vh] overflow-hidden rounded-2xl relative group">
-                            {/* Image */}
-                            <img
-                                className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
-                                src={member.image}
-                                alt={member.name}
-                            />
+                        </div>
+                    </div>
 
-                      {/* Overlay */}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center">
-                          {/* Name */}
-                          <p className="text-white font-nunito text-lg">{member.firstName + " " + member.middleName + " " + member.lastName}</p>
-                          <p className="text-white font-nunito text-lg">{member.phone}</p>
-                      </div>
-                  </div>
-              </div>
-          ))}
-
-
-
-            </div>
-
-
+                    <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                            {
+                                name: "Sarah Johnson",
+                                role: "Chief Legal Technology Officer",
+                                img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
+                            },
+                            {
+                                name: "Michael Chen",
+                                role: "Head of Software Development",
+                                img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
+                            },
+                            {
+                                name: "Aisha Patel",
+                                role: "Legal AI Specialist",
+                                img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
+                            },
+                        ].map((member, i) => (
+                            <TeamMember key={i} name={member.name} role={member.role} img={member.img} />
+                        ))}
+                    </div>
+                </div>
+            </section>
         </PublicLayout>
-    );
-};
-
-export default Index;
-
-
-export const loader: LoaderFunction = async ({ request }) => {
-    const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") as string) || 1;
-    const search_term = url.searchParams.get("search_term") as string;
-
-    const session = await getSession(request.headers.get("Cookie"));
-    const token = session.get("email");
-    // if (!token) {
-    //     return redirect("/")
-    // }
-    const { user, users, totalPages } = await usersController.FetchUsers({
-        request,
-        page,
-        search_term
-    });
-
-    return json({ user, users, totalPages });
+    )
 }
 
-
+export default Team
