@@ -1,7 +1,35 @@
 import { Button, Navbar } from "@nextui-org/react"
 import { Link } from "@remix-run/react"
+import { ArrowRight, ExternalLink, Twitter, Linkedin, Facebook, Instagram } from "lucide-react"
+
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+    const socialLinks = {
+        twitter: {
+            icon: Twitter,
+            url: "https://twitter.com/yourprofile",
+        },
+        linkedin: {
+            icon: Linkedin,
+            url: "https://linkedin.com/in/yourprofile",
+        },
+        facebook: {
+            icon: Facebook,
+            url: "https://facebook.com/yourprofile",
+        },
+        instagram: {
+            icon: Instagram,
+            url: "https://instagram.com/yourprofile",
+        },
+    };
+
+    const navigationLinks = {
+        About: "/about",
+        Careers: "/careers",
+        Press: "/press",
+        News: "/news",
+        Contact: "/contact",
+    };
     return (
         <div className="scroll-smooth">
             {/* <Navbar /> */}
@@ -74,7 +102,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             {/* CTA Section */}
             <section className="py-20 lg:px-20 bg-black">
                 <div className="container">
-                    <div className="rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-600/20 p-8 md:p-12 lg:p-16 relative overflow-hidden">
+                    <div className="rounded-2xl bg-gradient-to-br to-black from-gray-900  p-8 md:p-12 lg:p-16 relative overflow-hidden">
                         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                         <div className="relative z-10 max-w-3xl">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">Transform your business with us effectively</h2>
@@ -83,7 +111,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 today.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">Contact Sales</Button>
+                                <Button variant="bordered" className="border border-2 border-primary-500 text-white">Contact Us <ArrowRight className="h-4 w-4" /></Button>
                             </div>
                         </div>
                     </div>
@@ -93,19 +121,28 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             <footer className="border-t border-t-white/10  font-nunito border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20">
                 <div className="container py-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div>
-                            <div className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent mb-4">
-                                DennisLaw
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center">
+                                <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
+                                    D
+                                </div>
+                                <span className="ml-2 text-xl font-bold text-blue-500 font-montserrat">DENNISLAW</span>
                             </div>
                             <p className="text-muted-foreground mb-4">
                                 Transforming the legal landscape with innovative technology solutions.
                             </p>
                             <div className="flex gap-4">
-                                {["twitter", "linkedin", "facebook", "instagram"].map((social) => (
-                                    <Link key={social} to="#" className="text-muted-foreground hover:text-foreground">
+                                {Object.entries(socialLinks).map(([social, { icon: Icon, url }]) => (
+                                    <Link
+                                        key={social}
+                                        to={url}
+                                        target="_blank" // Opens the link in a new tab
+                                        rel="noopener noreferrer" // Security best practice
+                                        className="text-muted-foreground hover:text-foreground"
+                                    >
                                         <span className="sr-only">{social}</span>
-                                        <div className="h-8 w-8 rounded-full border border-border/40 flex items-center justify-center">
-                                            {/* <ExternalLink className="h-4 w-4" /> */}
+                                        <div className="h-8 w-8 rounded-full border border-primary-500/40 flex items-center justify-center">
+                                            <Icon className="h-4 w-4" />
                                         </div>
                                     </Link>
                                 ))}
@@ -114,9 +151,9 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                         <div>
                             <h3 className="font-bold font-montserrat mb-4 ">Company</h3>
                             <ul className="space-y-2 ">
-                                {["About", "Careers", "Press", "News", "Contact"].map((item) => (
-                                    <li key={item} >
-                                        <Link to="#" className="!text-blue-200 hover:text-foreground">
+                                {Object.entries(navigationLinks).map(([item, url]) => (
+                                    <li key={item}>
+                                        <Link to={url} className="!text-default-400 hover:text-foreground">
                                             {item}
                                         </Link>
                                     </li>
@@ -134,7 +171,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                     "Client Portals",
                                 ].map((item) => (
                                     <li key={item}>
-                                        <Link to="#" className="!text-blue-200 hover:text-foreground">
+                                        <Link to="#" className="!text-default-400 hover:text-foreground">
                                             {item}
                                         </Link>
                                     </li>
@@ -146,7 +183,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             <ul className="space-y-2">
                                 {["Terms", "Privacy", "Cookies", "Licenses", "Settings"].map((item) => (
                                     <li key={item}>
-                                        <Link to="#" className="!text-blue-200 hover:text-foreground">
+                                        <Link to="#" className="!text-default-400 hover:text-foreground">
                                             {item}
                                         </Link>
                                     </li>

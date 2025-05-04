@@ -5,7 +5,7 @@ import CheckedIcon from "~/components/icons/CheckedIcon";
 import { Link, useLoaderData } from "@remix-run/react";
 import img5 from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
 import { ProductCard } from "~/components/produt";
-import { ArrowRight, User } from "lucide-react";
+import { ArrowRight, Star, User } from "lucide-react";
 import { json, LoaderFunction } from "@remix-run/node";
 import blog from "~/controller/blog";
 import { BlogInterface } from "~/interface/interface";
@@ -336,7 +336,7 @@ const Home = () => {
         <section className="py-20 lg:px-20 bg-gradient-to-br from-gray-900 to-black">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="mb-4 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl font-bold font-montserrat">Testimonials</p>
+              <p className="mb-4  bg-clip-text text-primary-500 text-xl font-bold font-montserrat">Testimonials</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Experiences That Build Confidence</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 Hear what our clients have to say about their experience working with us.
@@ -365,8 +365,7 @@ const Home = () => {
                 <p>
                   <div className="flex mb-4">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      //   <Star key={i} className="h-5 w-5 fill-pink-500 text-pink-500" />
-                      <p key={i}>!</p>
+                      <Star key={i} className="h-5 w-5 fill-blue-500 text-blue-500" />
                     ))}
                   </div>
                   <p className="text-lg italic font-montserrat">
@@ -388,8 +387,7 @@ const Home = () => {
                   <div>
                     <div className="flex mb-2">
                       {[1, 2, 3, 4, 5].map((i) => (
-                        // <Star key={i} className="h-4 w-4 fill-pink-500 text-pink-500" />
-                        <p key={i}>!</p>
+                        <Star key={i} className="h-4 w-4 fill-blue-500 text-blue-500" />
                       ))}
                     </div>
                     <p className="text-md mb-2 font-nunito">
