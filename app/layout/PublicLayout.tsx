@@ -1,106 +1,145 @@
-import { Button, Navbar } from "@nextui-org/react"
-import { Link } from "@remix-run/react"
-import { ArrowRight, ExternalLink, Twitter, Linkedin, Facebook, Instagram } from "lucide-react"
 
+
+
+import { useState } from "react";
+import { Button, Navbar, Spinner } from "@nextui-org/react";
+import { Link } from "@remix-run/react";
+import {
+    ArrowRight,
+    ExternalLink,
+    Twitter,
+    Linkedin,
+    Facebook,
+    Instagram,
+    Menu,
+    X,
+} from "lucide-react";
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     const socialLinks = {
-        twitter: {
-            icon: Twitter,
-            url: "https://twitter.com/yourprofile",
-        },
-        linkedin: {
-            icon: Linkedin,
-            url: "https://linkedin.com/in/yourprofile",
-        },
-        facebook: {
-            icon: Facebook,
-            url: "https://facebook.com/yourprofile",
-        },
-        instagram: {
-            icon: Instagram,
-            url: "https://instagram.com/yourprofile",
-        },
-    };
+      twitter: { icon: Twitter, url: "https://twitter.com/yourprofile" },
+      linkedin: { icon: Linkedin, url: "https://linkedin.com/in/yourprofile" },
+      facebook: { icon: Facebook, url: "https://facebook.com/yourprofile" },
+      instagram: { icon: Instagram, url: "https://instagram.com/yourprofile" },
+  };
 
     const navigationLinks = {
-        About: "/about",
-        Careers: "/careers",
-        Press: "/press",
-        News: "/news",
-        Contact: "/contact",
+      Home: "/",
+      Services: "/services",
+      Team: "/team",
+      About: "/about",
+      Blog: "/blog",
+      Pricing: "/pricing",
+  };
+
+    const handleToggleMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
     };
+
+    const handlePageLoad = (callback: () => void) => {
+        setIsLoading(true);
+        callback();
+        setIsLoading(false);
+    };
+
     return (
         <div className="scroll-smooth">
-            {/* <Navbar /> */}
-            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-blue-500/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container flex h-16 items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Link to="/" className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                                <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
-                                    D
-                                </div>
-                                <span className="ml-2 text-xl font-bold text-blue-500 font-montserrat">DENNISLAW</span>
-                            </div>
-                        </Link>
-                        <nav className="hidden md:flex gap-6 ml-10">
-                            <Link
-                                to="/"
-                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                Home
-                            </Link>
-                            <Link
-                                to="/services"
-                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                Services
-                            </Link>
-                            <Link
-                                to="/team"
-                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                Team
-                            </Link>
-                            <Link
-                                to="/about"
-                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                About
-                            </Link>
-                            <Link
-                                to="/blog"
-                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                Blog
-                            </Link>
-                            <Link
-                                to="#blog"
-                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                Pricing
-                            </Link>
-                        </nav>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm" className="hidden md:flex">
-                            Log in
-                        </Button>
-                        <Link to="/contact">
-                            <Button size="sm" className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
-                                Contact Us
-                            </Button></Link>
-                    </div>
-                </div>
-            </header>
+          {/* Navbar */}
+          <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-blue-500/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="container flex h-16 items-center justify-between">
+                  {/* Logo */}
+                  <div className="flex items-center">
+                      <Link to="/" className="flex items-center space-x-2">
+                          <div className="flex items-center">
+                              <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
+                                  D
+                              </div>
+                              <span className="ml-2 text-xl font-bold text-blue-500 font-montserrat">
+                                  DENNISLAW
+                              </span>
+                          </div>
+                      </Link>
+                  </div>
 
-            <div className="flex min-h-screen flex-col">
-                {children}
-            </div>
+                  {/* Desktop Navigation */}
+                  <nav className="hidden md:flex gap-6">
+                      {Object.entries(navigationLinks).map(([name, path]) => (
+                          <Link
+                    key={name}
+                    to={path}
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    {name}
+                </Link>
+            ))}
+                  </nav>
 
-            {/* CTA Section */}
-            <section className="py-20 lg:px-20 bg-black">
+                  {/* Mobile Menu Toggle */}
+                  <div className="md:hidden flex items-center">
+                      <Button
+                          auto
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleToggleMenu}
+                          aria-label="Toggle menu"
+                      >
+                          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                      </Button>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="hidden md:flex items-center gap-4">
+                      <Button variant="ghost" size="sm">
+                          Log in
+                      </Button>
+                      <Link to="/contact">
+                          <Button
+                              size="sm"
+                              className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white"
+                          >
+                              Contact Us
+                          </Button>
+                      </Link>
+                  </div>
+              </div>
+
+              {/* Mobile Navigation */}
+              {isMobileMenuOpen && (
+                  <nav className="flex flex-col mt-4 space-y-2 md:hidden">
+                      {Object.entries(navigationLinks).map(([name, path]) => (
+                          <Link
+                              key={name}
+                              to={path}
+                              className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                              {name}
+                          </Link>
+                      ))}
+                  </nav>
+              )}
+          </header>
+
+          {/* Loading Spinner */}
+          {isLoading && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
+                  <Spinner size="lg" color="white" />
+              </div>
+          )}
+
+          {/* Page Content */}
+          <div
+              className="flex min-h-screen flex-col"
+              onClick={() => handlePageLoad(() => console.log("Page load"))}
+          >
+              {children}
+          </div>
+
+          {/* CTA Section */}
+          <section className="py-20 lg:px-20 bg-black">
                 <div className="container">
                     <div className="rounded-2xl bg-gradient-to-br to-black from-gray-900  p-8 md:p-12 lg:p-16 relative overflow-hidden">
                         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
@@ -209,8 +248,8 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                 </div>
             </footer>
-        </div>
-    )
-}
+      </div>
+    );
+};
 
-export default PublicLayout
+export default PublicLayout;
