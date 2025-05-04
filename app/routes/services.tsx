@@ -379,113 +379,7 @@ export default function ServicesPage() {
 
             {/* Service Details Section */}
             <section className="py-16 bg-gradient-to-br from-black to-gray-900 relative">
-                <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <motion.div
-                        className="max-w-3xl mx-auto text-center mb-12"
-                        initial="hidden"
-                        animate={isVisible.benefits ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <Chip className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20" variant="bordered" size="sm">
-                            Service Spotlight
-                        </Chip>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6">Digital Marketing Excellence</h2>
-                        <p className="text-gray-400">
-                            Our digital marketing services are designed to increase your online visibility and drive measurable
-                            results for your business.
-                        </p>
-                    </motion.div>
 
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <motion.div
-                            className="relative"
-                            initial="hidden"
-                            animate={isVisible.benefits ? "visible" : "hidden"}
-                            variants={{
-                                hidden: { opacity: 0, scale: 0.9 },
-                                visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } },
-                            }}
-                        >
-                            <div className="aspect-video rounded-2xl overflow-hidden">
-                                <img
-                                    src="/placeholder.svg?height=400&width=600"
-                                    alt="Digital marketing dashboard"
-                                    width={600}
-                                    height={400}
-                                    className="h-full w-full object-cover"
-                                />
-                            </div>
-                            <motion.div
-                                className="absolute -bottom-6 -right-6 h-32 w-32 rounded-2xl border border-blue-900/40 bg-black/90 p-4 backdrop-blur"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={isVisible.benefits ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                                transition={{ duration: 0.6, delay: 0.3 }}
-                            >
-                                <div className="h-full w-full rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-                                    <div className="text-white text-center">
-                                        <div className="text-3xl font-bold">3x</div>
-                                        <div className="text-xs">ROI Average</div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </motion.div>
-
-                        <motion.div
-                            className="space-y-6"
-                            initial="hidden"
-                            animate={isVisible.benefits ? "visible" : "hidden"}
-                            variants={fadeInUpVariants}
-                        >
-                            <h3 className="text-2xl font-bold">Comprehensive Digital Marketing Solutions</h3>
-                            <p className="text-gray-400">
-                                Our data-driven approach to digital marketing ensures that every dollar you spend is optimized for
-                                maximum return on investment.
-                            </p>
-                            <div className="space-y-4">
-                                {[
-                                    {
-                                        text: "Search Engine Optimization to improve organic rankings",
-                                        icon: <CheckedIcon className="h-5 w-5 text-blue-500" />,
-                                    },
-                                    {
-                                        text: "Pay-Per-Click advertising with conversion tracking",
-                                        icon: <CheckedIcon className="h-5 w-5 text-blue-500" />,
-                                    },
-                                    {
-                                        text: "Social Media Marketing across all major platforms",
-                                        icon: <CheckedIcon className="h-5 w-5 text-blue-500" />,
-                                    },
-                                    {
-                                        text: "Email Marketing campaigns with A/B testing",
-                                        icon: <CheckedIcon className="h-5 w-5 text-blue-500" />,
-                                    },
-                                    {
-                                        text: "Content Marketing strategy and implementation",
-                                        icon: <CheckedIcon className="h-5 w-5 text-blue-500" />,
-                                    },
-                                ].map((item, i) => (
-                                    <motion.div
-                                        key={i}
-                                        className="flex items-start gap-3"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={isVisible.benefits ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                                        transition={{ duration: 0.4, delay: i * 0.1 }}
-                                    >
-                                        <div className="mt-1">{item.icon}</div>
-                                        <p>{item.text}</p>
-                                    </motion.div>
-                                ))}
-                            </div>
-                            <Button
-                                className="bg-blue-500 hover:bg-blue-600 text-white"
-                                endContent={<CheckedIcon className="h-4 w-4" />}
-                            >
-                                Learn More About Digital Marketing
-                            </Button>
-                        </motion.div>
-                    </div>
-                </div>
             </section>
 
             {/* Methodology Section */}
@@ -687,115 +581,7 @@ export default function ServicesPage() {
 
             {/* Case Studies Preview */}
             <section id="case-studies-section" className="py-16 bg-black">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        className="max-w-3xl mx-auto text-center mb-12"
-                        initial="hidden"
-                        animate={isVisible.caseStudies ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <Chip className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20" variant="bordered" size="sm">
-                            Success Stories
-                        </Chip>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">See Our Services in Action</h2>
-                        <p className="text-gray-400">
-                            Explore how our services have helped businesses like yours achieve their goals and drive growth.
-                        </p>
-                    </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[
-                            {
-                                title: "E-commerce Transformation",
-                                category: "Digital Marketing & Development",
-                                image: "/placeholder.svg?height=400&width=600",
-                                result: "250% increase in online sales",
-                                client: "Fashion Retailer",
-                            },
-                            {
-                                title: "Financial Services Rebrand",
-                                category: "Brand & Product Design",
-                                image: "/placeholder.svg?height=400&width=600",
-                                result: "35% increase in brand recognition",
-                                client: "Investment Firm",
-                            },
-                            {
-                                title: "Healthcare IT Infrastructure",
-                                category: "IT Services & Cloud Solutions",
-                                image: "/placeholder.svg?height=400&width=600",
-                                result: "99.9% system uptime achieved",
-                                client: "Medical Center",
-                            },
-                        ].map((study, index) => (
-                            <motion.div
-                                key={index}
-                                initial="hidden"
-                                animate={isVisible.caseStudies ? "visible" : "hidden"}
-                                variants={{
-                                    hidden: { opacity: 0, y: 20 },
-                                    visible: {
-                                        opacity: 1,
-                                        y: 0,
-                                        transition: { duration: 0.6, delay: index * 0.1 },
-                                    },
-                                }}
-                            >
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all">
-                                    <div className="aspect-video overflow-hidden">
-                                        <img
-                                            src={study.image || "/placeholder.svg"}
-                                            alt={study.title}
-                                            width={600}
-                                            height={400}
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    </div>
-                                    <CardHeader className="pb-0">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="text-sm text-blue-500">{study.category}</div>
-                                            <Chip size="sm" variant="bordered" className="text-xs border-blue-500/20">
-                                                {study.client}
-                                            </Chip>
-                                        </div>
-                                        <h3 className="text-xl font-semibold group-hover:text-blue-500 transition-colors">
-                                            {study.title}
-                                        </h3>
-                                    </CardHeader>
-                                    <CardFooter className="pb-4">
-                                        <div className="flex items-center justify-between w-full">
-                                            <div className="text-sm text-gray-400">
-                                                Result: <span className="text-white">{study.result}</span>
-                                            </div>
-                                            <Button
-                                                variant="light"
-                                                size="sm"
-                                                className="group-hover:text-blue-500"
-                                                endContent={<ChevronDownIcon className="h-4 w-4" />}
-                                            >
-                                                View Case Study
-                                            </Button>
-                                        </div>
-                                    </CardFooter>
-                                </Card>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    <motion.div
-                        className="mt-8 text-center"
-                        initial="hidden"
-                        animate={isVisible.caseStudies ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <Button
-                            variant="bordered"
-                            className="border-blue-500/50 hover:border-blue-500 text-blue-500"
-                            endContent=""
-                        >
-                            View All Case Studies
-                        </Button>
-                    </motion.div>
-                </div>
             </section>
 
             {/* FAQ Section */}
@@ -871,12 +657,14 @@ export default function ServicesPage() {
                         variants={fadeInUpVariants}
                     >
                         <p className="text-gray-400 mb-4">Still have questions? We're here to help.</p>
-                        <Button
+                        <Link to="/contact">
+                            <Button
                             className="bg-blue-500 hover:bg-blue-600 text-white"
                             endContent=""
                         >
                             Contact Our Support Team
                         </Button>
+                        </Link>
                     </motion.div>
                 </div>
             </section>

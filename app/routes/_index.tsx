@@ -217,10 +217,12 @@ const Home = () => {
                 <p className="mb-2 font-bold font-montserrat  bg-clip-text text-primary-500 text-xl">Latest Insights</p>
                 <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
               </div>
+              <Link to="/block">
               <Button variant="bordered" className="font-montserrat border border-2 border-primary-500">
                 View all articles
-                {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
+                  <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -260,7 +262,8 @@ const Home = () => {
                     <p className="line-clamp-2 font-nunito">{article.description}</p>
                   </div>
                   <CardFooter>
-                    <Link to="/blog">
+
+                    <Link to={`/blog/${article.title}`} key={article.title}>
                     <Button variant="ghost" size="sm" className="group">
                       Read article
                       {/* <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /> */}
