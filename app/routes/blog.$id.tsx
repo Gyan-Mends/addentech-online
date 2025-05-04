@@ -80,7 +80,7 @@ export default function BlogDetailPage() {
             avatar: "/placeholder.svg?height=100&width=100",
             role: "Technology Analyst",
         },
-        image: "/placeholder.svg?height=600&width=1200",
+        image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
         category: slug === "rapid-growth-of-it" ? "Technology" : "Business",
         readTime: "5 min read",
     }
@@ -92,7 +92,7 @@ export default function BlogDetailPage() {
             title: "Digital Transformation Strategies for 2025",
             excerpt: "Key strategies businesses should adopt to stay competitive in the digital age...",
             date: "January 12, 2025",
-            image: "/placeholder.svg?height=400&width=600",
+            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
             category: "Digital",
         },
         {
@@ -101,7 +101,7 @@ export default function BlogDetailPage() {
             title: "The Impact of AI on Legal Practice",
             excerpt: "How artificial intelligence is revolutionizing the legal industry...",
             date: "January 15, 2025",
-            image: "/placeholder.svg?height=400&width=600",
+            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
             category: "Technology",
         },
         {
@@ -110,7 +110,7 @@ export default function BlogDetailPage() {
             title: "Cloud Computing Trends to Watch in 2025",
             excerpt: "The latest developments in cloud technology and how they affect businesses...",
             date: "January 18, 2025",
-            image: "/placeholder.svg?height=400&width=600",
+            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
             category: "Technology",
         },
     ]
@@ -119,45 +119,17 @@ export default function BlogDetailPage() {
 
 
         <PublicLayout >
-            {/* Breadcrumbs */}
-            <div className="bg-gray-900/30 py-4">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <Breadcrumbs size="sm">
-                        <BreadcrumbItem>
-                            <Link to="/" className="text-gray-400 hover:text-white">
-                                Home
-                            </Link>
-                        </BreadcrumbItem>
-                        <BreadcrumbItem>
-                            <Link to="/blog" className="text-gray-400 hover:text-white">
-                                Blog
-                            </Link>
-                        </BreadcrumbItem>
-                        <BreadcrumbItem>
-                            <span className="text-blue-500">{blogPost.title}</span>
-                        </BreadcrumbItem>
-                    </Breadcrumbs>
-                </div>
-            </div>
-
             {/* Article Header */}
-            <section className="py-12 bg-gradient-to-br from-black to-gray-900 relative">
+            <section className="py-12 bg-gradient-to-br from-black to-gray-900 relative font-nunito">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div className="max-w-4xl mx-auto">
-                        <Link
-                            to="/blog"
-                            className="inline-flex items-center text-blue-500 hover:text-blue-400 mb-6 transition-colors"
-                        >
-                            <ArrowLeft size={16} className="mr-2" />
-                            Back to all articles
-                        </Link>
 
                         <Chip size="sm" className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20">
                             {blogPost.category}
                         </Chip>
 
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-6">
+                        <h1 className="font-montserrat text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-6">
                             {blogPost.title}
                         </h1>
 
@@ -180,7 +152,7 @@ export default function BlogDetailPage() {
             </section>
 
             {/* Featured Image */}
-            <section className="py-8 bg-black">
+            <section className="py-8 bg-black font-nunito">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-4xl mx-auto">
                         <div className="aspect-[16/9] rounded-xl overflow-hidden">
@@ -197,7 +169,7 @@ export default function BlogDetailPage() {
             </section>
 
             {/* Article Content */}
-            <section className="py-12 bg-black">
+            <section className="py-12 bg-black font-nunito">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-4xl mx-auto">
                         <div className="flex flex-col md:flex-row gap-8">
@@ -258,10 +230,10 @@ export default function BlogDetailPage() {
                             <div className="w-full md:w-1/4">
                                 <div className="sticky top-24">
                                     <h3 className="text-lg font-semibold mb-4">Recent Posts</h3>
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 flex flex-col gap-4">
                                         {relatedPosts.slice(0, 2).map((post) => (
                                             <Link to={`/blog/${post.slug}`} key={post.id}>
-                                                <div className="group flex gap-3 items-start">
+                                                <div className="group flex gap-4 items-start">
                                                     <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
                                                         <img
                                                             src={post.image || "/placeholder.svg"}
@@ -303,7 +275,7 @@ export default function BlogDetailPage() {
             </section>
 
             {/* Related Articles */}
-            <section className="py-12 bg-gradient-to-br from-black to-gray-900">
+            <section className="py-12 bg-gradient-to-br from-black to-gray-900 font-nunito">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-4xl mx-auto">
                         <h2 className="text-2xl font-bold mb-8">Related Articles</h2>

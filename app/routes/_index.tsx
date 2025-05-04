@@ -2,18 +2,30 @@ import PublicLayout from "~/layout/PublicLayout";
 import { Badge, Button, Card, CardFooter, CardHeader } from "@nextui-org/react";
 import heroimage from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
 import CheckedIcon from "~/components/icons/CheckedIcon";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import img5 from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
 import { ProductCard } from "~/components/produt";
+import { ArrowRight, User } from "lucide-react";
+import { json, LoaderFunction } from "@remix-run/node";
+import blog from "~/controller/blog";
+import { BlogInterface } from "~/interface/interface";
 
 
 
 const Home = () => {
+
+  const {
+    blogs
+  } = useLoaderData<{
+    blogs: BlogInterface[]
+  }>()
+  console.log(blogs);
+
   return (
     <PublicLayout>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-20 md:py-32 bg-gradient-to-br from-black to-gray-900 px-4 lg:px-20">
+        <section className="relative overflow-hidden py-20 md:py-32 bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
           <div className="container relative">
             <div className="grid gap-10 md:grid-cols-2 items-center">
@@ -32,18 +44,20 @@ const Home = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
+                  <Link to="#products">
                   <Button className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
                     Get Started
-                    {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
+                      <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
+                  </Link>
                   <Link to="/about">
                     <Button >Learn More</Button>
                   </Link>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="h-8 w-8 rounded-full border-2 border-background bg-gray-800" />
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <img src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg" key={i} className="h-8 w-8 rounded-full border-2 border-background bg-gray-800" />
                     ))}
                   </div>
                   <div className="text-sm text-muted-foreground font-nunito">
@@ -70,10 +84,10 @@ const Home = () => {
         </section>
 
         {/* Products Section */}
-        <ProductCard />
+        <ProductCard id="products" />
 
         {/* Customer Centric Section */}
-        <section className="py-20 lg:px-20 px-4 bg-gradient-to-br from-gray-900 to-black">
+        <section className="py-20 lg:px-[125px] px-4 bg-gradient-to-br from-gray-900 to-black">
           <div className="container">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               <div className="grid grid-cols-2 gap-4">
@@ -97,7 +111,7 @@ const Home = () => {
                 </div>
               </div>
               <div className="space-y-6">
-                <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl font-bold font-montserrat ">Customer Centric</p>
+                <p className="text-primary-500 bg-clip-text  text-xl font-bold font-montserrat ">Customer Centric</p>
                 <h2 className="text-3xl md:text-3xl font-bold font-montserrat">Legal Tech Solutions That Put Clients First</h2>
                 <p className="text-muted-foreground font-nunito">
                   Our innovative approach combines legal expertise with cutting-edge technology to deliver solutions
@@ -107,7 +121,7 @@ const Home = () => {
                   {["Client-focused design", "Intuitive interfaces", "Secure data handling", "Compliance-ready"].map(
                     (item, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <div className="h-5 w-5 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center">
+                        <div className="h-5 w-5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center">
                           <CheckedIcon className="h-3 w-3 text-white" />
                         </div>
                         <span className="font-nunito">{item}</span>
@@ -115,17 +129,22 @@ const Home = () => {
                     ),
                   )}
                 </ul>
-                <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-montserrat">Learn More</Button>
+                <Link to="/about">
+                  <Button variant="bordered" className="border mt-4 border-primary-500 border-2 text-white font-montserrat">
+                    Learn More
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
         </section>
 
         {/* Services Section */}
-        <section id="services" className="py-20 lg:px-20 bg-black">
+        <section id="services" className="py-20 lg:px-[125px] bg-black">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="mb-4 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Services</p>
+              <p className="mb-4 bg-clip-text text-primary text-xl">Our Services</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Comprehensive Services Tailored to Your Needs</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-montserrat">
                 We offer a wide range of legal technology services designed to meet the specific needs of modern law
@@ -170,17 +189,19 @@ const Home = () => {
               ].map((service, i) => (
                 <Card
                   key={i}
-                  className="border bg-background/50 border-white/10 h-48 backdrop-blur transition-all hover:border-pink-500/50 hover:bg-background/80 p-6 bg-[#09090B80]"
+                  className="border group bg-background/50 border-primary-500/30 h-48 backdrop-blur transition-all hover:border-primary-500/50 hover:bg-background/80 p-6 bg-[#09090B80]"
                 >
                   <div className="flex flex-col gap-4">
-                    <p className="font-bold font-montserrat text-lg">{service.title}</p>
+                    <p className="font-bold font-montserrat text-lg group-hover:text-primary-500">{service.title}</p>
                     <p>{service.description}</p>
                   </div>
                   <CardFooter className="mt-4">
+                    <Link to="/services/#services-section">
                     <Button variant="ghost" size="sm" className="group">
                       Learn more
-                      {/* <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /> */}
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}
@@ -189,14 +210,14 @@ const Home = () => {
         </section>
 
         {/* Blog Section */}
-        <section id="blog" className="py-20 lg:px-20 bg-gradient-to-br from-black to-gray-900">
+        <section id="blog" className="py-20 lg:px-[125px] bg-gradient-to-br from-black to-gray-900">
           <div className="container">
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
               <div>
-                <p className="mb-2 font-bold font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Latest Insights</p>
+                <p className="mb-2 font-bold font-montserrat  bg-clip-text text-primary-500 text-xl">Latest Insights</p>
                 <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
               </div>
-              <Button className="font-montserrat hover:bg-[#09090B80] hover:border  hover:border-pink-500/50">
+              <Button variant="bordered" className="font-montserrat border border-2 border-primary-500">
                 View all articles
                 {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
               </Button>
@@ -239,10 +260,12 @@ const Home = () => {
                     <p className="line-clamp-2 font-nunito">{article.description}</p>
                   </div>
                   <CardFooter>
+                    <Link to="/blog">
                     <Button variant="ghost" size="sm" className="group">
                       Read article
                       {/* <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /> */}
                     </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}
@@ -251,10 +274,10 @@ const Home = () => {
         </section>
 
         {/* Methodology Section */}
-        <section className="py-20 lg:px-20 p-4 bg-black">
+        <section className="py-20 lg:px-[125px] p-4 bg-black">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="mb-4 font-bold font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Approach</p>
+              <p className="mb-4 font-bold font-montserrat  bg-clip-text text-primary text-xl">Our Approach</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Our Methodology Guarantees Your Success</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 We follow a proven methodology to ensure the success of your legal technology implementation.
@@ -297,7 +320,7 @@ const Home = () => {
                     <ul className="space-y-2">
                       {phase.items.map((item, j) => (
                         <li key={j} className="flex items-start gap-2">
-                          <CheckedIcon className="h-4 w-4 text-pink-500 mt-1" />
+                          <CheckedIcon className="h-4 w-4 text-primary-500 mt-1" />
                           <span className="text-sm">{item}</span>
                         </li>
                       ))}
@@ -387,3 +410,12 @@ const Home = () => {
 };
 
 export default Home;
+
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const { blogs } = await blog.getBlogs({
+    request,
+  });
+
+  return json({ blogs });
+}

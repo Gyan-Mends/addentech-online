@@ -3,7 +3,7 @@ import { Link } from "@remix-run/react"
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div>
+        <div className="scroll-smooth">
             {/* <Navbar /> */}
             <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-blue-500/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container flex h-16 items-center justify-between">
