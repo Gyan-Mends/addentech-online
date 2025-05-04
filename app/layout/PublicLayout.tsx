@@ -5,7 +5,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div>
             {/* <Navbar /> */}
-            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-white/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-blue-500/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container flex h-16 items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Link to="/" className="flex items-center space-x-2">
@@ -24,7 +24,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 Home
                             </Link>
                             <Link
-                                to="#services"
+                                to="/services"
                                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 Services
@@ -42,10 +42,16 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 About
                             </Link>
                             <Link
-                                to="#blog"
+                                to="/blog"
                                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                             >
                                 Blog
+                            </Link>
+                            <Link
+                                to="#blog"
+                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            >
+                                Pricing
                             </Link>
                         </nav>
                     </div>
