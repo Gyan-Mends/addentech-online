@@ -1,6 +1,7 @@
 import { TeamMember } from "~/components/team";
 import PublicLayout from "~/layout/PublicLayout";
 import { Twitter, Linkedin, Facebook, Instagram } from "lucide-react";
+import { Link } from "@remix-run/react";
 
 const Team = () => {
     const socialLinks = {
@@ -25,8 +26,8 @@ const Team = () => {
             role: "Head of Software Development",
             img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
             socials: [
-                { platform: "facebook", url: "https://facebook.com/michaelchen" },
-                { platform: "instagram", url: "https://instagram.com/michaelchen" },
+                { platform: "twitter", url: "https://twitter.com/sarahjohnson" },
+                { platform: "linkedin", url: "https://linkedin.com/in/sarahjohnson" },
             ],
         },
         {
@@ -42,7 +43,7 @@ const Team = () => {
 
     return (
         <PublicLayout>
-            <section className="py-16 bg-gradient-to-br from-black to-gray-900 lg:px-[125px]">
+            <section className="py-16 bg-gradient-to-br from-black to-gray-900 lg:px-[125px] px-4">
                 <div className="container">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="grid grid-cols-2 gap-4">
@@ -81,14 +82,17 @@ const Team = () => {
 
                     <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
                         {teamMembers.map((member, i) => (
-                            <TeamMember
-                                key={i}
-                                name={member.name}
-                                role={member.role}
-                                img={member.img}
-                                socials={member.socials}
-                                socialIcons={socialLinks}
-                            />
+                            <Link to={`/team/${member.name}`} key={member.name}>
+
+                                <TeamMember
+                                    key={i}
+                                    name={member.name}
+                                    role={member.role}
+                                    img={member.img}
+                                    socials={member.socials}
+                                    socialIcons={socialLinks}
+                                />
+                            </Link>
                         ))}
                     </div>
                 </div>
