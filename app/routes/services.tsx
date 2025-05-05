@@ -261,7 +261,7 @@ export default function ServicesPage() {
             {/* Hero Section */}
             <section
                 id="hero-section"
-                className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-br from-black to-gray-900"
+                className="relative overflow-hidden lg:py-20 py-10 md:py-28 bg-gradient-to-br from-black to-gray-900"
             >
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -310,7 +310,7 @@ export default function ServicesPage() {
                             aria-label="Service categories"
                             selectedKey={activeTab}
                             onSelectionChange={setActiveTab}
-                            className="justify-center font-nunito bg-gradient-to-br from-blue-900/20 to-blue-900/5 px-4 rounded"
+                            className="justify-center w-full font-nunito bg-gradient-to-br from-blue-900/20 to-blue-900/5 px-4 rounded"
                             variant="underlined"
                             color="primary"
                         >
@@ -678,8 +678,8 @@ export default function ServicesPage() {
 // Helper Components
 function ServiceCard({ service }) {
     return (
-        <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all duration-300 h-full">
-            <div className="pb-2 lg:px-4">
+        <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all duration-300 h-full py-4">
+            <div className="pb-2 lg:px-4 px-4 ">
                 <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">{service.icon}</div>
                 <h3 className="text-xl font-semibold group-hover:text-blue-500 transition-colors">{service.title}</h3>
             </div>
