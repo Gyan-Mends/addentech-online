@@ -1,5 +1,5 @@
 import { Card } from "@nextui-org/react";
-import { Linkedin, Twitter, Mail } from "lucide-react"; // Import necessary icons
+import { Linkedin, Twitter, Mail } from "lucide-react";
 
 interface SocialLink {
     platform: string;
@@ -10,7 +10,7 @@ interface TeamMemberProps {
     name: string;
     role: string;
     img: string;
-    socials?: SocialLink[]; // Add optional socials prop
+    socials?: SocialLink[]; // Dynamic social links passed here
 }
 
 export function TeamMember({ name, role, img, socials }: TeamMemberProps) {
@@ -36,17 +36,19 @@ export function TeamMember({ name, role, img, socials }: TeamMemberProps) {
                 <p className="text-gray-400 text-sm mb-3">{role}</p>
                 <div className="flex gap-3">
                     {socials?.map(({ platform, url }) => {
-                        const Icon = socialIcons[platform];
+                        const Icon = socialIcons[platform.toLowerCase() as keyof typeof socialIcons];
                         return (
-                            <a
-                                key={platform}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 hover:bg-blue-500/20 transition-colors"
-                            >
-                                {Icon ? <Icon className="h-4 w-4" /> : platform}
-                            </a>
+                            Icon && (
+                                <a
+                                    key={platform}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 hover:bg-blue-500/20 transition-colors"
+                                >
+                                    <Icon className="w-5 h-5" />
+                                </a>
+                            )
                         );
                     })}
                 </div>

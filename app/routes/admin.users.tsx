@@ -1,5 +1,5 @@
-import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react"
-import { ActionFunction, json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
+import { Avatar, Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react"
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
@@ -24,6 +24,9 @@ import usersController from "~/controller/Users"
 import { DepartmentInterface, RegistrationInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
+export const links: LinksFunction = () => {
+    return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
+};
 
 const Users = () => {
     const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
@@ -50,6 +53,26 @@ const Users = () => {
         departments: DepartmentInterface[]
     }>()
     const [selectedRole, setSelectedRole] = useState();
+    const [content, setContent] = useState("");
+    useEffect(() => {
+        // Set the initial content from dataValue.description
+        if (dataValue?.description) {
+            setContent(dataValue.description);
+        }
+    }, [dataValue]);
+    const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
+    const modules = {
+        toolbar: [
+            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }],
+            ['link', 'image', 'video'],
+            ['clean']
+        ],
+    };
+
 
     const handleClick = () => {
         setIsCreateModalOpened(true)
@@ -361,6 +384,7 @@ const Users = () => {
                         <input name="intent" value="update" type="hidden" />
                         <input name="id" value={dataValue?._id} type="hidden" />
 
+
                             <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
                                 setIsEditModalOpened(false)
                             }}>
@@ -523,9 +547,102 @@ const Users = () => {
                         </div>
                         </div>
 
+                    <div>
+                        <Divider />
+
+                        <div className="mt-6">
+                            <label htmlFor="" className="font-nunito">Bio</label>
+                            <input type="hidden" name="description" value={content} />
+                            <ReactQuill
+                                value={content} // Bind editor content to state
+                                onChange={setContent} // Update state on change
+                                modules={modules}
+                                className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
+                            />
+                        </div>
+
+                        <Divider className="mt-28" />
+
+                        <div className="flex flex-col gap-6">
+                            <p>Experience </p>
+                            <CustomInput
+                                label=" Password"
+                                isRequired
+                                name="password"
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+
+                            />
+                            <div className="flex gap-4">
+                                <CustomInput
+                                    label=" Password"
+                                    isRequired
+                                    name="password"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+                                <CustomInput
+                                    label=" Password"
+                                    isRequired
+                                    name="password"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+
+                            </div>
+                        </div>
+                        <Divider className="mt-6" />
+                        <div className="flex flex-col gap-6 mt-4">
+                            <p>Education </p>
+                            <CustomInput
+                                label=" Password"
+                                isRequired
+                                name="password"
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+
+                            />
+                            <div className="flex gap-4">
+                                <CustomInput
+                                    label=" Password"
+                                    isRequired
+                                    name="password"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+                                <CustomInput
+                                    label=" Password"
+                                    isRequired
+                                    name="password"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+
+                            </div>
+                        </div>
+                    </div>
+
                         <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="create" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
+
+
 
 
                     <button type="submit" className="rounded-xl bg-primary text-sm font-nunito h-10 w-40 px-4">

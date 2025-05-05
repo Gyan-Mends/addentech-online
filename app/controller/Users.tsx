@@ -212,7 +212,7 @@ class UsersController {
         limit = 7,
     }: {
         request?: Request;
-        page: number;
+            page?: number;
         search_term?: string;
         limit?: number;
     } = { page: 1 }) {

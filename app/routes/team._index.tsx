@@ -1,9 +1,18 @@
 import { TeamMember } from "~/components/team";
 import PublicLayout from "~/layout/PublicLayout";
 import { Twitter, Linkedin, Facebook, Instagram } from "lucide-react";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { json, LoaderFunction } from "@remix-run/node";
+import usersController from "~/controller/Users";
+import { RegistrationInterface } from "~/interface/interface";
 
 const Team = () => {
+    const {
+        users
+    } = useLoaderData<{
+        // user: { _id: string },
+        users: RegistrationInterface[],
+    }>()
     const socialLinks = {
         twitter: Twitter,
         linkedin: Linkedin,
@@ -11,35 +20,6 @@ const Team = () => {
         instagram: Instagram,
     };
 
-    const teamMembers = [
-        {
-            name: "Sarah Johnson",
-            role: "Chief Legal Technology Officer",
-            img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            socials: [
-                { platform: "twitter", url: "https://twitter.com/sarahjohnson" },
-                { platform: "linkedin", url: "https://linkedin.com/in/sarahjohnson" },
-            ],
-        },
-        {
-            name: "Michael Chen",
-            role: "Head of Software Development",
-            img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            socials: [
-                { platform: "twitter", url: "https://twitter.com/sarahjohnson" },
-                { platform: "linkedin", url: "https://linkedin.com/in/sarahjohnson" },
-            ],
-        },
-        {
-            name: "Aisha Patel",
-            role: "Legal AI Specialist",
-            img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            socials: [
-                { platform: "linkedin", url: "https://linkedin.com/in/aishapatel" },
-                { platform: "twitter", url: "https://twitter.com/aishapatel" },
-            ],
-        },
-    ];
 
     return (
         <PublicLayout>
@@ -81,16 +61,19 @@ const Team = () => {
                     </div>
 
                     <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {teamMembers.map((member, i) => (
-                            <Link to={`/team/${member.name}`} key={member.name}>
+                        {users.map((member, i) => (
+                            <Link to={`/team/${member._id}`} key={member._id}>
 
                                 <TeamMember
                                     key={i}
-                                    name={member.name}
-                                    role={member.role}
-                                    img={member.img}
-                                    socials={member.socials}
-                                    socialIcons={socialLinks}
+                                    name={member.firstName + " " + member.middleName + " " + member.lastName}
+                                    role={member.position}
+                                    img={member.image}
+                                    socials={[
+                                        { platform: "linkedin", url: "https://linkedin.com/in/johndoe" },
+                                        { platform: "twitter", url: "https://twitter.com/johndoe" },
+                                        { platform: "mail", url: "mailto:john.doe@example.com" },
+                                    ]}
                                 />
                             </Link>
                         ))}
@@ -102,3 +85,12 @@ const Team = () => {
 };
 
 export default Team;
+
+export const loader: LoaderFunction = async ({ request }) => {
+    const { user, users, totalPages } = await usersController.FetchUsers({
+        request,
+
+    });
+
+    return json({ user, users, totalPages });
+}

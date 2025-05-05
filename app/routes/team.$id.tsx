@@ -59,18 +59,7 @@ export default function TeamMemberDetailPage() {
                     period: "2018 - Present",
                     description: "Leading all technology initiatives and digital transformation efforts across the firm.",
                 },
-                {
-                    position: "Director of Legal Innovation",
-                    company: "Global Legal Partners",
-                    period: "2013 - 2018",
-                    description: "Developed and implemented technology solutions to enhance legal service delivery.",
-                },
-                {
-                    position: "Corporate Attorney",
-                    company: "Johnson & Williams LLP",
-                    period: "2008 - 2013",
-                    description: "Specialized in technology transactions and intellectual property law.",
-                },
+
             ],
             expertise: [
                 { skill: "Legal Technology Implementation", level: 95 },
@@ -79,35 +68,7 @@ export default function TeamMemberDetailPage() {
                 { skill: "Legal Project Management", level: 80 },
                 { skill: "Contract Automation", level: 90 },
             ],
-            publications: [
-                {
-                    title: "The Future of AI in Legal Practice",
-                    publisher: "Legal Technology Review",
-                    year: "2023",
-                },
-                {
-                    title: "Blockchain Applications in Legal Services",
-                    publisher: "Journal of Law and Technology",
-                    year: "2022",
-                },
-                {
-                    title: "Automating Compliance: A Guide for Modern Law Firms",
-                    publisher: "Legal Innovation Press",
-                    year: "2021",
-                },
-            ],
-            awards: [
-                {
-                    title: "Legal Technology Leader of the Year",
-                    organization: "African Legal Technology Awards",
-                    year: "2023",
-                },
-                {
-                    title: "Innovator of the Year",
-                    organization: "Global Legal Technology Forum",
-                    year: "2022",
-                },
-            ],
+
             projects: [
                 {
                     name: "AI-Powered Contract Analysis System",
@@ -348,13 +309,7 @@ export default function TeamMemberDetailPage() {
                             </div>
                         </div>
                         <div className="w-full md:w-2/3">
-                            <Link
-                                to="/team"
-                                className="inline-flex items-center text-blue-500 hover:text-blue-400 mb-4 transition-colors"
-                            >
-                                <ArrowLeft size={16} className="mr-2" />
-                                Back to team
-                            </Link>
+
                             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-4">
                                 {member.name}
                             </h1>
@@ -474,90 +429,8 @@ export default function TeamMemberDetailPage() {
                                 </Card>
                             </div>
                         </Tab>
-                        <Tab key="expertise" title="Expertise">
-                            <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
-                                <CardBody className="p-6">
-                                    <h2 className="text-2xl font-bold mb-6">Areas of Expertise</h2>
-                                    <div className="space-y-6">
-                                        {member.expertise.map((skill, index) => (
-                                            <div key={index} className="space-y-2">
-                                                <div className="flex justify-between">
-                                                    <span className="font-medium">{skill.skill}</span>
-                                                    <span className="text-blue-500">{skill.level}%</span>
-                                                </div>
-                                                <Progress
-                                                    value={skill.level}
-                                                    color="primary"
-                                                    className="h-2"
-                                                    aria-label={`${skill.skill} expertise level`}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardBody>
-                            </Card>
-                        </Tab>
-                        <Tab key="publications" title="Publications & Awards">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
-                                    <CardBody className="p-6">
-                                        <div className="flex items-center mb-4">
-                                            <FileText className="h-5 w-5 text-blue-500 mr-2" />
-                                            <h2 className="text-xl font-bold">Publications</h2>
-                                        </div>
-                                        <div className="space-y-4">
-                                            {member.publications.map((pub, index) => (
-                                                <div key={index} className="p-4 border border-blue-900/20 rounded-lg">
-                                                    <h3 className="font-semibold text-white">{pub.title}</h3>
-                                                    <p className="text-sm text-gray-400">
-                                                        {pub.publisher} • {pub.year}
-                                                    </p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardBody>
-                                </Card>
 
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
-                                    <CardBody className="p-6">
-                                        <div className="flex items-center mb-4">
-                                            <Award className="h-5 w-5 text-blue-500 mr-2" />
-                                            <h2 className="text-xl font-bold">Awards & Recognition</h2>
-                                        </div>
-                                        <div className="space-y-4">
-                                            {member.awards.map((award, index) => (
-                                                <div key={index} className="p-4 border border-blue-900/20 rounded-lg">
-                                                    <h3 className="font-semibold text-white">{award.title}</h3>
-                                                    <p className="text-sm text-gray-400">
-                                                        {award.organization} • {award.year}
-                                                    </p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            </div>
-                        </Tab>
-                        <Tab key="projects" title="Projects">
-                            <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
-                                <CardBody className="p-6">
-                                    <div className="flex items-center mb-6">
-                                        <Briefcase className="h-5 w-5 text-blue-500 mr-2" />
-                                        <h2 className="text-xl font-bold">Key Projects</h2>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {member.projects.map((project, index) => (
-                                            <Card key={index} className="border-blue-900/20 bg-gray-900/50">
-                                                <CardBody className="p-5">
-                                                    <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
-                                                    <p className="text-sm text-gray-400">{project.description}</p>
-                                                </CardBody>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                </CardBody>
-                            </Card>
-                        </Tab>
+
                     </Tabs>
                 </div>
             </section>
