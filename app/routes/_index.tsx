@@ -25,7 +25,7 @@ const Home = () => {
     <PublicLayout>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-20 md:py-32 bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
+        <section className="relative overflow-hidden py-2 lg:py-20 md:py-32 bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
           <div className="container relative">
             <div className="grid gap-10 md:grid-cols-2 items-center">
@@ -43,7 +43,7 @@ const Home = () => {
                     practices.
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex  gap-4">
                   <Link to="#products">
                   <Button className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
                     Get Started
@@ -51,7 +51,8 @@ const Home = () => {
                   </Button>
                   </Link>
                   <Link to="/about">
-                    <Button >Learn More</Button>
+                    <Button >Learn More<ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                   </Link>
                 </div>
                 <div className="flex items-center gap-4">
@@ -141,7 +142,7 @@ const Home = () => {
         </section>
 
         {/* Services Section */}
-        <section id="services" className="py-20 lg:px-[125px] bg-black">
+        <section id="services" className="lg:py-20 py-10 lg:px-[125px] px-4 bg-black">
           <div className="container">
             <div className="text-center mb-16">
               <p className="mb-4 bg-clip-text text-primary text-xl">Our Services</p>
@@ -210,7 +211,7 @@ const Home = () => {
         </section>
 
         {/* Blog Section */}
-        <section id="blog" className="py-20 lg:px-[125px] bg-gradient-to-br from-black to-gray-900">
+        <section id="blog" className="py-20 lg:px-[125px] px-4 bg-gradient-to-br from-black to-gray-900">
           <div className="container">
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
               <div>
@@ -336,7 +337,7 @@ const Home = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 lg:px-20 bg-gradient-to-br from-gray-900 to-black">
+        <section className="py-20 lg:px-20 px-4 bg-gradient-to-br from-gray-900 to-black">
           <div className="container">
             <div className="text-center mb-16">
               <p className="mb-4  bg-clip-text text-primary-500 text-xl font-bold font-montserrat">Testimonials</p>

@@ -8,7 +8,7 @@ import { ChevronRight } from "lucide-react";
 
 export function ProductCard({ id }: { id?: string }) {
     return (
-        <section id={id} className="py-20 bg-black lg:px-[35px]">
+        <section id={id} className="lg:py-20 py-10 bg-black lg:px-[35px] px-4">
             <div className="container">
                 <div className="flex flex-col items-center justify-center text-center mb-6">
                     <p className="mb-4 font-bold font-montserrat  bg-clip-text text-primary-500 text-xl">Explore More of Our Products</p>
@@ -21,7 +21,7 @@ export function ProductCard({ id }: { id?: string }) {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 px-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-20">
                     {[
                         {
                             title: "Justice Locator",
@@ -50,9 +50,9 @@ export function ProductCard({ id }: { id?: string }) {
                     ].map((product, i) => (
                         < CardContainer
                             key={i}
-                            className=" inter-var group overflow-hidden  backdrop-blur transition-all hover:border-border hover:bg-background/80 !bg-[#09090B80]"
+                            className="inter-var group overflow-hidden -mt-20 lg:mt-0  backdrop-blur transition-all hover:border-border hover:bg-background/80 !bg-[#09090B80]"
                         >
-                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-primary-500/40   ">
+                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-primary-500/40   ">
                                 <CardItem translateZ="50"
                                     className="text-xl  text-neutral-600 dark:text-white">
                                     <p className="text-md group-hover:text-primary font-nunito font-bold">{product.title}</p>
@@ -63,7 +63,7 @@ export function ProductCard({ id }: { id?: string }) {
                                     <img
                                         src={product.image}
                                         alt={product.title}
-                                        className="lg:h-60 lg:w-80  transition-transform group-hover:scale-105"
+                                        className="h-60 w-80  transition-transform group-hover:scale-105"
                                     />
                                 </CardItem>
 

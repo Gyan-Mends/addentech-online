@@ -139,7 +139,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           {/* CTA Section */}
-          <section className="py-20 lg:px-20 bg-black">
+            <section className="py-20 lg:px-20 px-4 bg-black">
                 <div className="container">
                     <div className="rounded-2xl bg-gradient-to-br to-black from-gray-900  p-8 md:p-12 lg:p-16 relative overflow-hidden">
                         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
@@ -157,7 +157,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                 </div>
             </section>
 
-            <footer className="border-t border-t-white/10  font-nunito border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20">
+            <footer className="border-t border-t-white/10  font-nunito border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20 px-4">
                 <div className="container py-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div className="flex flex-col gap-4">
