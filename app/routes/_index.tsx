@@ -316,7 +316,7 @@ const Home = () => {
                   ],
                 },
               ].map((phase, i) => (
-                <Card key={i} className="bg-[#09090B80] border hover:border-pink-500/50 border-white/10 backdrop-blur p-6">
+                <Card key={i} className="bg-[#09090B80] border hover:border-blue-500/50 border-white/10 backdrop-blur p-6">
                   <CardHeader>
                     <p className="font-bold font-montserrat">{phase.title}</p>
                   </CardHeader>
