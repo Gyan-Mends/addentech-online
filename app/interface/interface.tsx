@@ -12,6 +12,10 @@ export interface RegistrationInterface {
     position: string,
     department: string,
     image: string,
+    // New education background fields
+    institutionName?: string,
+    program?: string,
+    dateCompleted?: string,
 }
 export interface ContactInterface {
     _id: string,

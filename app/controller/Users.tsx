@@ -5,103 +5,122 @@ import bcrypt from 'bcryptjs'; // Import bcrypt
 
 
 class UsersController {
-    async CreateUser(
-        {
-            firstName,
-            middleName,
-            lastName,
-            email,
-            admin,
-            password,
-            phone,
-            role,
-            intent,
-            position,
-            department,
-            base64Image
-        }: {
-            firstName: string,
-            middleName: string,
-            lastName: string,
-            email: string,
-            admin: string,
-            password: string,
-            phone: string,
-            role: string,
-            intent: string,
-                department: string,
-                position: string,
-            base64Image: string
-        }) {
-
+    async CreateUser({
+        firstName,
+        middleName,
+        lastName,
+        email,
+        admin,
+        password,
+        phone,
+        role,
+        intent,
+        position,
+        department,
+        base64Image,
+        bio,
+        institutionName,
+        program,
+        dateCompletedProgram,
+        institution,
+        positionInstitution,
+        dateCompletedInstitution,
+    }: {
+          firstName: string;
+          middleName: string;
+          lastName: string;
+          email: string;
+          admin: string;
+          password: string;
+          phone: string;
+          role: string;
+          intent: string;
+          position: string;
+          department: string;
+          base64Image: string;
+          bio?: string;
+          institutionName?: string;
+          program?: string;
+          dateCompletedProgram?: string;
+          institution?: string;
+          positionInstitution?: string;
+          dateCompletedInstitution?: string;
+      }) {
         try {
             if (intent === "create") {
-                // checking if user exist
-                const UserCheck = await Registration.findOne({ email: email })
-                const phoneNumberCheck = await Registration.findOne({ phone: phone })
+              // Check if user exists by email or phone
+              const UserCheck = await Registration.findOne({ email });
+              const phoneNumberCheck = await Registration.findOne({ phone });
 
-                if (UserCheck) {
-                    return json({
-                        message: "User with this email already exist",
-                        success: false,
-                        status: 500
-                    })
-                } else if (phoneNumberCheck) {
-                    return json({
-                        message: "Phone number already exist",
-                        success: false,
-                        status: 500
-                    })
-                } else {
-                    const hashedPassword = await bcrypt.hash(password, 10) // hashing password
-
-                    const user = new Registration({
-                        firstName,
-                        middleName,
-                        lastName,
-                        email,
-                        admin,
-                        password: hashedPassword,
-                        phone,
-                        role,
-                        position,
-                        department,
-                        image: base64Image
-                    })
-
-                    // saving user details
-                    const saveUserDetails = await user.save()
-
-                    if (saveUserDetails) {
-                        return json({
-                            message: "User created successfully",
-                            success: true,
-                            status: 500
-                        })
-                    } else {
-                        return json({
-                            message: "Unable to create user",
-                            success: false,
-                            status: 500
-                        })
-                    }
-                }
-
-            } else {
+              if (UserCheck) {
+                  return json({
+                  message: "User with this email already exists",
+                  success: false,
+                  status: 409,
+              });
+            } else if (phoneNumberCheck) {
                 return json({
-                    message: "wrong intent",
-                    success: false,
-                    status: 400
-                })
+                  message: "Phone number already exists",
+                  success: false,
+                  status: 409,
+              });
+            } else {
+                const hashedPassword = await bcrypt.hash(password, 10); // Hashing password
+
+                const user = new Registration({
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    admin,
+                    password: hashedPassword,
+                    phone,
+                    role,
+                    position,
+                    department,
+                  image: base64Image,
+                  bio,
+                  institutionName,
+                  program,
+                  dateCompletedProgram,
+                  institution,
+                  positionInstitution,
+                  dateCompletedInstitution,
+              });
+
+                // Save user details
+                const saveUserDetails = await user.save();
+
+                if (saveUserDetails) {
+                    return json({
+                        message: "User created successfully",
+                        success: true,
+                    status: 201,
+                });
+              } else {
+                  return json({
+                      message: "Unable to create user",
+                      success: false,
+                    status: 500,
+                });
+                }
             }
+          } else {
+              return json({
+                message: "Invalid intent",
+                success: false,
+                status: 400,
+            });
+          }
         } catch (error: any) {
             return json({
                 message: error.message,
                 success: false,
-                status: 500
-            })
+              status: 500,
+          });
         }
     }
+
 
     async DeleteUser(
         {
@@ -207,7 +226,7 @@ class UsersController {
 
     async FetchUsers({
         request,
-        page,
+        page = 1,
         search_term,
         limit = 7,
     }: {
@@ -215,7 +234,7 @@ class UsersController {
             page?: number;
         search_term?: string;
         limit?: number;
-    } = { page: 1 }) {
+        }) {
         const skipCount = (page - 1) * (limit); 
 
         const searchFilter = search_term

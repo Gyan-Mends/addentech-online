@@ -21,13 +21,24 @@ import {
     Progress,
 } from "@nextui-org/react"
 import { MapPin, Phone, Mail, Linkedin, Twitter, ArrowLeft, Calendar, Briefcase, GraduationCap, Award, FileText, Users, MessageSquare, ChevronRight } from 'lucide-react'
-import { Link, useParams } from "@remix-run/react"
+import { Link, useLoaderData, useParams } from "@remix-run/react"
 import PublicLayout from "~/layout/PublicLayout"
+import { json, LoaderFunction } from "@remix-run/node"
+import Registration from "~/modal/registration"
+import { RegistrationInterface } from "~/interface/interface"
 
 export default function TeamMemberDetailPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const params = useParams()
     const slug = params.slug as string
+    const { userDetail
+        , related,
+        // recentPosts
+    } = useLoaderData<{
+        userDetail: RegistrationInterface;
+        related: RegistrationInterface[];
+        // recentPosts: any[];
+    }>();
 
     // This would normally come from a database or API
     const teamMembers = {
@@ -300,8 +311,8 @@ export default function TeamMemberDetailPage() {
                         <div className="w-full md:w-1/3">
                             <div className="aspect-square overflow-hidden rounded-xl border border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
                                 <img
-                                    src={member.img || "/placeholder.svg"}
-                                    alt={member.name}
+                                    src={userDetail.image || "/placeholder.svg"}
+                                    alt={userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
                                     width={600}
                                     height={600}
                                     className="h-full w-full object-cover"
@@ -311,27 +322,24 @@ export default function TeamMemberDetailPage() {
                         <div className="w-full md:w-2/3">
 
                             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-4">
-                                {member.name}
+                                {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
                             </h1>
                             <div className="mb-6">
                                 <Chip className="bg-blue-500/10 text-blue-500 border-blue-500/20" variant="bordered">
-                                    {member.role}
+                                    {userDetail.role}
                                 </Chip>
                             </div>
-                            <p className="text-lg text-gray-300 mb-6">{member.bio}</p>
+                            <div dangerouslySetInnerHTML={{ __html: userDetail.bio }} />
                             <div className="flex flex-wrap gap-4 mb-6">
                                 <div className="flex items-center text-gray-400">
                                     <Mail className="h-4 w-4 mr-2 text-blue-500" />
-                                    <span>{member.email}</span>
+                                    <span>{userDetail.email}</span>
                                 </div>
                                 <div className="flex items-center text-gray-400">
                                     <Phone className="h-4 w-4 mr-2 text-blue-500" />
-                                    <span>{member.phone}</span>
+                                    <span>{userDetail.phone}</span>
                                 </div>
-                                <div className="flex items-center text-gray-400">
-                                    <MapPin className="h-4 w-4 mr-2 text-blue-500" />
-                                    <span>{member.location}</span>
-                                </div>
+
                             </div>
                             <div className="flex gap-3">
                                 <Button
@@ -356,7 +364,9 @@ export default function TeamMemberDetailPage() {
                                 >
                                     <Twitter size={18} />
                                 </Button>
-                                <Button className="bg-blue-500 hover:bg-blue-600 text-white ml-2">Contact {member.name.split(" ")[0]}</Button>
+                                <Link to="/contact">
+                                    <Button className="bg-blue-500 hover:bg-blue-600 text-white ml-2">Contact {member.name.split(" ")[0]}</Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -370,13 +380,11 @@ export default function TeamMemberDetailPage() {
                         <Tab key="about" title="About">
                             <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
                                 <CardBody className="p-6">
-                                    <h2 className="text-2xl font-bold mb-4">About {member.name}</h2>
+                                    <h2 className="text-2xl font-bold mb-4">About                                 {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
+                                    </h2>
                                     <div className="space-y-4">
-                                        {member.longBio.split("\n\n").map((paragraph, index) => (
-                                            <p key={index} className="text-gray-300">
-                                                {paragraph}
-                                            </p>
-                                        ))}
+                                        <div dangerouslySetInnerHTML={{ __html: userDetail.bio }} />
+
                                     </div>
                                 </CardBody>
                             </Card>
@@ -390,18 +398,15 @@ export default function TeamMemberDetailPage() {
                                             <h2 className="text-xl font-bold">Professional Experience</h2>
                                         </div>
                                         <div className="space-y-6">
-                                            {member.experience.map((exp, index) => (
-                                                <div key={index} className="relative pl-6 border-l border-blue-900/40">
+                                            <div className="relative pl-6 border-l border-blue-900/40">
                                                     <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full bg-blue-500"></div>
-                                                    <h3 className="text-lg font-semibold">{exp.position}</h3>
-                                                    <div className="flex items-center text-blue-500 text-sm mb-1">
+                                                <h3 className="text-lg font-semibold">{userDetail.institution}</h3>
+                                                <div className="flex items-center text-blue-500 text-sm mb-1">
                                                         <Calendar className="h-3 w-3 mr-1" />
-                                                        <span>{exp.period}</span>
+                                                    <span>{userDetail.dateCompletedInstitution}</span>
                                                     </div>
-                                                    <p className="text-gray-400 mb-1">{exp.company}</p>
-                                                    <p className="text-sm text-gray-500">{exp.description}</p>
-                                                </div>
-                                            ))}
+                                                <p className="text-gray-400 mb-1">{userDetail.institution}</p>
+                                            </div>
                                         </div>
                                     </CardBody>
                                 </Card>
@@ -413,17 +418,15 @@ export default function TeamMemberDetailPage() {
                                             <h2 className="text-xl font-bold">Education</h2>
                                         </div>
                                         <div className="space-y-6">
-                                            {member.education.map((edu, index) => (
-                                                <div key={index} className="relative pl-6 border-l border-blue-900/40">
+                                            <div className="relative pl-6 border-l border-blue-900/40">
                                                     <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full bg-blue-500"></div>
-                                                    <h3 className="text-lg font-semibold">{edu.degree}</h3>
-                                                    <p className="text-gray-400 mb-1">{edu.institution}</p>
+                                                <h3 className="text-lg font-semibold">{userDetail.institutionName}</h3>
+                                                <p className="text-gray-400 mb-1">{userDetail.program}</p>
                                                     <div className="flex items-center text-blue-500 text-sm">
                                                         <Calendar className="h-3 w-3 mr-1" />
-                                                        <span>{edu.year}</span>
+                                                    <span>{userDetail.dateCompletedProgram}</span>
                                                     </div>
-                                                </div>
-                                            ))}
+                                            </div>
                                         </div>
                                     </CardBody>
                                 </Card>
@@ -441,23 +444,22 @@ export default function TeamMemberDetailPage() {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <h2 className="text-2xl font-bold mb-8">Meet Other Team Members</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {Object.entries(teamMembers)
-                            .filter(([key]) => key !== slug)
-                            .map(([key, otherMember]) => (
-                                <Link to={`/team/${key}`} key={key}>
-                                    <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all">
-                                        <div className="aspect-square overflow-hidden">
-                                            <img
-                                                src={otherMember.img || "/placeholder.svg"}
-                                                alt={otherMember.name}
-                                                width={300}
-                                                height={300}
-                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            />
-                                        </div>
-                                        <CardBody className="p-4">
-                                            <h3 className="font-bold text-lg group-hover:text-blue-500 transition-colors">{otherMember.name}</h3>
-                                            <p className="text-gray-400 text-sm mb-3">{otherMember.role}</p>
+                        {related?.map((otherMember, key) => (
+                            <Link to={`/team/${key}`} key={key}>
+                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all">
+                                    <div className="aspect-square overflow-hidden">
+                                        <img
+                                            src={otherMember.image || "/placeholder.svg"}
+                                            alt={`${otherMember.firstName} ${otherMember.middleName} ${otherMember.lastName}`}
+                                            width={300}
+                                            height={300}
+                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </div>
+                                    <CardBody className="p-4">
+                                        <h3 className="font-bold text-lg group-hover:text-blue-500 transition-colors">{otherMember.firstName} {otherMember.middleName} {otherMember.lastName}</h3>
+                                        <p className="text-gray-400 text-sm mb-3">{otherMember.role}</p>
+                                        <Link to={`/team/${otherMember._id}`} key={otherMember._id}>
                                             <Button
                                                 variant="light"
                                                 size="sm"
@@ -466,10 +468,12 @@ export default function TeamMemberDetailPage() {
                                             >
                                                 View Profile
                                             </Button>
-                                        </CardBody>
-                                    </Card>
-                                </Link>
-                            ))}
+                                        </Link>
+                                    </CardBody>
+                                </Card>
+                            </Link>
+                        ))}
+
                     </div>
                 </div>
             </section>
@@ -477,3 +481,36 @@ export default function TeamMemberDetailPage() {
         </PublicLayout>
     )
 }
+
+
+export const loader: LoaderFunction = async ({ request, params }) => {
+    const { id } = params;
+
+    if (!id) {
+        throw new Response("Task ID not provided", { status: 400 });
+    }
+
+    try {
+        const userDetail = await Registration.findById(id);
+
+        if (!userDetail) {
+            throw new Error("Blog not found");
+        }
+
+        // Find related blogs with the same category, excluding the current blog
+        const related = await Registration.find({
+            _id: { $ne: userDetail._id }, // Exclude the current blog
+        }).limit(3);
+
+
+
+        return json({
+            userDetail, id,
+            related,
+            // recentPosts
+        });
+    } catch (error) {
+        console.error("Error fetching task details:", error);
+        throw new Response("Internal Server Error", { status: 500 });
+    }
+};

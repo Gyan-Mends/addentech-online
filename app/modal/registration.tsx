@@ -39,6 +39,10 @@ const RegistrationSchema = new mongoose.Schema({
     required: true,
     type: String,
   },
+  intent: {
+    required: false,
+    type: String,
+  },
   department: {
     ref: "departments",
     required: true,
@@ -48,17 +52,45 @@ const RegistrationSchema = new mongoose.Schema({
     required: true,
     type: String,
   },
+  // New fields for education background
+  bio: {
+    required: false,
+    type: String,
+  },
+  institutionName: {
+    required: false,
+    type: String,
+  },
+  program: {
+    required: false,
+    type: String,
+  },
+  dateCompletedProgram: {
+    required: false,
+    type: String,
+  },
+  institution: {
+    required: false,
+    type: String,
+  },
+  positionInstitution: {
+    required: false,
+    type: String,
+  },
+  dateCompletedInstitution: {
+    required: false,
+    type: String,
+  },
 }, {
   timestamps: true
-})
+});
 
-let Registration: mongoose.Model<RegistrationInterface>
+let Registration: mongoose.Model<RegistrationInterface>;
 
 try {
-  Registration = mongoose.model<RegistrationInterface>("registration")
+  Registration = mongoose.model<RegistrationInterface>("registration");
 } catch (error) {
-  Registration = mongoose.model<RegistrationInterface>("registration", RegistrationSchema)
-
+  Registration = mongoose.model<RegistrationInterface>("registration", RegistrationSchema);
 }
 
-export default Registration
+export default Registration;

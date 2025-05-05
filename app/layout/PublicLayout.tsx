@@ -132,7 +132,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Page Content */}
           <div
-              className="flex min-h-screen flex-col"
+                className="flex min-h-screen flex-col font-nunito"
               onClick={() => handlePageLoad(() => console.log("Page load"))}
           >
               {children}

@@ -37,7 +37,11 @@ const Users = () => {
     const [dataValue, setDataValue] = useState<RegistrationInterface>()
     const [isLoading, setIsLoading] = useState(false)
     const submit = useSubmit()
-    const actionData = useActionData<any>()
+    const actionData = useActionData<{
+        message: string;
+        success: boolean;
+        status: number;
+    }>()
     const { mobileNumberApi } = useLoaderData<typeof loader>()
     const navigate = useNavigate()
     const navigation = useNavigation()
@@ -60,6 +64,7 @@ const Users = () => {
             setContent(dataValue.description);
         }
     }, [dataValue]);
+
     const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
     const modules = {
         toolbar: [
@@ -105,6 +110,20 @@ const Users = () => {
             setDataValue(dataValue.department);
         }
     }, [dataValue]);
+
+    // Handle action data for toast notifications
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                successToast(actionData.message);
+                setIsCreateModalOpened(false);
+                setIsEditDrawerOpened(false);
+                setIsEditModalOpened(false);
+            } else {
+                errorToast(actionData.message);
+            }
+        }
+    }, [actionData]);
 
     const handleDepartmentChange = (value) => {
         setDataValue(value); // Update state with the new value
@@ -552,7 +571,7 @@ const Users = () => {
 
                         <div className="mt-6">
                             <label htmlFor="" className="font-nunito">Bio</label>
-                            <input type="hidden" name="description" value={content} />
+                            <input type="hidden" name="bio" value={content} />
                             <ReactQuill
                                 value={content} // Bind editor content to state
                                 onChange={setContent} // Update state on change
@@ -564,11 +583,11 @@ const Users = () => {
                         <Divider className="mt-28" />
 
                         <div className="flex flex-col gap-6">
-                            <p>Experience </p>
+                            <p>Professional Experience </p>
                             <CustomInput
-                                label=" Password"
+                                label=" Institution"
                                 isRequired
-                                name="password"
+                                name="institution"
                                 isClearable
                                 placeholder=" "
                                 type="text"
@@ -577,9 +596,9 @@ const Users = () => {
                             />
                             <div className="flex gap-4">
                                 <CustomInput
-                                    label=" Password"
+                                    label=" Position_institution"
                                     isRequired
-                                    name="password"
+                                    name="position_institution"
                                     isClearable
                                     placeholder=" "
                                     type="text"
@@ -587,12 +606,12 @@ const Users = () => {
 
                                 />
                                 <CustomInput
-                                    label=" Password"
+                                    label=" Date Completed"
                                     isRequired
-                                    name="password"
+                                    name="date_completed"
                                     isClearable
                                     placeholder=" "
-                                    type="text"
+                                    type="date"
                                     labelPlacement="outside"
 
                                 />
@@ -601,11 +620,11 @@ const Users = () => {
                         </div>
                         <Divider className="mt-6" />
                         <div className="flex flex-col gap-6 mt-4">
-                            <p>Education </p>
+                            <p>Education Background</p>
                             <CustomInput
-                                label=" Password"
+                                label="Intution Name"
                                 isRequired
-                                name="password"
+                                name="institution_name"
                                 isClearable
                                 placeholder=" "
                                 type="text"
@@ -614,9 +633,9 @@ const Users = () => {
                             />
                             <div className="flex gap-4">
                                 <CustomInput
-                                    label=" Password"
+                                    label=" Program"
                                     isRequired
-                                    name="password"
+                                    name="program"
                                     isClearable
                                     placeholder=" "
                                     type="text"
@@ -624,12 +643,12 @@ const Users = () => {
 
                                 />
                                 <CustomInput
-                                    label=" Password"
+                                    label="Date Completed"
                                     isRequired
-                                    name="password"
+                                    name="date_c"
                                     isClearable
                                     placeholder=" "
-                                    type="text"
+                                    type="date"
                                     labelPlacement="outside"
 
                                 />
@@ -672,6 +691,15 @@ export const action: ActionFunction = async ({ request }) => {
     const department = formData.get("department") as string;
     const id = formData.get("id") as string;
 
+    const bio = formData.get("bio") as string;
+    const institution = formData.get("institution") as string;
+    const positionInstitution = formData.get("position_institution") as string;
+    const dateCompletedInstitution = formData.get("date_completed") as string;
+    const institutionName = formData.get("institution_name") as string;
+    const program = formData.get("program") as string;
+    const dateCompletedProgram = formData.get("date_c") as string;
+
+
 
     switch (intent) {
         case "create":
@@ -687,9 +715,17 @@ export const action: ActionFunction = async ({ request }) => {
                 intent,
                 position,
                 department,
-                base64Image
-            })
-            return user
+                base64Image,
+                bio,
+                institutionName,
+                program,
+                dateCompletedProgram,
+                institution,
+                positionInstitution,
+                dateCompletedInstitution,
+            });
+            return user;
+
 
         case "delete":
             const deleteUser = await usersController.DeleteUser({
