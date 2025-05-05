@@ -1,12 +1,5 @@
 import { useState } from "react"
 import {
-    Navbar,
-    NavbarBrand,
-    NavbarContent,
-    NavbarItem,
-    NavbarMenu,
-    NavbarMenuItem,
-    NavbarMenuToggle,
     Button,
     Input,
     Select,
@@ -15,69 +8,30 @@ import {
     CardHeader,
     CardBody,
     CardFooter,
-    Switch,
     Chip,
 } from "@nextui-org/react"
-import { Search, MapPin, Phone, Mail } from "lucide-react"
+import { Search } from "lucide-react"
 import PublicLayout from "~/layout/PublicLayout"
-import { Link } from "@remix-run/react"
+import { Link, useLoaderData } from "@remix-run/react"
+import { json, LoaderFunction } from "@remix-run/node"
+import blog from "~/controller/blog"
+import { BlogInterface } from "~/interface/interface"
 
 export default function BlogPage() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
 
-    const blogPosts = [
-        {
-            id: 1,
-            slug: "rapid-growth-of-it",
-            title: "The rapid growth of IT",
-            excerpt: "Exploring the exponential growth of information technology in modern business...",
-            date: "January 7, 2025",
-            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            category: "Technology",
-        },
-        {
-            id: 2,
-            slug: "persons-who-shall-lose-positions",
-            title: "Persons who shall lose their positions as a new Ghanaian...",
-            excerpt: "An analysis of the changing employment landscape in Ghana's evolving economy...",
-            date: "January 9, 2025",
-            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            category: "Business",
-        },
-        {
-            id: 3,
-            slug: "digital-transformation-strategies",
-            title: "Digital Transformation Strategies for 2025",
-            excerpt: "Key strategies businesses should adopt to stay competitive in the digital age...",
-            date: "January 12, 2025",
-            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            category: "Digital",
-        },
-        {
-            id: 4,
-            slug: "ai-in-legal-practice",
-            title: "The Impact of AI on Legal Practice",
-            excerpt: "How artificial intelligence is revolutionizing the legal industry...",
-            date: "January 15, 2025",
-            image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-            category: "Technology",
-        },
-    ]
+    const { blogs } = useLoaderData<{
+        blogs: BlogInterface[];
+    }>();
 
-    const categories = [
-        { value: "all", label: "All Categories" },
-        { value: "technology", label: "Technology" },
-        { value: "business", label: "Business" },
-        { value: "digital", label: "Digital" },
-        { value: "legal", label: "Legal" },
-    ]
+    const truncateText = (text, wordLimit) => {
+        const words = text.split(" ");
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(" ") + "...";
+        }
+        return text;
+    };
 
-    const filteredPosts = blogPosts.filter(
-        (post) =>
-            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
 
     return (
 
@@ -114,7 +68,7 @@ export default function BlogPage() {
                                 }}
                             />
                         </div>
-                        <div className="w-full md:w-1/3 lg:w-1/4">
+                        {/* <div className="w-full md:w-1/3 lg:w-1/4">
                             <Select
                                 placeholder="All Categories"
                                 className="bg-gray-900/50 border-blue-900/40 rounded-lg"
@@ -130,7 +84,7 @@ export default function BlogPage() {
                                     </SelectItem>
                                 )}
                             </Select>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </section>
@@ -139,14 +93,14 @@ export default function BlogPage() {
             <section className="py-12 bg-black font-nunito lg:px-[90px]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredPosts.map((post) => (
-                            <Link to={`/blog/${post.slug}`} key={post.id}>
+                        {blogs.map((post) => (
+                            <Link to={`/blog/${post._id}`} key={post._id}>
                                 <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all h-full">
                                     <CardHeader className="p-0">
                                         <div className="aspect-video w-full overflow-hidden">
                                             <img
-                                                src={post.image || "/placeholder.svg"}
-                                                alt={post.title}
+                                                src={post.image}
+                                                alt={post.name}
                                                 width={600}
                                                 height={400}
                                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -154,15 +108,23 @@ export default function BlogPage() {
                                         </div>
                                     </CardHeader>
                                     <CardBody className="p-6">
-                                        <p className="text-sm text-gray-400 mb-2">{post.date}</p>
+                                        <p className="font-nunito text-default-300 mb-2"> {new Date(post?.createdAt).toLocaleDateString("en-US", {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                        })}</p>
                                         <h3 className="text-xl font-semibold mb-3 group-hover:text-blue-500 transition-colors line-clamp-2">
-                                            {post.title}
+                                            {post.name}
                                         </h3>
-                                        <p className="text-gray-400 text-sm line-clamp-3">{post.excerpt}</p>
+                                        <div
+                                            className="text-gray-400 text-sm line-clamp-3"
+                                            dangerouslySetInnerHTML={{ __html: truncateText(post?.description, 10) }}
+                                        ></div>
+
                                     </CardBody>
                                     <CardFooter className="pt-0 pb-4 px-6">
                                         <Chip size="sm" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-                                            {post.category}
+                                            {post.category.name}
                                         </Chip>
                                     </CardFooter>
                                 </Card>
@@ -194,7 +156,15 @@ export default function BlogPage() {
                 </div>
             </section>
         </PublicLayout>
-
-
     )
 }
+
+export const loader: LoaderFunction = async ({ request }) => {
+    const { blogs } = await blog.getBlogs({
+        request,
+    });
+
+    return json({
+        blogs,
+    });
+};

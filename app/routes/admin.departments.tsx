@@ -222,9 +222,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     const session = await getSession(request.headers.get("Cookie"));
     const token = session.get("email");
-    if (!token) {
-        return redirect("/")
-    }
+    // if (!token) {
+    //     return redirect("/")
+    // }
 
     const { departments, totalPages } = await department.getDepartments({ request, page, search_term })
     const { user } = await usersController.FetchUsers({ request, page, search_term })

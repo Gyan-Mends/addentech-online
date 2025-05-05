@@ -8,7 +8,7 @@ const RegistrationSchema = new mongoose.Schema({
     type: String,
   },
   middleName: {
-    required: true,
+    required: false,
     type: String,
   },
   lastName: {
@@ -32,7 +32,7 @@ const RegistrationSchema = new mongoose.Schema({
     type: String,
   },
   admin: {
-    required: true,
+    required: false,
     type: String,
   },
   position: {

@@ -13,7 +13,6 @@ const DepartmentSchema = new mongoose.Schema({
     },
     admin: {
         ref: "registration",
-        required: true,
         type: Schema.Types.ObjectId,
     },
 })

@@ -33,57 +33,28 @@ import {
     Phone,
     Mail,
 } from "lucide-react"
-import { Link, useParams } from "@remix-run/react"
+import { Link, useLoaderData, useParams } from "@remix-run/react"
 import PublicLayout from "~/layout/PublicLayout"
+import Blog from "~/modal/blog"
+import { json, LoaderFunction } from "@remix-run/node"
+import { CategoryInterface, TaskInterface } from "~/interface/interface"
+import category from "~/controller/categoryController"
 
 export default function BlogDetailPage() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const params = useParams()
-    const slug = params.slug
 
-    // This would normally come from a database or API
-    const blogPost = {
-        slug: slug,
-        title:
-            slug === "rapid-growth-of-it"
-                ? "The rapid growth of IT"
-                : "Persons who shall lose their positions as a new Ghanaian...",
-        content: `
-      <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-      
-      <h2 class="text-2xl font-bold mt-8 mb-4">The Evolution of Technology</h2>
+    const { blogDetail, related, recentPosts } = useLoaderData<{
+        blogDetail: any;
+        related: any[];
+        recentPosts: any[];
+    }>();
+    const truncateText = (text, wordLimit) => {
+        const words = text.split(" ");
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(" ") + "...";
+        }
+        return text;
+    };
 
-      <p class="mb-4">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-      <p class="mb-4">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-
-      <blockquote class="border-l-4 border-blue-500 pl-4 italic my-6 text-gray-400">
-        "The advance of technology is based on making it fit in so that you don't really even notice it, so it's part of everyday life."
-        <cite class="block text-sm mt-2 text-gray-500">- Bill Gates</cite>
-      </blockquote>
-
-      <h2 class="text-2xl font-bold mt-8 mb-4">Impact on Business</h2>
-
-      <p class="mb-4">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
-
-      <p class="mb-4">Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-
-      <h2 class="text-2xl font-bold mt-8 mb-4">Looking to the Future</h2>
-
-      <p class="mb-4">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
-
-      <p class="mb-4">Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.</p>
-    `,
-        date: slug === "rapid-growth-of-it" ? "January 7, 2025" : "January 9, 2025",
-        author: {
-            name: "Dennis Law",
-            avatar: "/placeholder.svg?height=100&width=100",
-            role: "Technology Analyst",
-        },
-        image: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-        category: slug === "rapid-growth-of-it" ? "Technology" : "Business",
-        readTime: "5 min read",
-    }
 
     const relatedPosts = [
         {
@@ -126,25 +97,29 @@ export default function BlogDetailPage() {
                     <div className="max-w-4xl mx-auto">
 
                         <Chip size="sm" className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20">
-                            {blogPost.category}
+                            {blogDetail.category.name}
                         </Chip>
 
                         <h1 className="font-montserrat text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-6">
-                            {blogPost.title}
+                            {truncateText(blogDetail?.name, 10)}
                         </h1>
 
                         <div className="flex flex-wrap items-center gap-4 mb-8 text-sm text-gray-400">
                             <div className="flex items-center">
                                 <Calendar size={16} className="mr-2 text-blue-500" />
-                                {blogPost.date}
+                                {new Date(blogDetail?.createdAt).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                })}
                             </div>
                             <div className="flex items-center">
                                 <User size={16} className="mr-2 text-blue-500" />
-                                {blogPost.author.name}
+                                Dennis Law
                             </div>
                             <div className="flex items-center">
                                 <Tag size={16} className="mr-2 text-blue-500" />
-                                {blogPost.readTime}
+                                5 min read
                             </div>
                         </div>
                     </div>
@@ -157,8 +132,8 @@ export default function BlogDetailPage() {
                     <div className="max-w-4xl mx-auto">
                         <div className="aspect-[16/9] rounded-xl overflow-hidden">
                             <img
-                                src={blogPost.image || "/placeholder.svg"}
-                                alt={blogPost.title}
+                                src={blogDetail.image || "/placeholder.svg"}
+                                alt={blogDetail.title}
                                 width={1200}
                                 height={675}
                                 className="h-full w-full object-cover"
@@ -176,20 +151,20 @@ export default function BlogDetailPage() {
                             {/* Main Content */}
                             <div className="w-full md:w-3/4">
                                 <article className="prose prose-invert prose-blue max-w-none">
-                                    <div dangerouslySetInnerHTML={{ __html: blogPost.content }} />
+                                    <div dangerouslySetInnerHTML={{ __html: blogDetail.description }} />
                                 </article>
 
                                 {/* Tags */}
-                                <div className="mt-8 flex flex-wrap gap-2">
-                                    {["Technology", "IT", "Digital Transformation", "Business"].map((tag) => (
+                                {/* <div className="mt-8 flex flex-wrap gap-2">
+                                    {cat.map((tag) => (
                                         <Chip key={tag} size="sm" className="bg-gray-800 text-gray-300">
                                             {tag}
                                         </Chip>
                                     ))}
-                                </div>
+                                </div> */}
 
                                 {/* Author Bio */}
-                                <div className="mt-12 p-6 bg-gray-900/30 rounded-xl border border-blue-900/20">
+                                {/* <div className="mt-12 p-6 bg-gray-900/30 rounded-xl border border-blue-900/20">
                                     <div className="flex items-start gap-4">
                                         <Avatar src={blogPost.author.avatar} className="w-16 h-16" alt={blogPost.author.name} />
                                         <div>
@@ -201,7 +176,7 @@ export default function BlogDetailPage() {
                                             </p>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Share */}
                                 <div className="mt-8">
@@ -231,38 +206,28 @@ export default function BlogDetailPage() {
                                 <div className="sticky top-24">
                                     <h3 className="text-lg font-semibold mb-4">Recent Posts</h3>
                                     <div className="space-y-4 flex flex-col gap-4">
-                                        {relatedPosts.slice(0, 2).map((post) => (
-                                            <Link to={`/blog/${post.slug}`} key={post.id}>
+                                        {recentPosts.map((post) => (
+                                            <Link to={`/blog/${post._id}`} key={post._id}>
                                                 <div className="group flex gap-4 items-start">
                                                     <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
                                                         <img
                                                             src={post.image || "/placeholder.svg"}
-                                                            alt={post.title}
-                                                            width={64}
-                                                            height={64}
+                                                            alt={post.name}
                                                             className="h-full w-full object-cover"
                                                         />
                                                     </div>
                                                     <div>
                                                         <h4 className="text-sm font-medium group-hover:text-blue-500 transition-colors line-clamp-2">
-                                                            {post.title}
+                                                            {post.name}
                                                         </h4>
-                                                        <p className="text-xs text-gray-400 mt-1">{post.date}</p>
+                                                        <p className="text-xs text-gray-400 mt-1">
+                                                            {new Date(post.createdAt).toLocaleDateString("en-US", {
+                                                                year: "numeric",
+                                                                month: "long",
+                                                                day: "numeric",
+                                                            })}
+                                                        </p>
                                                     </div>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-
-                                    <Divider className="my-6 bg-gray-800" />
-
-                                    <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                                    <div className="space-y-2">
-                                        {["Technology", "Business", "Digital", "Legal", "Marketing"].map((category) => (
-                                            <Link to="#" key={category}>
-                                                <div className="flex justify-between items-center py-2 hover:text-blue-500 transition-colors">
-                                                    <span>{category}</span>
-                                                    <span className="text-sm text-gray-500">12</span>
                                                 </div>
                                             </Link>
                                         ))}
@@ -280,14 +245,14 @@ export default function BlogDetailPage() {
                     <div className="max-w-4xl mx-auto">
                         <h2 className="text-2xl font-bold mb-8">Related Articles</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {relatedPosts.map((post) => (
-                                <Link to={`/blog/${post.slug}`} key={post.id}>
+                            {related.map((post) => (
+                                <Link to={`/blog/${post._id}`} key={post._id}>
                                     <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all h-full">
                                         <CardHeader className="p-0">
                                             <div className="aspect-video w-full overflow-hidden">
                                                 <img
                                                     src={post.image || "/placeholder.svg"}
-                                                    alt={post.title}
+                                                    alt={post.name}
                                                     width={400}
                                                     height={225}
                                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -295,15 +260,19 @@ export default function BlogDetailPage() {
                                             </div>
                                         </CardHeader>
                                         <CardBody className="p-4">
-                                            <p className="text-xs text-gray-400 mb-1">{post.date}</p>
+                                            <p className="text-xs text-gray-400 mb-1">{new Date(post?.createdAt).toLocaleDateString("en-US", {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            })}</p>
                                             <h3 className="text-base font-semibold mb-2 group-hover:text-blue-500 transition-colors line-clamp-2">
-                                                {post.title}
+                                                {truncateText(post?.name, 10)}
                                             </h3>
-                                            <p className="text-gray-400 text-xs line-clamp-2">{post.excerpt}</p>
+                                            <p className="text-default-400" dangerouslySetInnerHTML={{ __html: truncateText(post.description, 6) }} />
                                         </CardBody>
                                         <CardFooter className="pt-0 pb-3 px-4">
                                             <Chip size="sm" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-                                                {post.category}
+                                                {post.category.name}
                                             </Chip>
                                         </CardFooter>
                                     </Card>
@@ -317,7 +286,37 @@ export default function BlogDetailPage() {
             {/* CTA Section */}
 
         </PublicLayout>
-
-
     )
 }
+
+export const loader: LoaderFunction = async ({ request, params }) => {
+    const { id } = params;
+
+    if (!id) {
+        throw new Response("Task ID not provided", { status: 400 });
+    }
+
+    try {
+        const blogDetail = await Blog.findById(id).populate("category");
+
+        if (!blogDetail) {
+            throw new Error("Blog not found");
+        }
+
+        // Find related blogs with the same category, excluding the current blog
+        const related = await Blog.find({
+            category: blogDetail.category._id, // Match the category ID
+            _id: { $ne: blogDetail._id }, // Exclude the current blog
+        }).populate("category").limit(3);
+        const recentPosts = await Blog.find({}).sort({ createdAt: -1 }).limit(5);
+
+
+
+        return json({
+            blogDetail, id, related, recentPosts
+        });
+    } catch (error) {
+        console.error("Error fetching task details:", error);
+        throw new Response("Internal Server Error", { status: 500 });
+    }
+};

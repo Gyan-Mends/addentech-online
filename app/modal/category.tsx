@@ -13,7 +13,7 @@ const CategorySchema = new mongoose.Schema({
     },
     seller: {
         ref: "registration",
-        required: true,
+        required: false,
         type: Schema.Types.ObjectId,
     },
 })

@@ -78,9 +78,9 @@ class CategoryController {
         search_term,
         limit = 9
     }: {
-        request: Request,
-        page: number;
-        search_term: string;
+            request?: Request,
+            page?: number;
+            search_term?: string;
         limit?: number;
     }): Promise<{
         user: RegistrationInterface[],
