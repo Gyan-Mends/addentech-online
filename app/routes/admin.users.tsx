@@ -874,7 +874,7 @@ export const meta: MetaFunction = () => {
             content:
                 "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
         },
-        { name: "og:url", content: "https://addentech.vercel.app" },
+        { name: "og:url", content: "https://addentech-online.vercel.app" },
         {
             name: "keywords",
             content:
