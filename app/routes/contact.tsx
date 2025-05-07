@@ -1,14 +1,32 @@
 import { Button, Card, CardHeader, Input, Textarea } from "@nextui-org/react"
-import { Form, Link } from "@remix-run/react"
+import { ActionFunction, json } from "@remix-run/node"
+import { Form, Link, useActionData } from "@remix-run/react"
+import { useEffect } from "react"
+import { Toaster } from "react-hot-toast"
+import { errorToast, successToast } from "~/components/toast"
+import contactController from "~/controller/contact"
 import PublicLayout from "~/layout/PublicLayout"
 
 
 
 const Contact = () => {
+    const actionData = useActionData<any>()
+
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                successToast(actionData.message)
+            } else {
+                errorToast(actionData.message)
+            }
+        }
+    }, [actionData])
 
     return (
         <PublicLayout>
             <div>
+                <Toaster position="top-right" />
+
                 <main className="flex-1 ">
                     {/* Hero Section */}
                     <section className="py-12 md:py-20 lg:px-[125px]">
@@ -205,3 +223,36 @@ const Contact = () => {
 }
 
 export default Contact
+
+export const action: ActionFunction = async ({ request }) => {
+    const formData = await request.formData();
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
+    const middleName = formData.get("middleName") as string;
+    const number = formData.get("number") as string;
+    const company = formData.get("company") as string;
+    const description = formData.get("description") as string;
+    const intent = formData.get("intent") as string;
+
+
+    switch (intent) {
+        case "create":
+            const user = await contactController.Create({
+                firstName,
+                middleName,
+                lastName,
+                number,
+                company,
+                description,
+
+            })
+            return user
+
+        default:
+            return json({
+                message: "Bad request",
+                success: false,
+                status: 400
+            })
+    }
+}

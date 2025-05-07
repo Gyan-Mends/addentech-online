@@ -13,6 +13,13 @@ import { BlogInterface } from "~/interface/interface";
 
 
 const Home = () => {
+  const truncateText = (text, wordLimit) => {
+    const words = text.split(" ");
+    if (words.length > wordLimit) {
+      return words.slice(0, wordLimit).join(" ") + "...";
+    }
+    return text;
+  };
 
   const {
     blogs
@@ -227,47 +234,35 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "The Future of AI in Legal Practice",
-                  description: "Explore how artificial intelligence is transforming the legal industry.",
-                  date: "May 2, 2023",
-                  image: img5
-                },
-                {
-                  title: "Cybersecurity for Law Firms",
-                  description: "Essential security practices every modern law firm should implement.",
-                  date: "April 15, 2023",
-                  image: img5,
-                },
-                {
-                  title: "Digital Transformation in Legal Services",
-                  description: "How technology is reshaping client expectations and service delivery.",
-                  date: "March 28, 2023",
-                  image: img5,
-                },
-              ].map((article, i) => (
+              {blogs.map((article, i) => (
                 <Card key={i} className="overflow-hidden border-border/40 bg-background/50 backdrop-blur">
                   <div className="aspect-video overflow-hidden">
                     <img
                       src={article.image || "/placeholder.svg"}
-                      alt={article.title}
+                      alt={article.name}
                       width={400}
                       height={200}
                       className="h-full w-full object-cover transition-transform hover:scale-105"
                     />
                   </div>
                   <div className="p-4 flex flex-col gap-2">
-                    <div className="text-sm text-muted-foreground font-nunito">{article.date}</div>
-                    <p className="line-clamp-2 font-bold text-lg font-monserrate">{article.title}</p>
-                    <p className="line-clamp-2 font-nunito">{article.description}</p>
+                    <div className="text-sm text-default-400 font-nunito">{new Date(article?.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}</div>
+                    <p className="line-clamp-2 font-bold text-lg font-monserrate">{truncateText(article?.name, 10)}</p>
+                    <div
+                      className="text-gray-400 text-sm line-clamp-3"
+                      dangerouslySetInnerHTML={{ __html: truncateText(article?.description, 10) }}
+                    ></div>
                   </div>
                   <CardFooter>
 
-                    <Link to={`/blog/${article.title}`} key={article.title}>
+                    <Link to={`/blog/${article._id}`} key={article._id}>
                     <Button variant="ghost" size="sm" className="group">
                       Read article
-                      {/* <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /> */}
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
                     </Link>
                   </CardFooter>
@@ -417,7 +412,8 @@ export default Home;
 export const loader: LoaderFunction = async ({ request }) => {
   const { blogs } = await blog.getBlogs({
     request,
+    limit: 3, // Specify the limit here
   });
 
   return json({ blogs });
-}
+};

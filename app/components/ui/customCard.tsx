@@ -1,49 +1,27 @@
-import { Skeleton } from "@nextui-org/react"
-import { ReactNode, useEffect, useState } from "react"
+import { Card, CardBody, CardHeader } from "@nextui-org/react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
-interface CustomFolderCardInterface {
-    children?: ReactNode,
-    className?: string,
-    title?: string
-    image?:string
-    header?:string
-    description?: string
-}
-
-const CustomCard= ({
-    children,
-    className,
-    title,
-    image,
-    header,
-    description
-
-}: CustomFolderCardInterface) => {
-    const [loading, setLoading] = useState(false)
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(true)
-        }, 1000)
-        return () => clearTimeout(timer)
-    }, [])
+const MetricCard = ({ title, value, description, icon, trend }: { title: any; value: any; description: any; icon: any; trend: any }) => {
     return (
-        <Skeleton className="rounded-2xl" isLoaded={loading}>
-            <div className="flex justify-between items-center p-2 shadow-sm rounded-2xl border">
-                <div className="flex gap-4">
-                    <div className=" h-12 w-12 rounded-lg bg-slate-200 p-1">
-                        <img className="h-10 w-10" src={image} alt="image" />
-                    </div>
-                    <div className="">
-                        <p>{header}</p>
-                        <p>{description}</p>
-                    </div>
+        <Card className="bg-[#020817] pr-6 border border-white/20">
+            <CardHeader className="flex items-center justify-between pb-2">
+                <span className="text-sm font-medium">{title}</span>
+                <div className="w-8 h-8 rounded-full bg-primary-500/10 flex items-center justify-center">
+                    {icon}
                 </div>
-                <div>
-                    <p>hsh</p>
-                </div>
-            </div>
-        </Skeleton>
-    )
-}
+            </CardHeader>
+            <CardBody>
+                <div className="text-2xl font-bold">{value}</div>
+                <p
+                    className={`text-xs ${trend === "up" ? "text-green-500" : trend === "down" ? "text-red-500" : "text-muted-foreground"} flex items-center mt-1`}
+                >
+                    {trend === "up" && <ChevronUpIcon className="mr-1 h-4 w-4" />}
+                    {trend === "down" && <ChevronDownIcon className="mr-1 h-4 w-4" />}
+                    {description}
+                </p>
+            </CardBody>
+        </Card>
+    );
+};
 
-export default CustomCard
+export default MetricCard;

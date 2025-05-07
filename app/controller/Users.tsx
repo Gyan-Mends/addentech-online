@@ -158,7 +158,14 @@ class UsersController {
             id,
             position,
             department,
-            base64Image
+            base64Image,
+            bio,
+            institutionName,
+            program,
+            dateCompletedProgram,
+            institution,
+            positionInstitution,
+            dateCompletedInstitution,
         }: {
             firstName: string,
             middleName: string,
@@ -170,47 +177,59 @@ class UsersController {
             id: string,
                 position: string,
                 department: string,
-                base64Image: string
-        }) {
+            base64Image: string,
+            bio,
+            institutionName,
+            program,
+            dateCompletedProgram,
+            institution,
+            positionInstitution,
+            dateCompletedInstitution,
+        }
+    ) {
         try {
+            const updateUser = await Registration.findByIdAndUpdate(id, {
+                firstName,
+                middleName,
+                lastName,
+                email,
+                phone,
+                role,
+                admin,
+                position,
+                department,
+                image: base64Image,
+                bio,
+                institutionName,
+                program,
+                dateCompletedProgram,
+                institution,
+                positionInstitution,
+                dateCompletedInstitution,
+            });
 
-                const updateUser = await Registration.findByIdAndUpdate(id, {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    phone,
-                    role,
-                    admin,
-                    position,
-                    department,
-                    image: base64Image
-                })
-
-                if (updateUser) {
-                    return json({
-                        message: "User updated successfully",
-                        success: true,
-                        status: 500
-                    })
-                } else {
-                    return json({
-                        message: "Unable to update this record",
-                        success: false,
-                        status: 500
-                    })
-                }
-
-
-
+            if (updateUser) {
+                return json({
+                    message: "User updated successfully",
+                    success: true,
+                    status: 200
+                });
+            } else {
+                return json({
+                    message: "Unable to update this record",
+                    success: false,
+                    status: 500
+                });
+            }
         } catch (error: any) {
             return json({
                 message: error.message,
                 success: false,
                 status: 500
-            })
+            });
         }
     }
+
 
     async logout(intent: string) {
         if (intent === "logout") {

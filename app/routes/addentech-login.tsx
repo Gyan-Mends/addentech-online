@@ -45,7 +45,7 @@ const Login = () => {
     };
 
     return (
-        <div className={`flex flex-col justify-center items-center h-[100vh] bg-[#0b0e13] overflow-y-hidden bg-gradient-to-br from-gray-900 to-black`}>
+        <div className={`flex flex-col justify-center items-center h-[100vh]  overflow-y-hidden bg-gradient-to-br from-gray-900 to-black`}>
             {/* Logo */}
             <div className="h-[100vh] w-full flex flex-col items-center justify-center">
                 <div className="text-center mb-8">

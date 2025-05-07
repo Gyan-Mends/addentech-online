@@ -1,5 +1,5 @@
 import { Badge, Button } from "@nextui-org/react"
-import { Link } from "@remix-run/react"
+import { Link, useLoaderData } from "@remix-run/react"
 import { CardBody, CardContainer, CardItem } from "~/components/acternity/3d"
 import { StatCard } from "~/components/card"
 import CheckedIcon from "~/components/icons/CheckedIcon"
@@ -11,9 +11,18 @@ import jl from "../components/images/JL.png"
 import dl from "~/components/images/Dennislaw-Logo.svg"
 import mr from "~/components/images/mr-logo.png"
 import news from "~/components/images/DL-News-Logo.png"
+import { json, LoaderFunction } from "@remix-run/node"
+import usersController from "~/controller/Users"
+import { RegistrationInterface } from "~/interface/interface"
 
 
 const About = () => {
+    const {
+        users
+    } = useLoaderData<{
+        // user: { _id: string },
+        users: RegistrationInterface[],
+    }>()
     return (
         <PublicLayout>
             <main className="flex-1">
@@ -213,24 +222,21 @@ const About = () => {
                         </div>
 
                         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {[
-                                {
-                                    name: "Sarah Johnson",
-                                    role: "Chief Legal Technology Officer",
-                                    img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                                },
-                                {
-                                    name: "Michael Chen",
-                                    role: "Head of Software Development",
-                                    img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-                                },
-                                {
-                                    name: "Aisha Patel",
-                                    role: "Legal AI Specialist",
-                                    img: "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg",
-                                },
-                            ].map((member, i) => (
-                                <TeamMember key={i} name={member.name} role={member.role} img={member.img} />
+                            {users.map((member, i) => (
+                                <Link to={`/team/${member._id}`} key={member._id}>
+
+                                    <TeamMember
+                                        key={i}
+                                        name={member.firstName + " " + member.middleName + " " + member.lastName}
+                                        role={member.position}
+                                        img={member.image}
+                                        socials={[
+                                            { platform: "linkedin", url: "https://linkedin.com/in/johndoe" },
+                                            { platform: "twitter", url: "https://twitter.com/johndoe" },
+                                            { platform: "mail", url: "mailto:john.doe@example.com" },
+                                        ]}
+                                    />
+                                </Link>
                             ))}
                         </div>
                     </div>
@@ -390,3 +396,13 @@ const About = () => {
 }
 
 export default About
+
+export const loader: LoaderFunction = async ({ request }) => {
+    const { user, users, totalPages } = await usersController.FetchUsers({
+        request,
+        limit: 3,
+
+    });
+
+    return json({ user, users, totalPages });
+}

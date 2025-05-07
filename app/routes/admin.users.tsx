@@ -1,20 +1,13 @@
-import { Avatar, Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react"
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
+import { Button, Divider, Select, SelectItem, TableCell, TableRow, Tooltip, User } from "@nextui-org/react"
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, } from "@remix-run/node"
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
+import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Toaster } from "react-hot-toast"
-import BackIcon from "~/components/icons/BackIcon"
 import CloseIcon from "~/components/icons/CloseIcon"
 import { DeleteIcon } from "~/components/icons/DeleteIcon"
 import { EditIcon } from "~/components/icons/EditIcon"
-import NotificationIcon from "~/components/icons/NotificationIcon"
-import PlusIcon from "~/components/icons/PlusIcon"
-import { SearchIcon } from "~/components/icons/SearchIcon"
 import { FileUploader } from "~/components/icons/uploader"
-import UserIcon from "~/components/icons/UserIcon"
 import ConfirmModal from "~/components/modal/confirmModal"
-import CreateModal from "~/components/modal/createModal"
-import EditModal from "~/components/modal/EditModal"
 import { UserColumns } from "~/components/table/columns"
 import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
@@ -42,7 +35,6 @@ const Users = () => {
         success: boolean;
         status: number;
     }>()
-    const { mobileNumberApi } = useLoaderData<typeof loader>()
     const navigate = useNavigate()
     const navigation = useNavigation()
     const {
@@ -56,12 +48,11 @@ const Users = () => {
         totalPages: number,
         departments: DepartmentInterface[]
     }>()
-    const [selectedRole, setSelectedRole] = useState();
     const [content, setContent] = useState("");
     useEffect(() => {
         // Set the initial content from dataValue.description
-        if (dataValue?.description) {
-            setContent(dataValue.description);
+        if (dataValue?.bio) {
+            setContent(dataValue.bio);
         }
     }, [dataValue]);
 
@@ -78,7 +69,6 @@ const Users = () => {
         ],
     };
 
-
     const handleClick = () => {
         setIsCreateModalOpened(true)
     }
@@ -88,14 +78,10 @@ const Users = () => {
     const handleConfirmModalClosed = () => {
         setIsConfirmModalOpened(false)
     }
-    const handleEditModalClosed = () => {
-        setIsEditModalOpened(false)
-    }
+
     const handleEditDrawerClosed = () => {
         setIsEditDrawerOpened(false)
     }
-
-
 
 
     useEffect(() => {
@@ -111,43 +97,17 @@ const Users = () => {
         }
     }, [dataValue]);
 
-    // Handle action data for toast notifications
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message);
-                setIsCreateModalOpened(false);
-                setIsEditDrawerOpened(false);
-                setIsEditModalOpened(false);
-            } else {
-                errorToast(actionData.message);
-            }
-        }
-    }, [actionData]);
-
-    const handleDepartmentChange = (value) => {
-        setDataValue(value); // Update state with the new value
-    };
-
-    const animals = [
-        { key: "cat", label: "Cat" },
-        { key: "dog", label: "Dog" },
-        { key: "elephant", label: "Elephant" },
-        { key: "lion", label: "Lion" },
-        { key: "tiger", label: "Tiger" },
-        { key: "giraffe", label: "Giraffe" },
-        { key: "dolphin", label: "Dolphin" },
-        { key: "penguin", label: "Penguin" },
-        { key: "zebra", label: "Zebra" },
-        { key: "shark", label: "Shark" },
-        { key: "whale", label: "Whale" },
-        { key: "otter", label: "Otter" },
-        { key: "crocodile", label: "Crocodile" },
-    ];
     return (
         <AdminLayout redirect="/admin/users" redirectDelay={1000} handleOnClick={handleClick} buttonName="Create User" pageName="Users Management">
 
-
+            <div className="flex justify-end">
+                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                    setIsCreateModalOpened(true)
+                }}>
+                    <Plus />
+                    Create User
+                </Button>
+            </div>
             {/* table  */}
             {/* table  */}
             <NewCustomTable
@@ -176,20 +136,25 @@ const Users = () => {
                         <TableCell>{user.phone}</TableCell>
                         <TableCell>{user.role}</TableCell>
                         <TableCell className="relative flex items-center gap-4">
-                            <button className="text-primary " onClick={() => {
-                                setIsEditDrawerOpened(true)
-                                setDataValue(user)
-                                console.log(dataValue);
+                            <Tooltip content="Edit User">
+                                <button className="text-primary " onClick={() => {
+                                    setIsEditDrawerOpened(true)
+                                    setDataValue(user)
+                                    console.log(dataValue);
 
-                            }}>
-                                <EditIcon className="" />
-                            </button>
-                            <button className="text-danger" onClick={() => {
-                                setIsConfirmModalOpened(true)
-                                setDataValue(user)
-                            }}>
-                                <DeleteIcon className="" />
-                            </button>
+                                }}>
+
+                                    <EditIcon className="" />
+                                </button>
+                            </Tooltip>
+                            <Tooltip content="Delete User">
+                                <button className="text-danger" onClick={() => {
+                                    setIsConfirmModalOpened(true)
+                                    setDataValue(user)
+                                }}>
+                                    <DeleteIcon className="" />
+                                </button>
+                            </Tooltip>
 
                         </TableCell>
                     </TableRow>
@@ -198,7 +163,7 @@ const Users = () => {
 
             {/* confirm modal */}
             {/* confirm modal */}
-            <ConfirmModal className="dark:bg-[#333] border border-white/5" header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
+            <ConfirmModal className="dark:bg-[#333] border border-white/5 !bg-[#020817]" header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button color="success" variant="flat" className="font-montserrat font-semibold" size="sm" onPress={handleConfirmModalClosed}>
                         No
@@ -224,11 +189,11 @@ const Users = () => {
             {dataValue && (
 
                 <div
-                    className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${isEditDrawerOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
+                    className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 !bg-[#020817] fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${isEditDrawerOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
                         }`}
-            >
+                >
                     <div className="flex justify-between gap-10 ">
-                        <p className="font-nunito">Create new User</p>
+                        <p className="font-nunito">Edit User</p>
                         <button
                             onClick={() => {
                                 handleEditDrawerClosed()
@@ -315,8 +280,8 @@ const Users = () => {
                                 name="role"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full  !bg-[#020817] "
                                 }}
                             >
                                 {[
@@ -339,8 +304,8 @@ const Users = () => {
                                 labelPlacement="outside"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
+                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full  !bg-[#020817] "
                                 }}
                             >
                                 {departments.map((animal) => (
@@ -397,6 +362,104 @@ const Users = () => {
                             </div>
                         </div>
 
+                        <div>
+                            <Divider />
+
+                            <div className="mt-6">
+                                <label htmlFor="" className="font-nunito">Bio</label>
+                                <input type="hidden" name="bio" value={content} />
+                                <ReactQuill
+                                    value={content} // Bind editor content to state
+                                    onChange={setContent} // Update state on change
+                                    modules={modules}
+                                    className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
+                                />
+                            </div>
+
+                            <Divider className="mt-28" />
+
+                            <div className="flex flex-col gap-6">
+                                <p>Professional Experience </p>
+                                <CustomInput
+                                    defaultValue={dataValue.institution}
+                                    label=" Institution"
+                                    isRequired
+                                    name="institution"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+                                <div className="flex gap-4">
+                                    <CustomInput
+                                        defaultValue={dataValue.positionInstitution}
+                                        label=" Position_institution"
+                                        isRequired
+                                        name="position_institution"
+                                        isClearable
+                                        placeholder=" "
+                                        type="text"
+                                        labelPlacement="outside"
+
+                                    />
+                                    <CustomInput
+                                        defaultValue={dataValue.dateCompletedInstitution}
+                                        label=" Date Completed"
+                                        isRequired
+                                        name="date_completed"
+                                        isClearable
+                                        placeholder=" "
+                                        type="date"
+                                        labelPlacement="outside"
+
+                                    />
+
+                                </div>
+                            </div>
+                            <Divider className="mt-6" />
+                            <div className="flex flex-col gap-6 mt-4">
+                                <p>Education Background</p>
+                                <CustomInput
+                                    defaultValue={dataValue.institutionName}
+                                    label="Intution Name"
+                                    isRequired
+                                    name="institution_name"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+                                <div className="flex gap-4">
+                                    <CustomInput
+                                        defaultValue={dataValue.positionInstitution}
+                                        label=" Program"
+                                        isRequired
+                                        name="program"
+                                        isClearable
+                                        placeholder=" "
+                                        type="text"
+                                        labelPlacement="outside"
+
+                                    />
+                                    <CustomInput
+                                        defaultValue={dataValue.dateCompletedProgram}
+                                        isRequired
+                                        label="Date Completed"
+                                        isRequired
+                                        name="date_c"
+                                        isClearable
+                                        placeholder=" "
+                                        type="date"
+                                        labelPlacement="outside"
+
+                                    />
+
+                                </div>
+                            </div>
+                        </div>
+
 
 
                         <input name="admin" value={user?._id} type="hidden" />
@@ -404,10 +467,10 @@ const Users = () => {
                         <input name="id" value={dataValue?._id} type="hidden" />
 
 
-                            <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
-                                setIsEditModalOpened(false)
-                            }}>
-                                Update
+                        <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
+                            setIsEditModalOpened(false)
+                        }}>
+                            Update
                         </Button>
                     </Form>
                 </div>
@@ -415,7 +478,7 @@ const Users = () => {
 
 
             <div
-                className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isCreateModalOpened ? "transform-none" : "translate-x-full"}`}
+                className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-[#020817] overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isCreateModalOpened ? "transform-none" : "translate-x-full"}`}
             >
                 <div className="flex justify-between gap-10 ">
                     <p className="font-nunito">Create new User</p>
@@ -430,120 +493,120 @@ const Users = () => {
                 <hr className=" border border-default-400 " />
 
                 <Form method="post" className="flex flex-col gap-4">
+                    <CustomInput
+                        label="First name"
+                        isRequired
+                        isClearable
+                        name="firstname"
+                        placeholder=" "
+                        type="text"
+                        labelPlacement="outside"
+                    />
+                    <div className="flex gap-4">
                         <CustomInput
-                            label="First name"
-                            isRequired
-                            isClearable
-                            name="firstname"
+                            label="Middle Name"
+                            name="middlename"
                             placeholder=" "
+                            isClearable
                             type="text"
                             labelPlacement="outside"
-                        />
-                        <div className="flex gap-4">
-                            <CustomInput
-                                label="Middle Name"
-                                name="middlename"
-                                placeholder=" "
-                                isClearable
-                                type="text"
-                                labelPlacement="outside"
 
-                            />
-                            <CustomInput
-                                label="Last Name"
-                                isRequired
-                                name="lastname"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-                            />
-                        </div>
+                        />
                         <CustomInput
-                            label="Email"
+                            label="Last Name"
                             isRequired
-                            name="email"
+                            name="lastname"
                             isClearable
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
                         />
-                        <div className="flex gap-4">
-                            <CustomInput
-                                label=" Phone"
-                                isRequired
-                                name="phone"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
-                            <CustomInput
-                                label=" Password"
-                                isRequired
-                                name="password"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
-                        </div>
-                        <div className="">
-                            <Select
-                                label="Role"
-                                labelPlacement="outside"
-                                placeholder=" "
-                                isRequired
-                                name="role"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
-                                }}
-                            >
-                                {[
-                                    { key: "admin", value: "admin", display_name: "Admin" },
-                                    { key: "hod", value: "hod", display_name: "HOD" },
-                                    { key: "staff", value: "staff", display_name: "Staff" },
-                                ].map((role) => (
-                                    <SelectItem key={role.key}>{role.display_name}</SelectItem>
-                                ))}
-                            </Select>
-                        </div>
-
-                        <div className="flex gap-4">
-                            <Select
-                                label="Departments"
-                                labelPlacement="outside"
-                                placeholder=" "
-                                isRequired
-                                name="department"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
-                                }}
-                            >
-                                {departments.map((department: DepartmentInterface, index: number) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
-                                ))}
-                            </Select>
-
-                            <CustomInput
-                                label=" Position"
-                                isRequired
-                                name="position"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
                     </div>
-                        <div className=" ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                    <CustomInput
+                        label="Email"
+                        isRequired
+                        name="email"
+                        isClearable
+                        placeholder=" "
+                        type="text"
+                        labelPlacement="outside"
+                    />
+                    <div className="flex gap-4">
+                        <CustomInput
+                            label=" Phone"
+                            isRequired
+                            name="phone"
+                            isClearable
+                            placeholder=" "
+                            type="text"
+                            labelPlacement="outside"
+
+                        />
+                        <CustomInput
+                            label=" Password"
+                            isRequired
+                            name="password"
+                            isClearable
+                            placeholder=" "
+                            type="text"
+                            labelPlacement="outside"
+
+                        />
+                    </div>
+                    <div className="">
+                        <Select
+                            label="Role"
+                            labelPlacement="outside"
+                            placeholder=" "
+                            isRequired
+                            name="role"
+                            classNames={{
+                                label: "font-nunito text-sm text-default-100",
+                                popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-[#020817]  "
+                            }}
+                        >
+                            {[
+                                { key: "admin", value: "admin", display_name: "Admin" },
+                                { key: "hod", value: "hod", display_name: "HOD" },
+                                { key: "staff", value: "staff", display_name: "Staff" },
+                            ].map((role) => (
+                                <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <Select
+                            label="Departments"
+                            labelPlacement="outside"
+                            placeholder=" "
+                            isRequired
+                            name="department"
+                            classNames={{
+                                label: "font-nunito text-sm text-default-100",
+                                popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-[#020817]  "
+                            }}
+                        >
+                            {departments.map((department: DepartmentInterface, index: number) => (
+                                <SelectItem key={department._id}>{department.name}</SelectItem>
+                            ))}
+                        </Select>
+
+                        <CustomInput
+                            label=" Position"
+                            isRequired
+                            name="position"
+                            isClearable
+                            placeholder=" "
+                            type="text"
+                            labelPlacement="outside"
+
+                        />
+                    </div>
+                    <div className=" ">
+                        <label className="font-nunito block text-sm" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
                                 name="image"
@@ -564,7 +627,7 @@ const Users = () => {
                             />
                             <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"><FileUploader className="h-20 w-20 text-white" /></span>
                         </div>
-                        </div>
+                    </div>
 
                     <div>
                         <Divider />
@@ -657,17 +720,17 @@ const Users = () => {
                         </div>
                     </div>
 
-                        <input name="admin" value={user?._id} type="hidden" />
-                        <input name="intent" value="create" type="hidden" />
-                        <input name="base64Image" value={base64Image} type="hidden" />
+                    <input name="admin" value={user?._id} type="hidden" />
+                    <input name="intent" value="create" type="hidden" />
+                    <input name="base64Image" value={base64Image} type="hidden" />
 
 
 
 
                     <button type="submit" className="rounded-xl bg-primary text-sm font-nunito h-10 w-40 px-4">
-                                Submit
+                        Submit
                     </button>
-                    </Form>
+                </Form>
             </div>
         </AdminLayout>
     )
@@ -690,7 +753,6 @@ export const action: ActionFunction = async ({ request }) => {
     const intent = formData.get("intent") as string;
     const department = formData.get("department") as string;
     const id = formData.get("id") as string;
-
     const bio = formData.get("bio") as string;
     const institution = formData.get("institution") as string;
     const positionInstitution = formData.get("position_institution") as string;
@@ -745,7 +807,14 @@ export const action: ActionFunction = async ({ request }) => {
                 position,
                 department,
                 base64Image,
-                id
+                id,
+                bio,
+                institutionName,
+                program,
+                dateCompletedProgram,
+                institution,
+                positionInstitution,
+                dateCompletedInstitution,
             })
             return updateUser
         case "logout":
@@ -786,16 +855,16 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Sales | Point of Sale" },
+        { title: "Addentechnology Limited" },
         {
             name: "description",
             content: ".",
         },
         {
             name: "author",
-            content: "MendsGyan",
+            content: "Mends Gyan",
         },
-        { name: "og:title", content: "Point of Sale" },
+        { name: "og:title", content: "Addentechnology" },
         {
             name: "og:description",
             content: "",
@@ -805,11 +874,11 @@ export const meta: MetaFunction = () => {
             content:
                 "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
         },
-        { name: "og:url", content: "https://marry-right.vercel.app" },
+        { name: "og:url", content: "https://addentech.vercel.app" },
         {
             name: "keywords",
             content:
-                "point of sales in Ghana, online shops, sales, e-commerce",
+                "Adentechnology Ghana, Dennis Law Ghana, Dennis Law, Addentech",
         },
     ];
 };

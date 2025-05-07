@@ -46,7 +46,9 @@ const Category = () => {
 
     return (
         <AdminLayout redirect="/admin/departments" redirectDelay={1000} handleOnClick={handleCreateModalOpened} buttonName="Create Department" pageName="Departments">
-
+            <button onClick={() => {
+                setCreateModalOpened(true)
+            }}>Open</button>
             <div className="">
                 <NewCustomTable
                     columns={CategoryColumns}
