@@ -11,7 +11,7 @@ export function ProductCard({ id }: { id?: string }) {
         <section id={id} className="lg:py-20 py-10 bg-black lg:px-[35px] px-4">
             <div className="container">
                 <div className="flex flex-col items-center justify-center text-center mb-6">
-                    <p className="mb-4 font-bold font-montserrat  bg-clip-text text-primary-500 text-xl">Explore More of Our Products</p>
+                    <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Explore More of Our Products</p>
                     <h2 className="text-3xl md:text-3xl font-montserrat font-bold mb-4">
                         Top-Notch Software Development and Digital Transformation
                     </h2>
@@ -52,10 +52,10 @@ export function ProductCard({ id }: { id?: string }) {
                             key={i}
                             className="inter-var group overflow-hidden -mt-20 lg:mt-0  backdrop-blur transition-all hover:border-border hover:bg-background/80 !bg-[#09090B80]"
                         >
-                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-primary-500/40   ">
+                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-pink-500/40   ">
                                 <CardItem translateZ="50"
                                     className="text-xl  text-neutral-600 dark:text-white">
-                                    <p className="text-md group-hover:text-primary font-nunito font-bold">{product.title}</p>
+                                    <p className="text-md group-hover:bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent  font-nunito font-bold">{product.title}</p>
                                     <p className="text-sm font-nunito">{product.description}</p>
                                 </CardItem>
 
@@ -70,7 +70,7 @@ export function ProductCard({ id }: { id?: string }) {
                                 <Button
                                     variant="flat"
                                     size="sm"
-                                    className="w-full group-hover:bg-gradient-to-br from-blue-500 to-cyan-600  font-montserrat"
+                                    className="w-full group-hover:bg-gradient-to-r from-pink-500 to-purple-600     font-montserrat"
                                 >
                                     Explore Product
                                     <ChevronRight className="ml-2 h-4 w-4" />

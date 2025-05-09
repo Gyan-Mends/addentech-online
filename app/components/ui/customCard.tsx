@@ -6,7 +6,7 @@ const MetricCard = ({ title, value, description, icon, trend }: { title: any; va
         <Card className="bg-[#020817] pr-6 border border-white/20">
             <CardHeader className="flex items-center justify-between pb-2">
                 <span className="text-sm font-medium">{title}</span>
-                <div className="w-8 h-8 rounded-full bg-primary-500/10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full text-green-500 bg-primary-500/10 flex items-center justify-center">
                     {icon}
                 </div>
             </CardHeader>

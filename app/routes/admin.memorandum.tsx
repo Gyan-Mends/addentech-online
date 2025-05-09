@@ -30,6 +30,7 @@ import memoController from "~/controller/memeo";
 import { MemoColumns } from "~/components/table/columns";
 import { ChevronDownIcon } from "~/components/icons/ArrowDown";
 import { EyeIcon } from "~/components/icons/EyeIcon";
+import { Plus, FileText, Download, ChevronsDownIcon, DownloadCloudIcon } from "lucide-react";
 export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
@@ -124,7 +125,16 @@ const Users = () => {
     return (
         <AdminLayout handleOnClick={handleClick} pageName="Users Management">
             <div>
-
+                <div className="flex justify-end">
+                    <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                        const randomRef = generateRandomReference();
+                        setReferenceNumber(randomRef);
+                        setIsDrawerOpen(true);
+                    }}>
+                        <Plus />
+                        Create Memo
+                    </Button>
+                </div>
 
                 <NewCustomTable
                     columns={MemoColumns}
@@ -148,13 +158,13 @@ const Users = () => {
                                     setIsConfirmModalOpened(true)
                                     setDataValue(memo)
                                 }}>
-                                    <DeleteIcon />
+                                    <DeleteIcon className="text-red-500" />
                                 </button>
                                 <button onClick={() => {
                                     setIsEditDrawerOpen(true)
                                     setDataValue(memo)
                                 }}>
-                                    <EditIcon />
+                                    <EditIcon className="text-blue-500" />
                                 </button>
                                 <button onClick={() => {
                                     setIsViewDrawerOpen(true)
@@ -162,9 +172,28 @@ const Users = () => {
                                 }}>
                                     <EyeIcon className="" />
                                 </button>
-                                <button>
-                                    <ChevronDownIcon />
-                                </button>
+                                { (memo.image && (typeof memo.image === 'string' || (memo.image as any).url)) ? (
+                                    <a
+                                        href={typeof memo.image === 'string' ? memo.image : (memo.image as any).url}
+                                        download
+                                        className="p-1 inline-block" // Added inline-block for better layout if needed
+                                        title="Download attached file"
+                                        onClick={(e) => {
+                                            const url = typeof memo.image === 'string' ? memo.image : (memo.image as any).url;
+                                            if (!url) {
+                                                e.preventDefault();
+                                                errorToast("No file available for download.");
+                                                console.warn("Download attempt with no URL for memo:", memo);
+                                            }
+                                        }}
+                                    >
+                                        <Download className="h-4 w-4 text-green-500" />
+                                    </a>
+                                ) : (
+                                    <button className="p-1" title="No file attached" disabled>
+                                        <DownloadCloudIcon />
+                                    </button>
+                                )}
                             </TableCell>
 
                         </TableRow>
@@ -172,8 +201,8 @@ const Users = () => {
                 </NewCustomTable>
 
 
-                {/* Creeat memo drawer */}
-                {/* Creeat memo drawer */}
+                {/* Create memo drawer */}
+                {/* Create memo drawer */}
                 <div
                     className={`w-[40vw] h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isDrawerOpen ? "transform-none" : "translate-x-full"}`}
                 >

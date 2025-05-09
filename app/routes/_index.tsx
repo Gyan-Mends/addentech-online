@@ -36,23 +36,23 @@ const Home = () => {
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
           <div className="container relative">
             <div className="grid gap-10 md:grid-cols-2 items-center">
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <h1 className="font-montserrat text-4xl md:text-6xl leading-tight tracking-tighter">
+              <div className="space-y-10">
+                <div className="space-y-10">
+                  <h1 className="text-4xl md:text-6xl font-montserrat font-bold leading-tight tracking-tighter">
                     Transforming the{" "}
-                    <span className="bg-blue-500 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                       Legal Landscape
                     </span>{" "}
-                    with Dennis Law
+                    with Addentechnology
                   </h1>
-                  <p className="font-montserrat text-xl text-muted-foreground max-w-[600px]">
+                  <p className="font-montserrat text-xl text-default-400 max-w-[600px]">
                     Powering the future of legal services with cutting-edge technology solutions designed for modern law
                     practices.
                   </p>
                 </div>
                 <div className="flex  gap-4">
                   <Link to="#products">
-                  <Button className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
+                    <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">
                     Get Started
                       <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -74,15 +74,15 @@ const Home = () => {
                 </div>
               </div>
               <div className="relative hidden md:block">
-                <div className="relative h-[500px] w-full overflow-hidden rounded-lg border border-border/40 border-white/20 bg-background/50 p-2 backdrop-blur">
+                <div className="relative h-[500px] w-full overflow-hidden rounded-lg border border-border/40 border-pink-500/10 bg-background/50 p-2 backdrop-blur">
                   <img
                     src={heroimage}
                     alt="Legal dashboard interface"
                     className="rounded-md object-cover h-full w-full"
                   />
                 </div>
-                <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-lg border border-border/40 bg-background/90 p-1 backdrop-blur">
-                  <div className="h-full w-full rounded bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-lg border border-pink-500/10 bg-background/90 p-1 backdrop-blur">
+                  <div className="h-full w-full rounded bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
                     <CheckedIcon className="h-10 w-10 text-white" />
                   </div>
                 </div>
@@ -119,7 +119,7 @@ const Home = () => {
                 </div>
               </div>
               <div className="space-y-6">
-                <p className="text-primary-500 bg-clip-text  text-xl font-bold font-montserrat ">Customer Centric</p>
+                <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent   text-xl font-bold font-montserrat ">Customer Centric</p>
                 <h2 className="text-3xl md:text-3xl font-bold font-montserrat">Legal Tech Solutions That Put Clients First</h2>
                 <p className="text-muted-foreground font-nunito">
                   Our innovative approach combines legal expertise with cutting-edge technology to deliver solutions
@@ -129,7 +129,7 @@ const Home = () => {
                   {["Client-focused design", "Intuitive interfaces", "Secure data handling", "Compliance-ready"].map(
                     (item, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <div className="h-5 w-5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center">
+                        <div className="h-5 w-5 rounded-full bg-gradient-to-r from-pink-500 to-purple-600   flex items-center justify-center">
                           <CheckedIcon className="h-3 w-3 text-white" />
                         </div>
                         <span className="font-nunito">{item}</span>
@@ -138,7 +138,7 @@ const Home = () => {
                   )}
                 </ul>
                 <Link to="/about">
-                  <Button variant="bordered" className="border mt-4 border-primary-500 border-2 text-white font-montserrat">
+                  <Button variant="bordered" className="border mt-4 bg-gradient-to-r from-pink-500 to-purple-600    text-white font-montserrat">
                     Learn More
                     <ArrowRight className="h-4 w-4" />
                   </Button>

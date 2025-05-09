@@ -23,6 +23,7 @@ import category from "~/controller/categoryController";
 import usersController from "~/controller/Users";
 import CloseIcon from "~/components/icons/CloseIcon";
 import CustomInput from "~/components/ui/CustomInput";
+import { Plus } from "lucide-react";
 
 type SessionData = {
     sessionId: {
@@ -79,8 +80,15 @@ const Category = () => {
     }, [])
 
     return (
-        <AdminLayout buttonName="Create Category" handleOnClick={handleClick} pageName="Categories">
-
+        <AdminLayout handleOnClick={handleClick} pageName="Categories">
+            <div className="flex justify-end">
+                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                    setCreateModalOpened(true)
+                }}>
+                    <Plus className="text-primary" />
+                    Create Blog Category
+                </Button>
+            </div>
             <div className="">
                 <NewCustomTable
                     columns={CategoryColumns}
@@ -116,10 +124,7 @@ const Category = () => {
             </div>
 
             {dataValue && (
-                <div
-                    className={`w-[20vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${editModalOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
-                        }`}
-                >
+                <CreateModal modalTitle="Create New User" isOpen={editModalOpened} onOpenChange={handleEditModalClose}>
                     <div className="flex justify-between gap-10 ">
                         <p className="font-nunito">Edit  Category</p>
                         <button
@@ -169,16 +174,11 @@ const Category = () => {
                             Update
                         </button>
                     </Form>
-                </div>
+                </CreateModal>
             )}
 
 
-
-
-
-
-
-            <ConfirmModal className="dark:bg-[#333] border border-white/5" 
+            <ConfirmModal className="dark:bg-[#333] border border-white/5"
                 content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
@@ -200,9 +200,8 @@ const Category = () => {
                 </div>
             </ConfirmModal>
 
-            <div
-                className={`w-[20vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${createModalOpened ? "transform-none" : "translate-x-full"}`}
-            >
+            <CreateModal modalTitle="Create New User" isOpen={createModalOpened} onOpenChange={handleCreateModalClosed}>
+
                 <div className="flex justify-between gap-10 ">
                     <p className="font-nunito">Create  Category</p>
                     <button
@@ -217,39 +216,39 @@ const Category = () => {
 
                 <Form method="post">
                     <CustomInput
-                            label="Name"
-                            name="name"
-                            placeholder=" "
-                            type="text"
-                            labelPlacement="outside"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
-                            }}
-                        />
-                        <input hidden name="seller" value={user?._id} type="" />
-                        <input hidden name="intent" value="create" type="" />
+                        label="Name"
+                        name="name"
+                        placeholder=" "
+                        type="text"
+                        labelPlacement="outside"
+                        classNames={{
+                            label: "font-nunito text-sm text-default-100",
+                            inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
+                        }}
+                    />
+                    <input hidden name="seller" value={user?._id} type="" />
+                    <input hidden name="intent" value="create" type="" />
 
-                        <Textarea
-                            autoFocus
+                    <Textarea
+                        autoFocus
                         label="Category description"
-                            labelPlacement="outside"
-                            placeholder=" "
-                            name="description"
-                            className="mt-4 font-nunito text-sm"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
-                            }}
-                        />
+                        labelPlacement="outside"
+                        placeholder=" "
+                        name="description"
+                        className="mt-4 font-nunito text-sm"
+                        classNames={{
+                            label: "font-nunito text-sm text-default-100",
+                            inputWrapper: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                        }}
+                    />
 
 
                     <button onClick={() => {
                     }} type="submit" className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4">
                         Submit
                     </button>
-                    </Form>
-            </div>
+                </Form>
+            </CreateModal>
 
 
 

@@ -1,17 +1,44 @@
-"use client"
+"use client";
 
-import { Avatar, Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
-import { Link } from "@remix-run/react";
-import { ArrowLeft, Bell, BookOpen, ChevronDown, FileText, Folder, LayoutDashboard, Menu, MessageSquare, Search, Settings, Tag, User, Users, X } from "lucide-react";
+import {
+    Avatar,
+    Button,
+    Divider,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownTrigger,
+    Input,
+    Spinner,
+} from "@nextui-org/react";
+import { Link, useNavigation } from "@remix-run/react";
+import {
+    ArrowLeft,
+    Bell,
+    BookOpen,
+    ChevronDown,
+    FileText,
+    Folder,
+    LayoutDashboard,
+    Mail,
+    Menu,
+    Search,
+    Settings,
+    Tag,
+    User,
+    X,
+} from "lucide-react";
 import { ReactNode, useState } from "react";
 
-
 const AdminLayout = ({ children }: { children: ReactNode }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const navigation = useNavigation();
 
+    const isLoading = navigation.state === "loading";
 
     return (
         <div className="flex h-screen bg-[#3B82F61A] font-nunito">
+            {/* Sidebar */}
             <div
                 className={`${isSidebarOpen ? "w-64" : "w-0 -ml-64"} bg-[#020817] border-r border-r-white/20 transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative`}
             >
@@ -24,47 +51,65 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             DENNISLAW
                         </span>
                     </div>
-                    <Button variant="ghost" onClick={() => setIsSidebarOpen(false)} className="md:hidden">
+                    <Button
+                        variant="ghost"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="md:hidden"
+                    >
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
 
                 <div className="flex flex-col flex-1 px-2 py-4 space-y-6">
-                    <ul className="flex flex-col ">
-                        <Link to="/hod">
-                            <li className=" hover:bg-[#3B82F61A] py-3  hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <LayoutDashboard className=" h-5 w-5 hover:text-white" />
+                    <ul className="flex flex-col">
+                        <Link to="/admin">
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <LayoutDashboard className="h-5 w-5 hover:text-white text-blue-500" />
                                 Dashboard
                             </li>
                         </Link>
                         <Link to="/admin/users">
-                            <li className=" hover:bg-[#3B82F61A] py-3  hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <User className=" h-5 w-5 hover:text-white" />
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <User className="h-5 w-5 hover:text-white text-blue-500" />
                                 Users
                             </li>
                         </Link>
-                        <Link to="/departments">
-                            <li className=" hover:bg-[#3B82F61A] py-3  hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <Folder className=" h-5 w-5 hover:text-white" />
+                        <Link to="/admin/departments">
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <Folder className="h-5 w-5 hover:text-white text-blue-500" />
                                 Department
                             </li>
                         </Link>
-                        <Link to="/blog">
-                            <li className=" hover:bg-[#3B82F61A] py-3  hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <BookOpen className=" h-5 w-5 hover:text-white" />
+                        <Link to="/admin/blog">
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <BookOpen className="h-5 w-5 hover:text-white text-blue-500" />
                                 Blog
                             </li>
                         </Link>
-                        <Link to="/categories">
-                            <li className=" hover:bg-[#3B82F61A] py-3  hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <Tag className=" h-5 w-5 hover:text-white" />
-                                Categories
+                        <Link to="/admin/category">
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <Tag className="h-5 w-5 hover:text-white text-blue-500" />
+                                Blog Categories
+                            </li>
+                        </Link>
+                        <Link to="/admin/contact">
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <Mail className="h-5 w-5 hover:text-white text-blue-500" />
+                                Messages
+                            </li>
+                        </Link>
+                        <Link to="/admin/memorandum">
+                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
+                                <FileText className="h-5 w-5 hover:text-white text-blue-500" />
+                                Memorandum
                             </li>
                         </Link>
                     </ul>
-
+                    <Divider className="" />
                     <div className="mt-6">
-                        <h3 className="text-xs font-semibold text-muted-foreground mb-2">SETTINGS</h3>
+                        <h3 className="text-xs font-semibold text-muted-foreground mb-2">
+                            SETTINGS
+                        </h3>
                         <Button variant="ghost" className="w-full justify-start">
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
@@ -102,9 +147,9 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 </div>
             </div>
 
-
+            {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="h-16 border-b bg-[#020817]  border-b-white/20 flex items-center justify-between px-4 sm:px-6">
+                <header className="h-16 border-b bg-[#020817] border-b-white/20 flex items-center justify-between px-4 sm:px-6">
                     <div className="flex items-center space-x-2">
                         <Button
                             variant="ghost"
@@ -113,7 +158,11 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         >
                             <Menu className="h-5 w-5" />
                         </Button>
-                        <Button variant="bordered" size="sm" className="hidden md:flex rounded-md text-md h-[35px]  border border-white/20">
+                        <Button
+                            variant="bordered"
+                            size="sm"
+                            className=" md:flex rounded-md text-md h-[35px] border border-white/20"
+                        >
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back
                         </Button>
@@ -126,30 +175,34 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             }
                             type="search"
                             placeholder="Search user..."
-                            className="w-full  "
+                            className="w-full"
                             classNames={{
-                                inputWrapper: "border rounded-md border-white/20 bg-[#020817]"
+                                inputWrapper:
+                                    "border rounded-md border-white/20 bg-[#020817]",
                             }}
                         />
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <div className="relative h-10 w-10 rounded-full flex items-center justify-center border border-white/20 ">
+                        <div className="relative h-10 w-10 rounded-full flex items-center justify-center border border-white/20">
                             <div>
                                 <Bell className="h-5 w-5" />
                                 <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary-400"></span>
                             </div>
                         </div>
-
                     </div>
                 </header>
 
                 <main className="flex-1 overflow-auto p-4 sm:p-6 bg-muted/30">
-                    {children}
+                    {isLoading ? (
+                        <div className="flex items-center justify-center h-full">
+                            <Spinner size="lg" />
+                        </div>
+                    ) : (
+                        children
+                    )}
                 </main>
             </div>
-
-
         </div>
     );
 };

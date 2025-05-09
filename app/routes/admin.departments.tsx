@@ -14,6 +14,8 @@ import usersController from "~/controller/Users";
 import department from "~/controller/departments";
 import CloseIcon from "~/components/icons/CloseIcon";
 import CustomInput from "~/components/ui/CustomInput";
+import { Plus } from "lucide-react";
+import CreateModal from "~/components/modal/createModal";
 
 
 const Category = () => {
@@ -31,7 +33,7 @@ const Category = () => {
     }
 
 
-    const handleDrawerModalClose = () => {
+    const handleEditDrawerModalClose = () => {
         setEditDrawerOpened(false);
     };
 
@@ -46,9 +48,14 @@ const Category = () => {
 
     return (
         <AdminLayout redirect="/admin/departments" redirectDelay={1000} handleOnClick={handleCreateModalOpened} buttonName="Create Department" pageName="Departments">
-            <button onClick={() => {
-                setCreateModalOpened(true)
-            }}>Open</button>
+            <div className="flex justify-end">
+                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                    setCreateModalOpened(true)
+                }}>
+                    <Plus />
+                    Create Department
+                </Button>
+            </div>
             <div className="">
                 <NewCustomTable
                     columns={CategoryColumns}
@@ -63,19 +70,19 @@ const Category = () => {
                             <TableCell>{dept.name}</TableCell>
                             <TableCell>{dept.description}</TableCell>
                             <TableCell className="relative flex items-center gap-4">
-                                <Button size="sm" color="success" variant="flat" onClick={() => {
+                                <button onClick={() => {
                                     setEditDrawerOpened(true)
                                     setDataValue(dept)
 
                                 }}>
-                                    <EditIcon /> Edit
-                                </Button >
-                                <Button size="sm" color="danger" variant="flat" onClick={() => {
+                                    <EditIcon className="text-primary" />
+                                </button >
+                                <button onClick={() => {
                                     setDataValue(dept)
                                     setConfirmModalOpened(true)
                                 }}>
-                                    <DeleteIcon /> Delete
-                                </Button>
+                                    <DeleteIcon className="text-danger" />
+                                </button>
 
                             </TableCell>
                         </TableRow>
@@ -83,7 +90,7 @@ const Category = () => {
                 </NewCustomTable>
             </div>
 
-            <ConfirmModal className="dark:bg-slate-950 bg-gray-200"
+            <ConfirmModal className="dark:bg-slate-950  border border-white/20  !bg-[#020817]"
                 content="Are you sure to delete department" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
@@ -106,15 +113,13 @@ const Category = () => {
             </ConfirmModal>
 
             {dataValue && (
-                <div
-                    className={`w-[20vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${editDrawerOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
-                        }`}
+                <CreateModal modalTitle="Create New User" isOpen={editDrawerOpened} onOpenChange={handleEditDrawerModalClose}
                 >
                     <div className="flex justify-between gap-10">
                         <p className="font-nunito">Edit Department Details</p>
                         <button
                             onClick={() => {
-                                handleDrawerModalClose();
+                                handleEditDrawerModalClose();
                             }}
                         >
                             <CloseIcon className="h-4 w-4" />
@@ -160,13 +165,12 @@ const Category = () => {
                             Update
                         </button>
                     </Form>
-                </div>
+                </CreateModal>
             )}
 
 
 
-            <div
-                className={`w-[20vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${createModalOpened ? "transform-none" : "translate-x-full"}`}
+            <CreateModal modalTitle="Create New User" isOpen={createModalOpened} onOpenChange={handleCreateModalClosed}
             >
                 <div className="flex justify-between gap-10 ">
                     <p className="font-nunito">Create a new Deprtment</p>
@@ -200,7 +204,7 @@ const Category = () => {
                         className="mt-4 font-nunito text-sm"
                         classNames={{
                             label: "font-nunito text-sm text-default-100",
-                            inputWrapper: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                            inputWrapper: "dark:bg-default-50 shadow-sm !bg-[#020817]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                         }}
                     />
 
@@ -209,7 +213,7 @@ const Category = () => {
                         Submit
                     </button>
                     </Form>
-            </div>
+            </CreateModal>
 
         </AdminLayout>
     );

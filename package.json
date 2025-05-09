@@ -13,6 +13,7 @@
   "dependencies": {
     "@ckbox/components": "^2.6.1",
     "@ckbox/core": "^2.6.1",
+    "@heroui/drawer": "^2.2.16",
     "@nextui-org/react": "^2.4.8",
     "@remix-run/css-bundle": "^2.14.0",
     "@remix-run/node": "^2.14.0",

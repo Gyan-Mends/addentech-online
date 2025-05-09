@@ -106,7 +106,7 @@ const Category = () => {
             </div>
 
 
-            <ConfirmModal className="dark:bg-[#333] border border-white/5"
+            <ConfirmModal className="dark:bg-[#333] !bg-[#020817] border border-white/20"
                 content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>

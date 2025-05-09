@@ -8,6 +8,7 @@ import { DeleteIcon } from "~/components/icons/DeleteIcon"
 import { EditIcon } from "~/components/icons/EditIcon"
 import { FileUploader } from "~/components/icons/uploader"
 import ConfirmModal from "~/components/modal/confirmModal"
+import CreateModal from "~/components/modal/createModal"
 import { UserColumns } from "~/components/table/columns"
 import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
@@ -187,11 +188,7 @@ const Users = () => {
             {/* Create Modal */}
             {/* Create Modal */}
             {dataValue && (
-
-                <div
-                    className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 !bg-[#020817] fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${isEditDrawerOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
-                        }`}
-                >
+                <CreateModal modalTitle="Create New User" isOpen={isEditDrawerOpened} onOpenChange={handleEditDrawerClosed}>
                     <div className="flex justify-between gap-10 ">
                         <p className="font-nunito">Edit User</p>
                         <button
@@ -280,7 +277,7 @@ const Users = () => {
                                 name="role"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                    popoverContent: "z-[10000] focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
                                     trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full  !bg-[#020817] "
                                 }}
                             >
@@ -304,7 +301,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                    popoverContent: "z-[10000] focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
                                     trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full  !bg-[#020817] "
                                 }}
                             >
@@ -473,15 +470,14 @@ const Users = () => {
                             Update
                         </Button>
                     </Form>
-                </div>
+                </CreateModal>
             )}
 
 
-            <div
-                className={`w-[30vw] flex flex-col gap-6 h-[100vh] bg-[#020817] overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isCreateModalOpened ? "transform-none" : "translate-x-full"}`}
-            >
+            <CreateModal modalTitle="Create New User" isOpen={isCreateModalOpened} onOpenChange={handleCreateModalClosed}>
+
                 <div className="flex justify-between gap-10 ">
-                    <p className="font-nunito">Create new User</p>
+                    <p className="font-nunito">Create User</p>
                     <button
                         onClick={() => {
                             handleCreateModalClosed()
@@ -495,7 +491,6 @@ const Users = () => {
                 <Form method="post" className="flex flex-col gap-4">
                     <CustomInput
                         label="First name"
-                        isRequired
                         isClearable
                         name="firstname"
                         placeholder=" "
@@ -562,7 +557,7 @@ const Users = () => {
                             name="role"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                popoverContent: "z-[10000] focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
                                 trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-[#020817]  "
                             }}
                         >
@@ -585,7 +580,7 @@ const Users = () => {
                             name="department"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
+                                popoverContent: "z-[10000] focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito !bg-[#020817]",
                                 trigger: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-[#020817]  "
                             }}
                         >
@@ -731,7 +726,7 @@ const Users = () => {
                         Submit
                     </button>
                 </Form>
-            </div>
+            </CreateModal>
         </AdminLayout>
     )
 }

@@ -48,20 +48,15 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className="scroll-smooth">
           {/* Navbar */}
-          <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-blue-500/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-pink-500/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container flex h-16 items-center justify-between">
                   {/* Logo */}
                   <div className="flex items-center">
-                      <Link to="/" className="flex items-center space-x-2">
-                          <div className="flex items-center">
-                              <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
-                                  D
-                              </div>
-                              <span className="ml-2 text-xl font-bold text-blue-500 font-montserrat">
-                                  DENNISLAW
-                              </span>
-                          </div>
-                      </Link>
+                        <Link to="/" className="flex items-center space-x-2">
+                            <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                Addentech
+                            </span>
+                        </Link>
                   </div>
 
                   {/* Desktop Navigation */}
@@ -93,14 +88,14 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                   {/* Actions */}
                   <div className="hidden md:flex items-center gap-4">
                         <Link to="/addentech-login">
-                            <Button variant="ghost" size="sm">
+                            <Button className="border border-pink-500/50 border-2" variant="ghost" size="sm">
                           Log in
                       </Button>
                         </Link>
                       <Link to="/contact">
                           <Button
                               size="sm"
-                              className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white"
+                                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white"
                           >
                               Contact Us
                           </Button>
@@ -143,7 +138,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
           {/* CTA Section */}
             <section className="py-20 lg:px-20 px-4 bg-black">
                 <div className="container">
-                    <div className="rounded-2xl bg-gradient-to-br to-black from-gray-900  p-8 md:p-12 lg:p-16 relative overflow-hidden">
+                    <div className="rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-600/20 p-8 md:p-12 lg:p-16 relative overflow-hidden">
                         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                         <div className="relative z-10 max-w-3xl">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">Transform your business with us effectively</h2>
@@ -152,14 +147,14 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 today.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Button variant="bordered" className="border border-2 border-primary-500 text-white">Contact Us <ArrowRight className="h-4 w-4" /></Button>
+                                <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">Contact Us <ArrowRight className="h-4 w-4" /></Button>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <footer className="border-t border-t-white/10  font-nunito border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20 px-4">
+            <footer className="border-t border-t-white-500/20  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20 px-4">
                 <div className="container py-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div className="flex flex-col gap-4">

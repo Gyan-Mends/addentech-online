@@ -1,6 +1,7 @@
 import { Button, Input, Select, SelectItem, Skeleton, TableCell, TableRow, Textarea, User } from "@nextui-org/react"
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
+import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import BackIcon from "~/components/icons/BackIcon"
@@ -49,6 +50,9 @@ const Users = () => {
         categories: CategoryInterface[]
     }>()
 
+    console.log(categories);
+
+
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
@@ -92,9 +96,16 @@ const Users = () => {
 
 
     return (
-        <AdminLayout buttonName="Create new blog" handleOnClick={handleClick} pageName="Users Management">
+        <AdminLayout handleOnClick={handleClick} pageName="Users Management">
 
-
+            <div className="flex justify-end">
+                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                    setIsCreateModalOpened(true)
+                }}>
+                    <Plus />
+                    Create Blog
+                </Button>
+            </div>
             {/* table  */}
             {/* table  */}
             <NewCustomTable
@@ -165,105 +176,9 @@ const Users = () => {
                 </div>
             </ConfirmModal>
 
-            {/* Create Modal */}
-            {/* Create Modal */}
-            {/* <EditModal
-                className="bg-gray-200 dark:bg-[#333] "
-                modalTitle="Update user details"
-                isOpen={isEditModalOpened}
-                onOpenChange={handleEditModalClosed}
-            >
-                {(onClose) => (
-                    <Form method="post" className="flex flex-col gap-4">
-                        <CustomInput
-                            label="Name"
-                            isRequired
-                            defaultValue={dataValue?.name}
-                            isClearable
-                            name="name"
-                            placeholder=" "
-                            type="text"
-                            labelPlacement="outside"
-                        />
-
-                        <div className="">
-                            <Select
-                                label="Category"
-                                labelPlacement="outside"
-                                placeholder=" "
-                                isRequired
-                                name="category"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   "
-                                }}
-                            >
-                                {categories.map((cat) => (
-                                    <SelectItem key={cat._id}>{cat.name}</SelectItem>
-                                ))}
-                            </Select>
-                        </div>
-
-                        <Textarea
-                            autoFocus
-                            defaultValue={dataValue?.description}
-                            label="Product description"
-                            labelPlacement="outside"
-                            placeholder=" "
-                            name="description"
-                            className="mt-4 font-nunito text-sm"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "h- 80 bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
-                            }}
-                        />
-
-
-
-                        <div className=" ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
-                            <input
-                                name="image"
-                                required
-                                placeholder=" "
-                                className="bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-sm   h-10 w-[25vw] rounded-xl"
-                                type="file"
-                                onChange={(event: any) => {
-                                    const file = event.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader()
-                                        reader.onloadend = () => {
-                                            setBase64Image(reader.result)
-                                        }
-                                        reader.readAsDataURL(file)
-                                    }
-                                }}
-                            />
-
-                        </div>
-
-                        <input name="admin" value={user?._id} type="hidden" />
-                        <input name="intent" value="update" type="hidden" />
-                        <input name="base64Image" value={base64Image} type="hidden" />
-
-                        <div className="flex justify-end gap-2 mt-10 font-nunito">
-                            <Button color="danger" variant="flat" onPress={onClose}>
-                                Close
-                            </Button>
-                            <button type="submit" className="bg-primary-400 rounded-xl bg-opacity-20 text-primary text-sm font-nunito px-4">
-                                Submit
-                            </button>
-                        </div>
-                    </Form>
-                )}
-            </EditModal> */}
-
 
             {dataValue && (
-                <div
-                    className={`w-[40vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10 fixed top-0 right-0 z-10 transition-all duration-500 ease-in-out p-6 ${isEditModalOpened ? "transform-none opacity-100" : "translate-x-full opacity-0"
-                        }`}
+                <CreateModal modalTitle="Create New User" isOpen={isEditModalOpened} onOpenChange={handleEditModalClosed}
                 >
                     <div className="flex justify-between gap-10 ">
                         <p className="font-nunito">Edit Blog</p>
@@ -366,15 +281,13 @@ const Users = () => {
                             <button className="font-montserrat w-40 bg-primary h-10 rounded-lg">Upload blog</button>
                         </div>
                     </Form>
-                </div>
+                </CreateModal>
             )}
 
             {/* Create Modal */}
 
 
-            <div
-                className={`w-[40vw] flex flex-col gap-6 h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isCreateModalOpened ? "transform-none" : "translate-x-full"}`}
-            >
+            <CreateModal modalTitle="Create New User" isOpen={isCreateModalOpened} onOpenChange={handleCreateModalClosed}>
                 <div className="flex justify-between gap-10 ">
                     <p className="font-nunito">Create a new Blog</p>
                     <button
@@ -389,7 +302,7 @@ const Users = () => {
 
                 <Form method="post" className="flex flex-col gap-4">
                     <CustomInput
-                        label="Name"
+                        label="Title"
                         isRequired
                         isClearable
                         name="name"
@@ -402,19 +315,19 @@ const Users = () => {
                         <Select
                             label="Category"
                             labelPlacement="outside"
-                            placeholder=" "
+                            placeholder="Select a category"
                             isRequired
                             name="category"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
+                                popoverContent: "z-[1000] focus:bg-white bg-white shadow-lg",
+                                trigger: "bg-white shadow-sm border border-gray-300 hover:border-primary focus:border-primary",
                             }}
                         >
-                            {categories.map((cat) => (
-                                <SelectItem key={cat._id}>{cat.name}</SelectItem>
-                            ))}
+                            <SelectItem>Option 1</SelectItem>
+                            <SelectItem>Option 2</SelectItem>
                         </Select>
+
                     </div>
 
                     <div>
@@ -425,13 +338,13 @@ const Users = () => {
                             onChange={setContent}
 
                             modules={modules}
-                            className='md:!h-[30vh] mt-2 font-nunito rounded w-full mb-12 !font-nunito'
+                            className='md:!h-[30vh] mt-2 font-nunito  w-full mb-12 !font-nunito !rounded'
                         />
                     </div>
 
 
 
-                    <div className="mt-4 ">
+                    <div className="mt-14 ">
                         <label className="font-nunito block text-sm" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
@@ -473,7 +386,7 @@ const Users = () => {
                         <button className="font-montserrat w-40 bg-primary h-10 rounded-lg">Upload blog</button>
                         </div>
                     </Form>
-            </div>
+            </CreateModal>
         </AdminLayout>
     )
 }

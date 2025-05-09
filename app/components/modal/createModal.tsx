@@ -1,36 +1,42 @@
-import React, { ReactNode } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure, Button } from "@nextui-org/react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerBody,
+} from "@heroui/drawer";
+import { ReactNode } from "react";
 
 interface CreateModalProps {
-  children: (onClose: () => void) => ReactNode;
+  children: ReactNode;
   modalTitle: string;
-  className?:string;
-  isOpen: boolean,
-  onOpenChange: () => void
+  className?: string;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void; // Updated to pass the current state
 }
 
-export default function CreateModal({ children, modalTitle,onOpenChange,className, isOpen }: CreateModalProps) {
-    
+const CreateModal = ({ children, modalTitle, onOpenChange, className, isOpen }: CreateModalProps) => {
+  // Handle close explicitly
+  const handleClose = () => {
+    onOpenChange(false); // Explicitly set the modal state to closed
+  };
+
   return (
     <>
-      <Modal
+      <Drawer
+        className="!bg-[#020817] border border-l border-l-white/30"
+        backdrop="blur"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        placement="center"
-        className={className}
+        onClose={handleClose}
       >
-        <ModalContent className="dark:bg-[#333]">
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1 font-nunito">{modalTitle}</ModalHeader>
-              <ModalBody>
-                {children(onClose)}
-                
-              </ModalBody>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        <DrawerContent >
+          <DrawerBody>
+            {children}
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </>
   );
-}
+};
+
+export default CreateModal;
+
