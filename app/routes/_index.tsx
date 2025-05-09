@@ -152,7 +152,7 @@ const Home = () => {
         <section id="services" className="lg:py-20 py-10 lg:px-[125px] px-4 bg-black">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="mb-4 bg-clip-text text-primary text-xl">Our Services</p>
+              <p className="mb-4 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Services</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Comprehensive Services Tailored to Your Needs</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-montserrat">
                 We offer a wide range of legal technology services designed to meet the specific needs of modern law
@@ -197,10 +197,10 @@ const Home = () => {
               ].map((service, i) => (
                 <Card
                   key={i}
-                  className="border group bg-background/50 border-primary-500/30 h-48 backdrop-blur transition-all hover:border-primary-500/50 hover:bg-background/80 p-6 bg-[#09090B80]"
+                  className="border group bg-background/50 border-pink-500/20 h-48 backdrop-blur transition-all hover:border-pink-500/50 hover:bg-background/80 p-6 bg-[#09090B80]"
                 >
                   <div className="flex flex-col gap-4">
-                    <p className="font-bold font-montserrat text-lg group-hover:text-primary-500">{service.title}</p>
+                    <p className="font-bold font-montserrat text-lg group-hover:bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{service.title}</p>
                     <p>{service.description}</p>
                   </div>
                   <CardFooter className="mt-4">
@@ -222,7 +222,7 @@ const Home = () => {
           <div className="container">
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
               <div>
-                <p className="mb-2 font-bold font-montserrat  bg-clip-text text-primary-500 text-xl">Latest Insights</p>
+                <p className="mb-2 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Latest Insights</p>
                 <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
               </div>
               <Link to="/block">
@@ -276,7 +276,7 @@ const Home = () => {
         <section className="py-20 lg:px-[125px] p-4 bg-black">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="mb-4 font-bold font-montserrat  bg-clip-text text-primary text-xl">Our Approach</p>
+              <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Approach</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Our Methodology Guarantees Your Success</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 We follow a proven methodology to ensure the success of your legal technology implementation.
@@ -319,7 +319,7 @@ const Home = () => {
                     <ul className="space-y-2">
                       {phase.items.map((item, j) => (
                         <li key={j} className="flex items-start gap-2">
-                          <CheckedIcon className="h-4 w-4 text-primary-500 mt-1" />
+                          <CheckedIcon className="h-4 w-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded mt-1" />
                           <span className="text-sm">{item}</span>
                         </li>
                       ))}
@@ -335,7 +335,7 @@ const Home = () => {
         <section className="py-20 lg:px-20 px-4 bg-gradient-to-br from-gray-900 to-black">
           <div className="container">
             <div className="text-center mb-16">
-              <p className="mb-4  bg-clip-text text-primary-500 text-xl font-bold font-montserrat">Testimonials</p>
+              <p className="mb-4  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl font-bold font-montserrat">Testimonials</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Experiences That Build Confidence</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 Hear what our clients have to say about their experience working with us.
@@ -364,7 +364,7 @@ const Home = () => {
                 <p>
                   <div className="flex mb-4">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} className="h-5 w-5 fill-blue-500 text-blue-500" />
+                      <Star key={i} className="h-5 w-5 fill-blue-500 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent " />
                     ))}
                   </div>
                   <p className="text-lg italic font-montserrat">

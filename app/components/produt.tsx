@@ -52,7 +52,7 @@ export function ProductCard({ id }: { id?: string }) {
                             key={i}
                             className="inter-var group overflow-hidden -mt-20 lg:mt-0  backdrop-blur transition-all hover:border-border hover:bg-background/80 !bg-[#09090B80]"
                         >
-                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-pink-500/40   ">
+                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-pink-500/20   ">
                                 <CardItem translateZ="50"
                                     className="text-xl  text-neutral-600 dark:text-white">
                                     <p className="text-md group-hover:bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent  font-nunito font-bold">{product.title}</p>
