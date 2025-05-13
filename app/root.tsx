@@ -45,7 +45,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <ThemeProvider defaultTheme="dark" attribute="class">
+        <ThemeProvider defaultTheme="light" attribute="class">
           <NextUIProvider>
             <Outlet />
           </NextUIProvider>

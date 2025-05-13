@@ -2,26 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import {
-    Button,
-    Card,
-    CardBody,
-    CardHeader,
-    CardFooter,
-    Chip,
-    Tabs,
-    Tab,
-    Navbar,
-    NavbarBrand,
-    NavbarContent,
-    NavbarItem,
-    NavbarMenu,
-    NavbarMenuItem,
-    NavbarMenuToggle,
-} from "@nextui-org/react"
+import { Button, Card, CardBody, CardHeader, CardFooter, Chip, Tabs, Tab } from "@nextui-org/react"
 import { Link } from "@remix-run/react"
-import CheckedIcon from "~/components/icons/CheckedIcon"
-import { ChevronDownIcon } from "~/components/icons/ArrowDown"
 import PublicLayout from "~/layout/PublicLayout"
 import {
     ArrowRight,
@@ -32,12 +14,9 @@ import {
     Cloud,
     Palette,
     ChevronRight,
-    MapPin,
-    Phone,
-    Mail,
     Star,
-    ChevronRightIcon,
-    ChevronLeftIcon,
+    ArrowUpRight,
+    Sparkles,
 } from "lucide-react"
 
 export default function ServicesPage() {
@@ -112,7 +91,7 @@ export default function ServicesPage() {
             title: "Digital Marketing & Consultation",
             description:
                 "Maximize digital presence with expert SEO, social media strategies, email campaigns, and performance analytics. We help you reach and engage your audience.",
-            icon: <BarChart3 className="h-10 w-10 text-blue-500" />,
+            icon: <BarChart3 className="h-10 w-10 text-pink-400" />,
             features: [
                 "Search Engine Optimization (SEO)",
                 "Social Media Marketing",
@@ -128,7 +107,7 @@ export default function ServicesPage() {
             title: "Design & Development",
             description:
                 "Innovative website design and development tailored to your business needs. We create intuitive and visually appealing sites that drive results.",
-            icon: <Code className="h-10 w-10 text-blue-500" />,
+            icon: <Code className="h-10 w-10 text-pink-400" />,
             features: [
                 "Responsive Website Design",
                 "Custom Web Applications",
@@ -144,7 +123,7 @@ export default function ServicesPage() {
             title: "IT Services",
             description:
                 "Support and management of IT systems, including business software, networks, and security. We ensure your technology infrastructure is robust and efficient.",
-            icon: <Layers className="h-10 w-10 text-blue-500" />,
+            icon: <Layers className="h-10 w-10 text-pink-400" />,
             features: [
                 "IT Infrastructure Management",
                 "Network Security Solutions",
@@ -160,7 +139,7 @@ export default function ServicesPage() {
             title: "Brand & Product Design",
             description:
                 "Creating strong brand identities through thoughtful design of logos, packaging, and overall brand aesthetics. We help your brand connect with customers.",
-            icon: <Palette className="h-10 w-10 text-blue-500" />,
+            icon: <Palette className="h-10 w-10 text-pink-400" />,
             features: [
                 "Logo & Identity Design",
                 "Brand Strategy Development",
@@ -176,7 +155,7 @@ export default function ServicesPage() {
             title: "Cloud Services",
             description:
                 "Robust cloud services providing scalable computing resources and secure data storage solutions. We enable flexibility and efficiency in your operations.",
-            icon: <Cloud className="h-10 w-10 text-blue-500" />,
+            icon: <Cloud className="h-10 w-10 text-pink-400" />,
             features: [
                 "Cloud Migration & Strategy",
                 "Infrastructure as a Service (IaaS)",
@@ -222,7 +201,6 @@ export default function ServicesPage() {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
     }
 
-
     const [activeTestimonial, setActiveTestimonial] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
 
@@ -255,38 +233,66 @@ export default function ServicesPage() {
     }
 
     return (
-
-
-        <PublicLayout >
+        <PublicLayout>
             {/* Hero Section */}
             <section
                 id="hero-section"
-                className="relative overflow-hidden lg:py-20 py-10 md:py-28 bg-gradient-to-br from-black to-gray-900"
+                className="relative overflow-hidden lg:py-24 py-16 md:py-32 bg-gradient-to-br from-gray-950 via-gray-900 to-black"
             >
+                {/* Animated background elements */}
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-pink-500/20 rounded-full filter blur-3xl animate-blob"></div>
+                    <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+                    <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-fuchsia-500/20 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+                </div>
+
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <motion.div
-                        className="max-w-3xl mx-auto"
+                        className="max-w-3xl mx-auto flex flex-col gap-6"
                         initial="hidden"
                         animate={isVisible.hero ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <Chip className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 font-nunito text-lg p-2" variant="bordered" size="sm">
-                            Our Services
-                        </Chip>
-                        <h1 className="text-4xl md:text-5xl font-montserrat lg:text-6xl font-bold leading-tight tracking-tighter mb-6">
+                        <div className="inline-flex">
+                            <Chip
+                                className="mb-4 bg-pink-500/10 text-pink-400 border-pink-500/20 font-medium text-sm px-3 py-1"
+                                variant="bordered"
+                                size="sm"
+                                startContent={<Sparkles className="h-3.5 w-3.5 mr-1" />}
+                            >
+                                Our Services
+                            </Chip>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-bold lg:text-6xl leading-tight tracking-tight mb-6">
                             Here is How We Can{" "}
-                            <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-500 bg-clip-text text-transparent">
                                 Help Your Business
                             </span>
                         </h1>
-                        <p className="text-xl text-gray-400 max-w-[800px] font-nunito">Comprehensive Services Tailored to Your Needs</p>
+                        <p className="text-xl text-gray-300 max-w-[800px] leading-relaxed">
+                            Comprehensive services tailored to your needs, designed to elevate your business in the digital landscape.
+                        </p>
                         <div className="flex flex-wrap gap-4 mt-8">
-                            <Link to="/contact">
-                                <Button variant="bordered" className="border-blue-500/50 font-nunito hover:border-blue-500 text-blue-500">
-                                    Contact Us{<ArrowRight className="h-4 w-4" />}
-                                </Button>
-                            </Link>
+                            <Button
+                                className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 py-6 rounded-full shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
+                                endContent={<ArrowUpRight className="h-4 w-4 ml-1" />}
+                                size="lg"
+                                as={Link}
+                                href="/contact"
+                            >
+                                Get Started
+                            </Button>
+                            <Button
+                                variant="bordered"
+                                className="border-pink-500/30 text-white font-medium px-6 py-6 rounded-full hover:bg-pink-500/10 hover:border-pink-500/50 transition-all duration-300"
+                                endContent={<ArrowRight className="h-4 w-4 ml-1" />}
+                                size="lg"
+                                as={Link}
+                                href="/contact"
+                            >
+                                Contact Us
+                            </Button>
                         </div>
                     </motion.div>
                 </div>
@@ -294,36 +300,45 @@ export default function ServicesPage() {
             </section>
 
             {/* Services Grid Section */}
-            <section id="services-section" className="py-16 bg-black lg:px-[90px]">
+            <section id="services-section" className="py-20 bg-black lg:px-[90px]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div
-                        className="max-w-3xl mx-auto text-center mb-12"
+                        className="max-w-3xl mx-auto text-center mb-16"
                         initial="hidden"
                         animate={isVisible.services ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 font-montserrat">Our Professional Services</h2>
-                        <p className="text-gray-400 mb-8 font-nunito">
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                            Our Professional Services
+                        </h2>
+                        <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto">
                             We offer a comprehensive range of services to help your business thrive in the digital age.
                         </p>
-                        <Tabs
-                            aria-label="Service categories"
-                            selectedKey={activeTab}
-                            onSelectionChange={setActiveTab}
-                            className="justify-center w-full font-nunito bg-gradient-to-br from-blue-900/20 to-blue-900/5 px-4 rounded"
-                            variant="underlined"
-                            color="primary"
-                        >
-                            <Tab key="all" title="All" />
-                            <Tab key="marketing" title="Marketing" />
-                            <Tab key="development" title="Development" />
-                            <Tab key="it" title="IT" />
-                            <Tab key="design" title="Design" />
-                            <Tab key="custom" title="Custom" />
-                        </Tabs>
+                        <div className=" p-1 rounded-full backdrop-blur-sm border border-white/5 mb-8 max-w-xl mx-auto">
+                            <Tabs
+                                aria-label="Service categories"
+                                selectedKey={activeTab}
+                                onSelectionChange={setActiveTab}
+                                className="justify-center w-full"
+                                variant="solid"
+                                color="default"
+                                classNames={{
+                                    tabList: "gap-2 w-full rounded-full p-1",
+                                    cursor: "bg-pink-500/20 rounded-full",
+                                    tab: "rounded-full px-4 py-2 text-sm font-medium data-[selected=true]:text-pink-400",
+                                    tabContent: "group-data-[selected=true]:text-pink-400",
+                                }}
+                            >
+                                <Tab key="all" title="All" />
+                                <Tab key="marketing" title="Marketing" />
+                                <Tab key="development" title="Development" />
+                                <Tab key="it" title="IT" />
+                                <Tab key="design" title="Design" />
+                            </Tabs>
+                        </div>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
@@ -355,19 +370,23 @@ export default function ServicesPage() {
                                     },
                                 }}
                             >
-                                <Card className="border border-blue-900/40 bg-gradient-to-br from-blue-900/20 to-blue-900/5 h-full">
-                                    <CardBody className="flex items-center justify-center text-center p-6">
+                                <Card className="border border-white/10 bg-default-500/10   shadow-lg h-full group hover:border-pink-500/30 transition-all duration-300 overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    <CardBody className="flex items-center justify-center text-center p-8">
                                         <div>
-                                            <h3 className="text-xl font-semibold mb-2">Need a Custom Solution?</h3>
-                                            <p className="text-gray-400 mb-4">Contact us to discuss your specific requirements</p>
-                                            <Link to="/contact">
-                                                <Button
-                                                    className="bg-blue-500 hover:bg-blue-600 text-white"
-                                                    endContent=""
-                                                >
-                                                    Get in Touch
-                                                </Button>
-                                            </Link>
+                                            <div className="w-16 h-16 rounded-full bg-pink-500/10 flex items-center justify-center mx-auto mb-6">
+                                                <Sparkles className="h-8 w-8 text-pink-400" />
+                                            </div>
+                                            <h3 className="text-xl font-semibold mb-3 text-white">Need a Custom Solution?</h3>
+                                            <p className="text-gray-300 mb-6">Contact us to discuss your specific requirements</p>
+                                            <Button
+                                                className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 rounded-full shadow-lg shadow-pink-500/10 hover:shadow-pink-500/30 transition-all duration-300"
+                                                endContent={<ArrowRight className="h-4 w-4 ml-1" />}
+                                                as={Link}
+                                                href="/contact"
+                                            >
+                                                Get in Touch
+                                            </Button>
                                         </div>
                                     </CardBody>
                                 </Card>
@@ -377,25 +396,36 @@ export default function ServicesPage() {
                 </div>
             </section>
 
-            {/* Service Details Section */}
-            <section className="py-16 bg-gradient-to-br from-black to-gray-900 relative">
-
-            </section>
-
             {/* Methodology Section */}
-            <section id="methodology-section" className="py-16 bg-black relative overflow-hidden lg:px-[90px]">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <section
+                id="methodology-section"
+                className="py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden"
+            >
+                <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
+                    <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
+                </div>
+
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <motion.div
                         className="max-w-3xl mx-auto text-center mb-16"
                         initial="hidden"
                         animate={isVisible.methodology ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <Chip className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 font-montserrat" variant="bordered" size="sm">
-                            Our Process
-                        </Chip>
-                        <h2 className="text-3xl md:text-3xl font-bold mb-6 font-montserrat">Our Methodology Guarantees Your Success</h2>
-                        <p className="text-gray-400 font-nunito">
+                        <div className="inline-flex mb-4">
+                            <Chip
+                                className=" font-medium text-sm px-3 py-1"
+                                variant="bordered"
+                                size="sm"
+                            >
+                                Our Process
+                            </Chip>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                            Our Methodology Guarantees Your Success
+                        </h2>
+                        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
                             We follow a proven methodology to ensure your project is delivered on time, within budget, and exceeds
                             your expectations.
                         </p>
@@ -403,23 +433,57 @@ export default function ServicesPage() {
 
                     {/* Wave Visualization */}
                     <motion.div
-                        className="relative h-32 mb-12"
+                        className="relative h-40 mb-16"
                         initial={{ opacity: 0 }}
                         animate={isVisible.methodology ? { opacity: 1 } : { opacity: 0 }}
                         transition={{ duration: 1 }}
                     >
                         <div className="absolute inset-0">
                             <svg viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                                <defs>
+                                    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stopColor="#ec4899" stopOpacity="0.2" />
+                                        <stop offset="50%" stopColor="#d946ef" stopOpacity="0.2" />
+                                        <stop offset="100%" stopColor="#c026d3" stopOpacity="0.2" />
+                                    </linearGradient>
+                                </defs>
                                 <path
                                     d="M0,100 C150,180 350,0 500,100 C650,200 750,0 900,100 C1050,200 1150,0 1200,100 V200 H0 V100Z"
-                                    className="fill-blue-500/10"
+                                    fill="url(#waveGradient)"
                                 />
                                 <motion.path
                                     d="M0,100 C150,180 350,0 500,100 C650,200 750,0 900,100 C1050,200 1150,0 1200,100"
-                                    className="stroke-blue-500 stroke-2 fill-none"
+                                    fill="none"
+                                    stroke="url(#waveGradient)"
+                                    strokeWidth="3"
                                     initial={{ pathLength: 0 }}
                                     animate={isVisible.methodology ? { pathLength: 1 } : { pathLength: 0 }}
                                     transition={{ duration: 1.5, ease: "easeInOut" }}
+                                />
+
+                                {/* Animated dots along the path */}
+                                <motion.circle
+                                    cx="0"
+                                    cy="100"
+                                    r="8"
+                                    fill="#ec4899"
+                                    initial={{ opacity: 0 }}
+                                    animate={
+                                        isVisible.methodology
+                                            ? {
+                                                opacity: [0, 1, 0],
+                                                cx: [0, 300, 600, 900, 1200],
+                                                cy: [100, 30, 100, 30, 100],
+                                            }
+                                            : { opacity: 0 }
+                                    }
+                                    transition={{
+                                        duration: 4,
+                                        repeat: Number.POSITIVE_INFINITY,
+                                        repeatType: "loop",
+                                        ease: "linear",
+                                        times: [0, 0.25, 0.5, 0.75, 1],
+                                    }}
                                 />
                             </svg>
                         </div>
@@ -480,19 +544,33 @@ export default function ServicesPage() {
             </section>
 
             {/* Testimonials Section */}
-            <section id="testimonials-section" className="py-16 bg-gradient-to-br from-black to-gray-900 lg:px-[75px]">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <section id="testimonials-section" className="py-20 bg-black relative overflow-hidden">
+                <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
+                </div>
+
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <motion.div
-                        className="max-w-3xl mx-auto text-center mb-12"
+                        className="max-w-3xl mx-auto text-center mb-16"
                         initial="hidden"
                         animate={isVisible.testimonials ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <Chip className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 font-nunito" variant="bordered" size="sm">
-                            Client Testimonials
-                        </Chip>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 font-nunito">What Our Clients Say About Our Services</h2>
-                        <p className="text-gray-400 font-montserrat">
+                        <div className="inline-flex mb-4">
+                            <Chip
+                                className="font-medium text-sm px-3 py-1"
+                                variant="bordered"
+                                size="sm"
+                                startContent={<Star className="h-3.5 w-3.5 mr-1 " />}
+                            >
+                                Client Testimonials
+                            </Chip>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                            What Our Clients Say About Our Services
+                        </h2>
+                        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
                             Don't just take our word for it. Here's what our clients have to say about working with us.
                         </p>
                     </motion.div>
@@ -510,10 +588,11 @@ export default function ServicesPage() {
                             >
                                 {testimonials.map((testimonial, index) => (
                                     <div key={index} className="w-full flex-shrink-0 px-4">
-                                        <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black h-full">
-                                            <CardBody className="p-6">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="h-12 w-12 rounded-full overflow-hidden flex-shrink-0">
+                                        <Card className="border border-white/10 bg-gradient-to-br from-gray-900 to-black h-full overflow-hidden">
+                                            <div className="absolute top-0 left-0 w-full h-1 bg-default-500/30"></div>
+                                            <CardBody className="p-8">
+                                                <div className="flex flex-col md:flex-row items-start gap-6">
+                                                    <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink-500/20">
                                                         <img
                                                             src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
                                                             alt={testimonial.author}
@@ -522,15 +601,15 @@ export default function ServicesPage() {
                                                             className="h-full w-full object-cover"
                                                         />
                                                     </div>
-                                                    <div className="flex-1 font-nunito">
-                                                        <div className="flex mb-2">
+                                                    <div className="flex-1">
+                                                        <div className="flex mb-3">
                                                             {Array.from({ length: 5 }).map((_, i) => (
-                                                                ""
+                                                                <Star key={i} className="h-4 w-4 text-pink-400/10 fill-pink-400 mr-1" />
                                                             ))}
                                                         </div>
-                                                        <p className="text-lg italic mb-4">"{testimonial.quote}"</p>
+                                                        <p className="text-lg italic mb-6 text-gray-200 leading-relaxed">"{testimonial.quote}"</p>
                                                         <div>
-                                                            <p className="font-medium">{testimonial.author}</p>
+                                                            <p className="font-medium text-white">{testimonial.author}</p>
                                                             <p className="text-sm text-gray-400">{testimonial.role}</p>
                                                         </div>
                                                     </div>
@@ -548,7 +627,7 @@ export default function ServicesPage() {
                                     <button
                                         key={index}
                                         onClick={() => goToSlide(index)}
-                                        className={`h-2 rounded-full transition-all ${index === activeTestimonial ? "w-8 bg-blue-500" : "w-2 bg-gray-600"
+                                        className={`h-2 rounded-full transition-all ${index === activeTestimonial ? "w-8 bg-pink-500" : "w-2 bg-gray-600"
                                             }`}
                                         aria-label={`Go to slide ${index + 1}`}
                                     />
@@ -559,50 +638,58 @@ export default function ServicesPage() {
                         <Button
                             isIconOnly
                             variant="bordered"
-                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/50 border-blue-900/40 hover:bg-black/70 hover:border-blue-500/50 hidden md:flex"
+                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/50 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex"
                             onClick={goToPrevious}
                             aria-label="Previous testimonial"
                         >
-                            <ChevronRightIcon className="h-4 w-4 rotate-180" />
+                            <ChevronRight className="h-4 w-4 rotate-180" />
                         </Button>
 
                         <Button
                             isIconOnly
                             variant="bordered"
-                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/50 border-blue-900/40 hover:bg-black/70 hover:border-blue-500/50 hidden md:flex"
+                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/50 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex"
                             onClick={goToNext}
                             aria-label="Next testimonial"
                         >
-                            <ChevronRightIcon className="h-4 w-4" />
+                            <ChevronRight className="h-4 w-4" />
                         </Button>
                     </motion.div>
-                    </div>
-            </section>
-
-            {/* Case Studies Preview */}
-            <section id="case-studies-section" className="py-16 bg-black">
-
+                </div>
             </section>
 
             {/* FAQ Section */}
-            <section id="faq-section" className="py-16 bg-gradient-to-br from-black to-gray-900 font-nunito">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <section id="faq-section" className="py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative">
+                <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
+                    <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
+                </div>
+
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <motion.div
-                        className="max-w-3xl mx-auto text-center mb-12"
+                        className="max-w-3xl mx-auto text-center mb-16"
                         initial="hidden"
                         animate={isVisible.faq ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <Chip className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20" variant="bordered" size="sm">
-                            FAQ
-                        </Chip>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Frequently Asked Questions</h2>
-                        <p className="text-gray-400">
+                        <div className="inline-flex mb-4">
+                            <Chip
+                                className=" font-medium text-sm px-3 py-1"
+                                variant="bordered"
+                                size="sm"
+                            >
+                                FAQ
+                            </Chip>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                            Frequently Asked Questions
+                        </h2>
+                        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
                             Find answers to common questions about our services and how we can help your business.
                         </p>
                     </motion.div>
 
-                    <div className="max-w-3xl mx-auto space-y-4">
+                    <div className="max-w-3xl mx-auto space-y-5">
                         {[
                             {
                                 question: "What industries do you specialize in?",
@@ -638,12 +725,18 @@ export default function ServicesPage() {
                                     },
                                 }}
                             >
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black hover:border-blue-500/50 transition-colors">
-                                    <CardHeader>
-                                        <h3 className="text-xl font-semibold">{faq.question}</h3>
+                                <Card className="border border-white/20 bg-gradient-to-br from-gray-900 to-black hover:border-pink-500/30 transition-all duration-300 group overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
+                                    <CardHeader className="px-6 py-5 flex gap-4">
+                                        <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-pink-400 font-medium">{index + 1}</span>
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-white group-hover:text-pink-100 transition-colors duration-300">
+                                            {faq.question}
+                                        </h3>
                                     </CardHeader>
-                                    <CardBody>
-                                        <p className="text-gray-400">{faq.answer}</p>
+                                    <CardBody className="px-6 pb-6 pt-0">
+                                        <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                                     </CardBody>
                                 </Card>
                             </motion.div>
@@ -651,62 +744,65 @@ export default function ServicesPage() {
                     </div>
 
                     <motion.div
-                        className="mt-8 text-center"
+                        className="mt-12 text-center"
                         initial="hidden"
                         animate={isVisible.faq ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <p className="text-gray-400 mb-4">Still have questions? We're here to help.</p>
-                        <Link to="/contact">
-                            <Button
-                            className="bg-blue-500 hover:bg-blue-600 text-white"
-                            endContent=""
+                        <p className="text-gray-300 mb-6 text-lg">Still have questions? We're here to help.</p>
+                        <Button
+                            className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 py-6 rounded-full shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
+                            endContent={<ArrowRight className="h-4 w-4 ml-1" />}
+                            size="lg"
+                            as={Link}
+                            href="/contact"
                         >
                             Contact Our Support Team
                         </Button>
-                        </Link>
                     </motion.div>
                 </div>
             </section>
         </PublicLayout>
-
-
-
     )
 }
 
 // Helper Components
 function ServiceCard({ service }) {
     return (
-        <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all duration-300 h-full py-4">
-            <div className="pb-2 lg:px-4 px-4 ">
-                <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">{service.icon}</div>
-                <h3 className="text-xl font-semibold group-hover:text-blue-500 transition-colors">{service.title}</h3>
-            </div>
-            <CardBody className="py-2 font-nunito">
-                <p className="text-gray-400 mb-4">{service.description}</p>
+        <Card className="border border-white/10 bg-default-500/10 shadow-md overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full">
+            <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+            <CardBody className="p-6">
+                <div className="mb-6 transform group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center">{service.icon}</div>
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-pink-100 transition-colors duration-300">
+                    {service.title}
+                </h3>
+                <p className="text-gray-300 mb-6">{service.description}</p>
 
                 {service.features.length > 0 && (
                     <div className="mt-auto">
-                        <div className="h-px w-full bg-blue-900/20 mb-4"></div>
-                        <h4 className="text-sm font-medium mb-2">Key Features:</h4>
-                        <ul className="space-y-2">
+                        <div className="h-px w-full bg-pink-900/20 mb-5"></div>
+                        <h4 className="text-sm font-medium mb-3 text-white">Key Features:</h4>
+                        <ul className="space-y-2.5">
                             {service.features.slice(0, 3).map((feature, i) => (
-                                <li key={i} className="flex items-start gap-2 text-sm">
-                                    <CheckCircle className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                                    <span className="text-gray-400">{feature}</span>
+                                <li key={i} className="flex items-start gap-3 text-sm">
+                                    <CheckCircle className="h-5 w-5 text-pink-400 mt-0.5 flex-shrink-0" />
+                                    <span className="text-gray-300">{feature}</span>
                                 </li>
                             ))}
                         </ul>
 
                         {service.benefits.length > 0 && (
-                            <div className="mt-4">
-                                <h4 className="text-sm font-medium mb-2">Benefits:</h4>
-                                <ul className="space-y-2">
+                            <div className="mt-5">
+                                <h4 className="text-sm font-medium mb-3 text-white">Benefits:</h4>
+                                <ul className="space-y-2.5">
                                     {service.benefits.slice(0, 2).map((benefit, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm">
-                                            <CheckCircle className="h-4 w-4 text-cyan-500 mt-0.5 flex-shrink-0" />
-                                            <span className="text-gray-400">{benefit}</span>
+                                        <li key={i} className="flex items-start gap-3 text-sm">
+                                            <CheckCircle className="h-5 w-5 text-pink-400 mt-0.5 flex-shrink-0" />
+                                            <span className="text-gray-300">{benefit}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -716,26 +812,36 @@ function ServiceCard({ service }) {
                 )}
             </CardBody>
 
+            <CardFooter className="pt-0 pb-5 px-6">
+                <Button
+                    className="w-full bg-black/30 hover:bg-pink-500/10 text-white border  border-white/10 hover:border-pink-500/40 transition-all duration-300 group-hover:text-pink-400"
+                    variant="bordered"
+                    endContent={<ArrowRight className="h-4 w-4 ml-1" />}
+                    as={Link}
+                    href={`/services/${service.id}`}
+                >
+                    Learn More
+                </Button>
+            </CardFooter>
         </Card>
     )
 }
 
 function ProcessStep({ step }) {
     return (
-        <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden relative group hover:border-blue-500/50 transition-all duration-300 h-full ">
-            <div className="absolute top-0 left-0 h-1 w-0 bg-gradient-to-r from-blue-500 to-cyan-400 group-hover:w-full transition-all duration-700"></div>
-            <div className="pb-2 flex text-xl flex-col lg:px-4 font-montserrat">
-                <div className="text-4xl font-bold text-blue-500/30 mb-2 group-hover:text-blue-500/50 transition-colors">
+        <Card className="border border-white/10 bg-black/30 overflow-hidden shadow-md relative group hover:border-pink-500/30 transition-all duration-300 h-full">
+            <div className="absolute top-0 left-0 h-1 w-0 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-700"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+            <CardBody className="p-6">
+                <div className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent mb-4 group-hover:from-pink-300 group-hover:to-fuchsia-400 transition-all duration-300">
                     {step.number}
                 </div>
-                <h3 className="text-xl font-semibold group-hover:text-blue-500 transition-colors">
+                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-pink-100 transition-colors duration-300">
                     {step.title}
                 </h3>
-            </div>
-            <CardBody>
-                <p className="text-sm text-gray-400 font-nunito">{step.description}</p>
+                <p className="text-gray-300">{step.description}</p>
             </CardBody>
         </Card>
-    );
+    )
 }
-

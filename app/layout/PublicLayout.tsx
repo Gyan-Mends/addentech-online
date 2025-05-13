@@ -14,6 +14,8 @@ import {
     Menu,
     X,
 } from "lucide-react";
+import { ThemeSwitcher } from "~/components/ThemeSwitcher";
+import ScrollAnimation from "~/components/animation";
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -48,7 +50,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className="scroll-smooth">
           {/* Navbar */}
-            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-pink-500/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-black/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container flex h-16 items-center justify-between">
                   {/* Logo */}
                   <div className="flex items-center">
@@ -65,7 +67,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                           <Link
                     key={name}
                     to={path}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                              className="text-sm font-medium text-default-500 transition-colors hover:text-foreground"
                 >
                     {name}
                 </Link>
@@ -87,6 +89,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
                   {/* Actions */}
                   <div className="hidden md:flex items-center gap-4">
+                        <ThemeSwitcher />
                         <Link to="/addentech-login">
                             <Button className="border border-pink-500/50 border-2" variant="ghost" size="sm">
                           Log in
@@ -136,9 +139,10 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           {/* CTA Section */}
-            <section className="py-20 lg:px-20 px-4 bg-black">
+            <section className="py-20 lg:px-20 px-4 bg-gray-100">
                 <div className="container">
-                    <div className="rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-600/20 p-8 md:p-12 lg:p-16 relative overflow-hidden">
+                    <ScrollAnimation>
+                        <div className="rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-600/20 p-8 md:p-12 lg:p-16 relative overflow-hidden">
                         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                         <div className="relative z-10 max-w-3xl">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">Transform your business with us effectively</h2>
@@ -151,13 +155,15 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             </div>
                         </div>
                     </div>
+                    </ScrollAnimation>
                 </div>
             </section>
 
             <footer className="border-t border-t-white-500/20  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20 px-4">
                 <div className="container py-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="flex flex-col gap-4">
+                        <ScrollAnimation>
+                            <div className="flex flex-col gap-4">
                             <div className="flex items-center">
                                 <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
                                     D
@@ -184,7 +190,9 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 ))}
                             </div>
                         </div>
-                        <div>
+                        </ScrollAnimation>
+                        <ScrollAnimation>
+                            <div>
                             <h3 className="font-bold font-montserrat mb-4 ">Company</h3>
                             <ul className="space-y-2 ">
                                 {Object.entries(navigationLinks).map(([item, url]) => (
@@ -196,7 +204,9 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 ))}
                             </ul>
                         </div>
-                        <div>
+                        </ScrollAnimation>
+                        <ScrollAnimation>
+                            <div>
                             <h3 className="font-medium mb-4">Services</h3>
                             <ul className="space-y-2">
                                 {[
@@ -214,7 +224,9 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 ))}
                             </ul>
                         </div>
-                        <div>
+                        </ScrollAnimation>
+                        <ScrollAnimation>
+                            <div>
                             <h3 className="font-medium mb-4">Legal</h3>
                             <ul className="space-y-2">
                                 {["Terms", "Privacy", "Cookies", "Licenses", "Settings"].map((item) => (
@@ -226,12 +238,16 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 ))}
                             </ul>
                         </div>
+                        </ScrollAnimation>
                     </div>
                     <div className="border-t border-t-white/10 border-border/40 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-sm text-muted-foreground">
+                        <ScrollAnimation>
+                            <p className="text-sm text-muted-foreground">
                             © {new Date().getFullYear()} DennisLaw. All rights reserved.
                         </p>
-                        <div className="flex gap-4 mt-4 md:mt-0">
+                        </ScrollAnimation>
+                        <ScrollAnimation>
+                            <div className="flex gap-4 mt-4 md:mt-0">
                             <Link to="#" className="text-sm text-muted-foreground hover:text-foreground">
                                 Privacy Policy
                             </Link>
@@ -242,6 +258,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                 Cookies Settings
                             </Link>
                         </div>
+                        </ScrollAnimation>
                     </div>
                 </div>
             </footer>

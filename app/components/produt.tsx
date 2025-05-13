@@ -5,12 +5,14 @@ import dl from "~/components/images/Dennislaw-Logo.svg"
 import mr from "~/components/images/mr-logo.png"
 import news from "~/components/images/DL-News-Logo.png"
 import { ChevronRight } from "lucide-react";
+import ScrollAnimation from "./animation";
 
 export function ProductCard({ id }: { id?: string }) {
     return (
-        <section id={id} className="lg:py-20 py-10 bg-black lg:px-[35px] px-4">
+        <section id={id} className="lg:py-20 py-10 bg-gray-100 shadow-t-gray-100 lg:px-[35px] px-4">
             <div className="container">
-                <div className="flex flex-col items-center justify-center text-center mb-6">
+                <ScrollAnimation>
+                    <div className="flex flex-col items-center justify-center text-center mb-6">
                     <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Explore More of Our Products</p>
                     <h2 className="text-3xl md:text-3xl font-montserrat font-bold mb-4">
                         Top-Notch Software Development and Digital Transformation
@@ -20,6 +22,7 @@ export function ProductCard({ id }: { id?: string }) {
                         experiences.
                     </p>
                 </div>
+                </ScrollAnimation>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-20">
                     {[
@@ -48,18 +51,22 @@ export function ProductCard({ id }: { id?: string }) {
                             type: "news",
                         },
                     ].map((product, i) => (
-                        < CardContainer
+                        <ScrollAnimation>
+                            < CardContainer
                             key={i}
-                            className="inter-var group overflow-hidden -mt-20 lg:mt-0  backdrop-blur transition-all hover:border-border hover:bg-background/80 !bg-[#09090B80]"
+                                className="inter-var shadow-md rounded-lg group overflow-hidden -mt-20 lg:mt-0  backdrop-blur transition-all hover:border-border hover:bg-background/80 bg-white border border-black/10 hover:transform-3d"
                         >
-                            <CardBody className="!bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-pink-500/20   ">
+                                <CardBody className="dark:bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-white/20   ">
                                 <CardItem translateZ="50"
                                     className="text-xl  text-neutral-600 dark:text-white">
-                                    <p className="text-md group-hover:bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent  font-nunito font-bold">{product.title}</p>
+                                        <p className="text-md bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-nunito font-bold">
+                                            {product.title}
+                                        </p>
+
                                     <p className="text-sm font-nunito">{product.description}</p>
                                 </CardItem>
 
-                                <CardItem className="mt-2 mb-10  overflow-hidden rounded-lg bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+                                    <CardItem className="mt-2 mb-10  overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
                                     <img
                                         src={product.image}
                                         alt={product.title}
@@ -70,7 +77,7 @@ export function ProductCard({ id }: { id?: string }) {
                                 <Button
                                     variant="flat"
                                     size="sm"
-                                    className="w-full group-hover:bg-gradient-to-r from-pink-500 to-purple-600     font-montserrat"
+                                        className="w-full group-hover:bg-gradient-to-r from-pink-500 to-purple-600     font-montserrat group-hover:text-white"
                                 >
                                     Explore Product
                                     <ChevronRight className="ml-2 h-4 w-4" />
@@ -78,6 +85,7 @@ export function ProductCard({ id }: { id?: string }) {
                             </CardBody>
 
                         </CardContainer>
+                        </ScrollAnimation>
 
                     ))}
                 </div>

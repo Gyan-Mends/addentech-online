@@ -9,6 +9,7 @@ import { ArrowRight, Star, User } from "lucide-react";
 import { json, LoaderFunction } from "@remix-run/node";
 import blog from "~/controller/blog";
 import { BlogInterface } from "~/interface/interface";
+import ScrollAnimation from "~/components/animation";
 
 
 
@@ -32,25 +33,30 @@ const Home = () => {
     <PublicLayout>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-2 lg:py-20 md:py-32 bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
+        <section className="relative overflow-hidden lg:!h-[100vh] py-2 lg:py-20 md:py-32 dark:bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
           <div className="container relative">
             <div className="grid gap-10 md:grid-cols-2 items-center">
               <div className="space-y-10">
                 <div className="space-y-10">
-                  <h1 className="text-4xl md:text-6xl font-montserrat font-bold leading-tight tracking-tighter">
+                  <ScrollAnimation>
+                    <h1 className="text-4xl  md:text-6xl font-montserrat font-bold leading-tight tracking-tighter">
                     Transforming the{" "}
                     <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                       Legal Landscape
                     </span>{" "}
                     with Addentechnology
                   </h1>
-                  <p className="font-montserrat text-xl text-default-400 max-w-[600px]">
+                  </ScrollAnimation>
+                  <ScrollAnimation delay={0.3}>
+                    <p className="font-montserrat lg:text-xl text-lg text-default-400 max-w-[600px]">
                     Powering the future of legal services with cutting-edge technology solutions designed for modern law
                     practices.
                   </p>
+                  </ScrollAnimation>
                 </div>
-                <div className="flex  gap-4">
+                <ScrollAnimation delay={0.4}>
+                  <div className="flex  gap-4">
                   <Link to="#products">
                     <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">
                     Get Started
@@ -62,7 +68,9 @@ const Home = () => {
                     </Button>
                   </Link>
                 </div>
-                <div className="flex items-center gap-4">
+                </ScrollAnimation>
+                <ScrollAnimation delay={0.5}>
+                  <div className="flex items-center gap-4">
                   <div className="flex -space-x-2">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <img src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg" key={i} className="h-8 w-8 rounded-full border-2 border-background bg-gray-800" />
@@ -72,20 +80,28 @@ const Home = () => {
                     Trusted by <span className="font-medium text-foreground">500+</span> law firms
                   </div>
                 </div>
+                </ScrollAnimation>
               </div>
               <div className="relative hidden md:block">
-                <div className="relative h-[500px] w-full overflow-hidden rounded-lg border border-border/40 border-pink-500/10 bg-background/50 p-2 backdrop-blur">
+                <ScrollAnimation >
+                  <div
+                    className="relative  h-[500px] w-full overflow-hidden rounded-lg border border-border/40 border-black/20 bg-default-300 p-2 backdrop-blur hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500"
+                  >
                   <img
-                    src={heroimage}
+                      src="https://res.cloudinary.com/djlnjjzvt/image/upload/v1747070545/hero1_rfu05r.jpg"
                     alt="Legal dashboard interface"
                     className="rounded-md object-cover h-full w-full"
                   />
                 </div>
-                <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-lg border border-pink-500/10 bg-background/90 p-1 backdrop-blur">
+                </ScrollAnimation>
+
+                <ScrollAnimation delay={0.3}>
+                  <div className="absolute -bottom-6 -left-6 h-24 w-24 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-110 transition-transform duration-500 rounded-lg border border-black/20 bg-default-300 p-1 backdrop-blur">
                   <div className="h-full w-full rounded bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
                     <CheckedIcon className="h-10 w-10 text-white" />
                   </div>
                 </div>
+                </ScrollAnimation>
               </div>
             </div>
           </div>
@@ -95,37 +111,50 @@ const Home = () => {
         <ProductCard id="products" />
 
         {/* Customer Centric Section */}
-        <section className="py-20 lg:px-[125px] px-4 bg-gradient-to-br from-gray-900 to-black">
+        <section className="py-20 lg:px-[125px] px-4 ">
           <div className="container">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               <div className="grid grid-cols-2 gap-4">
-                <div className="aspect-[3/4] overflow-hidden rounded-lg">
+                <ScrollAnimation>
+                  <div className="aspect-[3/4] overflow-hidden rounded-lg hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                   <img
-                    src={img5}
+                      src="https://res.cloudinary.com/djlnjjzvt/image/upload/v1747074574/c1_bamtmm.avif"
                     alt="Legal professionals"
                     width={300}
                     height={400}
-                    className="h-full w-full object-cover"
+                      className="h-full w-full object-cover "
                   />
                 </div>
-                <div className="aspect-[3/4] overflow-hidden rounded-lg mt-8">
+                </ScrollAnimation>
+                <ScrollAnimation delay={0.3}>
+                  <div className="aspect-[3/4] overflow-hidden rounded-lg mt-8 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                   <img
-                    src={img5}
+                      src="https://res.cloudinary.com/djlnjjzvt/image/upload/v1747074687/c2_hjpjmk.avif"
                     alt="Legal consultation"
                     width={300}
                     height={400}
-                    className="h-full w-full object-cover"
+                      className="h-full w-full object-cover "
                   />
                 </div>
+                </ScrollAnimation>
               </div>
               <div className="space-y-6">
-                <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent   text-xl font-bold font-montserrat ">Customer Centric</p>
+                <ScrollAnimation >
+                  <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent   text-xl font-bold font-montserrat ">Customer Centric</p>
+                </ScrollAnimation>
+                <ScrollAnimation delay={0.2}>
+
                 <h2 className="text-3xl md:text-3xl font-bold font-montserrat">Legal Tech Solutions That Put Clients First</h2>
-                <p className="text-muted-foreground font-nunito">
+                </ScrollAnimation>
+
+                <ScrollAnimation delay={0.3}>
+                  <p className="text-muted-foreground font-nunito">
                   Our innovative approach combines legal expertise with cutting-edge technology to deliver solutions
                   that truly address the needs of modern law practices and their clients.
                 </p>
-                <ul className="space-y-2">
+                </ScrollAnimation>
+                <ScrollAnimation delay={0.4}>
+                  <ul className="space-y-2">
                   {["Client-focused design", "Intuitive interfaces", "Secure data handling", "Compliance-ready"].map(
                     (item, i) => (
                       <li key={i} className="flex items-center gap-2">
@@ -137,21 +166,25 @@ const Home = () => {
                     ),
                   )}
                 </ul>
-                <Link to="/about">
+                </ScrollAnimation>
+                <ScrollAnimation delay={0.5}>
+                  <Link to="/about">
                   <Button variant="bordered" className="border mt-4 bg-gradient-to-r from-pink-500 to-purple-600    text-white font-montserrat">
                     Learn More
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
+                </ScrollAnimation>
               </div>
             </div>
           </div>
         </section>
 
         {/* Services Section */}
-        <section id="services" className="lg:py-20 py-10 lg:px-[125px] px-4 bg-black">
+        <section id="services" className="lg:py-20 py-10 lg:px-[125px] px-4 bg-gray-100">
           <div className="container">
-            <div className="text-center mb-16">
+            <ScrollAnimation>
+              <div className="text-center mb-16">
               <p className="mb-4 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Services</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Comprehensive Services Tailored to Your Needs</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-montserrat">
@@ -159,6 +192,7 @@ const Home = () => {
                 firms.
               </p>
             </div>
+            </ScrollAnimation>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
@@ -195,12 +229,13 @@ const Home = () => {
                   icon: "shield",
                 },
               ].map((service, i) => (
-                <Card
+                <ScrollAnimation>
+                  <Card
                   key={i}
-                  className="border group bg-background/50 border-pink-500/20 h-48 backdrop-blur transition-all hover:border-pink-500/50 hover:bg-background/80 p-6 bg-[#09090B80]"
+                    className="border group  border-black/20 h-48 backdrop-blur transition-all hover:border-pink-500/50 hover:bg-background/80 p-6 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500"
                 >
                   <div className="flex flex-col gap-4">
-                    <p className="font-bold font-montserrat text-lg group-hover:bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{service.title}</p>
+                      <p className="font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">{service.title}</p>
                     <p>{service.description}</p>
                   </div>
                   <CardFooter className="mt-4">
@@ -212,30 +247,34 @@ const Home = () => {
                     </Link>
                   </CardFooter>
                 </Card>
+                </ScrollAnimation>
               ))}
             </div>
           </div>
         </section>
 
         {/* Blog Section */}
-        <section id="blog" className="py-20 lg:px-[125px] px-4 bg-gradient-to-br from-black to-gray-900">
+        <section id="blog" className="py-20 lg:px-[125px] px-4 ">
           <div className="container">
-            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
+            <ScrollAnimation>
+              <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
               <div>
                 <p className="mb-2 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Latest Insights</p>
                 <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
               </div>
               <Link to="/block">
-              <Button variant="bordered" className="font-montserrat border border-2 border-primary-500">
+                  <Button variant="bordered" className="font-montserrat border border-2 border-pink-500">
                 View all articles
                   <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               </Link>
             </div>
+            </ScrollAnimation>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {blogs.map((article, i) => (
-                <Card key={i} className="overflow-hidden border-border/40 bg-background/50 backdrop-blur">
+                <ScrollAnimation delay={0.3}>
+                  <Card key={i} className="overflow-hidden border-border/40 bg-background/50 backdrop-blur hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500 border hover:border-pink-500/20">
                   <div className="aspect-video overflow-hidden">
                     <img
                       src={article.image || "/placeholder.svg"}
@@ -260,28 +299,31 @@ const Home = () => {
                   <CardFooter>
 
                     <Link to={`/blog/${article._id}`} key={article._id}>
-                    <Button variant="ghost" size="sm" className="group">
+                        <Button variant="ghost" size="sm" className="group border border-2 border-pink-500/40 hover:border-default-200">
                       Read article
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
                     </Link>
                   </CardFooter>
                 </Card>
+                </ScrollAnimation>
               ))}
             </div>
           </div>
         </section>
 
         {/* Methodology Section */}
-        <section className="py-20 lg:px-[125px] p-4 bg-black">
+        <section className="py-20 lg:py-40 lg:px-[125px] p-4 bg-gray-100">
           <div className="container">
-            <div className="text-center mb-16">
+            <ScrollAnimation>
+              <div className="text-center mb-16">
               <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Approach</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Our Methodology Guarantees Your Success</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 We follow a proven methodology to ensure the success of your legal technology implementation.
               </p>
             </div>
+            </ScrollAnimation>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {[
@@ -311,7 +353,8 @@ const Home = () => {
                   ],
                 },
               ].map((phase, i) => (
-                <Card key={i} className="bg-[#09090B80] border hover:border-blue-500/50 border-white/10 backdrop-blur p-6">
+                <ScrollAnimation delay={0.3}>
+                  <Card key={i} className="border hover:border-pink-500/50 border-black/10 backdrop-blur p-6  hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                   <CardHeader>
                     <p className="font-bold font-montserrat">{phase.title}</p>
                   </CardHeader>
@@ -319,31 +362,35 @@ const Home = () => {
                     <ul className="space-y-2">
                       {phase.items.map((item, j) => (
                         <li key={j} className="flex items-start gap-2">
-                          <CheckedIcon className="h-4 w-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded mt-1" />
+                          <CheckedIcon className="h-4 w-4 text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded mt-1" />
                           <span className="text-sm">{item}</span>
                         </li>
                       ))}
                     </ul>
                   </p>
                 </Card>
+                </ScrollAnimation>
               ))}
             </div>
           </div>
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 lg:px-20 px-4 bg-gradient-to-br from-gray-900 to-black">
+        <section className="py-20 lg:px-20 px-4 ">
           <div className="container">
-            <div className="text-center mb-16">
+            <ScrollAnimation>
+              <div className="text-center mb-16">
               <p className="mb-4  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl font-bold font-montserrat">Testimonials</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Experiences That Build Confidence</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 Hear what our clients have to say about their experience working with us.
               </p>
             </div>
+            </ScrollAnimation>
 
+            <ScrollAnimation delay={0.3} className=" ">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="col-span-1 lg:col-span-2 border-border/40 bg-background/50 backdrop-blur p-10">
+                <Card className="col-span-1 lg:col-span-2 border border-black/10  hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500 bg-background/50 backdrop-blur p-10 h-full">
                 <CardHeader>
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full overflow-hidden">
@@ -364,7 +411,7 @@ const Home = () => {
                 <p>
                   <div className="flex mb-4">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} className="h-5 w-5 fill-blue-500 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent " />
+                      <Star key={i} className="h-5 w-5 h-4 w-4 fill-pink-500 text-pink-500  bg-clip-text text-transparent " />
                     ))}
                   </div>
                   <p className="text-lg italic font-montserrat">
@@ -376,7 +423,7 @@ const Home = () => {
               </Card>
               <div className="relative h-[55vh]">
                 <img
-                  src={img5}
+                    src='https://res.cloudinary.com/djlnjjzvt/image/upload/v1747077587/e1_gfxcqi.avif'
                   alt="Testimonial"
                   width={300}
                   height={400}
@@ -386,17 +433,19 @@ const Home = () => {
                   <div>
                     <div className="flex mb-2">
                       {[1, 2, 3, 4, 5].map((i) => (
-                        <Star key={i} className="h-4 w-4 fill-blue-500 text-blue-500" />
+                        <Star key={i} className="h-4 w-4 fill-pink-500 text-pink-500 " />
                       ))}
                     </div>
-                    <p className="text-md mb-2 font-nunito">
+                      <p className="text-md text-white mb-2 font-nunito">
                       "Dennis Law's client portal has revolutionized how we communicate with clients."
                     </p>
-                    <div className="text-md text-muted-foreground font-nunito">Michael Chen, Litigation Specialist</div>
+                      <div className="text-md text-white font-nunito">Michael Chen, Litigation Specialist</div>
                   </div>
                 </div>
               </div>
             </div>
+            </ScrollAnimation>
+
           </div>
         </section>
 

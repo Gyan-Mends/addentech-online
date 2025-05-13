@@ -29,6 +29,7 @@ import {
     X,
 } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -184,6 +185,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
 
                     <div className="flex items-center space-x-3">
+                        <ThemeSwitcher />
                         <div className="relative h-10 w-10 rounded-full flex items-center justify-center border border-white/20">
                             <div>
                                 <Bell className="h-5 w-5" />
