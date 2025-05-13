@@ -18,6 +18,7 @@ import {
     ArrowUpRight,
     Sparkles,
 } from "lucide-react"
+import ScrollAnimation from "~/components/animation"
 
 export default function ServicesPage() {
     const [activeTab, setActiveTab] = useState("all")
@@ -237,10 +238,9 @@ export default function ServicesPage() {
             {/* Hero Section */}
             <section
                 id="hero-section"
-                className="relative overflow-hidden lg:py-24 py-16 md:py-32 bg-gradient-to-br from-gray-950 via-gray-900 to-black"
+                className="relative overflow-hidden lg:h-[90vh] lg:py-24 py-16 md:py-32 "
             >
                 {/* Animated background elements */}
-                <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-pink-500/20 rounded-full filter blur-3xl animate-blob"></div>
                     <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
@@ -255,52 +255,49 @@ export default function ServicesPage() {
                         variants={fadeInUpVariants}
                     >
                         <div className="inline-flex">
-                            <Chip
-                                className="mb-4 bg-pink-500/10 text-pink-400 border-pink-500/20 font-medium text-sm px-3 py-1"
-                                variant="bordered"
-                                size="sm"
-                                startContent={<Sparkles className="h-3.5 w-3.5 mr-1" />}
-                            >
+                            <Chip className="bg-white border border-2 border-black-200/20 shadow-sm">
+                                <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+
                                 Our Services
+                                </p>
                             </Chip>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-bold lg:text-6xl leading-tight tracking-tight mb-6">
+                        <h1 className="text-4xl md:text-5xl font-montserrat font-bold lg:text-6xl leading-tight tracking-tight mb-6">
                             Here is How We Can{" "}
-                            <span className="bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-500 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                                 Help Your Business
                             </span>
                         </h1>
-                        <p className="text-xl text-gray-300 max-w-[800px] leading-relaxed">
+                        <p className="text-xl  max-w-[800px] leading-relaxed">
                             Comprehensive services tailored to your needs, designed to elevate your business in the digital landscape.
                         </p>
                         <div className="flex flex-wrap gap-4 mt-8">
+                            <Link to="/">
                             <Button
-                                className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 py-6 rounded-full shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
+                                    className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium px-6 py-6 rounded-lg shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
                                 endContent={<ArrowUpRight className="h-4 w-4 ml-1" />}
-                                size="lg"
-                                as={Link}
-                                href="/contact"
+                                    size="lg"
                             >
                                 Get Started
                             </Button>
+                            </Link>
+                            <Link to="/contact">
                             <Button
-                                variant="bordered"
-                                className="border-pink-500/30 text-white font-medium px-6 py-6 rounded-full hover:bg-pink-500/10 hover:border-pink-500/50 transition-all duration-300"
+                                    className="border-pink-500/30  font-medium px-6 py-6 rounded-lg  hover:border-pink-500/50 transition-all duration-300"
                                 endContent={<ArrowRight className="h-4 w-4 ml-1" />}
                                 size="lg"
-                                as={Link}
-                                href="/contact"
+
                             >
                                 Contact Us
                             </Button>
+                            </Link>
                         </div>
                     </motion.div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent" />
             </section>
 
             {/* Services Grid Section */}
-            <section id="services-section" className="py-20 bg-black lg:px-[90px]">
+            <section id="services-section" className="py-20 bg-gray-100  lg:px-[90px]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div
                         className="max-w-3xl mx-auto text-center mb-16"
@@ -308,13 +305,13 @@ export default function ServicesPage() {
                         animate={isVisible.services ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                             Our Professional Services
                         </h2>
-                        <p className="text-gray-300 text-lg mb-10 max-w-2xl mx-auto">
+                        <p className=" text-lg mb-10 max-w-2xl mx-auto">
                             We offer a comprehensive range of services to help your business thrive in the digital age.
                         </p>
-                        <div className=" p-1 rounded-full backdrop-blur-sm border border-white/5 mb-8 max-w-xl mx-auto">
+                        <div className=" p-1 bg-white shadow-md rounded-full backdrop-blur-sm border border-white/5 mb-8 max-w-xl mx-auto">
                             <Tabs
                                 aria-label="Service categories"
                                 selectedKey={activeTab}
@@ -323,10 +320,10 @@ export default function ServicesPage() {
                                 variant="solid"
                                 color="default"
                                 classNames={{
-                                    tabList: "gap-2 w-full rounded-full p-1",
-                                    cursor: "bg-pink-500/20 rounded-full",
-                                    tab: "rounded-full px-4 py-2 text-sm font-medium data-[selected=true]:text-pink-400",
-                                    tabContent: "group-data-[selected=true]:text-pink-400",
+                                    tabList: "gap-2 w-full rounded-full bg-white  p-1",
+                                    cursor: "bg-gradient-to-r from-pink-500 to-purple-600 rounded-full",
+                                    tab: "rounded-full  px-4 py-2 text-sm font-medium data-[selected=true]:text-pink-400",
+                                    tabContent: "group-data-[selected=true]:text-white",
                                 }}
                             >
                                 <Tab key="all" title="All" />
@@ -358,6 +355,7 @@ export default function ServicesPage() {
                         ))}
 
                         {activeTab === "all" && (
+
                             <motion.div
                                 initial="hidden"
                                 animate={isVisible.services ? "visible" : "hidden"}
@@ -370,8 +368,8 @@ export default function ServicesPage() {
                                     },
                                 }}
                             >
-                                <Card className="border border-white/10 bg-default-500/10   shadow-lg h-full group hover:border-pink-500/30 transition-all duration-300 overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                <Card className="border border-white/10 h-full group hover:border-pink-500/30 transition-all duration-300 overflow-hidden hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
+                                    <div className="absolute inset-0  opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                     <CardBody className="flex items-center justify-center text-center p-8">
                                         <div>
                                             <div className="w-16 h-16 rounded-full bg-pink-500/10 flex items-center justify-center mx-auto mb-6">
@@ -379,14 +377,15 @@ export default function ServicesPage() {
                                             </div>
                                             <h3 className="text-xl font-semibold mb-3 text-white">Need a Custom Solution?</h3>
                                             <p className="text-gray-300 mb-6">Contact us to discuss your specific requirements</p>
+                                            <Link to="/contact">
                                             <Button
                                                 className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 rounded-full shadow-lg shadow-pink-500/10 hover:shadow-pink-500/30 transition-all duration-300"
                                                 endContent={<ArrowRight className="h-4 w-4 ml-1" />}
-                                                as={Link}
-                                                href="/contact"
+
                                             >
                                                 Get in Touch
                                             </Button>
+                                            </Link>
                                         </div>
                                     </CardBody>
                                 </Card>
@@ -399,7 +398,7 @@ export default function ServicesPage() {
             {/* Methodology Section */}
             <section
                 id="methodology-section"
-                className="py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden"
+                className="py-20  relative overflow-hidden"
             >
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
@@ -407,7 +406,8 @@ export default function ServicesPage() {
                 </div>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <motion.div
+                    <ScrollAnimation>
+                        <motion.div
                         className="max-w-3xl mx-auto text-center mb-16"
                         initial="hidden"
                         animate={isVisible.methodology ? "visible" : "hidden"}
@@ -422,26 +422,28 @@ export default function ServicesPage() {
                                 Our Process
                             </Chip>
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                             Our Methodology Guarantees Your Success
                         </h2>
-                        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                            <p className="text-lg max-w-2xl mx-auto">
                             We follow a proven methodology to ensure your project is delivered on time, within budget, and exceeds
                             your expectations.
                         </p>
                     </motion.div>
+                    </ScrollAnimation>
 
                     {/* Wave Visualization */}
-                    <motion.div
+                    <ScrollAnimation>
+                        <motion.div
                         className="relative h-40 mb-16"
                         initial={{ opacity: 0 }}
                         animate={isVisible.methodology ? { opacity: 1 } : { opacity: 0 }}
                         transition={{ duration: 1 }}
                     >
-                        <div className="absolute inset-0">
+                            <div className="absolute inset-0 ">
                             <svg viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                                 <defs>
-                                    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <linearGradient className="bg-gradient-to-r from-pink-500 to-purple-600" id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                         <stop offset="0%" stopColor="#ec4899" stopOpacity="0.2" />
                                         <stop offset="50%" stopColor="#d946ef" stopOpacity="0.2" />
                                         <stop offset="100%" stopColor="#c026d3" stopOpacity="0.2" />
@@ -488,6 +490,7 @@ export default function ServicesPage() {
                             </svg>
                         </div>
                     </motion.div>
+                    </ScrollAnimation>
 
                     {/* Process Steps */}
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -544,7 +547,7 @@ export default function ServicesPage() {
             </section>
 
             {/* Testimonials Section */}
-            <section id="testimonials-section" className="py-20 bg-black relative overflow-hidden">
+            <section id="testimonials-section" className="py-20 bg-gray-100 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
                     <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
@@ -567,10 +570,10 @@ export default function ServicesPage() {
                                 Client Testimonials
                             </Chip>
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                             What Our Clients Say About Our Services
                         </h2>
-                        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                        <p className=" text-lg max-w-2xl mx-auto ">
                             Don't just take our word for it. Here's what our clients have to say about working with us.
                         </p>
                     </motion.div>
@@ -588,8 +591,8 @@ export default function ServicesPage() {
                             >
                                 {testimonials.map((testimonial, index) => (
                                     <div key={index} className="w-full flex-shrink-0 px-4">
-                                        <Card className="border border-white/10 bg-gradient-to-br from-gray-900 to-black h-full overflow-hidden">
-                                            <div className="absolute top-0 left-0 w-full h-1 bg-default-500/30"></div>
+                                        <Card className="border border-white/10  h-full overflow-hidden">
+                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-purple-600"></div>
                                             <CardBody className="p-8">
                                                 <div className="flex flex-col md:flex-row items-start gap-6">
                                                     <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink-500/20">
@@ -607,10 +610,10 @@ export default function ServicesPage() {
                                                                 <Star key={i} className="h-4 w-4 text-pink-400/10 fill-pink-400 mr-1" />
                                                             ))}
                                                         </div>
-                                                        <p className="text-lg italic mb-6 text-gray-200 leading-relaxed">"{testimonial.quote}"</p>
+                                                        <p className="text-lg italic mb-6  leading-relaxed">"{testimonial.quote}"</p>
                                                         <div>
-                                                            <p className="font-medium text-white">{testimonial.author}</p>
-                                                            <p className="text-sm text-gray-400">{testimonial.role}</p>
+                                                            <p className="font-medium ">{testimonial.author}</p>
+                                                            <p className="text-sm ">{testimonial.role}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -627,7 +630,7 @@ export default function ServicesPage() {
                                     <button
                                         key={index}
                                         onClick={() => goToSlide(index)}
-                                        className={`h-2 rounded-full transition-all ${index === activeTestimonial ? "w-8 bg-pink-500" : "w-2 bg-gray-600"
+                                        className={`h-2 rounded-full transition-all ${index === activeTestimonial ? "w-8 bg-pink-500" : "w-2 bg-white"
                                             }`}
                                         aria-label={`Go to slide ${index + 1}`}
                                     />
@@ -638,7 +641,7 @@ export default function ServicesPage() {
                         <Button
                             isIconOnly
                             variant="bordered"
-                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/50 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex"
+                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-purple-600 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex text-white"
                             onClick={goToPrevious}
                             aria-label="Previous testimonial"
                         >
@@ -648,7 +651,7 @@ export default function ServicesPage() {
                         <Button
                             isIconOnly
                             variant="bordered"
-                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/50 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex"
+                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-purple-600 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex text-white"
                             onClick={goToNext}
                             aria-label="Next testimonial"
                         >
@@ -659,14 +662,15 @@ export default function ServicesPage() {
             </section>
 
             {/* FAQ Section */}
-            <section id="faq-section" className="py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative">
+            <section id="faq-section" className="py-20  relative">
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
                     <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
                 </div>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <motion.div
+                    <ScrollAnimation>
+                        <motion.div
                         className="max-w-3xl mx-auto text-center mb-16"
                         initial="hidden"
                         animate={isVisible.faq ? "visible" : "hidden"}
@@ -681,13 +685,14 @@ export default function ServicesPage() {
                                 FAQ
                             </Chip>
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                             Frequently Asked Questions
                         </h2>
-                        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                            <p className=" text-lg max-w-2xl mx-auto">
                             Find answers to common questions about our services and how we can help your business.
                         </p>
                     </motion.div>
+                    </ScrollAnimation>
 
                     <div className="max-w-3xl mx-auto space-y-5">
                         {[
@@ -712,7 +717,8 @@ export default function ServicesPage() {
                                     "We offer transparent pricing based on project requirements. Depending on the nature of the work, we may use fixed-price quotes, hourly rates, or retainer models. We provide detailed proposals so you know exactly what you're paying for.",
                             },
                         ].map((faq, index) => (
-                            <motion.div
+                            <ScrollAnimation>
+                                <motion.div
                                 key={index}
                                 initial="hidden"
                                 animate={isVisible.faq ? "visible" : "hidden"}
@@ -725,41 +731,45 @@ export default function ServicesPage() {
                                     },
                                 }}
                             >
-                                <Card className="border border-white/20 bg-gradient-to-br from-gray-900 to-black hover:border-pink-500/30 transition-all duration-300 group overflow-hidden">
+                                    <Card className="border border-black/20 bg-white hover:border-pink-500/30 transition-all duration-300 group overflow-hidden shadow-sm hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                                     <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
                                     <CardHeader className="px-6 py-5 flex gap-4">
                                         <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center flex-shrink-0">
                                             <span className="text-pink-400 font-medium">{index + 1}</span>
                                         </div>
-                                        <h3 className="text-xl font-semibold text-white group-hover:text-pink-100 transition-colors duration-300">
+                                            <h3 className="text-xl font-semibold  transition-colors duration-300">
                                             {faq.question}
                                         </h3>
                                     </CardHeader>
                                     <CardBody className="px-6 pb-6 pt-0">
-                                        <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                                            <p className="text-gray-500 leading-relaxed">{faq.answer}</p>
                                     </CardBody>
                                 </Card>
                             </motion.div>
+                            </ScrollAnimation>
                         ))}
                     </div>
 
-                    <motion.div
+                    <ScrollAnimation>
+                        <motion.div
                         className="mt-12 text-center"
                         initial="hidden"
                         animate={isVisible.faq ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
                         <p className="text-gray-300 mb-6 text-lg">Still have questions? We're here to help.</p>
+                            <Link to="/contact">
                         <Button
                             className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 py-6 rounded-full shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
                             endContent={<ArrowRight className="h-4 w-4 ml-1" />}
                             size="lg"
-                            as={Link}
-                            href="/contact"
+
                         >
                             Contact Our Support Team
                         </Button>
+                            </Link>
                     </motion.div>
+                    </ScrollAnimation>
                 </div>
             </section>
         </PublicLayout>
@@ -769,28 +779,28 @@ export default function ServicesPage() {
 // Helper Components
 function ServiceCard({ service }) {
     return (
-        <Card className="border border-white/10 bg-default-500/10 shadow-md overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full">
-            <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <ScrollAnimation>
+            <Card className="border border-black/10 shadow-md overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
+                <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
 
             <CardBody className="p-6">
                 <div className="mb-6 transform group-hover:scale-105 transition-transform duration-300">
                     <div className="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center">{service.icon}</div>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-pink-100 transition-colors duration-300">
+                    <h3 className="text-xl font-semibold mb-3  transition-colors duration-300">
                     {service.title}
                 </h3>
-                <p className="text-gray-300 mb-6">{service.description}</p>
+                    <p className="text-gray-500 mb-6">{service.description}</p>
 
                 {service.features.length > 0 && (
                     <div className="mt-auto">
                         <div className="h-px w-full bg-pink-900/20 mb-5"></div>
-                        <h4 className="text-sm font-medium mb-3 text-white">Key Features:</h4>
+                            <h4 className="text-sm font-medium mb-3 ">Key Features:</h4>
                         <ul className="space-y-2.5">
                             {service.features.slice(0, 3).map((feature, i) => (
                                 <li key={i} className="flex items-start gap-3 text-sm">
-                                    <CheckCircle className="h-5 w-5 text-pink-400 mt-0.5 flex-shrink-0" />
-                                    <span className="text-gray-300">{feature}</span>
+                                    <CheckCircle className="h-5 w-5 text-pink-500 mt-0.5 flex-shrink-0" />
+                                    <span className="text-gray-400">{feature}</span>
                                 </li>
                             ))}
                         </ul>
@@ -801,8 +811,8 @@ function ServiceCard({ service }) {
                                 <ul className="space-y-2.5">
                                     {service.benefits.slice(0, 2).map((benefit, i) => (
                                         <li key={i} className="flex items-start gap-3 text-sm">
-                                            <CheckCircle className="h-5 w-5 text-pink-400 mt-0.5 flex-shrink-0" />
-                                            <span className="text-gray-300">{benefit}</span>
+                                            <CheckCircle className="h-5 w-5 text-pink-500 mt-0.5 flex-shrink-0" />
+                                            <span className="text-gray-400">{benefit}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -814,7 +824,7 @@ function ServiceCard({ service }) {
 
             <CardFooter className="pt-0 pb-5 px-6">
                 <Button
-                    className="w-full bg-black/30 hover:bg-pink-500/10 text-white border  border-white/10 hover:border-pink-500/40 transition-all duration-300 group-hover:text-pink-400"
+                        className="w-full text-pink-500 border  border-white/10 hover:border-pink-500/40 transition-all duration-300 "
                     variant="bordered"
                     endContent={<ArrowRight className="h-4 w-4 ml-1" />}
                     as={Link}
@@ -824,24 +834,27 @@ function ServiceCard({ service }) {
                 </Button>
             </CardFooter>
         </Card>
+        </ScrollAnimation>
     )
 }
 
 function ProcessStep({ step }) {
     return (
-        <Card className="border border-white/10 bg-black/30 overflow-hidden shadow-md relative group hover:border-pink-500/30 transition-all duration-300 h-full">
+        <ScrollAnimation>
+            <Card className="border border-black/10  overflow-hidden shadow-md relative group hover:border-pink-500/30 transition-all duration-300 h-full hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
             <div className="absolute top-0 left-0 h-1 w-0 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-700"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
 
             <CardBody className="p-6">
                 <div className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent mb-4 group-hover:from-pink-300 group-hover:to-fuchsia-400 transition-all duration-300">
                     {step.number}
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-pink-100 transition-colors duration-300">
+                    <h3 className="text-xl font-semibold mb-3   transition-colors duration-300">
                     {step.title}
                 </h3>
-                <p className="text-gray-300">{step.description}</p>
+                    <p className="text-gray-400">{step.description}</p>
             </CardBody>
         </Card>
+        </ScrollAnimation>
     )
 }
