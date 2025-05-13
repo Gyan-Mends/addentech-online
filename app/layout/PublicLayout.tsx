@@ -90,11 +90,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                   {/* Actions */}
                   <div className="hidden md:flex items-center gap-4">
                         {/* <ThemeSwitcher /> */}
-                        <Link to="/addentech-login">
+                        {/* <Link to="/addentech-login">
                             <Button className="border border-pink-500/50 border-2" variant="ghost" size="sm">
                           Log in
                       </Button>
-                        </Link>
+                        </Link> */}
                       <Link to="/contact">
                           <Button
                               size="sm"

@@ -80,7 +80,7 @@ const Contact = () => {
                                                 className="w-full lg:h-[100vh] object-cover"
                                             />
                                         <div className="absolute bottom-0 left-0 p-4">
-                                            <p className="text-lg font-medium font-montserrat">Expert Team Ready to Help</p>
+                                                <p className="text-lg font-medium font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-white">Expert Team Ready to Help</p>
                                                 <p className="text-sm text-white font-nunito">Our dedicated professionals are available around the clock</p>
                                         </div>
                                     </div>
@@ -192,15 +192,18 @@ const Contact = () => {
                     {/* Office Location Section */}
                     <section className="py-16  lg:p-[125px]">
                         <div className="container">
-                            <div className="text-center mb-12">
+                            <ScrollAnimation>
+                                <div className="text-center mb-12">
                                 <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Visit Our Office And Start Your Journey</h2>
                                 <p className="text-gray-600 max-w-2xl mx-auto font-nunito">
                                     Our headquarters is conveniently located in the heart of the city. Stop by for a consultation or
                                     schedule a virtual meeting.
                                 </p>
                             </div>
+                            </ScrollAnimation>
 
-                            <div className="overflow-hidden rounded-xl border border-blue-900/50">
+                            <ScrollAnimation>
+                                <div className="overflow-hidden rounded-xl border border-black/20">
                                 <div className="aspect-[16/9] md:aspect-[21/9] w-full relative">
                                     <iframe className="w-full h-full   rounded-2xl " src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d7940.721604991315!2d-0.1566921298999994!3d5.660847350500148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sgh!4v1746271544705!5m2!1sen!2sgh" width="600" height="450" loading="lazy" ></iframe>
                                     <div className="absolute top-4 left-4 bg-white backdrop-blur-sm p-3 rounded-lg border border-black/20">
@@ -222,6 +225,7 @@ const Contact = () => {
                                     </div>
                                 </div>
                             </div>
+                            </ScrollAnimation>
                         </div>
                     </section>
 
