@@ -16,6 +16,7 @@ import { Link, useLoaderData } from "@remix-run/react"
 import { json, LoaderFunction } from "@remix-run/node"
 import blog from "~/controller/blog"
 import { BlogInterface } from "~/interface/interface"
+import ScrollAnimation from "~/components/animation"
 
 export default function BlogPage() {
     const [searchQuery, setSearchQuery] = useState("")
@@ -38,33 +39,34 @@ export default function BlogPage() {
 
         <PublicLayout>
             {/* Hero Section */}
-            <section className="py-20 md:py-28 bg-gradient-to-br from-black to-gray-900 relative">
+            <section className="py-20 md:py-28 bg-gray-100 relative">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <ScrollAnimation>
+                    <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div className="max-w-3xl mx-auto text-center">
-                        <h1 className="font-montserrat text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter mb-6">
+                            <h1 className="font-montserrat text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                             News & Articles
                         </h1>
                         <p className="text-xl text-gray-400 font-nunito">Stay informed with the latest updates...</p>
                     </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent"></div>
+                </ScrollAnimation>
             </section>
 
             {/* Search and Filter Section */}
-            <section className="py-12 bg-black font-nuito lg:px-[90px]">
+            <section className="py-12  font-nuito lg:px-[90px]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row gap-4 justify-between">
                         <div className="w-full md:w-1/2 lg:w-1/3">
                             <Input
                                 type="text"
                                 placeholder="Search articles..."
-                                startContent={<Search className="text-gray-400" size={18} />}
+                                startContent={<Search className="text-pink-500" size={18} />}
                                 value={searchQuery}
                                 onValueChange={setSearchQuery}
                                 classNames={{
                                     base: "bg-gray-900/50 border-blue-900/40 rounded-lg",
-                                    inputWrapper: "bg-transparent hover:bg-gray-900/80 focus-within:bg-gray-900/80",
+                                    inputWrapper: "bg-white hover:bg-gray-900/80 shadow-sm focus-within:bg-gray-900/80",
                                 }}
                             />
                         </div>
@@ -90,12 +92,12 @@ export default function BlogPage() {
             </section>
 
             {/* Blog Posts Grid */}
-            <section className="py-12 bg-black font-nunito lg:px-[90px]">
+            <section className="py-12  font-nunito lg:px-[90px]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {blogs.map((post) => (
                             <Link to={`/blog/${post._id}`} key={post._id}>
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all h-full">
+                                <Card className="border-blue-900/40  overflow-hidden group hover:border-blue-500/50 transition-all h-full">
                                     <CardHeader className="p-0">
                                         <div className="aspect-video w-full overflow-hidden">
                                             <img
@@ -113,7 +115,7 @@ export default function BlogPage() {
                                             month: "long",
                                             day: "numeric",
                                         })}</p>
-                                        <h3 className="text-xl font-semibold mb-3 group-hover:text-blue-500 transition-colors line-clamp-2">
+                                        <h3 className="text-xl font-semibold mb-3 transition-colors line-clamp-2">
                                             {post.name}
                                         </h3>
                                         <div
@@ -123,7 +125,7 @@ export default function BlogPage() {
 
                                     </CardBody>
                                     <CardFooter className="pt-0 pb-4 px-6">
-                                        <Chip size="sm" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                                        <Chip size="sm" className="bg-blue-pink/10 text-pink-500 border-blue-pink/20">
                                             {post.category.name}
                                         </Chip>
                                     </CardFooter>
@@ -135,9 +137,9 @@ export default function BlogPage() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-16 bg-black">
+            <section className="py-16 bg-gray-100">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="rounded-2xl border border-blue-900/40 bg-gradient-to-r from-blue-950/50 to-gray-900/50 p-8 md:p-12 relative overflow-hidden">
+                    <div className="rounded-2xl border border-black/20 bg-white shadow-md p-8 md:p-12 relative overflow-hidden">
                         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]"></div>
                         <div className="relative flex flex-col md:flex-row justify-between items-center gap-6">
                             <div>
