@@ -9,7 +9,7 @@ interface TestimonialCardProps {
 
 export function TestimonialCard({ quote, author, role, img }: TestimonialCardProps) {
     return (
-        <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+        <Card className="border-blue-900/40 bg-white overflow-hidden">
             <div className="p-6">
                 <div className="flex items-start gap-4">
                     <div className="h-12 w-12 rounded-full overflow-hidden flex-shrink-0">

@@ -7,9 +7,9 @@ import news from "~/components/images/DL-News-Logo.png"
 import { ChevronRight } from "lucide-react";
 import ScrollAnimation from "./animation";
 
-export function ProductCard({ id }: { id?: string }) {
+export function ProductCard({ id, className }: { id?: string, className: string }) {
     return (
-        <section id={id} className="lg:py-20 py-10 bg-gray-100 shadow-t-gray-100 lg:px-[35px] px-4">
+        <section id={id} className={className}>
             <div className="container">
                 <ScrollAnimation>
                     <div className="flex flex-col items-center justify-center text-center mb-6">

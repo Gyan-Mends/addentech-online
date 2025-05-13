@@ -108,7 +108,7 @@ const Home = () => {
         </section>
 
         {/* Products Section */}
-        <ProductCard id="products" />
+        <ProductCard className="lg:py-20 py-10 bg-gray-100 shadow-t-gray-100 lg:px-[35px] px-4" id=" products" />
 
         {/* Customer Centric Section */}
         <section className="py-20 lg:px-[125px] px-4 ">

@@ -26,6 +26,7 @@ import PublicLayout from "~/layout/PublicLayout"
 import { json, LoaderFunction } from "@remix-run/node"
 import Registration from "~/modal/registration"
 import { RegistrationInterface } from "~/interface/interface"
+import ScrollAnimation from "~/components/animation"
 
 export default function TeamMemberDetailPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -304,39 +305,42 @@ export default function TeamMemberDetailPage() {
 
 
             {/* Team Member Hero Section */}
-            <section className="py-12 bg-gradient-to-br from-black to-gray-900 relative">
+            <section className="py-12  relative">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="w-full md:w-1/3">
-                            <div className="aspect-square overflow-hidden rounded-xl border border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
-                                <img
+                            <div className="aspect-square overflow-hidden rounded-xl  hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
+                                <ScrollAnimation>
+                                    <img
                                     src={userDetail.image || "/placeholder.svg"}
                                     alt={userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
                                     width={600}
                                     height={600}
                                     className="h-full w-full object-cover"
                                 />
+                                </ScrollAnimation>
                             </div>
                         </div>
-                        <div className="w-full md:w-2/3">
+                        <ScrollAnimation className="w-full">
+                            <div className="w-full md:w-2/3">
 
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-4">
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-4 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                                 {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
                             </h1>
                             <div className="mb-6">
-                                <Chip className="bg-blue-500/10 text-blue-500 border-blue-500/20" variant="bordered">
+                                    <Chip className=" " variant="bordered">
                                     {userDetail.role}
                                 </Chip>
                             </div>
                             <div dangerouslySetInnerHTML={{ __html: userDetail.bio }} />
                             <div className="flex flex-wrap gap-4 mb-6">
                                 <div className="flex items-center text-gray-400">
-                                    <Mail className="h-4 w-4 mr-2 text-blue-500" />
+                                        <Mail className="h-4 w-4 mr-2 text-pink-500" />
                                     <span>{userDetail.email}</span>
                                 </div>
                                 <div className="flex items-center text-gray-400">
-                                    <Phone className="h-4 w-4 mr-2 text-blue-500" />
+                                        <Phone className="h-4 w-4 mr-2 text-pink-500" />
                                     <span>{userDetail.phone}</span>
                                 </div>
 
@@ -349,9 +353,9 @@ export default function TeamMemberDetailPage() {
                                     rel="noopener noreferrer"
                                     isIconOnly
                                     variant="flat"
-                                    className="bg-blue-900/20 text-blue-500"
+                                        className="bg-pink-900/20 "
                                 >
-                                    <Linkedin size={18} />
+                                        <Linkedin size={18} className="text-pink-500" />
                                 </Button>
                                 <Button
                                     as={Link}
@@ -360,25 +364,26 @@ export default function TeamMemberDetailPage() {
                                     rel="noopener noreferrer"
                                     isIconOnly
                                     variant="flat"
-                                    className="bg-blue-900/20 text-blue-500"
+                                        className="bg-pink-900/20 text-pink-500"
                                 >
                                     <Twitter size={18} />
                                 </Button>
                                 <Link to="/contact">
-                                    <Button className="bg-blue-500 hover:bg-blue-600 text-white ml-2">Contact {member.name.split(" ")[0]}</Button>
+                                        <Button className="   ml-2">Contact {member.name.split(" ")[0]}</Button>
                                 </Link>
                             </div>
                         </div>
+                        </ScrollAnimation>
                     </div>
                 </div>
             </section>
 
             {/* Team Member Details Section */}
-            <section className="py-12 bg-black">
+            <section className="py-12 bg-gray-100">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <Tabs aria-label="Team member details" color="primary" variant="underlined" className="mb-8">
+                    <Tabs aria-label="Team member details" variant="underlined" className="mb-8 bg-white rounded-lg shadow-sm">
                         <Tab key="about" title="About">
-                            <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
+                            <Card className="border-blue-900/40 bg-white">
                                 <CardBody className="p-6">
                                     <h2 className="text-2xl font-bold mb-4">About                                 {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
                                     </h2>
@@ -391,18 +396,18 @@ export default function TeamMemberDetailPage() {
                         </Tab>
                         <Tab key="experience" title="Experience & Education">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
+                                <Card className=" bg-white ">
                                     <CardBody className="p-6">
                                         <div className="flex items-center mb-4">
-                                            <Briefcase className="h-5 w-5 text-blue-500 mr-2" />
+                                            <Briefcase className="h-5 w-5 text-pink-500 mr-2" />
                                             <h2 className="text-xl font-bold">Professional Experience</h2>
                                         </div>
                                         <div className="space-y-6">
                                             <div className="relative pl-6 border-l border-blue-900/40">
-                                                    <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full bg-blue-500"></div>
+                                                <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full bg-pink-500"></div>
                                                 <h3 className="text-lg font-semibold">{userDetail.institution}</h3>
                                                 <div className="flex items-center text-blue-500 text-sm mb-1">
-                                                        <Calendar className="h-3 w-3 mr-1" />
+                                                    <Calendar className="h-3 w-3 mr-1 text-pink-500" />
                                                     <span>{userDetail.dateCompletedInstitution}</span>
                                                     </div>
                                                 <p className="text-gray-400 mb-1">{userDetail.institution}</p>
@@ -411,19 +416,19 @@ export default function TeamMemberDetailPage() {
                                     </CardBody>
                                 </Card>
 
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black">
+                                <Card className="bg-white to-black">
                                     <CardBody className="p-6">
                                         <div className="flex items-center mb-4">
-                                            <GraduationCap className="h-5 w-5 text-blue-500 mr-2" />
+                                            <GraduationCap className="h-5 w-5 text-pink-500 mr-2" />
                                             <h2 className="text-xl font-bold">Education</h2>
                                         </div>
                                         <div className="space-y-6">
                                             <div className="relative pl-6 border-l border-blue-900/40">
-                                                    <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full bg-blue-500"></div>
+                                                <div className="absolute -left-1.5 top-1.5 h-3 w-3 rounded-full bg-pink-500"></div>
                                                 <h3 className="text-lg font-semibold">{userDetail.institutionName}</h3>
-                                                <p className="text-gray-400 mb-1">{userDetail.program}</p>
-                                                    <div className="flex items-center text-blue-500 text-sm">
-                                                        <Calendar className="h-3 w-3 mr-1" />
+                                                <p className="mb-1">{userDetail.program}</p>
+                                                <div className="flex items-center text-pink-500 text-sm">
+                                                    <Calendar className="h-3 w-3 mr-1 text-pink-500" />
                                                     <span>{userDetail.dateCompletedProgram}</span>
                                                     </div>
                                             </div>
@@ -439,14 +444,15 @@ export default function TeamMemberDetailPage() {
             </section>
 
             {/* Other Team Members Section */}
-            <section className="py-12 bg-gradient-to-br from-black to-gray-900 relative">
+            <section className="py-12  relative">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <h2 className="text-2xl font-bold mb-8">Meet Other Team Members</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {related?.map((otherMember, key) => (
-                            <Link to={`/team/${key}`} key={key}>
-                                <Card className="border-blue-900/40 bg-gradient-to-br from-gray-900 to-black overflow-hidden group hover:border-blue-500/50 transition-all">
+                            <ScrollAnimation>
+                                <Link to={`/team/${key}`} key={key}>
+                                    <Card className="border-blue-900/40  overflow-hidden group hover:border-blue-500/50 transition-all">
                                     <div className="aspect-square overflow-hidden">
                                         <img
                                             src={otherMember.image || "/placeholder.svg"}
@@ -457,13 +463,13 @@ export default function TeamMemberDetailPage() {
                                         />
                                     </div>
                                     <CardBody className="p-4">
-                                        <h3 className="font-bold text-lg group-hover:text-blue-500 transition-colors">{otherMember.firstName} {otherMember.middleName} {otherMember.lastName}</h3>
+                                            <h3 className="font-bold text-lg group-hover:text-pink-500 transition-colors">{otherMember.firstName} {otherMember.middleName} {otherMember.lastName}</h3>
                                         <p className="text-gray-400 text-sm mb-3">{otherMember.role}</p>
                                         <Link to={`/team/${otherMember._id}`} key={otherMember._id}>
                                             <Button
                                                 variant="light"
                                                 size="sm"
-                                                className="p-0 group-hover:text-blue-500"
+                                                    className="p-0 group-hover:text-pink-500"
                                                 endContent={<ChevronRight className="h-4 w-4" />}
                                             >
                                                 View Profile
@@ -472,6 +478,7 @@ export default function TeamMemberDetailPage() {
                                     </CardBody>
                                 </Card>
                             </Link>
+                            </ScrollAnimation>
                         ))}
 
                     </div>

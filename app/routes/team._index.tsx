@@ -7,6 +7,7 @@ import usersController from "~/controller/Users"
 import type { RegistrationInterface } from "~/interface/interface"
 import { motion } from "framer-motion"
 import { Chip } from "@nextui-org/react"
+import ScrollAnimation from "~/components/animation"
 
 const Team = () => {
     const { users } = useLoaderData<{
@@ -27,7 +28,7 @@ const Team = () => {
 
     return (
         <PublicLayout>
-            <section className="py-20 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden lg:px-[125px] px-4">
+            <section className="py-20 relative overflow-hidden lg:px-[125px] px-4">
                 {/* Animated background elements */}
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                 <div className="absolute inset-0 opacity-30">
@@ -44,7 +45,8 @@ const Team = () => {
                         variants={fadeInUpVariants}
                     >
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="aspect-[3/4] overflow-hidden rounded-lg shadow-xl  transform transition-transform duration-500 hover:scale-[1.02]">
+                            <ScrollAnimation>
+                                <div className="aspect-[3/4]  overflow-hidden rounded-lg shadow-xl  transform transition-transform duration-500  hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                                 <img
                                     src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
                                     alt="Team member"
@@ -53,7 +55,9 @@ const Team = () => {
                                     className="h-full w-full object-cover"
                                 />
                             </div>
-                            <div className="aspect-[3/4] overflow-hidden rounded-lg mt-8 shadow-xl   transform transition-transform duration-500 hover:scale-[1.02]">
+                            </ScrollAnimation>
+                            <ScrollAnimation delay={0.3}>
+                                <div className="aspect-[3/4] overflow-hidden rounded-lg mt-8 shadow-xl   transform transition-transform duration-500  hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                                 <img
                                     src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
                                     alt="Team member"
@@ -62,8 +66,10 @@ const Team = () => {
                                     className="h-full w-full object-cover"
                                 />
                             </div>
+                            </ScrollAnimation>
                         </div>
-                        <div className="space-y-6">
+                        <ScrollAnimation>
+                            <div className="space-y-6">
                             <div className="inline-flex">
                                 <Chip
                                     className=" font-medium text-sm px-3 py-1"
@@ -74,14 +80,15 @@ const Team = () => {
                                     Our Team
                                 </Chip>
                             </div>
-                            <h2 className="text-3xl md:text-4xl font-bold font-montserrat bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent">
+                                <h2 className="text-3xl md:text-4xl font-bold font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                                 Meet Our Dedicated Experts Behind Addentech Success
                             </h2>
-                            <p className="text-gray-300 text-lg leading-relaxed font-nunito">
+                                <p className=" text-lg leading-relaxed font-nunito">
                                 Our team combines deep legal knowledge with technical expertise to create solutions that truly address
                                 the needs of modern legal practice.
                             </p>
                         </div>
+                        </ScrollAnimation>
                     </motion.div>
 
                     <motion.div
@@ -100,7 +107,8 @@ const Team = () => {
                         }}
                     >
                         {users.map((member, i) => (
-                            <motion.div key={member._id} variants={fadeInUpVariants}>
+                            <ScrollAnimation>
+                                <motion.div key={member._id} variants={fadeInUpVariants}>
                                 <Link
                                     to={`/team/${member._id}`}
                                     className="block h-full transition-transform duration-300 hover:translate-y-[-8px]"
@@ -117,6 +125,7 @@ const Team = () => {
                                     />
                                 </Link>
                             </motion.div>
+                            </ScrollAnimation>
                         ))}
                     </motion.div>
 
@@ -163,7 +172,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 // Enhanced Team Member component with the new styling
 function EnhancedTeamMember({ name, role, img, socials }) {
     return (
-        <div className="border border-white/10 bg-black overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full rounded-lg shadow-lg">
+        <div className="border border-white/10  overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full rounded-lg shadow-lg">
             <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -176,10 +185,10 @@ function EnhancedTeamMember({ name, role, img, socials }) {
             </div>
 
             <div className="p-6">
-                <h3 className="text-xl font-semibold mb-1 text-white group-hover:text-pink-100 transition-colors duration-300">
+                <h3 className="text-xl font-semibold mb-1   transition-colors duration-300">
                     {name}
                 </h3>
-                <p className="text-pink-400 mb-4">{role}</p>
+                <p className=" mb-4">{role}</p>
 
                 <div className="flex gap-3">
                     {socials.map((social, index) => {
@@ -198,9 +207,9 @@ function EnhancedTeamMember({ name, role, img, socials }) {
                                 href={social.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 hover:bg-pink-500/20 hover:text-pink-300 transition-all duration-300"
+                                className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center   transition-all duration-300"
                             >
-                                <SocialIcon className="h-4 w-4" />
+                                <SocialIcon className="h-4 w-4 text-pink-500" />
                             </a>
                         )
                     })}
