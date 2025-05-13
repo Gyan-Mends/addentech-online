@@ -10,6 +10,7 @@ import { json, LoaderFunction } from "@remix-run/node";
 import blog from "~/controller/blog";
 import { BlogInterface } from "~/interface/interface";
 import ScrollAnimation from "~/components/animation";
+import AdvertBanner from "~/components/advert";
 
 
 
@@ -252,6 +253,8 @@ const Home = () => {
             </div>
           </div>
         </section>
+
+        <AdvertBanner />
 
         {/* Blog Section */}
         <section id="blog" className="py-20 lg:px-[125px] px-4 ">

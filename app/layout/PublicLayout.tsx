@@ -34,7 +34,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
       Team: "/team",
       About: "/about",
       Blog: "/blog",
-      Pricing: "/pricing",
+        //   Pricing: "/pricing",
   };
 
     const handleToggleMenu = () => {
@@ -89,7 +89,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
                   {/* Actions */}
                   <div className="hidden md:flex items-center gap-4">
-                        <ThemeSwitcher />
+                        {/* <ThemeSwitcher /> */}
                         <Link to="/addentech-login">
                             <Button className="border border-pink-500/50 border-2" variant="ghost" size="sm">
                           Log in

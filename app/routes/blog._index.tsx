@@ -150,8 +150,8 @@ export default function BlogPage() {
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Button className="bg-cyan-500 hover:bg-cyan-600 text-white">Contact us</Button>
-                                <Button className="bg-fuchsia-600 hover:bg-fuchsia-700 text-white">Learn More</Button>
+                                <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">Contact us</Button>
+                                <Button className=" ">Learn More</Button>
                             </div>
                         </div>
                     </div>
