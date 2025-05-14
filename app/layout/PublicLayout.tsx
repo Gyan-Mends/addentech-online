@@ -165,10 +165,10 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                         <ScrollAnimation>
                             <div className="flex flex-col gap-4">
                             <div className="flex items-center">
-                                <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
-                                    D
+                                    <div className="h-8 w-8 rounded bg-pink-500 flex items-center justify-center text-white font-bold font-montserrat">
+                                        A
                                 </div>
-                                <span className="ml-2 text-xl font-bold text-blue-500 font-montserrat">DENNISLAW</span>
+                                    <span className="ml-2 text-xl font-bold text-pink-500 font-montserrat">ADDENTECH</span>
                             </div>
                             <p className="text-muted-foreground mb-4">
                                 Transforming the legal landscape with innovative technology solutions.
@@ -183,8 +183,8 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                         className="text-muted-foreground hover:text-foreground"
                                     >
                                         <span className="sr-only">{social}</span>
-                                        <div className="h-8 w-8 rounded-full border border-primary-500/40 flex items-center justify-center">
-                                            <Icon className="h-4 w-4" />
+                                        <div className="h-8 w-8 rounded-full border border-pink-500/40 flex items-center justify-center">
+                                            <Icon className="h-4 w-4 text-pink-500" />
                                         </div>
                                     </Link>
                                 ))}
