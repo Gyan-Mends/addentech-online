@@ -243,7 +243,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                     <div className="border-t border-t-white/10 border-border/40 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
                         <ScrollAnimation>
                             <p className="text-sm text-muted-foreground">
-                            © {new Date().getFullYear()} DennisLaw. All rights reserved.
+                                © {new Date().getFullYear()} Addentech. All rights reserved.
                         </p>
                         </ScrollAnimation>
                         <ScrollAnimation>
