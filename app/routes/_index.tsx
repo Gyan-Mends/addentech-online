@@ -44,9 +44,9 @@ const Home = () => {
                     <h1 className="text-4xl  md:text-6xl font-montserrat font-bold leading-tight tracking-tighter">
                     Transforming the{" "}
                     <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                      Legal Landscape
+                        Legal Landscape with
                     </span>{" "}
-                    with Addentechnology
+                      Addentechnology
                   </h1>
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.3}>
@@ -109,7 +109,7 @@ const Home = () => {
         </section>
 
         {/* Products Section */}
-        <ProductCard className="lg:py-20 py-10 bg-gray-100 shadow-t-gray-100 lg:px-[35px] px-4" id=" products" />
+        <ProductCard className="lg:py-20 py-10 bg-gray-100 shadow-t-gray-100 lg:px-[35px] px-4" id="products" />
 
         {/* Customer Centric Section */}
         <section className="py-20 lg:px-[125px] px-4 ">

@@ -11,38 +11,34 @@ export default function AdvertBanner() {
 
                 <div className="grid md:grid-cols-2 gap-8 p-6 md:p-10 items-center">
                     <div className="space-y-6">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20">
-                            <Sparkles className="h-4 w-4 text-pink-500" />
-                            <span className="text-sm font-medium text-pink-500">Limited Time Offer</span>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-400/10 border border-pink-400/20">
+                            <Sparkles className="h-4 w-4 text-pink-400" />
+                            <span className="text-sm font-medium text-pink-400">Awards & Recognition</span>
                         </div>
 
                         <h2 className="text-2xl md:text-3xl font-bold font-montserrat">
-                            Get{" "}
+                            Proud Nominee for the{" "}
                             <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                                30% Off
+                                2025 African Legal Innovation
                             </span>{" "}
-                            on All Premium Legal Tech Solutions
+                            & Technology Awards
                         </h2>
 
                         <p className="text-muted-foreground font-nunito">
-                            Upgrade your legal practice with our cutting-edge technology solutions. Special pricing available for new
-                            clients until June 30th.
+                            Honored to be recognized for revolutionizing legal services with technology. Join us in redefining the future of legal innovation.
                         </p>
 
                         <div className="flex flex-wrap gap-4">
-                            <Link to="/pricing">
+                            <Link to="/learn-more">
                                 <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">
-                                    Claim Offer
+                                    Support our Mission
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
-                            <Link to="/demo">
-                                <Button className="border-pink-500/50 hover:border-pink-500">
-                                    Schedule Demo
-                                </Button>
-                            </Link>
+
                         </div>
                     </div>
+
 
                     <div className="relative h-[300px] rounded-lg overflow-hidden hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                         <img
@@ -52,13 +48,8 @@ export default function AdvertBanner() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                             <div className="bg-white/90 dark:bg-black/90 backdrop-blur-sm rounded-lg p-4 w-full">
-                                <p className="font-bold text-lg font-montserrat">Premium Package</p>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-muted-foreground line-through">$1999</span>
-                                    <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                                        $1399
-                                    </span>
-                                </div>
+                                <p className="font-bold text-lg font-montserrat">African Legal Awadrds</p>
+
                             </div>
                         </div>
                     </div>

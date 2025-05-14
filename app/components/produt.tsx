@@ -6,6 +6,7 @@ import mr from "~/components/images/mr-logo.png"
 import news from "~/components/images/DL-News-Logo.png"
 import { ChevronRight } from "lucide-react";
 import ScrollAnimation from "./animation";
+import { Link } from "@remix-run/react";
 
 export function ProductCard({ id, className }: { id?: string, className: string }) {
     return (
@@ -13,82 +14,91 @@ export function ProductCard({ id, className }: { id?: string, className: string 
             <div className="container">
                 <ScrollAnimation>
                     <div className="flex flex-col items-center justify-center text-center mb-6">
-                    <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Explore More of Our Products</p>
-                    <h2 className="text-3xl md:text-3xl font-montserrat font-bold mb-4">
-                        Top-Notch Software Development and Digital Transformation
-                    </h2>
-                    <p className="font-montserrat text-muted-foreground max-w-[800px]">
-                        Explore our suite of innovative legal tech solutions designed to streamline workflows and enhance client
-                        experiences.
-                    </p>
-                </div>
+                        <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Explore More of Our Products</p>
+                        <h2 className="text-3xl md:text-3xl font-montserrat font-bold mb-4">
+                            Top-Notch Software Development and Digital Transformation
+                        </h2>
+                        <p className="font-montserrat text-muted-foreground max-w-[800px]">
+                            Explore our suite of innovative legal tech solutions designed to streamline workflows and enhance client
+                            experiences.
+                        </p>
+                    </div>
                 </ScrollAnimation>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-20">
                     {[
                         {
+                            link: "",
                             title: "Justice Locator",
                             description: "Legal advice on the go",
                             image: jl,
                             type: "mobile",
+                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
                         },
                         {
+                            link: "https://www.dennislawgh.com/",
                             title: "DennisLaw",
                             description: "AI-powered legal assistant",
                             image: dl,
                             type: "brand",
+                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
                         },
                         {
+                            link: "http://marryrightgh.com/",
                             title: "MarryRight",
                             description: "Family law simplified",
                             image: mr,
                             type: "app",
+                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
                         },
                         {
-                            title: "Legal News",
+                            link: "https://dennislawnews.com/",
+                            title: "Dennislaw News",
                             description: "Stay updated on legal trends",
                             image: news,
                             type: "news",
+                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
                         },
                     ].map((product, i) => (
                         <ScrollAnimation>
-                            < CardContainer
-                            key={i}
-                                className="inter-var shadow-md rounded-lg group overflow-hidden -mt-20 lg:mt-0  backdrop-blur transition-all hover:border-border hover:bg-background/80 bg-white border border-black/10 hover:transform-3d"
-                        >
-                                <CardBody className="dark:bg-[#09090B80 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2]  lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-white/20   ">
-                                <CardItem translateZ="50"
-                                    className="text-xl  text-neutral-600 dark:text-white">
+                            <CardContainer
+                                key={i}
+                                className={`inter-var shadow-md rounded-lg group overflow-hidden -mt-20 lg:mt-0 backdrop-blur transition-all hover:border-border hover:bg-background/80 bg-white border border-black/10 hover:transform-3d `}
+                            >
+                                <CardBody className="dark:bg-[#09090B80 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] lg:w-20 sm:w-[30rem] h-auto rounded-xl p-6 !border !border-white/20">
+                                    <CardItem
+                                        translateZ="50"
+                                        className="text-xl text-neutral-600 dark:text-white"
+                                    >
                                         <p className="text-md bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-nunito font-bold">
                                             {product.title}
                                         </p>
+                                        <p className="text-sm font-nunito">{product.description}</p>
+                                    </CardItem>
 
-                                    <p className="text-sm font-nunito">{product.description}</p>
-                                </CardItem>
+                                    <CardItem className="mt-2 mb-10 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+                                        <img
+                                            src={product.image}
+                                            alt={product.title}
+                                            className={product.className}
+                                        />
+                                    </CardItem>
 
-                                    <CardItem className="mt-2 mb-10  overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
-                                    <img
-                                        src={product.image}
-                                        alt={product.title}
-                                        className="h-60 w-80  transition-transform group-hover:scale-105"
-                                    />
-                                </CardItem>
-
-                                <Button
-                                    variant="flat"
-                                    size="sm"
-                                        className="w-full group-hover:bg-gradient-to-r from-pink-500 to-purple-600     font-montserrat group-hover:text-white"
-                                >
-                                    Explore Product
-                                    <ChevronRight className="ml-2 h-4 w-4" />
-                                </Button>
-                            </CardBody>
-
-                        </CardContainer>
+                                    <Link to={product.link}><Button
+                                        variant="flat"
+                                        size="sm"
+                                        className="w-full group-hover:bg-gradient-to-r from-pink-500 to-purple-600 font-montserrat group-hover:text-white"
+                                    >
+                                        Explore Product
+                                        <ChevronRight className="ml-2 h-4 w-4" />
+                                    </Button>
+                                    </Link>
+                                </CardBody>
+                            </CardContainer>
                         </ScrollAnimation>
-
                     ))}
                 </div>
+
             </div>
         </section>
     )
