@@ -11,7 +11,7 @@ import {
     Input,
     Spinner,
 } from "@nextui-org/react";
-import { Link, useNavigation } from "@remix-run/react";
+import { Link, useNavigate, useNavigation } from "@remix-run/react";
 import {
     ArrowLeft,
     Bell,
@@ -33,6 +33,7 @@ import { ReactNode, useState } from "react";
 const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const navigation = useNavigation();
+    const navigate = useNavigate()
 
     const isLoading = navigation.state === "loading";
 
@@ -170,6 +171,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             startContent={
                                 <Search className="h-4 w-4 text-pink-500" />
                             }
+                            onValueChange={(value) => {
+                                const timeoutId = setTimeout(() => {
+                                    navigate(`?search_term=${value}`);
+                                }, 100);
+                                return () => clearTimeout(timeoutId);
+                            }}
                             type="search"
                             placeholder="Search user..."
                             className="w-full"

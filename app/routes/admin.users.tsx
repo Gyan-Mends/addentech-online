@@ -69,7 +69,7 @@ const Users = () => {
             ['clean']
         ],
     };
-    
+
     useEffect(() => {
         if (actionData) {
             if (actionData.success) {
@@ -295,27 +295,294 @@ const Users = () => {
                         </div>
 
 
+                        <div className="flex gap-4">
+                            <Select
+                                isRequired
+                                className="max-w-xs"
+                                label="Department"
+                                labelPlacement="outside"
+                                placeholder="Select Department"
+                                name="department"
+                                defaultSelectedKeys={[dataValue.department]}
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent:
+                                        "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                    trigger:
+                                        "shadow-sm border border-black/5 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white",
+                                }}
+                            >
+                                {departments.map((department) => (
+                                    <SelectItem key={department._id} value={department._id}>
+                                        {department.name}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+
+                            <CustomInput
+                                label=" Position"
+                                isRequired
+                                name="position"
+                                defaultValue={dataValue.role}
+                                isClearable
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+
+                            />
+                        </div>
+                        <div className=" ">
+                            <input name="base64Image" value={base64Image} type="hidden" />
+                            <label className="font-nunito block text-sm" htmlFor="">
+                                Image
+                            </label>
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
+                                <input
+                                    name="image"
+                                    placeholder=" "
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    type="file"
+                                    onChange={(event: any) => {
+                                        const file = event.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setBase64Image(reader.result);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                                {/* Display the default image or the uploaded image */}
+                                {base64Image ? (
+                                    <img
+                                        src={base64Image}
+                                        alt="Preview"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                    />
+                                ) : (
+                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <FileUploader className="h-20 w-20 text-white" />
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <Divider />
+
+                            <div className="mt-6">
+                                <label htmlFor="" className="font-nunito">Bio</label>
+                                <input type="hidden" name="bio" value={content} />
+                                <ReactQuill
+                                    value={content} // Bind editor content to state
+                                    onChange={setContent} // Update state on change
+                                    modules={modules}
+                                    className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
+                                />
+                            </div>
+
+                            <Divider className="mt-28" />
+
+                            <div className="flex flex-col gap-6">
+                                <p>Professional Experience </p>
+                                <CustomInput
+                                    defaultValue={dataValue.institution}
+                                    label=" Institution"
+                                    isRequired
+                                    name="institution"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+                                <div className="flex gap-4">
+                                    <CustomInput
+                                        defaultValue={dataValue.positionInstitution}
+                                        label=" Position_institution"
+                                        isRequired
+                                        name="position_institution"
+                                        isClearable
+                                        placeholder=" "
+                                        type="text"
+                                        labelPlacement="outside"
+
+                                    />
+                                    <CustomInput
+                                        defaultValue={dataValue.dateCompletedInstitution}
+                                        label=" Date Completed"
+                                        isRequired
+                                        name="date_completed"
+                                        isClearable
+                                        placeholder=" "
+                                        type="date"
+                                        labelPlacement="outside"
+
+                                    />
+
+                                </div>
+                            </div>
+                            <Divider className="mt-6" />
+                            <div className="flex flex-col gap-6 mt-4">
+                                <p>Education Background</p>
+                                <CustomInput
+                                    defaultValue={dataValue.institutionName}
+                                    label="Intution Name"
+                                    isRequired
+                                    name="institution_name"
+                                    isClearable
+                                    placeholder=" "
+                                    type="text"
+                                    labelPlacement="outside"
+
+                                />
+                                <div className="flex gap-4">
+                                    <CustomInput
+                                        defaultValue={dataValue.positionInstitution}
+                                        label=" Program"
+                                        isRequired
+                                        name="program"
+                                        isClearable
+                                        placeholder=" "
+                                        type="text"
+                                        labelPlacement="outside"
+
+                                    />
+                                    <CustomInput
+                                        defaultValue={dataValue.dateCompletedProgram}
+                                        isRequired
+                                        label="Date Completed"
+                                        isRequired
+                                        name="date_c"
+                                        isClearable
+                                        placeholder=" "
+                                        type="date"
+                                        labelPlacement="outside"
+
+                                    />
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <input name="admin" value={user?._id} type="hidden" />
+                        <input name="intent" value="update" type="hidden" />
+                        <input name="id" value={dataValue?._id} type="hidden" />
+
+
+                        <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
+                            setIsEditModalOpened(false)
+                        }}>
+                            Update
+                        </Button>
+                    </Form>
+                </Drawer>
+            )
+            }
+            {/* Create Modal */}
+            {/* Create Modal */}
+            <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create User">
+                <Form method="post" className="flex flex-col gap-4 p-4">
+                    <CustomInput
+                        label="First name"
+                        isClearable
+                        name="firstname"
+                        placeholder=" "
+                        type="text"
+                        labelPlacement="outside"
+                    />
                     <div className="flex gap-4">
-                        <Select
-                            isRequired
-                            className="max-w-xs"
-                            label="Department"
+                        <CustomInput
+                            label="Middle Name"
+                            name="middlename"
+                            placeholder=" "
+                            isClearable
+                            type="text"
                             labelPlacement="outside"
-                            placeholder="Select Department"
-                            name="department"
-                            defaultSelectedKeys={[dataValue.department]}
+
+                        />
+                        <CustomInput
+                            label="Last Name"
+                            isRequired
+                            name="lastname"
+                            isClearable
+                            placeholder=" "
+                            type="text"
+                            labelPlacement="outside"
+                        />
+                    </div>
+                    <CustomInput
+                        label="Email"
+                        isRequired
+                        name="email"
+                        isClearable
+                        placeholder=" "
+                        type="text"
+                        labelPlacement="outside"
+                    />
+                    <div className="flex gap-4">
+                        <CustomInput
+                            label=" Phone"
+                            isRequired
+                            name="phone"
+                            isClearable
+                            placeholder=" "
+                            type="text"
+                            labelPlacement="outside"
+
+                        />
+                        <CustomInput
+                            label=" Password"
+                            isRequired
+                            name="password"
+                            isClearable
+                            placeholder=" "
+                            type="text"
+                            labelPlacement="outside"
+
+                        />
+                    </div>
+                    <div className="">
+                        <Select
+                            label="Role"
+                            labelPlacement="outside"
+                            placeholder=" "
+                            isRequired
+                            name="role"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                popoverContent:
-                                    "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
-                                trigger:
-                                    "shadow-sm border border-black/5 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white",
+                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                             }}
                         >
-                            {departments.map((department) => (
-                                <SelectItem key={department._id} value={department._id}>
-                                    {department.name}
-                                </SelectItem>
+                            {[
+                                { key: "admin", value: "admin", display_name: "Admin" },
+                                { key: "hod", value: "hod", display_name: "HOD" },
+                                { key: "staff", value: "staff", display_name: "Staff" },
+                            ].map((role) => (
+                                <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <Select
+                            label="Departments"
+                            labelPlacement="outside"
+                            placeholder=" "
+                            isRequired
+                            name="department"
+                            classNames={{
+                                label: "font-nunito text-sm text-default-100",
+                                popoverContent: "z-[10000]  !bg-white shadow-sm  border border-black/5 font-nunito ",
+                                trigger: "   shadow-sm   border border-black/30  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white "
+                            }}
+                        >
+                            {departments.map((department: DepartmentInterface, index: number) => (
+                                <SelectItem key={department._id}>{department.name}</SelectItem>
                             ))}
                         </Select>
 
@@ -323,7 +590,6 @@ const Users = () => {
                             label=" Position"
                             isRequired
                             name="position"
-                            defaultValue={dataValue.role}
                             isClearable
                             placeholder=" "
                             type="text"
@@ -332,28 +598,25 @@ const Users = () => {
                         />
                     </div>
                     <div className=" ">
-                        <input name="base64Image" value={base64Image} type="hidden" />
-                        <label className="font-nunito block text-sm" htmlFor="">
-                            Image
-                        </label>
+                        <label className="font-nunito block text-sm" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
                                 name="image"
+                                required
                                 placeholder=" "
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 type="file"
                                 onChange={(event: any) => {
                                     const file = event.target.files[0];
                                     if (file) {
-                                        const reader = new FileReader();
+                                        const reader = new FileReader()
                                         reader.onloadend = () => {
-                                            setBase64Image(reader.result);
-                                        };
-                                        reader.readAsDataURL(file);
+                                            setBase64Image(reader.result)
+                                        }
+                                        reader.readAsDataURL(file)
                                     }
                                 }}
                             />
-                            {/* Display the default image or the uploaded image */}
                             {base64Image ? (
                                 <img
                                     src={base64Image}
@@ -362,7 +625,7 @@ const Users = () => {
                                 />
                             ) : (
                                 <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                                    <FileUploader className="h-20 w-20 text-white" />
+                                    <FileUploader className="h-20 w-20 !text-gray-600" />
                                 </span>
                             )}
                         </div>
@@ -387,7 +650,6 @@ const Users = () => {
                         <div className="flex flex-col gap-6">
                             <p>Professional Experience </p>
                             <CustomInput
-                                defaultValue={dataValue.institution}
                                 label=" Institution"
                                 isRequired
                                 name="institution"
@@ -399,7 +661,6 @@ const Users = () => {
                             />
                             <div className="flex gap-4">
                                 <CustomInput
-                                    defaultValue={dataValue.positionInstitution}
                                     label=" Position_institution"
                                     isRequired
                                     name="position_institution"
@@ -410,7 +671,6 @@ const Users = () => {
 
                                 />
                                 <CustomInput
-                                    defaultValue={dataValue.dateCompletedInstitution}
                                     label=" Date Completed"
                                     isRequired
                                     name="date_completed"
@@ -427,7 +687,6 @@ const Users = () => {
                         <div className="flex flex-col gap-6 mt-4">
                             <p>Education Background</p>
                             <CustomInput
-                                defaultValue={dataValue.institutionName}
                                 label="Intution Name"
                                 isRequired
                                 name="institution_name"
@@ -439,7 +698,6 @@ const Users = () => {
                             />
                             <div className="flex gap-4">
                                 <CustomInput
-                                    defaultValue={dataValue.positionInstitution}
                                     label=" Program"
                                     isRequired
                                     name="program"
@@ -450,8 +708,6 @@ const Users = () => {
 
                                 />
                                 <CustomInput
-                                    defaultValue={dataValue.dateCompletedProgram}
-                                    isRequired
                                     label="Date Completed"
                                     isRequired
                                     name="date_c"
@@ -466,271 +722,15 @@ const Users = () => {
                         </div>
                     </div>
 
-
-
                     <input name="admin" value={user?._id} type="hidden" />
-                    <input name="intent" value="update" type="hidden" />
-                    <input name="id" value={dataValue?._id} type="hidden" />
+                    <input name="intent" value="create" type="hidden" />
+                    <input name="base64Image" value={base64Image} type="hidden" />
 
-
-                    <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
-                        setIsEditModalOpened(false)
-                    }}>
-                        Update
-                    </Button>
+                    <button type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4">
+                        Submit
+                    </button>
                 </Form>
-                </Drawer>
-    )
-}
-{/* Create Modal */ }
-{/* Create Modal */ }
-<Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create User">
-    <Form method="post" className="flex flex-col gap-4 p-4">
-        <CustomInput
-            label="First name"
-            isClearable
-            name="firstname"
-            placeholder=" "
-            type="text"
-            labelPlacement="outside"
-        />
-        <div className="flex gap-4">
-            <CustomInput
-                label="Middle Name"
-                name="middlename"
-                placeholder=" "
-                isClearable
-                type="text"
-                labelPlacement="outside"
-
-            />
-            <CustomInput
-                label="Last Name"
-                isRequired
-                name="lastname"
-                isClearable
-                placeholder=" "
-                type="text"
-                labelPlacement="outside"
-            />
-        </div>
-        <CustomInput
-            label="Email"
-            isRequired
-            name="email"
-            isClearable
-            placeholder=" "
-            type="text"
-            labelPlacement="outside"
-        />
-        <div className="flex gap-4">
-            <CustomInput
-                label=" Phone"
-                isRequired
-                name="phone"
-                isClearable
-                placeholder=" "
-                type="text"
-                labelPlacement="outside"
-
-            />
-            <CustomInput
-                label=" Password"
-                isRequired
-                name="password"
-                isClearable
-                placeholder=" "
-                type="text"
-                labelPlacement="outside"
-
-            />
-        </div>
-        <div className="">
-            <Select
-                label="Role"
-                labelPlacement="outside"
-                placeholder=" "
-                isRequired
-                name="role"
-                classNames={{
-                    label: "font-nunito text-sm text-default-100",
-                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                }}
-            >
-                {[
-                    { key: "admin", value: "admin", display_name: "Admin" },
-                    { key: "hod", value: "hod", display_name: "HOD" },
-                    { key: "staff", value: "staff", display_name: "Staff" },
-                ].map((role) => (
-                    <SelectItem key={role.key}>{role.display_name}</SelectItem>
-                ))}
-            </Select>
-        </div>
-
-        <div className="flex gap-4">
-            <Select
-                label="Departments"
-                labelPlacement="outside"
-                placeholder=" "
-                isRequired
-                name="department"
-                classNames={{
-                    label: "font-nunito text-sm text-default-100",
-                    popoverContent: "z-[10000]  !bg-white shadow-sm  border border-black/5 font-nunito ",
-                    trigger: "   shadow-sm   border border-black/30  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white "
-                }}
-            >
-                {departments.map((department: DepartmentInterface, index: number) => (
-                    <SelectItem key={department._id}>{department.name}</SelectItem>
-                ))}
-            </Select>
-
-            <CustomInput
-                label=" Position"
-                isRequired
-                name="position"
-                isClearable
-                placeholder=" "
-                type="text"
-                labelPlacement="outside"
-
-            />
-        </div>
-        <div className=" ">
-            <label className="font-nunito block text-sm" htmlFor="">Image</label>
-            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
-                <input
-                    name="image"
-                    required
-                    placeholder=" "
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    type="file"
-                    onChange={(event: any) => {
-                        const file = event.target.files[0];
-                        if (file) {
-                            const reader = new FileReader()
-                            reader.onloadend = () => {
-                                setBase64Image(reader.result)
-                            }
-                            reader.readAsDataURL(file)
-                        }
-                    }}
-                />
-                {base64Image ? (
-                    <img
-                        src={base64Image}
-                        alt="Preview"
-                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
-                    />
-                ) : (
-                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                        <FileUploader className="h-20 w-20 !text-gray-600" />
-                    </span>
-                )}
-            </div>
-        </div>
-
-        <div>
-            <Divider />
-
-            <div className="mt-6">
-                <label htmlFor="" className="font-nunito">Bio</label>
-                <input type="hidden" name="bio" value={content} />
-                <ReactQuill
-                    value={content} // Bind editor content to state
-                    onChange={setContent} // Update state on change
-                    modules={modules}
-                    className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
-                />
-            </div>
-
-            <Divider className="mt-28" />
-
-            <div className="flex flex-col gap-6">
-                <p>Professional Experience </p>
-                <CustomInput
-                    label=" Institution"
-                    isRequired
-                    name="institution"
-                    isClearable
-                    placeholder=" "
-                    type="text"
-                    labelPlacement="outside"
-
-                />
-                <div className="flex gap-4">
-                    <CustomInput
-                        label=" Position_institution"
-                        isRequired
-                        name="position_institution"
-                        isClearable
-                        placeholder=" "
-                        type="text"
-                        labelPlacement="outside"
-
-                    />
-                    <CustomInput
-                        label=" Date Completed"
-                        isRequired
-                        name="date_completed"
-                        isClearable
-                        placeholder=" "
-                        type="date"
-                        labelPlacement="outside"
-
-                    />
-
-                </div>
-            </div>
-            <Divider className="mt-6" />
-            <div className="flex flex-col gap-6 mt-4">
-                <p>Education Background</p>
-                <CustomInput
-                    label="Intution Name"
-                    isRequired
-                    name="institution_name"
-                    isClearable
-                    placeholder=" "
-                    type="text"
-                    labelPlacement="outside"
-
-                />
-                <div className="flex gap-4">
-                    <CustomInput
-                        label=" Program"
-                        isRequired
-                        name="program"
-                        isClearable
-                        placeholder=" "
-                        type="text"
-                        labelPlacement="outside"
-
-                    />
-                    <CustomInput
-                        label="Date Completed"
-                        isRequired
-                        name="date_c"
-                        isClearable
-                        placeholder=" "
-                        type="date"
-                        labelPlacement="outside"
-
-                    />
-
-                </div>
-            </div>
-        </div>
-
-        <input name="admin" value={user?._id} type="hidden" />
-        <input name="intent" value="create" type="hidden" />
-        <input name="base64Image" value={base64Image} type="hidden" />
-
-        <button type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4">
-            Submit
-        </button>
-    </Form>
-</Drawer>
+            </Drawer>
         </AdminLayout >
     )
 }
