@@ -1,6 +1,6 @@
 import { Button, Card, CardHeader, Input, Textarea } from "@nextui-org/react"
 import { ActionFunction, json } from "@remix-run/node"
-import { Form, Link, useActionData } from "@remix-run/react"
+import { Form, Link, useActionData, useSubmit, useFormAction } from "@remix-run/react"
 import { CheckCircle, Users } from "lucide-react"
 import { useEffect } from "react"
 import { Toaster } from "react-hot-toast"
@@ -18,6 +18,11 @@ const Contact = () => {
         if (actionData) {
             if (actionData.success) {
                 successToast(actionData.message)
+                // Reset form
+                const form = document.querySelector("form") as HTMLFormElement
+                if (form) {
+                    form.reset()
+                }
             } else {
                 errorToast(actionData.message)
             }
