@@ -146,19 +146,72 @@ class UsersController {
             }
     }
 
-    async UpdateUser(
-        {
+    async UpdateUser({
+        firstName,
+        middleName,
+        lastName,
+        email,
+        admin,
+        phone,
+        role,
+        id,
+        position,
+        department,
+        base64Image,
+        bio,
+        institutionName,
+        program,
+        dateCompletedProgram,
+        institution,
+        positionInstitution,
+        dateCompletedInstitution,
+    }: {
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    email: string;
+    admin: string;
+    phone: string;
+    role: string;
+    id: string;
+    position?: string;
+    department?: string;
+    base64Image?: string;
+    bio?: string;
+    institutionName?: string;
+    program?: string;
+    dateCompletedProgram?: string;
+    institution?: string;
+    positionInstitution?: string;
+    dateCompletedInstitution?: string;
+}) {
+      try {
+          // Find the user to update
+          const existingUser = await Registration.findById(id);
+
+          if (!existingUser) {
+              return json({
+                  message: "User not found. Unable to update.",
+                  success: false,
+                  status: 404,
+              });
+        }
+
+        // Update the image only if a new one is provided
+        const updatedImage = base64Image ? base64Image : existingUser.image;
+
+        // Prepare update payload
+        const updatePayload: Record<string, any> = {
             firstName,
-            middleName,
             lastName,
             email,
-            admin,
             phone,
             role,
-            id,
+            admin,
+            middleName,
             position,
             department,
-            base64Image,
+            image: updatedImage,
             bio,
             institutionName,
             program,
@@ -166,69 +219,41 @@ class UsersController {
             institution,
             positionInstitution,
             dateCompletedInstitution,
-        }: {
-            firstName: string,
-            middleName: string,
-            lastName: string,
-            email: string,
-            admin: string,
-            phone: string,
-            role: string,
-            id: string,
-                position: string,
-                department: string,
-            base64Image: string,
-            bio,
-            institutionName,
-            program,
-            dateCompletedProgram,
-            institution,
-            positionInstitution,
-            dateCompletedInstitution,
-        }
-    ) {
-        try {
-            const updateUser = await Registration.findByIdAndUpdate(id, {
-                firstName,
-                middleName,
-                lastName,
-                email,
-                phone,
-                role,
-                admin,
-                position,
-                department,
-                image: base64Image,
-                bio,
-                institutionName,
-                program,
-                dateCompletedProgram,
-                institution,
-                positionInstitution,
-                dateCompletedInstitution,
-            });
+        };
 
-            if (updateUser) {
-                return json({
-                    message: "User updated successfully",
-                    success: true,
-                    status: 200
-                });
-            } else {
-                return json({
-                    message: "Unable to update this record",
-                    success: false,
-                    status: 500
-                });
+        // Remove undefined values from the payload
+        Object.keys(updatePayload).forEach((key) => {
+            if (updatePayload[key] === undefined) {
+                delete updatePayload[key];
             }
-        } catch (error: any) {
+        });
+
+        // Perform the update
+        const updatedUser = await Registration.findByIdAndUpdate(id, updatePayload, { new: true });
+
+        if (updatedUser) {
             return json({
-                message: error.message,
+                message: "User updated successfully",
+                success: true,
+                status: 200,
+                data: updatedUser, // Return updated user for confirmation
+            });
+        } else {
+            return json({
+                message: "Unable to update this record.",
                 success: false,
-                status: 500
+                status: 500,
             });
         }
-    }
+    } catch (error: any) {
+        return json({
+            message: error.message || "An error occurred while updating the user.",
+            success: false,
+            status: 500,
+        });
+      }
+  }
+
 
 
     async logout(intent: string) {
