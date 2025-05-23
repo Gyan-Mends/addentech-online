@@ -43,14 +43,14 @@ const About = () => {
         <PublicLayout>
             <main className="flex-1">
                 {/* Hero Section */}
-                <section className="relative overflow-hidden py-20 md:py-28  lg:px-[125px]">
+                <section className="relative overflow-hidden py-10 md:py-28  lg:px-[125px]">
                     <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                     <div className="container relative">
                         <div className="max-w-3xl mx-auto text-center mb-12">
                             <ScrollAnimation>
                                 <h1 className="text-4xl font-montserrat md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter mb-6">
-                                    <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Transforming </span>The Legal Landscape With{" "}
-                                    <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                    <span className="text-pink-500">Transforming </span>The Legal Landscape With{" "}
+                                    <span className="text-pink-500">
                                         Technology
                                     </span>
                                 </h1>
@@ -61,52 +61,6 @@ const About = () => {
                                     revolutionize the practice of law.
                                 </p>
                             </ScrollAnimation>
-                            <ScrollAnimation delay={0.4}>
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                                    <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-montserrat">
-                                        Get Started
-                                        {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
-                                    </Button>
-                                    <Button className="font-montserrat">Learn More</Button>
-                                </div>
-
-                            </ScrollAnimation>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <ScrollAnimation>
-                                <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                                    <img
-                                        src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                                        alt="Legal technology workspace"
-                                        width={600}
-                                        height={400}
-                                        className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-                                    />
-                                </div>
-                            </ScrollAnimation>
-                            <ScrollAnimation>
-                                <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                                    <img
-                                        src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                                        alt="Legal team collaboration"
-                                        width={600}
-                                        height={400}
-                                        className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-                                    />
-                                </div>
-                            </ScrollAnimation>
-                            <ScrollAnimation>
-                                <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                                    <img
-                                        src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                                        alt="Legal professionals with technology"
-                                        width={600}
-                                        height={400}
-                                        className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
-                                    />
-                                </div>
-                            </ScrollAnimation>
                         </div>
                     </div>
                 </section>
@@ -116,11 +70,7 @@ const About = () => {
                     <div className="container ">
                         <ScrollAnimation>
                             <div className="max-w-3xl mx-auto text-center mb-12">
-                                <h2 className="text-2xl md:text-3xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-bold mb-4 font-montserrat">Learn More About Our Company Statistics</h2>
-                                <p className="text-muted-foreground font-nunito">
-                                    Our track record speaks for itself. We've helped numerous law firms transform their practice with
-                                    cutting-edge technology.
-                                </p>
+                                <h2 className="text-2xl md:text-3xl">Learn More About Our Company Statistics</h2>
                             </div>
                         </ScrollAnimation>
 
@@ -142,8 +92,7 @@ const About = () => {
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div className="space-y-6">
                                 <ScrollAnimation>
-                                    <div className="bg-pink-500/10 w-28 m-auto text-center p-1 rounded text-pink-500 hover:bg-blue-500/20 font-montserrat">Our Vision</div>
-                                    <h2 className="text-3xl md:text-4xl font-bold font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent" >To transform the legal landscape with innovation</h2>
+                                    <h2 className="text-3xl md:text-4xl font-bold font-montserrat" >To transform the legal landscape with innovation</h2>
                                 </ScrollAnimation>
                                 <ScrollAnimation delay={0.2}>
                                     <p className="text-muted-foreground font-nunito">
@@ -201,29 +150,11 @@ const About = () => {
                         <div className="max-w-3xl mx-auto text-center">
                             <ScrollAnimation>
                                 <div className="bg-pink-500/10 text-pink-500 w-28 text-center rounded p-1 hover:bg-pink-500/20 mb-4 m-auto font-montserrat">Our Mission</div>
-                                <h2 className="text-3xl md:text-4xl font-bold mb-6 font-montserrat">
-                                    Delivering <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">innovative</span> solutions that empower <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">legal</span> professionals to excel in a digital world
-                                </h2>
+                                <h2 className="text-3xl md:text-4xl font-semibold mb-6 font-montserrat">
+                                    To provide our customers with quality legal technology services and develope excellents at a fair and competitive price                                </h2>
                             </ScrollAnimation>
-                            <ScrollAnimation delay={0.2}>
-                                <p className="text-muted-foreground mb-8 font-nunito">
-                                    We are committed to developing cutting-edge technology that addresses the unique challenges faced by
-                                    legal professionals, enabling them to serve their clients more effectively.
-                                </p>
-                            </ScrollAnimation>
-                            <ScrollAnimation delay={0.3}>
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    <Link to="/service">
-                                        <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-montserrat" >Our Services</Button>
+                            
 
-                                    </Link>
-                                    <Link to="/contact">
-                                        <Button className="  font-montserrat">
-                                            Contact Us
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </ScrollAnimation>
                         </div>
                     </div>
                 </section>
@@ -271,17 +202,8 @@ const About = () => {
                             </div>
                             <ScrollAnimation>
                                 <div className="space-y-6">
-                                    <div className="inline-flex">
-                                        <Chip
-                                            className=" font-medium text-sm px-3 py-1"
-                                            variant="bordered"
-                                            size="sm"
-                                            startContent={<Sparkles className="h-3.5 w-3.5 mr-1" />}
-                                        >
-                                            Our Team
-                                        </Chip>
-                                    </div>
-                                    <h2 className="text-3xl md:text-4xl font-bold font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                   
+                                    <h2 className="text-3xl md:text-4xl font-bold font-montserrat ">
                                         Meet Our Dedicated Experts Behind Addentech Success
                                     </h2>
                                     <p className=" text-lg leading-relaxed font-nunito">
@@ -363,41 +285,35 @@ const About = () => {
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div className="space-y-6 font-nunito">
                                 <ScrollAnimation>
-                                    <div className="bg-pink-500/10 text-pink-500 m-auto p-1 text-center rounded w-28 hover:bg-pink-500/20">About Us</div>
-                                <h2 className="text-3xl md:text-4xl font-bold">Know More About Us</h2>
+                                    <h2 className="text-3xl md:text-4xl font-bold">Know More About Us</h2>
                                 </ScrollAnimation>
                                 <ScrollAnimation delay={0.2}>
                                     <p className="text-muted-foreground">
-                                    DennisLaw is a pioneering legal technology company founded in 2018 with a mission to transform how
-                                    legal services are delivered. Our team combines decades of legal expertise with cutting-edge technical
-                                    knowledge to create solutions that address the unique challenges faced by modern law firms.
-                                </p>
+                                        DennisLaw is a pioneering legal technology company founded in 2018 with a mission to transform how
+                                        legal services are delivered. Our team combines decades of legal expertise with cutting-edge technical
+                                        knowledge to create solutions that address the unique challenges faced by modern law firms.
+                                    </p>
                                 </ScrollAnimation>
                                 <ScrollAnimation delay={0.3}>
                                     <p className="text-muted-foreground">
-                                    We believe that technology should enhance, not replace, the human elements of legal practice. Our
-                                    solutions are designed to handle routine tasks and data management, freeing attorneys to focus on the
-                                    strategic, creative, and interpersonal aspects of their work where they add the most value.
-                                </p>
+                                        We believe that technology should enhance, not replace, the human elements of legal practice. Our
+                                        solutions are designed to handle routine tasks and data management, freeing attorneys to focus on the
+                                        strategic, creative, and interpersonal aspects of their work where they add the most value.
+                                    </p>
                                 </ScrollAnimation>
-                                <ScrollAnimation delay={0.4}>
-                                    <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">
-                                    Learn More
-                                    {/* <ArrowRight className="ml-2 h-4 w-4" /> */}
-                                </Button>
-                                </ScrollAnimation>
+                               
                             </div>
                             <div className="relative">
                                 <ScrollAnimation>
                                     <div className="aspect-video rounded-lg overflow-hidden hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
-                                    <img
-                                        src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                                        alt="Our company"
-                                        width={600}
-                                        height={400}
-                                        className="h-full w-full object-cover"
-                                    />
-                                </div>
+                                        <img
+                                            src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
+                                            alt="Our company"
+                                            width={600}
+                                            height={400}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
                                 </ScrollAnimation>
                             </div>
                         </div>
@@ -407,46 +323,12 @@ const About = () => {
                 {/* Why Choose Us Section */}
                 <ProductCard className="lg:py-20 bg-white py-10 shadow-t-gray-100 lg:px-[35px] px-4" />
 
-                {/* Testimonials Section */}
-                <section className="py-16  lg:px-[125px] font-nunito">
-                    <div className="container">
-                        <ScrollAnimation>
-                            <div className="max-w-3xl mx-auto text-center mb-12">
-                                <div className=" mb-4 w-40 p-1 m-auto text-center rounded font-montserrat  text-center">Testimonials</div>
-                                <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserra bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Client experiences that inspire confidence</h2>
-                            <p className="text-muted-foreground">
-                                Hear what our clients have to say about their experience working with us.
-                            </p>
-                        </div>
-                        </ScrollAnimation>
-
-                        <div className="grid grid-cols-1 gap-6">
-                            <TestimonialCard
-                                quote="Our visibility and performance have been dramatically improved by the innovative solutions from the DennisLaw team."
-                                author="Lisa Thompson"
-                                role="Managing Partner, Thompson Legal"
-                                img="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                            />
-                        </div>
-
-                        <div className="flex justify-center mt-8">
-                            <div className="flex gap-2">
-                                {[0, 1, 2].map((i) => (
-                                    <button
-                                        key={i}
-                                        className={`h-2 rounded-full ${i === 0 ? "w-8 bg-blue-500" : "w-2 bg-gray-600"}`}
-                                        aria-label={`Go to slide ${i + 1}`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </section>
+              
             </main>
         </PublicLayout>
     )
 }
-function EnhancedTeamMember({ name, role, img, socials }) {
+function EnhancedTeamMember({ name, role, img, socials }: { name: string; role: string; img: string; socials: { platform: string; url: string }[] }) {
     return (
         <div className="border border-white/10  overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full rounded-lg shadow-lg">
             <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>

@@ -15,73 +15,50 @@ import PublicLayout from "~/layout/PublicLayout"
 import { Link, useLoaderData } from "@remix-run/react"
 import { json, LoaderFunction } from "@remix-run/node"
 import blog from "~/controller/blog"
-import { BlogInterface } from "~/interface/interface"
+import { BlogInterface, CategoryInterface } from "~/interface/interface"
 import ScrollAnimation from "~/components/animation"
+import category from "~/controller/categoryController"
 
 
 export default function BlogPage() {
+ const {
+        blogs,
+        categories
+    } = useLoaderData<{
+        blogs: BlogInterface[],
+        categories: CategoryInterface[]
+    }>()  
+    
+    console.log(blogs);
+    
     const [searchQuery, setSearchQuery] = useState("");
 
-    const articles = [
-        {
-            image: "https://res.cloudinary.com/djlnjjzvt/image/upload/v1746900373/b2_yzywg9.avif",
-            title: "Understanding the New Companies Act of Ghana",
-            excerpt:
-                "A comprehensive guide to the key changes in the new Companies Act and how they affect businesses in Ghana",
-            date: "April 15, 2025",
-            author: "John Mensah",
-            category: "Corporate Governance",
-            readTime: "5 min read",
-        },
-        {
-            image: "https://res.cloudinary.com/djlnjjzvt/image/upload/v1746900683/b3_ov52nd.jpg",
-            title: "Tax Compliance for SMEs in Ghana",
-            excerpt:
-                "Essential tax compliance practices that every small and medium enterprise in Ghana should implement.",
-            date: "March 28, 2025",
-            author: "By Abena Owusu",
-            category: "Tax Administration",
-            readTime: "7 min read",
-        },
-        {
-            image: "https://res.cloudinary.com/djlnjjzvt/image/upload/v1746901014/b4_h6fkeq.avif",
-            title: "Building Effective Boards for Corporate Success",
-            excerpt:
-                "How to constitute and manage effective boards that drive corporate success and good governance.",
-            date: "February 10, 2025",
-            author: "Michael Asante",
-            category: "Corporate Governance",
-            readTime: "6 min read",
-        },
-        {
-            image: "https://res.cloudinary.com/djlnjjzvt/image/upload/v1746901244/b5_pv9wq0.avif",
-            title: "Foreign Investment Opportunities in Ghana",
-            excerpt:
-                "Exploring the vast investment opportunities available to foreign investors in Ghana's growing economy.",
-            date: "January 22, 2025",
-            author: " Sarah Johnson",
-            category: "Investment",
-            readTime: "8 min read",
-        },
+    
 
-    ];
-
-    const filteredArticles = articles.filter(
+    const filteredArticles = blogs.filter(
         (article) =>
-            article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+            article.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            article.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const truncateText = (text, wordLimit) => {
+        const words = text.split(" ");
+        if (words.length > wordLimit) {
+            return words.slice(0, wordLimit).join(" ") + "...";
+        }
+        return text;
+    };
 
     return (
 
 
         <PublicLayout>
            <main className="flex-1">
-                <div className="bg-gray-50 py-12 md:py-10">
+                <div className="bg-gray-50 py-12 md:py-10 flex flex-col justify-center items-center">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                      
-                            <h1 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-                                Blog
+                            <h1 className="text-3xl font-bold text-center tracking-tight text-gray-900 md:text-4xl">
+                                Articles
                             </h1>
                             <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
                                 Insights, news, and resources on corporate governance,
@@ -100,37 +77,41 @@ export default function BlogPage() {
                                     </h2>
 
                                 <div className=" mt-10 lg:grid lg:grid-cols-2 gap-10">
-                                    {filteredArticles.map((article, index) => (
+                                    {blogs.map((article, index) => (
                                        
-                                            <Link to="/404">
+                                            <Link to={`/blog/${article._id}`}>
                                                 <div className="group">
                                                     <div className="mb-4 h-60 w-full rounded-lg bg-gray-200">
                                                         <img className="rounded-lg h-full w-full" src={article.image} alt="" /></div>
                                                     <div className="">
                                                         <span className="text-sm font-medium text-pink-500">
-                                                            {article.category}
+                                                            {article.category.name}
                                                         </span>
                                                         <h3 className="mt-2 text-xl font-semibold text-gray-900 group-hover:text-pink-500">
-                                                            {article.title}
+                                                            {article.name}
                                                         </h3>
                                                         <p className="mt-3 text-gray-600">
-                                                            {article.excerpt}
+                                                        <div dangerouslySetInnerHTML={{ __html: truncateText(article.description, 15) }} />
                                                         </p>
                                                         <div className="mt-4 flex items-center text-sm text-gray-500">
                                                             <div className="flex items-center">
                                                                 <Calendar className="mr-1 h-4 w-4" />
-                                                                <span>{article.date}</span>
+                                                                <span>{new Date(article.createdAt).toLocaleDateString("en-US", {
+                                                                    year: "numeric",
+                                                                    month: "long",
+                                                                    day: "numeric",
+                                                                })}</span>
                                                             </div>
                                                             <span className="mx-2">•</span>
                                                             <div className="flex items-center">
                                                                 <User className="mr-1 h-4 w-4" />
-                                                                <span>{article.author}</span>
+                                                                {/* <span>{article.admin}</span> */}
                                                             </div>
                                                             <span className="mx-2">•</span>
-                                                            <span>{article.readTime}</span>
+                                                            <span>5 min read</span>
                                                         </div>
-                                                        <Link to="/404" className="mt-4">
-                                                            <span className="inline-flex items-center text-sm font-medium text-pink-500 group-hover:text-pink-600">
+                                                        <Link to={`/blog/${article._id}`} className="!mt-8">
+                                                            <span className="inline-flex items-center !mt-4 text-sm font-medium text-pink-500 group-hover:text-pink-600">
                                                                 Read more
                                                                 <ArrowRight className="ml-1 h-4 w-4" />
                                                             </span>
@@ -170,40 +151,15 @@ export default function BlogPage() {
                                         <h3 className="text-lg font-semibold text-gray-900">
                                             Categories
                                         </h3>
-                                        <ul className="mt-4 space-y-2">
-                                            <li>
-                                                <Link
-                                                    to="#"
-                                                    className="text-gray-600 hover:text-pink-500"
-                                                >
-                                                    Corporate Governance
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    to="#"
-                                                    className="text-gray-600 hover:text-pink-500"
-                                                >
-                                                    Financial Management
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    to="#"
-                                                    className="text-gray-600 hover:text-pink-500"
-                                                >
-                                                    Compliance
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    to="#"
-                                                    className="text-gray-600 hover:text-pink-500"
-                                                >
-                                                    Business Administration
-                                                </Link>
-                                            </li>
-                                        </ul>
+                                        {categories.map((category) => (
+                                            <Link
+                                                key={category._id}
+                                                to={`/blog/category/${category._id}`}
+                                                className="mt-4 block text-sm font-medium text-gray-900 hover:text-pink-500"
+                                            >
+                                                {category.name}
+                                            </Link>
+                                        ))}
                                     </div>
 
 
@@ -236,8 +192,6 @@ export default function BlogPage() {
                     </div>
                 </section>
             </main>
-
-          
         </PublicLayout>
     )
 }
@@ -246,8 +200,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     const { blogs } = await blog.getBlogs({
         request,
     });
+    const { categories } = await category.getCategories({
+        request,
+    });
 
     return json({
         blogs,
+        categories,
     });
 };

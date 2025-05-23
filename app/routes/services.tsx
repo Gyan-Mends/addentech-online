@@ -284,14 +284,7 @@ export default function ServicesPage() {
                         animate={isVisible.hero ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <div className="inline-flex">
-                            <Chip className="bg-white border border-2 border-black-200/20 shadow-sm">
-                                <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-
-                                    Our Services
-                                </p>
-                            </Chip>
-                        </div>
+                       
                         <h1 className="text-4xl md:text-5xl font-montserrat font-bold lg:text-6xl leading-tight tracking-tight mb-6">
                             Here is How We Can{" "}
                             <span className="text-pink-500">

@@ -302,10 +302,10 @@ const Home = () => {
                   <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
                 </div>
                 <Link to="/blog">
-                  <Button variant="bordered" className="font-montserrat border border-2 ">
-                    View all articles
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                    <Button variant="bordered" className="font-montserrat border border-2">
+                        View all articles
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                 </Link>
               </div>
             </ScrollAnimation>
@@ -337,8 +337,8 @@ const Home = () => {
                     </div>
                     <CardFooter>
 
-                      <Link to={`/blog/${article._id}`} key={article._id}>
-                        <Button variant="ghost" size="sm" className="group border border-2  hover:border-default-200">
+                      <Link to={`/blog/${article._id}`}>
+                        <Button variant="ghost" size="sm" className="group border border-2 hover:border-default-200">
                           Read article
                           <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Button>

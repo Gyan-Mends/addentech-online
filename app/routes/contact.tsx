@@ -38,7 +38,7 @@ const Contact = () => {
                                     <ScrollAnimation>
                                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter font-montserrat">
                                         Ready to Take Your Business To That{" "}
-                                            <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                            <span className="text-pink-500">
                                             GIGANTIC
                                         </span>{" "}
                                         New Level?
@@ -175,7 +175,7 @@ const Contact = () => {
 
 
                                                 <button
-                                                        className="h-10 w-40 rounded-lg text-lg font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 text-white  hover:transition hover:duration-500 hover:dark:text-white"
+                                                        className="h-10 w-40 rounded-lg text-lg font-montserrat bg-pink-500 text-white  hover:transition hover:duration-500 hover:dark:text-white"
                                                 >
                                                     Submit
                                                 </button>
@@ -194,7 +194,7 @@ const Contact = () => {
                         <div className="container">
                             <ScrollAnimation>
                                 <div className="text-center mb-12">
-                                <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Visit Our Office And Start Your Journey</h2>
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Visit Our Office And Start Your Journey</h2>
                                 <p className="text-gray-600 max-w-2xl mx-auto font-nunito">
                                     Our headquarters is conveniently located in the heart of the city. Stop by for a consultation or
                                     schedule a virtual meeting.

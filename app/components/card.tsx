@@ -20,7 +20,6 @@ export function StatCard({ value, label, icon }: StatCardProps) {
                     </div>
                         <p className="">{label}</p>
                 </div>
-                    <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-pink-500/20"></div>
             </div>
         </Card>
         </ScrollAnimation>

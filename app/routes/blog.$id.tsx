@@ -251,50 +251,53 @@ export default function BlogDetailPage() {
             </section>
 
             {/* Related Articles */}
-            <section className="py-12  font-nunito">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl font-bold mb-8 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Related Articles</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {related.map((post) => (
-                                <ScrollAnimation>
-                                    <Link to={`/blog/${post._id}`} key={post._id}>
-                                        <Card className="border-black/40 shadow-md overflow-hidden group hover:border-blue-500/50 transition-all h-full">
-                                        <CardHeader className="p-0">
-                                            <div className="aspect-video w-full overflow-hidden">
-                                                <img
-                                                    src={post.image || "/placeholder.svg"}
-                                                    alt={post.name}
-                                                    width={400}
-                                                    height={225}
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                            </div>
-                                        </CardHeader>
-                                        <CardBody className="p-4">
-                                            <p className="text-xs text-gray-400 mb-1">{new Date(post?.createdAt).toLocaleDateString("en-US", {
-                                                year: "numeric",
-                                                month: "long",
-                                                day: "numeric",
-                                            })}</p>
-                                                <h3 className="text-base font-semibold mb-2 group-hover:text-pink-500 transition-colors line-clamp-2">
-                                                {truncateText(post?.name, 10)}
-                                            </h3>
-                                            <p className="text-default-400" dangerouslySetInnerHTML={{ __html: truncateText(post.description, 6) }} />
-                                        </CardBody>
-                                        <CardFooter className="pt-0 pb-3 px-4">
-                                                <Chip size="sm" className="bg-blue-pink-500/10 text-pink-500 border-blue-500/20">
-                                                {post.category.name}
-                                            </Chip>
-                                        </CardFooter>
-                                    </Card>
-                                </Link>
-                                </ScrollAnimation>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
+           {related.length > 0 && (
+             <section className="py-12  font-nunito">
+             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div className="max-w-4xl mx-auto">
+                     <h2 className="text-2xl font-bold mb-8 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Related Articles</h2>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                         {related.map((post) => (
+                             <ScrollAnimation>
+                                 <Link to={`/blog/${post._id}`} key={post._id}>
+                                     <Card className="border-black/40 shadow-md overflow-hidden group hover:border-blue-500/50 transition-all h-full">
+                                     <CardHeader className="p-0">
+                                         <div className="aspect-video w-full overflow-hidden">
+                                             <img
+                                                 src={post.image || "/placeholder.svg"}
+                                                 alt={post.name}
+                                                 width={400}
+                                                 height={225}
+                                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                             />
+                                         </div>
+                                     </CardHeader>
+                                     <CardBody className="p-4">
+                                         <p className="text-xs text-gray-400 mb-1">{new Date(post?.createdAt).toLocaleDateString("en-US", {
+                                             year: "numeric",
+                                             month: "long",
+                                             day: "numeric",
+                                         })}</p>
+                                             <h3 className="text-base font-semibold mb-2 group-hover:text-pink-500 transition-colors line-clamp-2">
+                                             {truncateText(post?.name, 10)}
+                                         </h3>
+                                         <p className="text-default-400" dangerouslySetInnerHTML={{ __html: truncateText(post.description, 6) }} />
+                                     </CardBody>
+                                     <CardFooter className="pt-0 pb-3 px-4">
+                                             <Chip size="sm" className="bg-blue-pink-500/10 text-pink-500 border-blue-500/20">
+                                             {post.category.name}
+                                         </Chip>
+                                     </CardFooter>
+                                 </Card>
+                             </Link>
+                             </ScrollAnimation>
+                         ))}
+                     </div>
+                 </div>
+             </div>
+         </section>
+            
+           )}
 
             {/* CTA Section */}
 
