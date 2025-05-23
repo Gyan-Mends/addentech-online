@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node"
-import { Contact } from "~/modal/contact"
+import Contact from "~/modal/contact"
 
 class ContactController {
     async Create({

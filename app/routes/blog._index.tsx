@@ -81,7 +81,7 @@ export default function BlogPage() {
                                        
                                             <Link to={`/blog/${article._id}`}>
                                                 <div className="group">
-                                                    <div className="mb-4 h-60 w-full rounded-lg bg-gray-200">
+                                                    <div className="mb-4 h-80 w-full rounded-lg bg-gray-200">
                                                         <img className="rounded-lg h-full w-full" src={article.image} alt="" /></div>
                                                     <div className="">
                                                         <span className="text-sm font-medium text-pink-500">

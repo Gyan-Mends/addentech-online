@@ -164,10 +164,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 function EnhancedTeamMember({ name, role, img, socials }) {
     return (
         <div className="border border-white/10  overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full rounded-lg shadow-lg">
-            <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-            <div className="aspect-[3/4] overflow-hidden">
+            <div className="aspect-[6/7] overflow-hidden">
                 <img
                     src={img || "https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"}
                     alt={name}

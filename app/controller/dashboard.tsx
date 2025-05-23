@@ -1,8 +1,8 @@
 import User from "~/modal/registration";
 import Category from "~/modal/category";
 import Blog from "~/modal/blog";
-import { Contact } from "~/modal/contact";
 import Departments from "~/modal/department";
+import Contact from "~/modal/contact";
 
 class DashboardController {
     async getDashboardData(): Promise<any> {
