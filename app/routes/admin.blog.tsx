@@ -87,6 +87,12 @@ const Users = () => {
         }
     }, [dataValue]);
 
+    useEffect(() => {
+        if (dataValue?.category) {
+            setDataValue(dataValue?.category);
+        }
+    }, [dataValue]);
+
 
     useEffect(() => {
         if (actionData) {
@@ -214,7 +220,7 @@ const Users = () => {
                                 }}
                             >
                                 {categories.map((cat) => (
-                                    <SelectItem key={cat._id}>{cat?.name}</SelectItem>
+                                    <SelectItem value={cat._id} key={cat._id}>{cat?.name}</SelectItem>
                                 ))}
                             </Select>
                         </div>
