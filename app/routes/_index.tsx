@@ -34,7 +34,7 @@ const Home = () => {
     <PublicLayout>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden lg:!h-[100vh] py-2 lg:py-20 md:py-32 dark:bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
+        <section className="relative overflow-hidden  py-2 lg:py-20 md:py-32 dark:bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
           <div className="container relative">
             <div className="grid gap-10 md:grid-cols-2 items-center">
@@ -43,10 +43,10 @@ const Home = () => {
                   <ScrollAnimation>
                     <h1 className="text-4xl  md:text-6xl font-montserrat font-bold leading-tight tracking-tighter">
                     Transforming the{" "}
-                    <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                        Legal Landscape with
-                    </span>{" "}
-                      Addentechnology
+                      <span className="text-pink-500">
+                        Legal Landscape
+                      </span>{" "}
+                      with Technology
                   </h1>
                   </ScrollAnimation>
                   <ScrollAnimation delay={0.3}>
@@ -58,19 +58,14 @@ const Home = () => {
                 </div>
                 <ScrollAnimation delay={0.4}>
                   <div className="flex  gap-4">
-                  <Link to="#products">
-                    <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">
-                    Get Started
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  </Link>
                   <Link to="/about">
-                    <Button >Learn More<ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Button  className="">
+                    Learn More<ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                   </Link>
                 </div>
                 </ScrollAnimation>
-                <ScrollAnimation delay={0.5}>
+                {/* <ScrollAnimation delay={0.5}>
                   <div className="flex items-center gap-4">
                   <div className="flex -space-x-2">
                     {[1, 2, 3, 4, 5].map((i) => (
@@ -78,10 +73,10 @@ const Home = () => {
                     ))}
                   </div>
                   <div className="text-sm text-muted-foreground font-nunito">
-                    Trusted by <span className="font-medium text-foreground">500+</span> law firms
+                    Trusted by <span className="font-medium text-pink-500">500+</span> law firms
                   </div>
                 </div>
-                </ScrollAnimation>
+                </ScrollAnimation> */}
               </div>
               <div className="relative hidden md:block">
                 <ScrollAnimation >
@@ -98,7 +93,7 @@ const Home = () => {
 
                 <ScrollAnimation delay={0.3}>
                   <div className="absolute -bottom-6 -left-6 h-24 w-24 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-110 transition-transform duration-500 rounded-lg border border-black/20 bg-default-300 p-1 backdrop-blur">
-                  <div className="h-full w-full rounded bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
+                  <div className="h-full w-full rounded bg-pink-500 flex items-center justify-center">
                     <CheckedIcon className="h-10 w-10 text-white" />
                   </div>
                 </div>
@@ -140,11 +135,8 @@ const Home = () => {
                 </ScrollAnimation>
               </div>
               <div className="space-y-6">
-                <ScrollAnimation >
-                  <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent   text-xl font-bold font-montserrat ">Customer Centric</p>
-                </ScrollAnimation>
+                
                 <ScrollAnimation delay={0.2}>
-
                 <h2 className="text-3xl md:text-3xl font-bold font-montserrat">Legal Tech Solutions That Put Clients First</h2>
                 </ScrollAnimation>
 
@@ -159,7 +151,7 @@ const Home = () => {
                   {["Client-focused design", "Intuitive interfaces", "Secure data handling", "Compliance-ready"].map(
                     (item, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <div className="h-5 w-5 rounded-full bg-gradient-to-r from-pink-500 to-purple-600   flex items-center justify-center">
+                        <div className="h-5 w-5 rounded-full bg-pink-500 flex items-center justify-center">
                           <CheckedIcon className="h-3 w-3 text-white" />
                         </div>
                         <span className="font-nunito">{item}</span>
@@ -168,14 +160,7 @@ const Home = () => {
                   )}
                 </ul>
                 </ScrollAnimation>
-                <ScrollAnimation delay={0.5}>
-                  <Link to="/about">
-                  <Button variant="bordered" className="border mt-4 bg-gradient-to-r from-pink-500 to-purple-600    text-white font-montserrat">
-                    Learn More
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                </ScrollAnimation>
+               
               </div>
             </div>
           </div>
@@ -186,7 +171,6 @@ const Home = () => {
           <div className="container">
             <ScrollAnimation>
               <div className="text-center mb-16">
-              <p className="mb-4 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Services</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Comprehensive Services Tailored to Your Needs</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-montserrat">
                 We offer a wide range of legal technology services designed to meet the specific needs of modern law
@@ -198,37 +182,22 @@ const Home = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
-                  title: "Digital Practice Management",
-                  description: "Streamline your legal practice with our comprehensive digital management solutions.",
+                  title: "Digital Marketing & Consultation",
+                  description: "Maximize digital presence with expert SEO, social media strategies, email campaigns, and...",
                   icon: "laptop",
                 },
                 {
-                  title: "Legal AI Development",
+                  title: "Design & Development",
                   description:
-                    "Leverage the power of artificial intelligence to enhance your legal research and document analysis.",
+                    "Innovative website design and development tailored to your business needs...",
                   icon: "brain",
                 },
                 {
-                  title: "E-Discovery",
-                  description: "Efficiently manage electronic discovery with our advanced search and analysis tools.",
+                  title: "IT Services",
+                  description: "Support and management of IT systems, including business software, networks, and security...",
                   icon: "search",
                 },
-                {
-                  title: "Brand & Website Design",
-                  description:
-                    "Create a compelling online presence that reflects your firm's values and attracts clients.",
-                  icon: "palette",
-                },
-                {
-                  title: "Client Portals",
-                  description: "Provide secure, 24/7 access to case information and documents for your clients.",
-                  icon: "users",
-                },
-                {
-                  title: "Compliance Solutions",
-                  description: "Stay compliant with evolving regulations with our specialized legal tech tools.",
-                  icon: "shield",
-                },
+               
               ].map((service, i) => (
                 <ScrollAnimation>
                   <Card
@@ -236,7 +205,7 @@ const Home = () => {
                     className="border group  border-black/20 h-48 backdrop-blur transition-all hover:border-pink-500/50 hover:bg-background/80 p-6 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500"
                 >
                   <div className="flex flex-col gap-4">
-                      <p className="font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">{service.title}</p>
+                      <p className="font-bold font-montserrat   text-xl">{service.title}</p>
                     <p>{service.description}</p>
                   </div>
                   <CardFooter className="mt-4">
@@ -252,6 +221,14 @@ const Home = () => {
               ))}
             </div>
           </div>
+         <ScrollAnimation>
+         <div className="flex justify-center items-center h-[100px] mt-12">
+         <Link to="/services#services-section">
+         <Button>View More Services <ArrowRight className="ml-2 h-4 w-4" /></Button>
+         </Link>
+         </div>
+
+         </ScrollAnimation>
         </section>
 
         <AdvertBanner />
@@ -262,11 +239,10 @@ const Home = () => {
             <ScrollAnimation>
               <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
               <div>
-                <p className="mb-2 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Latest Insights</p>
                 <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
               </div>
-              <Link to="/block">
-                  <Button variant="bordered" className="font-montserrat border border-2 border-pink-500">
+              <Link to="/blog">
+                  <Button variant="bordered" className="font-montserrat border border-2 ">
                 View all articles
                   <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -302,7 +278,7 @@ const Home = () => {
                   <CardFooter>
 
                     <Link to={`/blog/${article._id}`} key={article._id}>
-                        <Button variant="ghost" size="sm" className="group border border-2 border-pink-500/40 hover:border-default-200">
+                        <Button variant="ghost" size="sm" className="group border border-2  hover:border-default-200">
                       Read article
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
@@ -320,7 +296,6 @@ const Home = () => {
           <div className="container">
             <ScrollAnimation>
               <div className="text-center mb-16">
-              <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Our Approach</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Our Methodology Guarantees Your Success</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 We follow a proven methodology to ensure the success of your legal technology implementation.
@@ -365,7 +340,7 @@ const Home = () => {
                     <ul className="space-y-2">
                       {phase.items.map((item, j) => (
                         <li key={j} className="flex items-start gap-2">
-                          <CheckedIcon className="h-4 w-4 text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded mt-1" />
+                          <CheckedIcon className="h-4 w-4 text-white bg-gradient rounded mt-1" />
                           <span className="text-sm">{item}</span>
                         </li>
                       ))}
@@ -383,7 +358,6 @@ const Home = () => {
           <div className="container">
             <ScrollAnimation>
               <div className="text-center mb-16">
-              <p className="mb-4  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl font-bold font-montserrat">Testimonials</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Experiences That Build Confidence</h2>
               <p className="text-muted-foreground max-w-[800px] mx-auto font-nunito">
                 Hear what our clients have to say about their experience working with us.

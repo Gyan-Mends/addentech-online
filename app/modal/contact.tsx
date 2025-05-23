@@ -1,45 +1,12 @@
-import { Schema } from "mongoose";
-import category from "~/controller/categoryController";
-import { BlogInterface, ContactInterface } from "~/interface/interface";
-import mongoose from "~/mongoose.server";
+import mongoose from "mongoose";
 
-const ContacSchema = new mongoose.Schema({
-    firstName: {
-        required: true,
-        type: String,
-    },
-    middleName: {
-        required: false,
-        type: String,
-    },
-    lastName: {
-        required: true,
-        type: String,
-    },
-    number: {
-        required: true,
-        type: String,
-    },
-    comapny: {
-        required: false,
-        type: String,
-    },
-    description: {
-        required: true,
-        type: String,
-    },
+const contactSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    message: { type: String, required: true },
+  },
+  { timestamps: true }
+);
 
-}, {
-    timestamps: true
-})
-
-let Contact: mongoose.Model<ContactInterface>
-
-try {
-    Contact = mongoose.model<ContactInterface>("contact")
-} catch (error) {
-    Contact = mongoose.model<ContactInterface>("contact", ContacSchema)
-
-}
-
-export default Contact
+export const Contact = mongoose.models.Contact || mongoose.model("Contact", contactSchema);

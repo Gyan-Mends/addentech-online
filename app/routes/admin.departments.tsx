@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Textarea, TableRow, TableCell, Tooltip, Skeleton } from "@nextui-org/react";
-import { ActionFunction, LoaderFunction, json, redirect } from "@remix-run/node";
+import { Button, Input, Textarea, TableRow, TableCell} from "@nextui-org/react";
+import { ActionFunction, LoaderFunction, json,  } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { CategoryColumns } from "~/components/table/columns";
 import AdminLayout from "~/layout/adminLayout";
@@ -12,10 +12,11 @@ import NewCustomTable from "~/components/table/newTable";
 import { CategoryInterface, DepartmentInterface } from "~/interface/interface";
 import usersController from "~/controller/Users";
 import department from "~/controller/departments";
-import CloseIcon from "~/components/icons/CloseIcon";
 import CustomInput from "~/components/ui/CustomInput";
 import { Plus } from "lucide-react";
-import CreateModal from "~/components/modal/createModal";
+import Drawer from "~/components/modal/drawer";
+import { Toaster } from "react-hot-toast";
+import { errorToast, successToast } from "~/components/toast";
 
 
 const Category = () => {
@@ -27,10 +28,7 @@ const Category = () => {
     const [confirmModalOpened, setConfirmModalOpened] = useState(false)
     const navigate = useNavigate()
     const navigation = useNavigation()
-
-    const handleCreateModalOpened = () => {
-        setCreateModalOpened(true)
-    }
+    const actionData = useActionData<{ message: string, success: boolean, status: number }>()
 
 
     const handleEditDrawerModalClose = () => {
@@ -45,11 +43,26 @@ const Category = () => {
         setCreateModalOpened(false)
     }
 
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                successToast(actionData.message)
+                setCreateModalOpened(false)
+                setConfirmModalOpened(false)
+                setEditDrawerOpened(false)
+            } else {
+                errorToast(actionData.message)
+            }
+        }
+    }, [actionData])
+
+
 
     return (
-        <AdminLayout redirect="/admin/departments" redirectDelay={1000} handleOnClick={handleCreateModalOpened} buttonName="Create Department" pageName="Departments">
+        <AdminLayout >
+            <Toaster position="top-right" />
             <div className="flex justify-end">
-                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
                     setCreateModalOpened(true)
                 }}>
                     <Plus />
@@ -90,7 +103,7 @@ const Category = () => {
                 </NewCustomTable>
             </div>
 
-            <ConfirmModal className="dark:bg-slate-950  border border-white/20  !bg-[#020817]"
+            <ConfirmModal
                 content="Are you sure to delete department" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
@@ -113,21 +126,8 @@ const Category = () => {
             </ConfirmModal>
 
             {dataValue && (
-                <CreateModal modalTitle="Create New User" isOpen={editDrawerOpened} onOpenChange={handleEditDrawerModalClose}
-                >
-                    <div className="flex justify-between gap-10">
-                        <p className="font-nunito">Edit Department Details</p>
-                        <button
-                            onClick={() => {
-                                handleEditDrawerModalClose();
-                            }}
-                        >
-                            <CloseIcon className="h-4 w-4" />
-                        </button>
-                    </div>
-                    <hr className="border border-default-400" />
-
-                    <Form method="post">
+                <Drawer isDrawerOpened={editDrawerOpened} handleDrawerClosed={handleEditDrawerModalClose} title="Edit Department">
+                    <Form method="post" className="p-4">
                         <Input
                             label="Name"
                             name="name"
@@ -154,7 +154,7 @@ const Category = () => {
                             defaultValue={dataValue?.description}
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333]",
+                                inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                             }}
                         />
 
@@ -165,26 +165,13 @@ const Category = () => {
                             Update
                         </button>
                     </Form>
-                </CreateModal>
+                </Drawer>
             )}
 
 
 
-            <CreateModal modalTitle="Create New User" isOpen={createModalOpened} onOpenChange={handleCreateModalClosed}
-            >
-                <div className="flex justify-between gap-10 ">
-                    <p className="font-nunito">Create a new Deprtment</p>
-                    <button
-                        onClick={() => {
-                            handleCreateModalClosed()
-                        }}
-                    >
-                        <CloseIcon className="h-4 w-4" />
-                    </button>
-                </div>
-                <hr className=" border border-default-400 " />
-
-                <Form method="post">
+            <Drawer isDrawerOpened={createModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Department">
+                <Form method="post" className="p-4">
                     <CustomInput
                         label="Name"
                         name="name"
@@ -204,16 +191,16 @@ const Category = () => {
                         className="mt-4 font-nunito text-sm"
                         classNames={{
                             label: "font-nunito text-sm text-default-100",
-                            inputWrapper: "dark:bg-default-50 shadow-sm !bg-[#020817]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                            inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                         }}
                     />
 
                     <button onClick={() => {
-                    }} type="submit" className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4">
+                    }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
                         Submit
                     </button>
-                    </Form>
-            </CreateModal>
+                </Form>
+            </Drawer>
 
         </AdminLayout>
     );

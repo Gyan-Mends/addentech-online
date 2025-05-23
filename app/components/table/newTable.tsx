@@ -32,8 +32,8 @@ export default function NewCustomTable(
                 classNames={{
                     base: "h-[68vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none",
                     wrapper:
-                        "dark:bg-default-50 !bg-[#020817] vertical-scrollbar horizontal-scrollbar shadow-md  rounded-2xl dark:border border-white/20",
-                    th: "dark: bg-[#3B82F61A]",
+                        "dark:bg-default-50 !bg-white vertical-scrollbar horizontal-scrollbar shadow-md  rounded-2xl dark:border border-white/20",
+                    th: "dark: ",
                     td: "font-nunito text-xs text-slate-500 dark:text-slate-200 ",
                 }}
             >

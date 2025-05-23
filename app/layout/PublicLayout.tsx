@@ -53,11 +53,15 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-black/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container flex h-16 items-center justify-between">
                   {/* Logo */}
-                  <div className="flex items-center">
-                        <Link to="/" className="flex items-center space-x-2">
-                            <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                                Addentech
-                            </span>
+                    <div className="flex  items-center">
+                        <Link to="/" className="flex flex-col items-center space-x-2">
+                            <p className="text-xl font-bold text-gradient">
+                                ADDENTECH
+                            </p>
+                            <p className="font-montserrat text-lg">
+                                Addens Technology Ltd
+                            </p>
+
                         </Link>
                   </div>
 
@@ -96,12 +100,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                       </Button>
                         </Link> */}
                       <Link to="/contact">
-                          <Button
-                              size="sm"
-                                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+                            <button
+                                className="bg-gradient py-1 px-2 rounded"
                           >
                               Contact Us
-                          </Button>
+                            </button>
                       </Link>
                   </div>
               </div>

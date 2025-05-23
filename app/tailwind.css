@@ -6,8 +6,21 @@
 @tailwind components;
 @tailwind utilities;
 
-.custom-border {
-    border-style: dashed;
+@layer utilities {
+    .bg-gradient {
+        @apply bg-pink-500 text-white;
+    }
+    /* .bg-gradient {
+        @apply bg-gradient-to-r from-pink-500 to-purple-600 text-white;
+    } */
+
+    .text-gradient {
+        @apply text-pink-500;
+    } 
+
+    /* .text-gradient {
+        @apply  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent;
+    }  */
 }
 @layer base {
     :root {

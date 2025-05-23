@@ -1,82 +1,69 @@
 import { Card, CardHeader, Progress, Tab, Tabs } from "@nextui-org/react"
+import { json, LoaderFunction, redirect } from "@remix-run/node"
+import { useLoaderData } from "@remix-run/react"
 import { BarChart2, BookOpen, Folder, Tag, Users } from "lucide-react"
 import { useState } from "react"
 import { CardBody } from "~/components/acternity/3d"
 import MetricCard from "~/components/ui/customCard"
+import dashboard from "~/controller/dashboard"
 import AdminLayout from "~/layout/adminLayout"
+import { getSession } from "~/session"
 
 const Dashboard = () => {
-  const [selectedTab, setSelectedTab] = useState("daily");
+  const data = useLoaderData<typeof loader>()
 
-  const renderContent = () => {
-    switch (selectedTab) {
-      case "daily":
-        return <p className="text-muted-foreground/50">Daily Activity Content</p>;
-      case "weekly":
-        return <p className="text-muted-foreground/50">Weekly Activity Content</p>;
-      case "monthly":
-        return <p className="text-muted-foreground/50">Monthly Activity Content</p>;
-      default:
-        return <p className="text-muted-foreground/50">Select a tab to view content</p>;
-    }
-  };
+  const { totalUsers, totalCategories, totalBlogs, totalDepartments, totalMessages } = data
+
+  
   return (
     <AdminLayout>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Total Departments"
-          value="12"
-          description="+2 from last month"
-          icon={<Folder className="h-4 w-4" />}
-          trend="up"
-        />
-        <MetricCard
-          title="Total Users"
-          value="2,543"
-          description="+15% from last month"
-          icon={<Users className="h-4 w-4" />}
-          trend="up"
-        />
-        <MetricCard
-          title="Blog Categories"
-          value="32"
-          description="Same as last month"
-          icon={<Tag className="h-4 w-4" />}
-          trend="neutral"
-        />
-        <MetricCard
-          title="Blogs"
-          value="128"
-          description="+12 from last week"
-          icon={<BookOpen className="h-4 w-4" />}
-          trend="up"
-        />
-      </div>
+      <div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            title="Total Departments"
+            value={totalDepartments}
+            description="+2 from last month"
+            icon={<Folder className="h-4 w-4" />}
+            trend="up"
+          />
+          <MetricCard
+            title="Total Users"
+            value={totalUsers}
+            description="+15% from last month"
+            icon={<Users className="h-4 w-4" />}
+            trend="up"
+          />
+          <MetricCard
+            title="Blog Categories"
+            value={totalCategories}
+            description="Same as last month"
+            icon={<Tag className="h-4 w-4" />}
+            trend="neutral"
+          />
+          <MetricCard
+            title="Blogs"
+            value={totalBlogs}
+            description="+12 from last week"
+            icon={<BookOpen className="h-4 w-4" />}
+            trend="up"
+          />
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-7 mt-4">
-        <Card className="md:col-span-4 border border-white/20 bg-[#020817]">
-          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-            <span className="text-base font-medium">User Activity</span>
-            <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value)}>
-              <Tab >Daily</Tab>
-              <Tab >Weekly</Tab>
-              <Tab >Monthly</Tab>
-            </Tabs>
-          </CardHeader>
-          <CardBody>
-            <div className="h-[300px] flex items-center justify-center">
-              {renderContent()}
-            </div>
-          </CardBody>
-        </Card>
+        <div className="grid gap-4 md:grid-cols-7 mt-4">
+          <Card className="md:col-span-4 border border-black/20 bg-white">
+            <CardBody>  
+              <div className="h-[300px] flex items-center justify-center">
 
-        <Card className="md:col-span-3 border border-white/20 bg-[#020817] px-10">
-          <CardHeader>
-            <p className="text-base font-medium">Report</p>
-            <p>Monthly overview</p>
-          </CardHeader>
-          <CardBody className="space-y-4 ">
-            <div className="space-y-2">
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card className="md:col-span-3 border border-black/20 bg-white shadow-sm px-10">
+            <CardBody className="space-y-4 ">
+              <div>
+
+              </div>
+              {/* <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center">
                   <span className="font-medium">New Users</span>
@@ -114,12 +101,31 @@ const Dashboard = () => {
                 <span>92%</span>
               </div>
               <Progress value={92} className="h-2 w-[100%]" />
-            </div>
-          </CardBody>
-        </Card>
+            </div> */}
+            </CardBody>
+          </Card>
+        </div>
       </div>
     </AdminLayout>
   )
 }
 
 export default Dashboard
+
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const dashboardData = await dashboard.getDashboardData()
+  
+  const session = await getSession(request.headers.get("Cookie"));
+  const token = session.get("email");
+  if (!token) {
+      return redirect("/login")
+  }
+  
+  if ('error' in dashboardData) {
+      return json({ error: dashboardData.error }, { status: 500 })
+
+  }
+  
+  return dashboardData
+}

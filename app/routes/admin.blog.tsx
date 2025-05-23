@@ -1,20 +1,15 @@
-import { Button, Input, Select, SelectItem, Skeleton, TableCell, TableRow, Textarea, User } from "@nextui-org/react"
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node"
-import { Form, Link, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
+import { Button,  Select, SelectItem, TableCell, TableRow, User } from "@nextui-org/react"
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction,  } from "@remix-run/node"
+import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
-import BackIcon from "~/components/icons/BackIcon"
-import CloseIcon from "~/components/icons/CloseIcon"
 import { DeleteIcon } from "~/components/icons/DeleteIcon"
 import { EditIcon } from "~/components/icons/EditIcon"
-import PlusIcon from "~/components/icons/PlusIcon"
-import { SearchIcon } from "~/components/icons/SearchIcon"
 import { FileUploader } from "~/components/icons/uploader"
 import ConfirmModal from "~/components/modal/confirmModal"
-import CreateModal from "~/components/modal/createModal"
-import EditModal from "~/components/modal/EditModal"
-import { BlogColumns, UserColumns } from "~/components/table/columns"
+import Drawer from "~/components/modal/drawer"
+import { BlogColumns } from "~/components/table/columns"
 import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
 import CustomInput from "~/components/ui/CustomInput"
@@ -36,6 +31,7 @@ const Users = () => {
     const [dataValue, setDataValue] = useState<BlogInterface>()
     const submit = useSubmit()
     const navigate = useNavigate()
+    const actionData = useActionData()
     const [content, setContent] = useState("");
     const navigation = useNavigation()
     const {
@@ -50,15 +46,12 @@ const Users = () => {
         categories: CategoryInterface[]
     }>()
 
-    console.log(categories);
 
 
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
-    const handleClick = () => {
-        setIsCreateModalOpened(true)
-    }
+   
     const handleConfirmModalClosed = () => {
         setIsConfirmModalOpened(false)
     }
@@ -95,11 +88,25 @@ const Users = () => {
     }, [dataValue]);
 
 
-    return (
-        <AdminLayout handleOnClick={handleClick} pageName="Users Management">
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                successToast(actionData.message)
+                setIsCreateModalOpened(false)
+                setIsConfirmModalOpened(false)
+                setIsEditModalOpened(false)
+            } else {
+                errorToast(actionData.message)
+            }
+        }
+    }, [actionData])
 
-            <div className="flex justify-end">
-                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+    return (
+        <AdminLayout>
+            <Toaster position="top-right"/>
+          <div className="relative">
+          <div className="flex justify-end">
+                <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
                     setIsCreateModalOpened(true)
                 }}>
                     <Plus />
@@ -152,10 +159,11 @@ const Users = () => {
                     </TableRow>
                 ))}
             </NewCustomTable>
+          </div>
 
             {/* confirm modal */}
             {/* confirm modal */}
-            <ConfirmModal className="dark:bg-[#333] border border-white/5" header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
+            <ConfirmModal header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button color="success" variant="flat" className="font-montserrat font-semibold" size="sm" onPress={handleConfirmModalClosed}>
                         No
@@ -178,21 +186,8 @@ const Users = () => {
 
 
             {dataValue && (
-                <CreateModal modalTitle="Create New User" isOpen={isEditModalOpened} onOpenChange={handleEditModalClosed}
-                >
-                    <div className="flex justify-between gap-10 ">
-                        <p className="font-nunito">Edit Blog</p>
-                        <button
-                            onClick={() => {
-                                handleEditModalClosed()
-                            }}
-                        >
-                            <CloseIcon className="h-4 w-4" />
-                        </button>
-                    </div>
-                    <hr className=" border border-default-400 " />
-
-                    <Form method="post" className="flex flex-col gap-4">
+              <Drawer isDrawerOpened={isEditModalOpened} handleDrawerClosed={handleEditModalClosed} title="Edit Blog">
+                <Form method="post" className="flex flex-col gap-4 p-4">
                         <CustomInput
                             label="Name"
                             isRequired
@@ -278,29 +273,17 @@ const Users = () => {
 
 
                         <div className="flex gap-6 mt-6">
-                            <button className="font-montserrat w-40 bg-primary h-10 rounded-lg">Upload blog</button>
+                            <button className="font-montserrat w-40 bg-pink-500 text-white h-10 rounded-lg">Upload blog</button>
                         </div>
                     </Form>
-                </CreateModal>
+              </Drawer>
             )}
 
             {/* Create Modal */}
 
 
-            <CreateModal modalTitle="Create New User" isOpen={isCreateModalOpened} onOpenChange={handleCreateModalClosed}>
-                <div className="flex justify-between gap-10 ">
-                    <p className="font-nunito">Create a new Blog</p>
-                    <button
-                        onClick={() => {
-                            handleCreateModalClosed()
-                        }}
-                    >
-                        <CloseIcon className="h-4 w-4" />
-                    </button>
-                </div>
-                <hr className=" border border-default-400 " />
-
-                <Form method="post" className="flex flex-col gap-4">
+            <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Blog">
+                <Form method="post" className="flex flex-col gap-4 p-4">
                     <CustomInput
                         label="Title"
                         isRequired
@@ -324,8 +307,13 @@ const Users = () => {
                                 trigger: "bg-white shadow-sm border border-gray-300 hover:border-primary focus:border-primary",
                             }}
                         >
-                            <SelectItem>Option 1</SelectItem>
-                            <SelectItem>Option 2</SelectItem>
+                            {
+                                categories.map((category: CategoryInterface) => (
+                                    <SelectItem key={category._id} value={category._id}>
+                                        {category.name}
+                                    </SelectItem>
+                                ))
+                            }
                         </Select>
 
                     </div>
@@ -379,14 +367,14 @@ const Users = () => {
                     </div>
 
                     <input hidden name="admin" value={user?._id} type="" />
-                        <input name="intent" value="create" type="hidden" />
-                        <input name="base64Image" value={base64Image} type="hidden" />
+                    <input name="intent" value="create" type="hidden" />
+                    <input name="base64Image" value={base64Image} type="hidden" />
 
                     <div className="flex gap-6 mt-6">
-                        <button className="font-montserrat w-40 bg-primary h-10 rounded-lg">Upload blog</button>
-                        </div>
-                    </Form>
-            </CreateModal>
+                        <button className="font-montserrat w-40 bg-pink-500 text-white h-10 rounded-lg">Upload blog</button>
+                    </div>
+                </Form>
+            </Drawer>
         </AdminLayout>
     )
 }

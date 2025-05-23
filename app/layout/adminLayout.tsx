@@ -29,7 +29,6 @@ import {
     X,
 } from "lucide-react";
 import { ReactNode, useState } from "react";
-import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -38,18 +37,16 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const isLoading = navigation.state === "loading";
 
     return (
-        <div className="flex h-screen bg-[#3B82F61A] font-nunito">
+        <div className="flex h-screen  font-nunito">
             {/* Sidebar */}
             <div
-                className={`${isSidebarOpen ? "w-64" : "w-0 -ml-64"} bg-[#020817] border-r border-r-white/20 transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative`}
+                className={`${isSidebarOpen ? "w-64" : "w-0 -ml-64"} bg-white shadow-r-md transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative`}
             >
                 <div className="flex items-center justify-between p-4 border-b border-b-white/20">
                     <div className="flex items-center">
-                        <div className="h-8 w-8 rounded bg-blue-500 flex items-center justify-center text-white font-bold font-montserrat">
-                            D
-                        </div>
-                        <span className="ml-2 text-xl font-bold text-blue-500 font-montserrat">
-                            DENNISLAW
+
+                        <span className="ml-2 text-xl font-bold font-montserrat">
+                            Addentech
                         </span>
                     </div>
                     <Button
@@ -64,44 +61,44 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 <div className="flex flex-col flex-1 px-2 py-4 space-y-6">
                     <ul className="flex flex-col">
                         <Link to="/admin">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <LayoutDashboard className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <LayoutDashboard className="h-5 w-5 hover:text-white text-pink-500" />
                                 Dashboard
                             </li>
                         </Link>
                         <Link to="/admin/users">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <User className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <User className="h-5 w-5 hover:text-white text-pink-500" />
                                 Users
                             </li>
                         </Link>
                         <Link to="/admin/departments">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <Folder className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <Folder className="h-5 w-5 hover:text-white text-pink-500" />
                                 Department
                             </li>
                         </Link>
                         <Link to="/admin/blog">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <BookOpen className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <BookOpen className="h-5 w-5 hover:text-white text-pink-500" />
                                 Blog
                             </li>
                         </Link>
                         <Link to="/admin/category">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <Tag className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <Tag className="h-5 w-5 hover:text-white text-pink-500" />
                                 Blog Categories
                             </li>
                         </Link>
                         <Link to="/admin/contact">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <Mail className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <Mail className="h-5 w-5 hover:text-white text-pink-500" />
                                 Messages
                             </li>
                         </Link>
                         <Link to="/admin/memorandum">
-                            <li className="hover:bg-[#3B82F61A] py-3 hover:border-r-4 hover:border-r-primary-500 hover:bg-opacity-50 hover:text-white font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-gray-200">
-                                <FileText className="h-5 w-5 hover:text-white text-blue-500" />
+                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
+                                <FileText className="h-5 w-5 hover:text-white text-pink-500" />
                                 Memorandum
                             </li>
                         </Link>
@@ -149,8 +146,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="h-16 border-b bg-[#020817] border-b-white/20 flex items-center justify-between px-4 sm:px-6">
+            <div className="flex-1 flex flex-col overflow-hidden ">
+                <header className="h-16 bg-white shadow-b-md flex items-center justify-between px-4 sm:px-6">
                     <div className="flex items-center space-x-2">
                         <Button
                             variant="ghost"
@@ -160,11 +157,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             <Menu className="h-5 w-5" />
                         </Button>
                         <Button
-                            variant="bordered"
                             size="sm"
-                            className=" md:flex rounded-md text-md h-[35px] border border-white/20"
+                            className=" md:flex rounded-md text-md h-[35px] shadow-sm hover:bg-pink-300 text-pink-500 bg-pink-200 "
                         >
-                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            <ArrowLeft className="mr-2 h-4 w-4 " />
                             Back
                         </Button>
                     </div>
@@ -172,20 +168,20 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     <div className="flex-1 max-w-md mx-4 rounded">
                         <Input
                             startContent={
-                                <Search className="h-4 w-4 text-default-400" />
+                                <Search className="h-4 w-4 text-pink-500" />
                             }
                             type="search"
                             placeholder="Search user..."
                             className="w-full"
                             classNames={{
                                 inputWrapper:
-                                    "border rounded-md border-white/20 bg-[#020817]",
+                                    "border hover:bg-gray-50 shadow-sm focus:bg-gray-50 focus:ring-1 focus:ring-pink-500 rounded-md border-black/20 bg-white ",
                             }}
                         />
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <ThemeSwitcher />
+                        {/* <ThemeSwitcher /> */}
                         <div className="relative h-10 w-10 rounded-full flex items-center justify-center border border-white/20">
                             <div>
                                 <Bell className="h-5 w-5" />
@@ -195,11 +191,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-auto p-4 sm:p-6 bg-muted/30">
+                <main className="flex-1 overflow-auto p-4 sm:p-6 rounded-lg bg-gray-50 rounded-tl-xl">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full">
-                            <Spinner size="lg" />
+                            <Spinner className="!text-pink-500" size="lg" />
                         </div>
+
                     ) : (
                         children
                     )}

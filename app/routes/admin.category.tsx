@@ -24,6 +24,7 @@ import usersController from "~/controller/Users";
 import CloseIcon from "~/components/icons/CloseIcon";
 import CustomInput from "~/components/ui/CustomInput";
 import { Plus } from "lucide-react";
+import Drawer from "~/components/modal/drawer";
 
 type SessionData = {
     sessionId: {
@@ -79,13 +80,26 @@ const Category = () => {
         return () => clearTimeout(timeOut)
     }, [])
 
+    useEffect(() => {
+        if (actionData?.success) {
+            successToast(actionData?.message)
+            setCreateModalOpened(false)
+            setEditModalOpened(false)
+            setConfirmModalOpened(false)
+        }
+        if (actionData?.error) {
+            errorToast(actionData?.message)
+        }
+    }, [actionData])
+
     return (
-        <AdminLayout handleOnClick={handleClick} pageName="Categories">
+        <AdminLayout >
+            <Toaster position="top-right" />
             <div className="flex justify-end">
-                <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
                     setCreateModalOpened(true)
                 }}>
-                    <Plus className="text-primary" />
+                    <Plus />
                     Create Blog Category
                 </Button>
             </div>
@@ -124,71 +138,55 @@ const Category = () => {
             </div>
 
             {dataValue && (
-                <CreateModal modalTitle="Create New User" isOpen={editModalOpened} onOpenChange={handleEditModalClose}>
-                    <div className="flex justify-between gap-10 ">
-                        <p className="font-nunito">Edit  Category</p>
-                        <button
-                            onClick={() => {
-                                handleEditModalClose()
-                            }}
-                        >
-                            <CloseIcon className="h-4 w-4" />
-                        </button>
-                    </div>
-                    <hr className=" border border-default-400 " />
-
-                    <Form method="post">
-                        <Input
+                <Drawer title="Edit Category" isDrawerOpened={editModalOpened} handleDrawerClosed={handleEditModalClose}>
+                    <Form method="post" className="p-4">
+                        <CustomInput
                             label="Name"
                             name="name"
                             defaultValue={setDataValue?.name}
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
-                            }}
+                            
                         />
                         <input name="seller" value={user?._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
-                        <input name="id" value={setDataValue?._id} type="hidden" />
+                        <input name="id" value={dataValue?._id} type="hidden" />
                         <Textarea
-                            autoFocus
                             label="Product description"
                             labelPlacement="outside"
                             placeholder=" "
                             name="description"
                             className="mt-4 font-nunito text-sm"
-                            defaultValue={setDataValue?.description}
+                            defaultValue={dataValue?.description}
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
+                                inputWrapper: " shadow-sm   border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 bg-white hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                             }}
                         />
 
 
 
                         <button onClick={() => {
-                        }} type="submit" className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4">
+                        }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
                             Update
                         </button>
                     </Form>
-                </CreateModal>
+                </Drawer>
             )}
 
 
-            <ConfirmModal className="dark:bg-[#333] border border-white/5"
+            <ConfirmModal
                 content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
                         No
                     </Button>
                     <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
-                        if (setDataValue) {
+                        if (dataValue) {
                             submit({
                                 intent: "delete",
-                                id: setDataValue?._id
+                                id: dataValue?._id
 
                             }, {
                                 method: "post"
@@ -200,31 +198,16 @@ const Category = () => {
                 </div>
             </ConfirmModal>
 
-            <CreateModal modalTitle="Create New User" isOpen={createModalOpened} onOpenChange={handleCreateModalClosed}>
-
-                <div className="flex justify-between gap-10 ">
-                    <p className="font-nunito">Create  Category</p>
-                    <button
-                        onClick={() => {
-                            handleCreateModalClosed()
-                        }}
-                    >
-                        <CloseIcon className="h-4 w-4" />
-                    </button>
-                </div>
-                <hr className=" border border-default-400 " />
-
-                <Form method="post">
+            <Drawer isDrawerOpened={createModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Category"
+            >
+                <Form method="post" className="p-4">
                     <CustomInput
                         label="Name"
                         name="name"
                         placeholder=" "
                         type="text"
                         labelPlacement="outside"
-                        classNames={{
-                            label: "font-nunito text-sm text-default-100",
-                            inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333] "
-                        }}
+
                     />
                     <input hidden name="seller" value={user?._id} type="" />
                     <input hidden name="intent" value="create" type="" />
@@ -238,17 +221,17 @@ const Category = () => {
                         className="mt-4 font-nunito text-sm"
                         classNames={{
                             label: "font-nunito text-sm text-default-100",
-                            inputWrapper: "dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                            inputWrapper: " shadow-sm   border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 bg-white hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                         }}
                     />
 
 
                     <button onClick={() => {
-                    }} type="submit" className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4">
+                    }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
                         Submit
                     </button>
                 </Form>
-            </CreateModal>
+            </Drawer>
 
 
 

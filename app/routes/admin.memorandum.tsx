@@ -31,6 +31,7 @@ import { MemoColumns } from "~/components/table/columns";
 import { ChevronDownIcon } from "~/components/icons/ArrowDown";
 import { EyeIcon } from "~/components/icons/EyeIcon";
 import { Plus, FileText, Download, ChevronsDownIcon, DownloadCloudIcon } from "lucide-react";
+import Drawer from "~/components/modal/drawer";
 export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
@@ -126,7 +127,7 @@ const Users = () => {
         <AdminLayout handleOnClick={handleClick} pageName="Users Management">
             <div>
                 <div className="flex justify-end">
-                    <Button className="border border-white/30 px-4 py-1 bg-[#020817]" onClick={() => {
+                    <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
                         const randomRef = generateRandomReference();
                         setReferenceNumber(randomRef);
                         setIsDrawerOpen(true);
@@ -172,7 +173,7 @@ const Users = () => {
                                 }}>
                                     <EyeIcon className="" />
                                 </button>
-                                { (memo.image && (typeof memo.image === 'string' || (memo.image as any).url)) ? (
+                                {(memo.image && (typeof memo.image === 'string' || (memo.image as any).url)) ? (
                                     <a
                                         href={typeof memo.image === 'string' ? memo.image : (memo.image as any).url}
                                         download
@@ -203,25 +204,17 @@ const Users = () => {
 
                 {/* Create memo drawer */}
                 {/* Create memo drawer */}
-                <div
-                    className={`w-[40vw] h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isDrawerOpen ? "transform-none" : "translate-x-full"}`}
+                <Drawer
+                    isDrawerOpened={isDrawerOpen}
+                    handleDrawerClosed={() => {
+                        setIsDrawerOpen(false)
+                    }}
+                    title="Create Memo"
                 >
-                    <div className="flex justify-between gap-10 ">
-                        <p className="font-nunito">Create a new memo</p>
-                        <button
-                            onClick={() => {
-                                setIsDrawerOpen(false);
-                            }}
-                        >
-                            <CloseIcon className="h-4 w-4" />
-                        </button>
-                    </div>
-                    <hr className="mt-4 border border-default-400" />
-
-                    <Form className="flex flex-col gap-6 pt-4" method="post">
+                    <Form className="flex flex-col gap-6 p-4" method="post">
                         <input
                             name="refNumber"
-                            className="text-sm dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
+                            className="text-sm dark:bg-default-50 shadow-sm   border border-black/30   hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
                             value={referenceNumber} type="text" />
 
                         <div className="flex gap-6">
@@ -233,8 +226,8 @@ const Users = () => {
                                 name="fromDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
@@ -249,8 +242,8 @@ const Users = () => {
                                 name="fromName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {users.map((user: RegistrationInterface) => (
@@ -270,37 +263,37 @@ const Users = () => {
 
                         <div className="flex gap-6">
                             <Select
-                            label="To Department"
-                            labelPlacement="outside"
-                            placeholder="Select department"
-                            isRequired
+                                label="To Department"
+                                labelPlacement="outside"
+                                placeholder="Select department"
+                                isRequired
                                 name="toDepartment"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
-                            }}
-                        >
-                            {departments.map((department: DepartmentInterface) => (
-                                <SelectItem key={department._id}>{department.name}</SelectItem>
-                            ))}
-                        </Select>
-                        <Select
-                            label="To Name"
-                            labelPlacement="outside"
-                            placeholder="Select department"
-                            isRequired
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                }}
+                            >
+                                {departments.map((department: DepartmentInterface) => (
+                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                ))}
+                            </Select>
+                            <Select
+                                label="To Name"
+                                labelPlacement="outside"
+                                placeholder="Select department"
+                                isRequired
                                 name="toName"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
-                            }}
-                        >
-                            {users.map((user: RegistrationInterface) => (
-                                <SelectItem key={user._id}>{user.firstName}</SelectItem>
-                            ))}
-                        </Select>
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                }}
+                            >
+                                {users.map((user: RegistrationInterface) => (
+                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
+                                ))}
+                            </Select>
                         </div>
 
                         <div>
@@ -326,8 +319,8 @@ const Users = () => {
                                 name="memoType"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {[
@@ -340,12 +333,12 @@ const Users = () => {
                             </Select>
                             <CustomInput
                                 label="Due Date"
-                            isRequired
+                                isRequired
                                 name="dueDate"
-                            type="Date"
-                            placeholder=" "
-                            labelPlacement="outside"
-                        />
+                                type="Date"
+                                placeholder=" "
+                                labelPlacement="outside"
+                            />
 
                         </div>
 
@@ -357,8 +350,8 @@ const Users = () => {
                             name="frequency"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-full",
+                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                             }}
                         >
                             {[
@@ -391,8 +384,8 @@ const Users = () => {
                                 name="ccDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
@@ -407,8 +400,8 @@ const Users = () => {
                                 name="ccName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {users.map((user: RegistrationInterface) => (
@@ -454,24 +447,15 @@ const Users = () => {
                         <input name="base64Image" value={base64Image} type="hidden" />
 
                     </Form>
-                </div>
+                </Drawer>
 
-                <div
-                    className={`w-[20vw] h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isViewDrawerOpen ? "transform-none" : "translate-x-full"}`}
-                >
-                    <div className="flex justify-between gap-10 ">
-                        <p className="font-nunito">Memo Details</p>
-                        <button
-                            onClick={() => {
-                                setIsViewDrawerOpen(false);
-                            }}
-                        >
-                            <CloseIcon className="h-4 w-4" />
-                        </button>
-                    </div>
-                    <hr className="mt-4 border border-default-400" />
-
-                    <div className="font-nunito text-xs flex flex-col gap-4 mt-6">
+             {/* View Memo */}
+             <Drawer
+             isDrawerOpened={isViewDrawerOpen}
+             handleDrawerClosed={() => setIsViewDrawerOpen(false)}
+             title="View Memo"
+             >
+                 <div className="font-nunito text-xs flex flex-col gap-4 mt-6 p-4">
                         <span className="flex justify-between">
                             <p> Reference Number:</p>
                             <p>{dataValue?.refNumber}</p>
@@ -531,29 +515,19 @@ const Users = () => {
                             <img src={dataValue?.image} alt="" />
                         </span>
                     </div>
-                </div>
+             </Drawer>
 
                 {/* Edit Memo */}
-                <div
-                    className={`w-[40vw] h-[100vh] bg-default-50 overflow-y-scroll border dark:border-white/10  fixed top-0 right-0 z-10 transition-transform duration-500 p-6 ${isEditDrawerOpen ? "transform-none" : "translate-x-full"}`}
-                >
-                    <div className="flex justify-between gap-10 ">
-                        <p className="font-nunito">Edit memo</p>
-                        <button
-                            onClick={() => {
-                                setIsEditDrawerOpen(false);
-                            }}
-                        >
-                            <CloseIcon className="h-4 w-4" />
-                        </button>
-                    </div>
-                    <hr className="mt-4 border border-default-400" />
-
-                    <Form className="flex flex-col gap-6 pt-4" method="post">
+               <Drawer
+               isDrawerOpened={isEditDrawerOpen}
+               handleDrawerClosed={() => setIsEditDrawerOpen(false)}
+               title="Edit Memo"
+               >
+                    <Form className="flex flex-col gap-6 p-4" method="post">
                         <input
                             name="refNumber"
-                            className="text-sm dark:bg-default-50 shadow-sm   border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
-                            value={referenceNumber} type="text" />
+                            className="text-sm dark:bg-default-50 shadow-sm   border border-black/30   hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
+                            value={dataValue?.refNumber} type="text" />
 
                         <div className="flex gap-6">
                             <Select
@@ -564,8 +538,8 @@ const Users = () => {
                                 name="fromDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
@@ -580,8 +554,8 @@ const Users = () => {
                                 name="fromName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {users.map((user: RegistrationInterface) => (
@@ -608,8 +582,8 @@ const Users = () => {
                                 name="toDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
@@ -624,8 +598,8 @@ const Users = () => {
                                 name="toName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {users.map((user: RegistrationInterface) => (
@@ -657,8 +631,8 @@ const Users = () => {
                                 name="memoType"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {[
@@ -688,8 +662,8 @@ const Users = () => {
                             name="frequency"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-full",
+                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                             }}
                         >
                             {[
@@ -722,8 +696,8 @@ const Users = () => {
                                 name="ccDepartment"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
@@ -738,8 +712,8 @@ const Users = () => {
                                 name="ccName"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "focus:dark:bg-[#333] bg-white shadow-sm dark:bg-default-50 border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-default-50 border border-white/30 hover:border-b-primary hover:bg-white max-w-sm",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
+                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
                                 {users.map((user: RegistrationInterface) => (
@@ -785,7 +759,7 @@ const Users = () => {
                         <input name="base64Image" value={base64Image} type="hidden" />
 
                     </Form>
-                </div>
+               </Drawer>
             </div>
 
             <ConfirmModal className="dark:bg-default-50 border border-white/10" header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>

@@ -3,7 +3,7 @@ import { CardBody, CardContainer, CardItem } from "./acternity/3d";
 import jl from "../components/images/JL.png"
 import dl from "~/components/images/Dennislaw-Logo.svg"
 import mr from "~/components/images/mr-logo.png"
-import news from "~/components/images/DL-News-Logo.png"
+import news from "~/components/images/DL-News-Logo-LPNLKYG2.png"
 import { ChevronRight } from "lucide-react";
 import ScrollAnimation from "./animation";
 import { Link } from "@remix-run/react";
@@ -14,19 +14,33 @@ export function ProductCard({ id, className }: { id?: string, className: string 
             <div className="container">
                 <ScrollAnimation>
                     <div className="flex flex-col items-center justify-center text-center mb-6">
-                        <p className="mb-4 font-bold font-montserrat  bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-xl">Explore More of Our Products</p>
                         <h2 className="text-3xl md:text-3xl font-montserrat font-bold mb-4">
                             Top-Notch Software Development and Digital Transformation
                         </h2>
                         <p className="font-montserrat text-muted-foreground max-w-[800px]">
-                            Explore our suite of innovative legal tech solutions designed to streamline workflows and enhance client
-                            experiences.
+                        Discover our innovative legal tech solutions that streamline workflows and elevate client experiences.
                         </p>
                     </div>
                 </ScrollAnimation>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-4 lg:px-20">
                     {[
+                         {
+                            link: "https://www.dennislawgh.com/",
+                            title: "DennisLaw",
+                            description: "AI-powered legal assistant",
+                            image: dl,
+                            type: "brand",
+                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
+                        },
+                         {
+                            link: "https://dennislawnews.com/",
+                            title: "Dennislaw News",
+                            description: "Stay updated on legal trends",
+                            image: news,
+                            type: "news",
+                            className: "h-20 mb-20 mt-20  flex items-center justify-center w-80 transition-transform group-hover:scale-105", 
+                        },
                         {
                             link: "",
                             title: "Justice Locator",
@@ -35,14 +49,7 @@ export function ProductCard({ id, className }: { id?: string, className: string 
                             type: "mobile",
                             className: "h-60 w-80 transition-transform group-hover:scale-105", 
                         },
-                        {
-                            link: "https://www.dennislawgh.com/",
-                            title: "DennisLaw",
-                            description: "AI-powered legal assistant",
-                            image: dl,
-                            type: "brand",
-                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
-                        },
+                       
                         {
                             link: "http://marryrightgh.com/",
                             title: "MarryRight",
@@ -51,14 +58,7 @@ export function ProductCard({ id, className }: { id?: string, className: string 
                             type: "app",
                             className: "h-60 w-80 transition-transform group-hover:scale-105", 
                         },
-                        {
-                            link: "https://dennislawnews.com/",
-                            title: "Dennislaw News",
-                            description: "Stay updated on legal trends",
-                            image: news,
-                            type: "news",
-                            className: "h-60 w-80 transition-transform group-hover:scale-105", 
-                        },
+                       
                     ].map((product, i) => (
                         <ScrollAnimation>
                             <CardContainer
@@ -70,13 +70,13 @@ export function ProductCard({ id, className }: { id?: string, className: string 
                                         translateZ="50"
                                         className="text-xl text-neutral-600 dark:text-white"
                                     >
-                                        <p className="text-md bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-nunito font-bold">
+                                        <p className="text-md font-nunito font-bold">
                                             {product.title}
                                         </p>
                                         <p className="text-sm font-nunito">{product.description}</p>
                                     </CardItem>
 
-                                    <CardItem className="mt-2 mb-10 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+                                    <CardItem className="mt-2 flex items-center justify-center mb-10 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
                                         <img
                                             src={product.image}
                                             alt={product.title}
@@ -87,7 +87,7 @@ export function ProductCard({ id, className }: { id?: string, className: string 
                                     <Link to={product.link}><Button
                                         variant="flat"
                                         size="sm"
-                                        className="w-full group-hover:bg-gradient-to-r from-pink-500 to-purple-600 font-montserrat group-hover:text-white"
+                                        className="w-full hover:bg-gradient font-montserrat"
                                     >
                                         Explore Product
                                         <ChevronRight className="ml-2 h-4 w-4" />
