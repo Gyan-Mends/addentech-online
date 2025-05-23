@@ -237,27 +237,7 @@ export default function BlogPage() {
                 </section>
             </main>
 
-            {/* CTA Section */}
-            <section className="py-16 bg-gray-100">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="rounded-2xl border border-black/20 bg-white shadow-md p-8 md:p-12 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]"></div>
-                        <div className="relative flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div>
-                                <h2 className="text-2xl md:text-3xl font-bold mb-2">Transform your business with us effortlessly</h2>
-                                <p className="text-gray-400 max-w-2xl">
-                                    Ready to take your business to the next level? Our team of experts is here to help you achieve your
-                                    goals.
-                                </p>
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <Button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white">Contact us</Button>
-                                <Button className=" ">Learn More</Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          
         </PublicLayout>
     )
 }

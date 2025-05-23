@@ -195,6 +195,30 @@ export default function ServicesPage() {
         },
     ]
 
+
+    const FAQs = [
+        {
+            question: "What industries do you specialize in?",
+            answer:
+                "We have experience working with clients across various industries including legal, healthcare, finance, e-commerce, education, and technology. Our team adapts our approach to meet the specific needs of each industry.",
+        },
+        {
+            question: "How long does a typical project take to complete?",
+            answer:
+                "Project timelines vary depending on scope and complexity. A simple website might take 4-6 weeks, while a comprehensive digital transformation project could take several months. We provide detailed timelines during our planning phase.",
+        },
+        {
+            question: "Do you offer ongoing support after project completion?",
+            answer:
+                "Yes, we offer various support and maintenance packages to ensure your solution continues to perform optimally. These can include regular updates, performance monitoring, security patches, and technical support.",
+        },
+        {
+            question: "How do you handle project pricing?",
+            answer:
+                "We offer transparent pricing based on project requirements. Depending on the nature of the work, we may use fixed-price quotes, hourly rates, or retainer models. We provide detailed proposals so you know exactly what you're paying for.",
+        },
+    ];
+
     const filteredServices = activeTab === "all" ? services : services.filter((service) => service.category === activeTab)
 
     const fadeInUpVariants = {
@@ -233,12 +257,18 @@ export default function ServicesPage() {
         setTimeout(() => setIsPaused(false), 10000)
     }
 
+    const [openIndex, setOpenIndex] = useState(null);
+
+    const toggleFAQ = (index) => {
+        setOpenIndex(openIndex === index ? null : index);
+    };
+
     return (
         <PublicLayout>
             {/* Hero Section */}
             <section
                 id="hero-section"
-                className="relative overflow-hidden lg:h-[90vh] lg:py-24 py-16 md:py-32 "
+                className="relative overflow-hidden  lg:py-24 py-16 md:py-32 "
             >
                 {/* Animated background elements */}
                 <div className="absolute inset-0 opacity-30">
@@ -258,20 +288,20 @@ export default function ServicesPage() {
                             <Chip className="bg-white border border-2 border-black-200/20 shadow-sm">
                                 <p className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
 
-                                Our Services
+                                    Our Services
                                 </p>
                             </Chip>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-montserrat font-bold lg:text-6xl leading-tight tracking-tight mb-6">
                             Here is How We Can{" "}
-                            <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                            <span className="text-pink-500">
                                 Help Your Business
                             </span>
                         </h1>
                         <p className="text-xl  max-w-[800px] leading-relaxed">
                             Comprehensive services tailored to your needs, designed to elevate your business in the digital landscape.
                         </p>
-                        <div className="flex flex-wrap gap-4 mt-8">
+                        {/* <div className="flex flex-wrap gap-4 mt-8">
                             <Link to="/">
                             <Button
                                     className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium px-6 py-6 rounded-lg shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
@@ -291,7 +321,7 @@ export default function ServicesPage() {
                                 Contact Us
                             </Button>
                             </Link>
-                        </div>
+                        </div> */}
                     </motion.div>
                 </div>
             </section>
@@ -305,13 +335,13 @@ export default function ServicesPage() {
                         animate={isVisible.services ? "visible" : "hidden"}
                         variants={fadeInUpVariants}
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6">
                             Our Professional Services
                         </h2>
                         <p className=" text-lg mb-10 max-w-2xl mx-auto">
                             We offer a comprehensive range of services to help your business thrive in the digital age.
                         </p>
-                        <div className=" p-1 bg-white shadow-md rounded-full backdrop-blur-sm border border-white/5 mb-8 max-w-xl mx-auto">
+                        <div className=" p-1 !text-black bg-white shadow-md rounded-full backdrop-blur-sm border border-white/5 mb-8 max-w-xl mx-auto">
                             <Tabs
                                 aria-label="Service categories"
                                 selectedKey={activeTab}
@@ -319,9 +349,10 @@ export default function ServicesPage() {
                                 className="justify-center w-full"
                                 variant="solid"
                                 color="default"
+
                                 classNames={{
                                     tabList: "gap-2 w-full rounded-full bg-white  p-1",
-                                    cursor: "bg-gradient-to-r from-pink-500 to-purple-600 rounded-full",
+                                    cursor: "bg-default-600 text-black rounded-full",
                                     tab: "rounded-full  px-4 py-2 text-sm font-medium data-[selected=true]:text-pink-400",
                                     tabContent: "group-data-[selected=true]:text-white",
                                 }}
@@ -353,44 +384,6 @@ export default function ServicesPage() {
                                 <ServiceCard service={service} />
                             </motion.div>
                         ))}
-
-                        {activeTab === "all" && (
-
-                            <motion.div
-                                initial="hidden"
-                                animate={isVisible.services ? "visible" : "hidden"}
-                                variants={{
-                                    hidden: { opacity: 0, y: 20 },
-                                    visible: {
-                                        opacity: 1,
-                                        y: 0,
-                                        transition: { duration: 0.6, delay: filteredServices.length * 0.1 },
-                                    },
-                                }}
-                            >
-                                <Card className="border border-white/10 h-full group hover:border-pink-500/30 transition-all duration-300 overflow-hidden hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
-                                    <div className="absolute inset-0  opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <CardBody className="flex items-center justify-center text-center p-8">
-                                        <div>
-                                            <div className="w-16 h-16 rounded-full bg-pink-500/10 flex items-center justify-center mx-auto mb-6">
-                                                <Sparkles className="h-8 w-8 text-pink-400" />
-                                            </div>
-                                            <h3 className="text-xl font-semibold mb-3 text-white">Need a Custom Solution?</h3>
-                                            <p className="text-gray-300 mb-6">Contact us to discuss your specific requirements</p>
-                                            <Link to="/contact">
-                                            <Button
-                                                className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 rounded-full shadow-lg shadow-pink-500/10 hover:shadow-pink-500/30 transition-all duration-300"
-                                                endContent={<ArrowRight className="h-4 w-4 ml-1" />}
-
-                                            >
-                                                Get in Touch
-                                            </Button>
-                                            </Link>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            </motion.div>
-                        )}
                     </div>
                 </div>
             </section>
@@ -408,88 +401,81 @@ export default function ServicesPage() {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <ScrollAnimation>
                         <motion.div
-                        className="max-w-3xl mx-auto text-center mb-16"
-                        initial="hidden"
-                        animate={isVisible.methodology ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <div className="inline-flex mb-4">
-                            <Chip
-                                className=" font-medium text-sm px-3 py-1"
-                                variant="bordered"
-                                size="sm"
-                            >
-                                Our Process
-                            </Chip>
-                        </div>
-                            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                            Our Methodology Guarantees Your Success
-                        </h2>
+                            className="max-w-3xl mx-auto text-center mb-16"
+                            initial="hidden"
+                            animate={isVisible.methodology ? "visible" : "hidden"}
+                            variants={fadeInUpVariants}
+                        >
+                            <div className="inline-flex mb-4">
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                                Our Methodology Guarantees Your Success
+                            </h2>
                             <p className="text-lg max-w-2xl mx-auto">
-                            We follow a proven methodology to ensure your project is delivered on time, within budget, and exceeds
-                            your expectations.
-                        </p>
-                    </motion.div>
+                                We follow a proven methodology to ensure your project is delivered on time, within budget, and exceeds
+                                your expectations.
+                            </p>
+                        </motion.div>
                     </ScrollAnimation>
 
                     {/* Wave Visualization */}
                     <ScrollAnimation>
                         <motion.div
-                        className="relative h-40 mb-16"
-                        initial={{ opacity: 0 }}
-                        animate={isVisible.methodology ? { opacity: 1 } : { opacity: 0 }}
-                        transition={{ duration: 1 }}
-                    >
+                            className="relative h-40 mb-16"
+                            initial={{ opacity: 0 }}
+                            animate={isVisible.methodology ? { opacity: 1 } : { opacity: 0 }}
+                            transition={{ duration: 1 }}
+                        >
                             <div className="absolute inset-0 ">
-                            <svg viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                                <defs>
-                                        <linearGradient className="bg-gradient-to-r from-pink-500 to-purple-600" id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stopColor="#ec4899" stopOpacity="0.2" />
-                                        <stop offset="50%" stopColor="#d946ef" stopOpacity="0.2" />
-                                        <stop offset="100%" stopColor="#c026d3" stopOpacity="0.2" />
-                                    </linearGradient>
-                                </defs>
-                                <path
-                                    d="M0,100 C150,180 350,0 500,100 C650,200 750,0 900,100 C1050,200 1150,0 1200,100 V200 H0 V100Z"
-                                    fill="url(#waveGradient)"
-                                />
-                                <motion.path
-                                    d="M0,100 C150,180 350,0 500,100 C650,200 750,0 900,100 C1050,200 1150,0 1200,100"
-                                    fill="none"
-                                    stroke="url(#waveGradient)"
-                                    strokeWidth="3"
-                                    initial={{ pathLength: 0 }}
-                                    animate={isVisible.methodology ? { pathLength: 1 } : { pathLength: 0 }}
-                                    transition={{ duration: 1.5, ease: "easeInOut" }}
-                                />
+                                <svg viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                                    <defs>
+                                        <linearGradient className="" id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="#ec4899" stopOpacity="0.2" />
+                                            <stop offset="50%" stopColor="#d946ef" stopOpacity="0.2" />
+                                            <stop offset="100%" stopColor="#c026d3" stopOpacity="0.2" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path
+                                        d="M0,100 C150,180 350,0 500,100 C650,200 750,0 900,100 C1050,200 1150,0 1200,100 V200 H0 V100Z"
+                                        fill="url(#waveGradient)"
+                                    />
+                                    <motion.path
+                                        d="M0,100 C150,180 350,0 500,100 C650,200 750,0 900,100 C1050,200 1150,0 1200,100"
+                                        fill="none"
+                                        stroke="url(#waveGradient)"
+                                        strokeWidth="3"
+                                        initial={{ pathLength: 0 }}
+                                        animate={isVisible.methodology ? { pathLength: 1 } : { pathLength: 0 }}
+                                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                                    />
 
-                                {/* Animated dots along the path */}
-                                <motion.circle
-                                    cx="0"
-                                    cy="100"
-                                    r="8"
-                                    fill="#ec4899"
-                                    initial={{ opacity: 0 }}
-                                    animate={
-                                        isVisible.methodology
-                                            ? {
-                                                opacity: [0, 1, 0],
-                                                cx: [0, 300, 600, 900, 1200],
-                                                cy: [100, 30, 100, 30, 100],
-                                            }
-                                            : { opacity: 0 }
-                                    }
-                                    transition={{
-                                        duration: 4,
-                                        repeat: Number.POSITIVE_INFINITY,
-                                        repeatType: "loop",
-                                        ease: "linear",
-                                        times: [0, 0.25, 0.5, 0.75, 1],
-                                    }}
-                                />
-                            </svg>
-                        </div>
-                    </motion.div>
+                                    {/* Animated dots along the path */}
+                                    <motion.circle
+                                        cx="0"
+                                        cy="100"
+                                        r="8"
+                                        fill="#ec4899"
+                                        initial={{ opacity: 0 }}
+                                        animate={
+                                            isVisible.methodology
+                                                ? {
+                                                    opacity: [0, 1, 0],
+                                                    cx: [0, 300, 600, 900, 1200],
+                                                    cy: [100, 30, 100, 30, 100],
+                                                }
+                                                : { opacity: 0 }
+                                        }
+                                        transition={{
+                                            duration: 4,
+                                            repeat: Number.POSITIVE_INFINITY,
+                                            repeatType: "loop",
+                                            ease: "linear",
+                                            times: [0, 0.25, 0.5, 0.75, 1],
+                                        }}
+                                    />
+                                </svg>
+                            </div>
+                        </motion.div>
                     </ScrollAnimation>
 
                     {/* Process Steps */}
@@ -546,230 +532,62 @@ export default function ServicesPage() {
                 </div>
             </section>
 
-            {/* Testimonials Section */}
-            <section id="testimonials-section" className="py-20 bg-gray-100 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
-                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
-                </div>
-
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <motion.div
-                        className="max-w-3xl mx-auto text-center mb-16"
-                        initial="hidden"
-                        animate={isVisible.testimonials ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <div className="inline-flex mb-4">
-                            <Chip
-                                className="font-medium text-sm px-3 py-1"
-                                variant="bordered"
-                                size="sm"
-                                startContent={<Star className="h-3.5 w-3.5 mr-1 " />}
-                            >
-                                Client Testimonials
-                            </Chip>
-                        </div>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                            What Our Clients Say About Our Services
-                        </h2>
-                        <p className=" text-lg max-w-2xl mx-auto ">
-                            Don't just take our word for it. Here's what our clients have to say about working with us.
-                        </p>
-                    </motion.div>
-
-                    <motion.div
-                        initial="hidden"
-                        animate={isVisible.testimonials ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                        className="relative"
-                    >
-                        <div className="overflow-hidden">
-                            <div
-                                className="flex transition-transform duration-500 ease-in-out"
-                                style={{ transform: `translateX(-${activeTestimonial * 100}%)` }}
-                            >
-                                {testimonials.map((testimonial, index) => (
-                                    <div key={index} className="w-full flex-shrink-0 px-4">
-                                        <Card className="border border-white/10  h-full overflow-hidden">
-                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-purple-600"></div>
-                                            <CardBody className="p-8">
-                                                <div className="flex flex-col md:flex-row items-start gap-6">
-                                                    <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink-500/20">
-                                                        <img
-                                                            src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg"
-                                                            alt={testimonial.author}
-                                                            width={100}
-                                                            height={100}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex mb-3">
-                                                            {Array.from({ length: 5 }).map((_, i) => (
-                                                                <Star key={i} className="h-4 w-4 text-pink-400/10 fill-pink-400 mr-1" />
-                                                            ))}
-                                                        </div>
-                                                        <p className="text-lg italic mb-6  leading-relaxed">"{testimonial.quote}"</p>
-                                                        <div>
-                                                            <p className="font-medium ">{testimonial.author}</p>
-                                                            <p className="text-sm ">{testimonial.role}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardBody>
-                                        </Card>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center mt-8">
-                            <div className="flex gap-2">
-                                {testimonials.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => goToSlide(index)}
-                                        className={`h-2 rounded-full transition-all ${index === activeTestimonial ? "w-8 bg-pink-500" : "w-2 bg-white"
-                                            }`}
-                                        aria-label={`Go to slide ${index + 1}`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        <Button
-                            isIconOnly
-                            variant="bordered"
-                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-purple-600 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex text-white"
-                            onClick={goToPrevious}
-                            aria-label="Previous testimonial"
-                        >
-                            <ChevronRight className="h-4 w-4 rotate-180" />
-                        </Button>
-
-                        <Button
-                            isIconOnly
-                            variant="bordered"
-                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-purple-600 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex text-white"
-                            onClick={goToNext}
-                            aria-label="Next testimonial"
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </motion.div>
-                </div>
-            </section>
 
             {/* FAQ Section */}
-            <section id="faq-section" className="py-20  relative">
+            <section id="faq-section" className="py-20 relative">
                 <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl"></div>
                     <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-fuchsia-500/10 rounded-full filter blur-3xl"></div>
                 </div>
 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <ScrollAnimation>
-                        <motion.div
-                        className="max-w-3xl mx-auto text-center mb-16"
-                        initial="hidden"
-                        animate={isVisible.faq ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <div className="inline-flex mb-4">
-                            <Chip
-                                className=" font-medium text-sm px-3 py-1"
-                                variant="bordered"
-                                size="sm"
-                            >
-                                FAQ
-                            </Chip>
-                        </div>
-                            <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                    <motion.div className="max-w-3xl mx-auto text-center mb-16">
+
+                        <h2 className="text-3xl md:text-4xl font-bold mb-6 ">
                             Frequently Asked Questions
                         </h2>
-                            <p className=" text-lg max-w-2xl mx-auto">
+                        <p className="text-lg max-w-2xl mx-auto">
                             Find answers to common questions about our services and how we can help your business.
                         </p>
                     </motion.div>
-                    </ScrollAnimation>
 
                     <div className="max-w-3xl mx-auto space-y-5">
-                        {[
-                            {
-                                question: "What industries do you specialize in?",
-                                answer:
-                                    "We have experience working with clients across various industries including legal, healthcare, finance, e-commerce, education, and technology. Our team adapts our approach to meet the specific needs of each industry.",
-                            },
-                            {
-                                question: "How long does a typical project take to complete?",
-                                answer:
-                                    "Project timelines vary depending on scope and complexity. A simple website might take 4-6 weeks, while a comprehensive digital transformation project could take several months. We provide detailed timelines during our planning phase.",
-                            },
-                            {
-                                question: "Do you offer ongoing support after project completion?",
-                                answer:
-                                    "Yes, we offer various support and maintenance packages to ensure your solution continues to perform optimally. These can include regular updates, performance monitoring, security patches, and technical support.",
-                            },
-                            {
-                                question: "How do you handle project pricing?",
-                                answer:
-                                    "We offer transparent pricing based on project requirements. Depending on the nature of the work, we may use fixed-price quotes, hourly rates, or retainer models. We provide detailed proposals so you know exactly what you're paying for.",
-                            },
-                        ].map((faq, index) => (
-                            <ScrollAnimation>
-                                <motion.div
+                        {FAQs.map((faq, index) => (
+                            <motion.div
                                 key={index}
                                 initial="hidden"
-                                animate={isVisible.faq ? "visible" : "hidden"}
-                                variants={{
-                                    hidden: { opacity: 0, y: 20 },
-                                    visible: {
-                                        opacity: 1,
-                                        y: 0,
-                                        transition: { duration: 0.6, delay: index * 0.1 },
-                                    },
-                                }}
+                                animate="visible"
+                                className="border border-black/20 rounded-lg bg-white hover:border-pink-500/30 transition-all duration-300 group overflow-hidden shadow-sm"
                             >
-                                    <Card className="border border-black/20 bg-white hover:border-pink-500/30 transition-all duration-300 group overflow-hidden shadow-sm hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
-                                    <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
-                                    <CardHeader className="px-6 py-5 flex gap-4">
+                                <div
+                                    className="px-6 py-5 flex items-center justify-between cursor-pointer"
+                                    onClick={() => toggleFAQ(index)}
+                                >
+                                    <div className="flex gap-4">
                                         <div className="w-8 h-8 rounded-full bg-pink-500/10 flex items-center justify-center flex-shrink-0">
                                             <span className="text-pink-400 font-medium">{index + 1}</span>
                                         </div>
-                                            <h3 className="text-xl font-semibold  transition-colors duration-300">
-                                            {faq.question}
-                                        </h3>
-                                    </CardHeader>
-                                    <CardBody className="px-6 pb-6 pt-0">
-                                            <p className="text-gray-500 leading-relaxed">{faq.answer}</p>
-                                    </CardBody>
-                                </Card>
+                                        <h3 className="text-xl font-semibold">{faq.question}</h3>
+                                    </div>
+                                    <span>{openIndex === index ? "-" : "+"}</span>
+                                </div>
+                                {openIndex === index && (
+                                    <div className="px-6 pb-6">
+                                        <p className="text-gray-500 leading-relaxed">{faq.answer}</p>
+                                    </div>
+                                )}
                             </motion.div>
-                            </ScrollAnimation>
                         ))}
                     </div>
 
-                    <ScrollAnimation>
-                        <motion.div
-                        className="mt-12 text-center"
-                        initial="hidden"
-                        animate={isVisible.faq ? "visible" : "hidden"}
-                        variants={fadeInUpVariants}
-                    >
-                        <p className="text-gray-300 mb-6 text-lg">Still have questions? We're here to help.</p>
-                            <Link to="/contact">
-                        <Button
-                            className="bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white font-medium px-6 py-6 rounded-full shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all duration-300"
-                            endContent={<ArrowRight className="h-4 w-4 ml-1" />}
-                            size="lg"
-
-                        >
-                            Contact Our Support Team
-                        </Button>
-                            </Link>
+                    <motion.div className="mt-12 flex flex-col justify-center items-center gap-2">
+                        <p className=" mb-6 text-lg">
+                            Still have questions? We're here to help.
+                        </p>
+                        <Link className="flex items-center gap-2 text-pink-500 hover:text-pink-600 transition-colors duration-300" to="/contact">
+                            Contact Our Support Team <ArrowRight className="h-4 w-4 ml-1" />
+                        </Link>
                     </motion.div>
-                    </ScrollAnimation>
                 </div>
             </section>
         </PublicLayout>
@@ -781,59 +599,57 @@ function ServiceCard({ service }) {
     return (
         <ScrollAnimation>
             <Card className="border border-black/10 shadow-md overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
-                <div className="absolute top-0 left-0 w-0 h-1 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-500"></div>
-
-            <CardBody className="p-6">
-                <div className="mb-6 transform group-hover:scale-105 transition-transform duration-300">
-                    <div className="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center">{service.icon}</div>
-                </div>
+                <CardBody className="p-6">
+                    <div className="mb-6 transform group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center">{service.icon}</div>
+                    </div>
                     <h3 className="text-xl font-semibold mb-3  transition-colors duration-300">
-                    {service.title}
-                </h3>
+                        {service.title}
+                    </h3>
                     <p className="text-gray-500 mb-6">{service.description}</p>
 
-                {service.features.length > 0 && (
-                    <div className="mt-auto">
-                        <div className="h-px w-full bg-pink-900/20 mb-5"></div>
+                    {service.features.length > 0 && (
+                        <div className="mt-auto">
+                            <div className="h-px w-full bg-pink-900/20 mb-5"></div>
                             <h4 className="text-sm font-medium mb-3 ">Key Features:</h4>
-                        <ul className="space-y-2.5">
-                            {service.features.slice(0, 3).map((feature, i) => (
-                                <li key={i} className="flex items-start gap-3 text-sm">
-                                    <CheckCircle className="h-5 w-5 text-pink-500 mt-0.5 flex-shrink-0" />
-                                    <span className="text-gray-400">{feature}</span>
-                                </li>
-                            ))}
-                        </ul>
+                            <ul className="space-y-2.5">
+                                {service.features.slice(0, 3).map((feature, i) => (
+                                    <li key={i} className="flex items-start gap-3 text-sm">
+                                        <CheckCircle className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                                        <span className="text-gray-400">{feature}</span>
+                                    </li>
+                                ))}
+                            </ul>
 
-                        {service.benefits.length > 0 && (
-                            <div className="mt-5">
-                                <h4 className="text-sm font-medium mb-3 text-white">Benefits:</h4>
-                                <ul className="space-y-2.5">
-                                    {service.benefits.slice(0, 2).map((benefit, i) => (
-                                        <li key={i} className="flex items-start gap-3 text-sm">
-                                            <CheckCircle className="h-5 w-5 text-pink-500 mt-0.5 flex-shrink-0" />
-                                            <span className="text-gray-400">{benefit}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </CardBody>
+                            {service.benefits.length > 0 && (
+                                <div className="mt-5">
+                                    <h4 className="text-sm font-medium mb-3 ">Benefits:</h4>
+                                    <ul className="space-y-2.5">
+                                        {service.benefits.slice(0, 2).map((benefit, i) => (
+                                            <li key={i} className="flex items-start gap-3 text-sm">
+                                                <CheckCircle className="h-5 w-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                                                <span className="text-gray-400">{benefit}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </CardBody>
 
-            <CardFooter className="pt-0 pb-5 px-6">
-                <Button
-                        className="w-full text-pink-500 border  border-white/10 hover:border-pink-500/40 transition-all duration-300 "
-                    variant="bordered"
-                    endContent={<ArrowRight className="h-4 w-4 ml-1" />}
-                    as={Link}
-                    href={`/services/${service.id}`}
-                >
-                    Learn More
-                </Button>
-            </CardFooter>
-        </Card>
+                <CardFooter className="pt-0 pb-5 px-6">
+                    <Button
+                        className="w-full text-gray-600 border  border-white/10 hover:border-gray-600/40 transition-all duration-300 "
+                        variant="bordered"
+                        endContent={<ArrowRight className="h-4 w-4 ml-1" />}
+                        as={Link}
+                        href={`/services/${service.id}`}
+                    >
+                        Learn More
+                    </Button>
+                </CardFooter>
+            </Card>
         </ScrollAnimation>
     )
 }
@@ -842,19 +658,19 @@ function ProcessStep({ step }) {
     return (
         <ScrollAnimation>
             <Card className="border border-black/10  overflow-hidden shadow-md relative group hover:border-pink-500/30 transition-all duration-300 h-full hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
-            <div className="absolute top-0 left-0 h-1 w-0 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-700"></div>
+                <div className="absolute top-0 left-0 h-1 w-0 bg-gradient-to-r from-pink-500 to-fuchsia-600 group-hover:w-full transition-all duration-700"></div>
 
 
-            <CardBody className="p-6">
-                <div className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent mb-4 group-hover:from-pink-300 group-hover:to-fuchsia-400 transition-all duration-300">
-                    {step.number}
-                </div>
+                <CardBody className="p-6">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-fuchsia-500 bg-clip-text text-transparent mb-4 group-hover:from-pink-300 group-hover:to-fuchsia-400 transition-all duration-300">
+                        {step.number}
+                    </div>
                     <h3 className="text-xl font-semibold mb-3   transition-colors duration-300">
-                    {step.title}
-                </h3>
+                        {step.title}
+                    </h3>
                     <p className="text-gray-400">{step.description}</p>
-            </CardBody>
-        </Card>
+                </CardBody>
+            </Card>
         </ScrollAnimation>
     )
 }

@@ -70,17 +70,8 @@ const Team = () => {
                         </div>
                         <ScrollAnimation>
                             <div className="space-y-6">
-                            <div className="inline-flex">
-                                <Chip
-                                    className=" font-medium text-sm px-3 py-1"
-                                    variant="bordered"
-                                    size="sm"
-                                    startContent={<Sparkles className="h-3.5 w-3.5 mr-1" />}
-                                >
-                                    Our Team
-                                </Chip>
-                            </div>
-                                <h2 className="text-3xl md:text-4xl font-bold font-montserrat bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                            
+                                <h2 className="text-3xl md:text-4xl font-bold font-montserrat text-pink-500">
                                 Meet Our Dedicated Experts Behind Addentech Success
                             </h2>
                                 <p className=" text-lg leading-relaxed font-nunito">
