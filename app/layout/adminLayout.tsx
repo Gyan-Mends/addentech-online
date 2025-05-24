@@ -116,34 +116,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                 </div>
 
-                {/* Profile Section */}
-                <div className="p-4 border-t mt-auto">
-                    <div className="flex items-center space-x-3">
-                        <Avatar>
-                            <img src="/placeholder.svg?height=40&width=40" />
-                            <p>JD</p>
-                        </Avatar>
-                        <div>
-                            <p className="text-sm font-medium">John Doe</p>
-                            <p className="text-xs text-muted-foreground">Administrator</p>
-                        </div>
-                        <Dropdown>
-                            <DropdownTrigger asChild>
-                                <Button variant="ghost">
-                                    <ChevronDown className="h-4 w-4" />
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem key="account">My Account</DropdownItem>
-                                <Divider />
-                                <DropdownItem key="profile">Profile</DropdownItem>
-                                <DropdownItem key="settings">Settings</DropdownItem>
-                                <Divider />
-                                <DropdownItem key="logout">Logout</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                    </div>
-                </div>
+               
             </div>
 
             {/* Main Content */}
