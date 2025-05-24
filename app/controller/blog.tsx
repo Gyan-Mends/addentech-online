@@ -30,13 +30,13 @@ class BlogController {
         admin,
         id
     }: {
-            name: string,
-            base64Image: string,
-            category: string,
-            description: string,
-            admin: string,
-            id: string
-        }) {    
+        name: string,
+        base64Image: string,
+        category: string,
+        description: string,
+        admin: string,
+        id: string
+    }) {
 
         const updateBlog = await Blog.findByIdAndUpdate(id, {
             name,
@@ -48,9 +48,9 @@ class BlogController {
         });
         if (updateBlog) {
             return json({ message: "Blog updated successfully", success: true }, { status: 200 });
-            } else {
+        } else {
             return json({ message: "Blog not found", success: false }, { status: 404 });
-            }
+        }
 
 
     }
@@ -104,9 +104,9 @@ class BlogController {
         search_term,
         limit = 9
     }: {
-            request?: Request,
-            page?: number;
-            search_term?: string;
+        request?: Request,
+        page?: number;
+        search_term?: string;
         limit?: number;
     }): Promise<{
         user: RegistrationInterface[],

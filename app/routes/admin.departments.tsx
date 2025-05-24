@@ -137,7 +137,7 @@ const Category = () => {
                             labelPlacement="outside"
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-white/30 focus:bg-[#333]",
+                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-black/30 focus:bg-[#333]",
                             }}
                         />
                         <input name="seller" value={user?._id} type="hidden" />
@@ -160,7 +160,7 @@ const Category = () => {
 
                         <button
                             type="submit"
-                            className="mt-10 h-10 text-white bg-primary-400 rounded-xl font-nunito px-4"
+                            className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4"
                         >
                             Update
                         </button>

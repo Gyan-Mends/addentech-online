@@ -1,7 +1,7 @@
 import { Button,  Select, SelectItem, TableCell, TableRow, User } from "@nextui-org/react"
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction,  } from "@remix-run/node"
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
-import { Plus } from "lucide-react"
+import { Plus, Upload } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import { DeleteIcon } from "~/components/icons/DeleteIcon"
@@ -92,6 +92,12 @@ const Users = () => {
             setDataValue(dataValue?.category);
         }
     }, [dataValue]);
+
+    useEffect(() => {
+            if (dataValue?.image) {
+                setBase64Image(dataValue.image); // Set the image from the database as the initial value
+            }
+        }, [dataValue]);
 
 
     useEffect(() => {
@@ -238,44 +244,48 @@ const Users = () => {
 
 
 
-                        <div className="mt-4 ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
-                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
-                                <input
-                                    name="image"
-                                    required
-                                    placeholder=" "
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                    type="file"
-                                    onChange={(event: any) => {
-                                        const file = event.target.files[0];
-                                        if (file) {
-                                            const reader = new FileReader()
-                                            reader.onloadend = () => {
-                                                setBase64Image(reader.result)
-                                            }
-                                            reader.readAsDataURL(file)
-                                        }
-                                    }}
+                        <div className=" ">
+                        <input name="base64Image" value={base64Image} type="hidden" />
+                        <label className="font-nunito block text-sm !text-black" htmlFor="image">
+                            Image
+                        </label>
+                        <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
+                            {/* The file input */}
+                            <input
+                                name="image"
+                                id="image"
+                                type="file"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                accept="image/*"
+                                onChange={(event) => {
+                                    const file = event.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            setBase64Image(reader.result as string); // Update state with new image data
+                                        };
+                                        reader.readAsDataURL(file); // Convert file to base64
+                                    }
+                                }}
+                            />
+                            {/* Display the default image or the uploaded image */}
+                            {base64Image ? (
+                                <img
+                                    src={base64Image}
+                                    alt="Preview"
+                                    className="absolute inset-0 w-full h-full object-cover rounded-xl"
                                 />
-                                {base64Image ? (
-                                    <img
-                                        src={base64Image}
-                                        alt="Preview"
-                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
-                                    />
-                                ) : (
-                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                                        <FileUploader className="h-20 w-20 text-white" />
-                                    </span>
-                                )}
-                            </div>
+                            ) : (
+                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                    <Upload className="h-14 w-14 text-gray-400" />
+                                </span>
+                            )}
                         </div>
-
+                    </div>
                         <input hidden name="admin" value={user?._id} type="" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
-                        <input name="id" value={dataValue?._id} type="hidden" />
+                        <input name="id" value={dataValue?._id} type="text" />
 
 
                         <div className="flex gap-6 mt-6">

@@ -481,7 +481,7 @@ const Users = () => {
                         <input name="id" value={dataValue?._id} type="hidden" />
 
 
-                        <Button size="sm" type="submit" className="bg-[#05ECF2]  bg-opacity-20 text-[#05ECF2] text-sm font-montserrat font-semibold px-4" onClick={() => {
+                        <Button size="sm" type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4" onClick={() => {
                             setIsEditModalOpened(false)
                         }}>
                             Update
@@ -605,6 +605,7 @@ const Users = () => {
 
                         />
                     </div>
+                
                     <div className=" ">
                         <label className="font-nunito block text-sm" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
