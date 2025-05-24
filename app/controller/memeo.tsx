@@ -74,6 +74,98 @@ class MemoController {
 
     };
 
+    async UpdateMemo({
+        id,
+        refNumber,
+        fromDepartment,
+        fromName,
+        memoDate,
+        toDepartment,
+        toName,
+        subject,
+        memoType,
+        dueDate,
+        frequency,
+        remark,
+        ccDepartment,
+        ccName,
+        emailCheck,
+        base64Image,
+    }: {
+        id: string;
+        refNumber: string;
+        fromDepartment: string;
+        fromName: string;
+        memoDate: string;
+        toDepartment: string;
+        toName: string;
+        subject: string;
+        memoType: string;
+        dueDate?: string;
+        frequency?: string;
+        remark?: string;
+        ccDepartment?: string;
+        ccName?: string;
+        emailCheck?: boolean;
+        base64Image?: string; // Make image optional
+    }) {
+        try {
+            // Find the existing memo
+            const existingMemo = await Memo.findById(id);
+    
+            if (!existingMemo) {
+                return json(
+                    { message: "Memo not found", success: false },
+                    { status: 404 }
+                );
+            }
+    
+            // Update image only if a new one is provided
+            const updatedImage = base64Image ? base64Image : existingMemo.image;
+    
+            // Update the memo with the new or existing image
+            const updatedMemo = await Memo.findByIdAndUpdate(
+                id,
+                {
+                    refNumber,
+                    fromDepartment,
+                    fromName,
+                    memoDate,
+                    toDepartment,
+                    toName,
+                    subject,
+                    memoType,
+                    dueDate,
+                    frequency,
+                    remark,
+                    ccDepartment,
+                    ccName,
+                    emailCheck,
+                    image: updatedImage,
+                },
+                { new: true } // Return the updated document
+            );
+    
+            if (updatedMemo) {
+                return json(
+                    { message: "Memo updated successfully", success: true, data: updatedMemo },
+                    { status: 200 }
+                );
+            } else {
+                return json(
+                    { message: "Unable to update memo", success: false },
+                    { status: 500 }
+                );
+            }
+        } catch (error: any) {
+            return json(
+                { message: error.message || "An error occurred while updating the memo.", success: false },
+                { status: 500 }
+            );
+        }
+    }
+    
+
 
     async FetchMemo({
         request,

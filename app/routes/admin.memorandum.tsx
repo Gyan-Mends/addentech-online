@@ -1,4 +1,5 @@
 import { Avatar, Button, Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react";
+import FormSelect from "~/components/form/FormSelect";
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -30,7 +31,7 @@ import memoController from "~/controller/memeo";
 import { MemoColumns } from "~/components/table/columns";
 import { ChevronDownIcon } from "~/components/icons/ArrowDown";
 import { EyeIcon } from "~/components/icons/EyeIcon";
-import { Plus, FileText, Download, ChevronsDownIcon, DownloadCloudIcon } from "lucide-react";
+import { Plus, FileText, Download, ChevronsDownIcon, DownloadCloudIcon, Upload } from "lucide-react";
 import Drawer from "~/components/modal/drawer";
 export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
@@ -54,6 +55,15 @@ const Users = () => {
     console.log("This is the ref:" + referenceNumber);
     const [content, setContent] = useState("");
     const [contentTwo, setContentTow] = useState("");
+    const [departmentValue, setDepartmentValue] = useState("");
+    const [fromNameValue, setFromNameValue] = useState("");
+    const [toNameValue, setToNameValue] = useState("");
+    const [toDepartmentValue, setToDepartmentValue] = useState("");
+    const [ccNameValue, setCcNameValue] = useState("");
+    const [ccDepartmentValue, setCcDepartmentValue] = useState("");
+    const [memoTypeValue, setMemoTypeValue] = useState("");
+    const [frequencyValue, setFrequencyValue] = useState("");
+    const [dueDateValue, setDueDateValue] = useState("");
     function formatTime(date: Date) {
         const now = new Date();
         const isToday = date.toDateString() === now.toDateString();
@@ -121,10 +131,55 @@ const Users = () => {
         ],
     };
 
+    useEffect(() => {
+        if (dataValue?.image) {
+            setBase64Image(dataValue.image); // Set the image from the database as the initial value
+        }
+    }, [dataValue]);
+    useEffect(() => {
+        if (dataValue?.fromDepartment) {
+            setDepartmentValue(dataValue.fromDepartment._id);
+        }
+    }, [dataValue]);
+    useEffect(() => {
+        if (dataValue?.fromName) {
+            setFromNameValue(dataValue.fromName._id);
+        }
+    }, [dataValue]);
 
+    const handleEdit = (data: MemoInterface) => {
+        // Set the content for the Quill editors
+        setContent(data.subject || "");
+        setContentTow(data.remark || "");
+
+        // Format dates to YYYY-MM-DD for input fields
+        const formatDateForInput = (dateString: string | Date) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        };
+
+        const formattedData = {
+            ...data,
+            memoDate: formatDateForInput(data.memoDate || ''),
+            dueDate: formatDateForInput(data.dueDate || '')
+        };
+
+        setDataValue(formattedData);
+        setDepartmentValue(data.fromDepartment?._id || "");
+        setFromNameValue(data.fromName?._id || "");
+        setToDepartmentValue(data.toDepartment?._id || "");
+        setToNameValue(data.toName?._id || "");
+        setCcDepartmentValue(data.ccDepartment?._id || "");
+        setCcNameValue(data.ccName?._id || "");
+        setMemoTypeValue(data.memoType || "");
+        setFrequencyValue(data.frequency || "");
+        setDueDateValue(formatDateForInput(data.dueDate || ''));
+        setIsEditDrawerOpen(true);
+    };
 
     return (
-        <AdminLayout handleOnClick={handleClick} pageName="Users Management">
+        <AdminLayout>
             <div>
                 <div className="flex justify-end">
                     <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
@@ -149,9 +204,9 @@ const Users = () => {
                         <TableRow key={index}>
                             <TableCell>{memo.refNumber}</TableCell>
                             <TableCell>{memo.fromDepartment?.name}</TableCell>
-                            <TableCell>{memo.fromName?.firstName}</TableCell>
+                            <TableCell>{memo.fromName?.firstName + " " + memo.fromName?.middleName + " " + memo.fromName?.lastName}</TableCell>
                             <TableCell>{memo.toDepartment?.name}</TableCell>
-                            <TableCell>{memo.toName?.firstName}</TableCell>
+                            <TableCell>{memo.toName?.firstName + " " + memo.toName?.middleName + " " + memo.toName?.lastName}</TableCell>
                             <TableCell>{new Date(memo?.memoDate).toLocaleDateString()}</TableCell>
                             <TableCell>{new Date(memo?.dueDate).toLocaleDateString()}</TableCell>
                             <TableCell className="flex gap-2">
@@ -162,8 +217,7 @@ const Users = () => {
                                     <DeleteIcon className="text-red-500" />
                                 </button>
                                 <button onClick={() => {
-                                    setIsEditDrawerOpen(true)
-                                    setDataValue(memo)
+                                    handleEdit(memo);
                                 }}>
                                     <EditIcon className="text-blue-500" />
                                 </button>
@@ -449,13 +503,13 @@ const Users = () => {
                     </Form>
                 </Drawer>
 
-             {/* View Memo */}
-             <Drawer
-             isDrawerOpened={isViewDrawerOpen}
-             handleDrawerClosed={() => setIsViewDrawerOpen(false)}
-             title="View Memo"
-             >
-                 <div className="font-nunito text-xs flex flex-col gap-4 mt-6 p-4">
+                {/* View Memo */}
+                <Drawer
+                    isDrawerOpened={isViewDrawerOpen}
+                    handleDrawerClosed={() => setIsViewDrawerOpen(false)}
+                    title="View Memo"
+                >
+                    <div className="font-nunito text-xs flex flex-col gap-4 mt-6 p-4">
                         <span className="flex justify-between">
                             <p> Reference Number:</p>
                             <p>{dataValue?.refNumber}</p>
@@ -515,14 +569,14 @@ const Users = () => {
                             <img src={dataValue?.image} alt="" />
                         </span>
                     </div>
-             </Drawer>
+                </Drawer>
 
                 {/* Edit Memo */}
-               <Drawer
-               isDrawerOpened={isEditDrawerOpen}
-               handleDrawerClosed={() => setIsEditDrawerOpen(false)}
-               title="Edit Memo"
-               >
+                <Drawer
+                    isDrawerOpened={isEditDrawerOpen}
+                    handleDrawerClosed={() => setIsEditDrawerOpen(false)}
+                    title="Edit Memo"
+                >
                     <Form className="flex flex-col gap-6 p-4" method="post">
                         <input
                             name="refNumber"
@@ -530,82 +584,82 @@ const Users = () => {
                             value={dataValue?.refNumber} type="text" />
 
                         <div className="flex gap-6">
-                            <Select
+                            <FormSelect
                                 label="From Department"
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
                                 name="fromDepartment"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department?.name}</SelectItem>
-                                ))}
-                            </Select>
-                            <Select
+                                options={departments}
+                                optionKey="_id"
+                                optionLabel="name"
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="fromDepartment"
+                                isObject={true}
+                            />
+                            <FormSelect
                                 label="From Name"
                                 labelPlacement="outside"
-                                placeholder="Select department"
+                                placeholder="Select user"
                                 isRequired
                                 name="fromName"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {users.map((user: RegistrationInterface) => (
-                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
-                                ))}
-                            </Select>
+                                options={users}
+                                optionKey="_id"
+                                optionLabel="firstName"
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="fromName"
+                                isObject={true}
+                            />
                         </div>
 
-                        <CustomInput
-                            label="Memo Date"
-                            isRequired
-                            name="memoDate"
-                            type="Date"
-                            placeholder=" "
-                            labelPlacement="outside"
-                        />
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium text-foreground-700">
+                                Memo Date <span className="text-danger">*</span>
+                            </label>
+                            <input
+                                type="date"
+                                name="memoDate"
+                                required
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                value={dataValue?.memoDate || ''}
+                                onChange={(e) => setDataValue(prev => ({
+                                    ...prev,
+                                    memoDate: e.target.value
+                                }))}
+                            />
+                        </div>
 
                         <div className="flex gap-6">
-                            <Select
+                            <FormSelect
                                 label="To Department"
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
                                 name="toDepartment"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
-                                ))}
-                            </Select>
-                            <Select
+                                options={departments}
+                                optionKey="_id"
+                                optionLabel="name"
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="toDepartment"
+                                isObject={true}
+                            />
+                            <FormSelect
                                 label="To Name"
                                 labelPlacement="outside"
-                                placeholder="Select department"
+                                placeholder="Select user"
                                 isRequired
                                 name="toName"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {users.map((user: RegistrationInterface) => (
-                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
-                                ))}
-                            </Select>
+                                options={users}
+                                optionKey="_id"
+                                optionLabel="firstName"
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="toName"
+                                isObject={true}
+                            />
                         </div>
 
                         <div>
@@ -614,7 +668,6 @@ const Users = () => {
                             <ReactQuill
                                 value={content}
                                 onChange={setContent}
-
                                 modules={modules}
                                 className='md:!h-[20vh] mt-2 font-nunito rounded w-full mb-12 !font-nunito'
                             />
@@ -623,57 +676,55 @@ const Users = () => {
 
 
                         <div className="flex gap-6 mt-6">
-                            <Select
+                            <FormSelect
                                 label="Memo Type"
                                 labelPlacement="outside"
-                                placeholder="Select department"
+                                placeholder="Select type"
                                 isRequired
                                 name="memoType"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {[
+                                options={[
                                     { key: "Open", value: "Open", display_name: "Open" },
                                     { key: "Processing", value: "Processing", display_name: "Processing" },
                                     { key: "Closed", value: "Closed", display_name: "Closed" },
-                                ].map((role) => (
-                                    <SelectItem key={role.key}>{role.display_name}</SelectItem>
-                                ))}
-                            </Select>
-                            <CustomInput
-                                label="Due Date"
-                                isRequired
-                                name="dueDate"
-                                type="Date"
-                                placeholder=" "
-                                labelPlacement="outside"
+                                ]}
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="memoType"
                             />
+                            <div className="flex-1 flex flex-col gap-1">
+                                <label className="text-sm font-medium text-foreground-700">
+                                    Due Date <span className="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    name="dueDate"
+                                    required
+                                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                    value={dataValue?.dueDate || ''}
+                                    onChange={(e) => setDataValue(prev => ({
+                                        ...prev,
+                                        dueDate: e.target.value
+                                    }))}
+                                />
+                            </div>
 
                         </div>
 
-                        <Select
+                        <FormSelect
                             label="Follow up Frequency"
                             labelPlacement="outside"
-                            placeholder="Select department"
+                            placeholder="Select frequency"
                             isRequired
                             name="frequency"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                            }}
-                        >
-                            {[
-                                { key: "Evey Day", value: "Evey Day", display_name: "Evey Day" },
+                            options={[
+                                { key: "Every Day", value: "Every Day", display_name: "Every Day" },
                                 { key: "Every Week", value: "Every Week", display_name: "Every Week" },
                                 { key: "Every Month", value: "Every Month", display_name: "Every Month" },
-                            ].map((role) => (
-                                <SelectItem key={role.key}>{role.display_name}</SelectItem>
-                            ))}
-                        </Select>
+                            ]}
+                            dataValue={dataValue || {}}
+                            setDataValue={setDataValue}
+                            fieldName="frequency"
+                        />
 
                         <div>
                             <label htmlFor="" className="font-nunito">Remarks</label>
@@ -688,62 +739,72 @@ const Users = () => {
                         </div>
 
                         <div className="flex gap-6 mt-6">
-                            <Select
+                            <FormSelect
                                 label="CC Department"
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
                                 name="ccDepartment"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
-                                ))}
-                            </Select>
-                            <Select
+                                options={departments}
+                                optionKey="_id"
+                                optionLabel="name"
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="ccDepartment"
+                                isObject={true}
+                            />
+                            <FormSelect
                                 label="CC Name"
                                 labelPlacement="outside"
-                                placeholder="Select department"
+                                placeholder="Select user"
                                 isRequired
                                 name="ccName"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {users.map((user: RegistrationInterface) => (
-                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
-                                ))}
-                            </Select>
+                                options={users}
+                                optionKey="_id"
+                                optionLabel="firstName"
+                                dataValue={dataValue || {}}
+                                setDataValue={setDataValue}
+                                fieldName="ccName"
+                                isObject={true}
+                            />
                         </div>
 
                         <div className=" ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
-                            <input name="image" type="text" hidden />
-                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
+                            <input name="base64Image" value={base64Image} type="hidden" />
+                            <label className="font-nunito block text-sm !text-black" htmlFor="image">
+                                Image
+                            </label>
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
+                                {/* The file input */}
                                 <input
                                     name="image"
-                                    required
-                                    placeholder=" "
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    id="image"
                                     type="file"
-                                    onChange={(event: any) => {
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    accept="image/*"
+                                    onChange={(event) => {
                                         const file = event.target.files[0];
                                         if (file) {
-                                            const reader = new FileReader()
+                                            const reader = new FileReader();
                                             reader.onloadend = () => {
-                                                setBase64Image(reader.result)
-                                            }
-                                            reader.readAsDataURL(file)
+                                                setBase64Image(reader.result as string); // Update state with new image data
+                                            };
+                                            reader.readAsDataURL(file); // Convert file to base64
                                         }
                                     }}
                                 />
-                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"><FileUploader className="h-20 w-20 text-white" /></span>
+                                {/* Display the default image or the uploaded image */}
+                                {base64Image ? (
+                                    <img
+                                        src={base64Image}
+                                        alt="Preview"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                    />
+                                ) : (
+                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <Upload className="h-14 w-14 text-gray-400" />
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -751,15 +812,16 @@ const Users = () => {
                         <Checkbox name="emailCheck" className="font-nunito" defaultSelected>Send Email Notification</Checkbox>
 
                         <div className="flex gap-6 mt-6">
-                            <button color="primary" className="font-montserrat w-40">Send Memo</button>
+                            <button color="primary" className="font-montserrat w-40">Update Memo</button>
                         </div>
 
                         <input name="admin" value="{user?._id}" type="hidden" />
-                        <input name="intent" value="create" type="hidden" />
+                        <input name="intent" value="update" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
+                        <input name="id" value={dataValue?._id} type="text" />
 
                     </Form>
-               </Drawer>
+                </Drawer>
             </div>
 
             <ConfirmModal className="dark:bg-default-50 border border-white/10" header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
@@ -831,6 +893,29 @@ export const action: ActionFunction = async ({ request }) => {
                 base64Image,
             })
             return memo
+
+
+        case "update":
+            const updateMemo = await memoController.UpdateMemo({
+                id,
+                refNumber,
+                fromDepartment,
+                fromName,
+                memoDate,
+                toDepartment,
+                toName,
+                subject,
+                memoType,
+                dueDate,
+                frequency,
+                remark,
+                ccDepartment,
+                ccName,
+                emailCheck,
+                base64Image,
+            })
+            return updateMemo
+
 
         case "delete":
             const deleteMemo = await memoController.DeleteMemo({

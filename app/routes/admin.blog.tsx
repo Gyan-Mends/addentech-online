@@ -1,5 +1,5 @@
-import { Button,  Select, SelectItem, TableCell, TableRow, User } from "@nextui-org/react"
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction,  } from "@remix-run/node"
+import { Button, Select, SelectItem, TableCell, TableRow, User } from "@nextui-org/react"
+import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, } from "@remix-run/node"
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { Plus, Upload } from "lucide-react"
 import { log } from "node:console"
@@ -47,11 +47,11 @@ const Users = () => {
         totalPages: number,
         categories: CategoryInterface[]
     }>()
- 
+
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
-   
+
     const handleConfirmModalClosed = () => {
         setIsConfirmModalOpened(false)
     }
@@ -86,7 +86,7 @@ const Users = () => {
             setContent(dataValue.description);
         }
     }, [dataValue]);
-    
+
     useEffect(() => {
         // Set the initial content from dataValue.description
         if (dataValue?.category) {
@@ -96,10 +96,10 @@ const Users = () => {
 
 
     useEffect(() => {
-            if (dataValue?.image) {
-                setBase64Image(dataValue.image); // Set the image from the database as the initial value
-            }
-        }, [dataValue]);
+        if (dataValue?.image) {
+            setBase64Image(dataValue.image); // Set the image from the database as the initial value
+        }
+    }, [dataValue]);
 
 
     useEffect(() => {
@@ -118,65 +118,65 @@ const Users = () => {
 
     return (
         <AdminLayout>
-            <Toaster position="top-right"/>
-          <div className="relative">
-          <div className="flex justify-end">
-                <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
-                    setIsCreateModalOpened(true)
-                }}>
-                    <Plus />
-                    Create Blog
-                </Button>
-            </div>
-            {/* table  */}
-            {/* table  */}
-            <NewCustomTable
-                columns={BlogColumns}
-                loadingState={navigation.state === "loading" ? "loading" : "idle"}
-                totalPages={totalPages}
-                page={1}
-                setPage={(page) => (
-                    navigate(`?page=${page}`)
-                )}>
-                {blogs?.map((blog: BlogInterface, index: number) => (
-                    <TableRow key={index}>
-                        <TableCell className="text-xs">
-                            <p className="!text-xs">
-                                <User
-                                    avatarProps={{ radius: "sm", src: blog?.image }}
-                                    name={
-                                        <p className="font-nunito text-xs">
-                                            {truncateText(blog?.name, 10)}
-                                        </p>
-                                    }
-                                />
-                            </p>
-                        </TableCell>
-                        <TableCell className="text-xs">{blog.category?.name}</TableCell>
-                        <TableCell className="text-xs">{blog._id}</TableCell>
-                        <TableCell>
-                            <div dangerouslySetInnerHTML={{ __html: truncateText(blog.description, 15) }} />
-                        </TableCell>
-                        <TableCell className="relative flex items-center gap-4 text-primary">
-                            <button onClick={() => {
-                                
-                                setIsEditModalOpened(true)
-                                setDataValue(blog)
-                            }}>
-                                <EditIcon className="text-primary" />
-                            </button>
-                            <button onClick={() => {
-                                setIsConfirmModalOpened(true)
-                                setDataValue(blog)
-                            }}>
-                                <DeleteIcon className="text-danger" />
-                            </button>
+            <Toaster position="top-right" />
+            <div className="relative">
+                <div className="flex justify-end">
+                    <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
+                        setIsCreateModalOpened(true)
+                    }}>
+                        <Plus />
+                        Create Blog
+                    </Button>
+                </div>
+                {/* table  */}
+                {/* table  */}
+                <NewCustomTable
+                    columns={BlogColumns}
+                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                    totalPages={totalPages}
+                    page={1}
+                    setPage={(page) => (
+                        navigate(`?page=${page}`)
+                    )}>
+                    {blogs?.map((blog: BlogInterface, index: number) => (
+                        <TableRow key={index}>
+                            <TableCell className="text-xs">
+                                <p className="!text-xs">
+                                    <User
+                                        avatarProps={{ radius: "sm", src: blog?.image }}
+                                        name={
+                                            <p className="font-nunito text-xs">
+                                                {truncateText(blog?.name, 10)}
+                                            </p>
+                                        }
+                                    />
+                                </p>
+                            </TableCell>
+                            <TableCell className="text-xs">{blog.category?.name}</TableCell>
+                            <TableCell className="text-xs">{blog._id}</TableCell>
+                            <TableCell>
+                                <div dangerouslySetInnerHTML={{ __html: truncateText(blog.description, 15) }} />
+                            </TableCell>
+                            <TableCell className="relative flex items-center gap-4 text-primary">
+                                <button onClick={() => {
 
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </NewCustomTable>
-          </div>
+                                    setIsEditModalOpened(true)
+                                    setDataValue(blog)
+                                }}>
+                                    <EditIcon className="text-primary" />
+                                </button>
+                                <button onClick={() => {
+                                    setIsConfirmModalOpened(true)
+                                    setDataValue(blog)
+                                }}>
+                                    <DeleteIcon className="text-danger" />
+                                </button>
+
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </NewCustomTable>
+            </div>
 
             {/* confirm modal */}
             {/* confirm modal */}
@@ -203,8 +203,8 @@ const Users = () => {
 
 
             {dataValue && (
-              <Drawer isDrawerOpened={isEditModalOpened} handleDrawerClosed={handleEditModalClosed} title="Edit Blog">
-                <Form method="post" className="flex flex-col gap-4 p-4">
+                <Drawer isDrawerOpened={isEditModalOpened} handleDrawerClosed={handleEditModalClosed} title="Edit Blog">
+                    <Form method="post" className="flex flex-col gap-4 p-4">
                         <CustomInput
                             label="Name"
                             isRequired
@@ -258,43 +258,43 @@ const Users = () => {
 
 
                         <div className=" ">
-                        <input name="base64Image" value={base64Image} type="hidden" />
-                        <label className="font-nunito block text-sm !text-black" htmlFor="image">
-                            Image
-                        </label>
-                        <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
-                            {/* The file input */}
-                            <input
-                                name="image"
-                                id="image"
-                                type="file"
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                accept="image/*"
-                                onChange={(event) => {
-                                    const file = event.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onloadend = () => {
-                                            setBase64Image(reader.result as string); // Update state with new image data
-                                        };
-                                        reader.readAsDataURL(file); // Convert file to base64
-                                    }
-                                }}
-                            />
-                            {/* Display the default image or the uploaded image */}
-                            {base64Image ? (
-                                <img
-                                    src={base64Image}
-                                    alt="Preview"
-                                    className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                            <input name="base64Image" value={base64Image} type="hidden" />
+                            <label className="font-nunito block text-sm !text-black" htmlFor="image">
+                                Image
+                            </label>
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
+                                {/* The file input */}
+                                <input
+                                    name="image"
+                                    id="image"
+                                    type="file"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    accept="image/*"
+                                    onChange={(event) => {
+                                        const file = event.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setBase64Image(reader.result as string); // Update state with new image data
+                                            };
+                                            reader.readAsDataURL(file); // Convert file to base64
+                                        }
+                                    }}
                                 />
-                            ) : (
-                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                                    <Upload className="h-14 w-14 text-gray-400" />
-                                </span>
-                            )}
+                                {/* Display the default image or the uploaded image */}
+                                {base64Image ? (
+                                    <img
+                                        src={base64Image}
+                                        alt="Preview"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                    />
+                                ) : (
+                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <Upload className="h-14 w-14 text-gray-400" />
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                    </div>
                         <input hidden name="admin" value={user?._id} type="" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
@@ -305,7 +305,7 @@ const Users = () => {
                             <button className="font-montserrat w-40 bg-pink-500 text-white h-10 rounded-lg">Upload blog</button>
                         </div>
                     </Form>
-              </Drawer>
+                </Drawer>
             )}
 
             {/* Create Modal */}
@@ -447,7 +447,7 @@ export const action: ActionFunction = async ({ request }) => {
                 base64Image,
                 category,
                 description,
-                admin, 
+                admin,
                 id
             })
             return updateUser
