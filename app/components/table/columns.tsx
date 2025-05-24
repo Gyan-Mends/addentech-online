@@ -5,8 +5,10 @@ export const CategoryColumns = [
 ];
 
 export const BlogColumns = [
+    
     { title: "Name", allowSort: true },
     { title: "Category", allowSort: true },
+    { title: "ID", allowSort: true },
     { title: "Description", allowSort: true },
     { title: "Action", allowSort: true }
 ]

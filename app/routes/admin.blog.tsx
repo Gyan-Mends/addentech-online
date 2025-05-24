@@ -2,6 +2,7 @@ import { Button,  Select, SelectItem, TableCell, TableRow, User } from "@nextui-
 import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction,  } from "@remix-run/node"
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
 import { Plus, Upload } from "lucide-react"
+import { log } from "node:console"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import { DeleteIcon } from "~/components/icons/DeleteIcon"
@@ -34,6 +35,7 @@ const Users = () => {
     const actionData = useActionData()
     const [content, setContent] = useState("");
     const navigation = useNavigation()
+    const [categoryValue, setCategoryValue] = useState("")
     const {
         user,
         blogs,
@@ -45,9 +47,7 @@ const Users = () => {
         totalPages: number,
         categories: CategoryInterface[]
     }>()
-
-
-
+ 
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
@@ -86,12 +86,14 @@ const Users = () => {
             setContent(dataValue.description);
         }
     }, [dataValue]);
-
+    
     useEffect(() => {
+        // Set the initial content from dataValue.description
         if (dataValue?.category) {
-            setDataValue(dataValue?.category);
+            setCategoryValue(dataValue.category._id);
         }
     }, [dataValue]);
+
 
     useEffect(() => {
             if (dataValue?.image) {
@@ -112,6 +114,7 @@ const Users = () => {
             }
         }
     }, [actionData])
+
 
     return (
         <AdminLayout>
@@ -150,11 +153,13 @@ const Users = () => {
                             </p>
                         </TableCell>
                         <TableCell className="text-xs">{blog.category?.name}</TableCell>
+                        <TableCell className="text-xs">{blog._id}</TableCell>
                         <TableCell>
                             <div dangerouslySetInnerHTML={{ __html: truncateText(blog.description, 15) }} />
                         </TableCell>
                         <TableCell className="relative flex items-center gap-4 text-primary">
                             <button onClick={() => {
+                                
                                 setIsEditModalOpened(true)
                                 setDataValue(blog)
                             }}>
@@ -215,18 +220,26 @@ const Users = () => {
                             <Select
                                 label="Category"
                                 labelPlacement="outside"
-                                defaultSelectedKeys={[dataValue.category]}
+                                selectedKeys={categoryValue ? [categoryValue] : []}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0];
+                                    if (selectedKey) {
+                                        setCategoryValue(selectedKey as string);
+                                    }
+                                }}
                                 placeholder=" "
                                 isRequired
                                 name="category"
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-white/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full   "
+                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                                 }}
                             >
                                 {categories.map((cat) => (
-                                    <SelectItem value={cat._id} key={cat._id}>{cat?.name}</SelectItem>
+                                    <SelectItem key={cat._id} value={cat._id}>
+                                        {cat?.name}
+                                    </SelectItem>
                                 ))}
                             </Select>
                         </div>
@@ -406,6 +419,7 @@ export const action: ActionFunction = async ({ request }) => {
     const admin = formData.get("admin") as string;
     const intent = formData.get("intent") as string;
     const id = formData.get("id") as string;
+    console.log(id);
     console.log(admin);
 
 
@@ -433,7 +447,8 @@ export const action: ActionFunction = async ({ request }) => {
                 base64Image,
                 category,
                 description,
-                admin, id
+                admin, 
+                id
             })
             return updateUser
         case "logout":
