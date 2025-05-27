@@ -49,62 +49,6 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-7 mt-4">
-          <Card className="md:col-span-4 border border-black/20 bg-white">
-            <CardBody>  
-              <div className="h-[300px] flex items-center justify-center">
-
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card className="md:col-span-3 border border-black/20 bg-white shadow-sm px-10">
-            <CardBody className="space-y-4 ">
-              <div>
-
-              </div>
-              {/* <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center">
-                  <span className="font-medium">New Users</span>
-                </div>
-                <span>78%</span>
-              </div>
-              <Progress value={78} className="h-2" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center">
-                  <span className="font-medium">Blog Posts</span>
-                </div>
-                <span>63%</span>
-              </div>
-              <Progress value={63} className="h-2" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center">
-                  <span className="font-medium">Comments</span>
-                </div>
-                <span>42%</span>
-              </div>
-              <Progress value={42} className="h-2" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center">
-                  <span className="font-medium">Engagement</span>
-                </div>
-                <span>92%</span>
-              </div>
-              <Progress value={92} className="h-2 w-[100%]" />
-            </div> */}
-            </CardBody>
-          </Card>
-        </div>
       </div>
     </AdminLayout>
   )

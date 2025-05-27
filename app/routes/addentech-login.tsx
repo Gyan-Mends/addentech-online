@@ -52,7 +52,7 @@ const Login = () => {
                 <div className="text-center mb-8">
 
                     <h1 className="text-2xl font-semibold mb-2 font-montserrat">WELCOME BACK</h1>
-                    <p className="text-gray-500 italic font-nunito">Addens Technology Ltd</p>
+                    <p className="text-gray-500 italic font-nunito">A legal material portal</p>
                 </div>
 
                 <Form method="post" className=" flex flex-col gap-6">
@@ -63,6 +63,7 @@ const Login = () => {
                             labelPlacement="outside"
                             placeholder="Enter your email "
                             type="email"
+
                             endContent={<EmailIcon className="text-xl text-default-400 " />}
                             className="placeholder:text-gray-300"
                         />
@@ -80,7 +81,7 @@ const Login = () => {
                             labelPlacement="outside"
                             type={isVisible ? "text" : "password"}
                             placeholder="Enter your password "
-                            className="placeholder:text-gray-300 !w-80"
+                            className="placeholder:text-gray-300"
                             endContent={
                                 <button
                                     className="focus:outline-none"

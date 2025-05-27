@@ -50,6 +50,7 @@ const Users = () => {
         departments: DepartmentInterface[]
     }>()
     const [content, setContent] = useState("");
+    const [department, setDepartment] = useState()
     useEffect(() => {
         // Set the initial content from dataValue.description
         if (dataValue?.bio) {
@@ -107,7 +108,7 @@ const Users = () => {
 
     useEffect(() => {
         if (dataValue?.department) {
-            setDataValue(dataValue.department);
+            // setDataValue(dataValue.department);
         }
     }, [dataValue]);
 
@@ -185,7 +186,7 @@ const Users = () => {
                     <Button color="success" variant="flat" className="font-montserrat font-semibold" size="sm" onPress={handleConfirmModalClosed}>
                         No
                     </Button>
-                    <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onClick={() => {
+                    <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onPress={() => {
                         setIsConfirmModalOpened(false)
                         if (dataValue) {
                             submit({
