@@ -11,11 +11,12 @@ import { commitSession, getSession } from "~/session";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
-  const user = session.get("user");
+  const user = session.get("email");
   
   // Check for user authorization
   if (!user) {
-    return redirect("/login?redirectTo=/admin/tasks");
+    // Fix the redirect to use proper path without duplication
+    return redirect("/addentech-login");
   }
   
   // Check role-based permissions

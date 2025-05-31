@@ -77,7 +77,7 @@ const navItems: NavItem[] = [
         to: "/admin/monthly-reports",
         icon: <BarChart className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Monthly Reports",
-        roles: ["admin", "department_head", "manager"]
+        roles: ["admin", "head", "manager", "staff"]
     },
     {
         to: "/admin/blog",

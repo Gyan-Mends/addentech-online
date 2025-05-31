@@ -1,31 +1,49 @@
-import { Button, Card, Input, Select, SelectItem, Spinner, Tab, Tabs, Textarea } from "@nextui-org/react";
+import { Button, Card, Input, Select, SelectItem, Spinner, Tab, Tabs, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { DataTable } from "../components/DataTable";
 import AdminLayout from "~/layout/adminLayout";
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import monthlyReportController from "~/controller/monthlyReport";
 import { ActionFunctionArgs } from "@remix-run/node";
-import { BarChart, Calendar, FileText, Plus } from "lucide-react";
+import { BarChart, Calendar, FileText, Plus, Trash2, Edit, Eye } from "lucide-react";
 import { useState } from "react";
 import { commitSession, getSession } from "~/session";
+import Registration from "~/modal/registration";
+import Departments from "~/modal/department";
+import type { DepartmentInterface } from "~/modal/department";
+import type { RegistrationInterface } from "~/modal/registration";
+import type { MonthlyReportInterface } from "~/modal/monthlyReport";
+
+// Define type for loader data
+interface LoaderData {
+  currentUser: RegistrationInterface;
+  data?: MonthlyReportInterface[];
+  departments?: DepartmentInterface[];
+  success?: boolean;
+  message?: string;
+  report?: MonthlyReportInterface;
+}
+
+// Define type for action data
+interface ActionData {
+  success: boolean;
+  message: string;
+  data?: any;
+}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
-  const user = session.get("user");
+  const userEmail = session.get("email");
   
   // Check for user authorization
-  if (!user) {
-    return redirect("/login?redirectTo=/admin/monthly-reports");
+  if (!userEmail) {
+    return redirect("/addentech-login");
   }
   
-  // Check role-based permissions
-  const hasReportPermission = 
-    user.role === "admin" || 
-    user.permissions?.view_report || 
-    user.permissions?.create_report;
-  
-  if (!hasReportPermission) {
-    return redirect("/admin?error=You do not have permission to access reports");
+  // Get the user from database using email
+  const currentUser = await Registration.findOne({ email: userEmail });
+  if (!currentUser) {
+    return redirect("/addentech-login");
   }
 
   const url = new URL(request.url);
@@ -33,32 +51,61 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const reportId = url.searchParams.get("id");
 
   if (reportId) {
-    return await monthlyReportController.getReportById({ reportId });
-  } else if (departmentId) {
-    return await monthlyReportController.getReportsByDepartment({ departmentId });
+    const reportData = await monthlyReportController.getReportById({ reportId });
+    return json({
+      ...reportData,
+      currentUser
+    });
   } else {
-    // Get all reports for admin, or just the user's department for staff
-    if (user.role === "admin") {
-      const reports = await monthlyReportController.getAllReports();
-      return reports;
+    let reportsResponse;
+    
+    // Handle reports based on role
+    if (currentUser.role === "admin" || currentUser.role === "manager") {
+      // Admin and managers can see all reports
+      reportsResponse = await monthlyReportController.getAllReports();
+    } else if (currentUser.role === "head") {
+      // Department heads can see all reports from their department
+      reportsResponse = await monthlyReportController.getReportsByDepartment({ 
+        departmentId: currentUser.department, 
+        user: currentUser 
+      });
     } else {
-      return await monthlyReportController.getReportsByDepartment({ departmentId: user.department });
+      // Staff can only see reports they created
+      reportsResponse = await monthlyReportController.getReportsByUser({ userId: currentUser._id });
     }
+    
+    // Get departments for the create report form
+    const departments = await Departments.find().sort({ name: 1 });
+    
+    return json({
+      data: reportsResponse.data,
+      success: reportsResponse.success,
+      message: reportsResponse.message,
+      currentUser,
+      departments
+    });
   }
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
-  const user = session.get("user");
+  const userEmail = session.get("email");
   
-  if (!user) {
+  if (!userEmail) {
     return json({ success: false, message: "User not authenticated" });
+  }
+  
+  // Get the user from database using email
+  const user = await Registration.findOne({ email: userEmail });
+  if (!user) {
+    return json({ success: false, message: "User not found" });
   }
 
   const formData = await request.formData();
   const action = formData.get("_action") as string;
 
   if (action === "create") {
+    // All roles can create reports
     const department = formData.get("department") as string;
     const month = parseInt(formData.get("month") as string, 10);
     const year = parseInt(formData.get("year") as string, 10);
@@ -80,70 +127,55 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       amount,
       createdBy: user._id,
       notes,
+      user
     });
-  } else if (action === "update") {
+  } else if (action === "delete") {
     const reportId = formData.get("reportId") as string;
-    const subscriptionPackage = formData.get("subscriptionPackage") as string;
-    const numberOfFirms = parseInt(formData.get("numberOfFirms") as string, 10);
-    const numberOfUsers = parseInt(formData.get("numberOfUsers") as string, 10);
-    const amount = parseFloat(formData.get("amount") as string);
-    const notes = formData.get("notes") as string;
-
-    return await monthlyReportController.updateReport({
-      reportId,
-      subscriptionPackage,
-      numberOfFirms,
-      numberOfUsers,
-      amount,
-      notes,
-    });
-  } else if (action === "submit") {
+    return await monthlyReportController.deleteReport({ reportId, user });
+  } else if (action === "approve") {
     const reportId = formData.get("reportId") as string;
-    return await monthlyReportController.submitReport({ reportId });
-  } else if (action === "approve" || action === "reject") {
-    const reportId = formData.get("reportId") as string;
+    const actionType = formData.get("action") as string;
     const notes = formData.get("notes") as string;
     
-    // Check if user has permission to approve/reject
-    if (user.role !== "admin" && !user.permissions?.approve_report) {
-      return json({ 
-        success: false, 
-        message: "You don't have permission to approve or reject reports" 
+    if (actionType === "approve") {
+      return await monthlyReportController.approveReport({
+        reportId,
+        approvedBy: user._id,
+        notes,
+        user
+      });
+    } else if (actionType === "reject") {
+      return await monthlyReportController.rejectReport({
+        reportId,
+        rejectedBy: user._id,
+        notes,
+        user
       });
     }
-
-    return await monthlyReportController.approveOrRejectReport({
-      reportId,
-      status: action === "approve" ? "approved" : "rejected",
-      notes,
-    });
   }
-
+  
   return json({ success: false, message: "Invalid action" });
 };
 
 export default function MonthlyReportsPage() {
   const navigation = useNavigation();
-  const loaderData = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
+  const loaderData = useLoaderData<typeof loader>() as LoaderData;
+  const actionData = useActionData<typeof action>() as ActionData | undefined;
+  
+  const isLoading = navigation.state === "submitting";
   const [activeTab, setActiveTab] = useState("view");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showApprovalForm, setShowApprovalForm] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<any>(null);
-
-  const isLoading = navigation.state === "loading";
-
-  // Get current date for form defaults
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-11
-  const currentYear = currentDate.getFullYear();
-
-  // Helper function to get month name
-  const getMonthName = (month: number) => {
-    const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    return months[month - 1] || "";
+  const [selectedReport, setSelectedReport] = useState<MonthlyReportInterface | null>(null);
+  
+  // Get data from loader
+  const { currentUser, departments, data: reportsData } = loaderData;
+  const reports = reportsData || [];
+  
+  // Function to get month name
+  const getMonthName = (month: number): string => {
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return monthNames[month - 1];
   };
 
   // Columns for reports table
@@ -151,457 +183,378 @@ export default function MonthlyReportsPage() {
     {
       key: "department",
       label: "DEPARTMENT",
-      render: (row: any) => {
-        const department = row.department || {};
-        return department.name || "Unknown";
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span>{row.departmentName}</span>;
+      }
     },
     {
       key: "month",
       label: "PERIOD",
-      render: (row: any) => {
-        return `${getMonthName(row.month)} ${row.year}`;
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span>{getMonthName(row.month)} {row.year}</span>;
+      }
     },
     {
       key: "type",
       label: "TYPE",
-      render: (row: any) => {
-        return row.type;
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span className="capitalize">{row.type}</span>;
+      }
     },
     {
       key: "package",
       label: "PACKAGE",
-      render: (row: any) => {
-        return row.subscriptionPackage;
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span className="capitalize">{row.subscriptionPackage}</span>;
+      }
     },
     {
       key: "firms",
       label: "FIRMS",
-      render: (row: any) => {
-        return row.numberOfFirms;
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span>{row.numberOfFirms}</span>;
+      }
     },
     {
       key: "users",
       label: "USERS",
-      render: (row: any) => {
-        return row.numberOfUsers;
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span>{row.numberOfUsers}</span>;
+      }
     },
     {
       key: "amount",
       label: "AMOUNT (GHS)",
-      render: (row: any) => {
-        return `₵${row.amount.toLocaleString()}`;
-      },
+      render: (row: MonthlyReportInterface) => {
+        return <span>{row.amount.toFixed(2)}</span>;
+      }
     },
     {
       key: "status",
       label: "STATUS",
-      render: (row: any) => {
+      render: (row: MonthlyReportInterface) => {
+        const getStatusColor = () => {
+          switch (row.status) {
+            case "approved":
+              return "text-green-500 bg-green-100";
+            case "rejected":
+              return "text-red-500 bg-red-100";
+            case "pending":
+              return "text-yellow-500 bg-yellow-100";
+            default:
+              return "text-gray-500 bg-gray-100";
+          }
+        };
+        
         return (
-          <span
-            className={`px-2 py-1 rounded text-xs font-semibold ${
-              row.status === "approved"
-                ? "bg-green-100 text-green-800"
-                : row.status === "rejected"
-                ? "bg-red-100 text-red-800"
-                : row.status === "submitted"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {row.status.toUpperCase()}
+          <span className={`py-1 px-2 rounded-full text-xs font-medium ${getStatusColor()}`}>
+            {row.status === "pending" ? "Pending" : row.status === "approved" ? "Approved" : "Rejected"}
           </span>
         );
-      },
+      }
     },
     {
       key: "actions",
       label: "ACTIONS",
-      render: (row: any) => {
+      render: (row: MonthlyReportInterface) => {
+        // Check permissions based on user role and report status
+        const canDelete = 
+          (currentUser.role === "admin" || currentUser.role === "manager") || 
+          ((currentUser.role === "head" || currentUser.role === "staff") && 
+           currentUser._id.toString() === row.createdBy.toString());
+        
+        const canApproveReject = 
+          (currentUser.role === "admin" || currentUser.role === "manager" || 
+           (currentUser.role === "head" && currentUser.department.toString() === row.department.toString())) && 
+          row.status === "pending";
+        
         return (
-          <div className="flex space-x-2">
-            <Button
-              size="sm"
-              color="primary"
-              className="bg-pink-500"
+          <div className="flex gap-2 justify-end">
+            <Button 
+              isIconOnly 
+              size="sm" 
+              color="primary" 
+              variant="light"
               onClick={() => {
-                setSelectedReport(row);
-                setActiveTab("edit");
+                // View report details (you can implement a view details modal)
+                console.log("View report:", row);
               }}
             >
-              Edit
+              <Eye size={16} />
             </Button>
-            {row.status === "draft" && (
-              <Form method="post">
-                <input type="hidden" name="reportId" value={row._id} />
-                <input type="hidden" name="_action" value="submit" />
-                <Button
-                  size="sm"
-                  color="success"
-                  type="submit"
-                  isLoading={isLoading}
-                >
-                  Submit
-                </Button>
-              </Form>
-            )}
-            {row.status === "submitted" && (
-              <Button
-                size="sm"
-                color="warning"
+            
+            {canApproveReject && (
+              <Button 
+                isIconOnly 
+                size="sm" 
+                color="success" 
+                variant="light"
                 onClick={() => {
                   setSelectedReport(row);
                   setShowApprovalForm(true);
                 }}
               >
-                Review
+                <Edit size={16} />
+              </Button>
+            )}
+            
+            {canDelete && (
+              <Button 
+                isIconOnly 
+                size="sm" 
+                color="danger" 
+                variant="light"
+                onClick={() => {
+                  setSelectedReport(row);
+                  setShowDeleteConfirm(true);
+                }}
+              >
+                <Trash2 size={16} />
               </Button>
             )}
           </div>
         );
-      },
-    },
+      }
+    }
   ];
 
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Monthly Sales Reports
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <BarChart className="h-6 w-6" />
+            Monthly Reports
           </h1>
+          {isLoading && <Spinner />}
         </div>
 
-        {actionData && (
-          <div
-            className={`mb-4 p-4 rounded-md ${
-              actionData.success
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
+        {actionData && actionData.message && (
+          <div className={`p-4 mb-4 rounded-md ${actionData.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
             {actionData.message}
           </div>
         )}
 
-        <Tabs
-          selectedKey={activeTab}
+        <Tabs 
+          selectedKey={activeTab} 
           onSelectionChange={(key) => setActiveTab(key as string)}
-          className="mb-6"
+          aria-label="Report Tabs"
         >
-          <Tab
-            key="view"
-            title={
-              <div className="flex items-center space-x-2">
-                <FileText className="h-4 w-4" />
-                <span>View Reports</span>
-              </div>
-            }
-          />
-          <Tab
-            key="create"
-            title={
-              <div className="flex items-center space-x-2">
-                <Plus className="h-4 w-4" />
-                <span>Create Report</span>
-              </div>
-            }
-          />
-          <Tab
-            key="edit"
-            title={
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4" />
-                <span>Edit Report</span>
-              </div>
-            }
-          />
-          <Tab
-            key="analytics"
-            title={
-              <div className="flex items-center space-x-2">
-                <BarChart className="h-4 w-4" />
-                <span>Analytics</span>
-              </div>
-            }
-          />
-        </Tabs>
+          <Tab key="view" title="View Reports">
+            <div className="py-4">
+              <DataTable columns={columns} rows={reports || []} />
+              
+              {/* Delete Confirmation Modal */}
+              <Modal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">Confirm Delete</ModalHeader>
+                      <ModalBody>
+                        <p>Are you sure you want to delete this report? This action cannot be undone.</p>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button color="default" variant="light" onPress={onClose}>
+                          Cancel
+                        </Button>
+                        <Form method="post">
+                          <input type="hidden" name="_action" value="delete" />
+                          <input type="hidden" name="reportId" value={selectedReport?._id} />
+                          <Button type="submit" color="danger" isLoading={isLoading}>
+                            Delete
+                          </Button>
+                        </Form>
+                      </ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
 
-        {activeTab === "view" && (
-          <>
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <Spinner size="lg" color="primary" />
-              </div>
-            ) : (
-              <>
-                {loaderData.data ? (
-                  <DataTable
-                    columns={columns}
-                    data={loaderData.data}
-                    pagination
-                    search
-                  />
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">No reports found.</p>
+              {/* Approval Form Modal */}
+              <Modal isOpen={showApprovalForm} onClose={() => setShowApprovalForm(false)}>
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">Review Report</ModalHeader>
+                      <ModalBody>
+                        <Form method="post">
+                          <input type="hidden" name="_action" value="approve" />
+                          <input type="hidden" name="reportId" value={selectedReport?._id} />
+                          <Textarea
+                            name="notes"
+                            label="Review Notes"
+                            placeholder="Add comments about this report"
+                          />
+                          <div className="flex justify-between gap-2 mt-4">
+                            <Button 
+                              type="submit" 
+                              name="action" 
+                              value="reject" 
+                              color="danger" 
+                              className="flex-1"
+                              isLoading={isLoading}
+                            >
+                              Reject Report
+                            </Button>
+                            <Button
+                              type="submit"
+                              name="action"
+                              value="approve"
+                              color="success"
+                              className="flex-1"
+                              isLoading={isLoading}
+                            >
+                              Approve Report
+                            </Button>
+                          </div>
+                        </Form>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button type="button" variant="flat" onPress={onClose}>
+                          Cancel
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </div>
+          </Tab>
+
+          <Tab key="create" title="Create Report">
+            <div className="py-4">
+              <Card className="p-6">
+                <Form method="post">
+                  <input type="hidden" name="_action" value="create" />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <Select
+                        label="Department"
+                        placeholder="Select department"
+                        name="department"
+                        isRequired
+                        defaultSelectedKeys={currentUser.role === "head" && currentUser.department ? [currentUser.department.toString()] : []}
+                        isDisabled={currentUser.role === "head"}
+                      >
+                        {departments?.map((dept: DepartmentInterface) => (
+                          <SelectItem key={dept._id.toString()} value={dept._id.toString()}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Select 
+                        label="Month" 
+                        placeholder="Select month" 
+                        name="month"
+                        isRequired
+                      >
+                        {Array.from({ length: 12 }, (_, i) => (
+                          <SelectItem key={(i + 1).toString()} value={(i + 1).toString()}>
+                            {getMonthName(i + 1)}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Select 
+                        label="Year" 
+                        placeholder="Select year" 
+                        name="year"
+                        isRequired
+                      >
+                        {Array.from({ length: 5 }, (_, i) => {
+                          const year = new Date().getFullYear() - 2 + i;
+                          return (
+                            <SelectItem key={year.toString()} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          );
+                        })}
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Select 
+                        label="Report Type" 
+                        placeholder="Select type" 
+                        name="type"
+                        isRequired
+                      >
+                        <SelectItem key="revenue" value="revenue">Revenue</SelectItem>
+                        <SelectItem key="usage" value="usage">Usage</SelectItem>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Select 
+                        label="Subscription Package" 
+                        placeholder="Select package" 
+                        name="subscriptionPackage"
+                        isRequired
+                      >
+                        <SelectItem key="basic" value="basic">Basic</SelectItem>
+                        <SelectItem key="standard" value="standard">Standard</SelectItem>
+                        <SelectItem key="premium" value="premium">Premium</SelectItem>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Input 
+                        type="number" 
+                        label="Number of Firms" 
+                        placeholder="Enter number of firms" 
+                        name="numberOfFirms"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Input 
+                        type="number" 
+                        label="Number of Users" 
+                        placeholder="Enter number of users" 
+                        name="numberOfUsers"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Input 
+                        type="number" 
+                        label="Amount (GHS)" 
+                        placeholder="Enter amount" 
+                        name="amount"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="col-span-2">
+                      <Textarea 
+                        label="Notes" 
+                        placeholder="Enter notes about this report" 
+                        name="notes"
+                      />
+                    </div>
                   </div>
-                )}
-              </>
-            )}
-          </>
-        )}
-
-        {activeTab === "create" && (
-          <Form method="post" className="space-y-4 max-w-3xl mx-auto">
-            <input type="hidden" name="_action" value="create" />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                name="department"
-                label="Department ID"
-                placeholder="Enter department ID"
-                isRequired
-              />
-              <Select
-                name="month"
-                label="Month"
-                placeholder="Select month"
-                defaultSelectedKeys={[`${currentMonth}`]}
-                isRequired
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((month) => (
-                  <SelectItem key={month} value={month}>
-                    {getMonthName(month)}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Input
-                name="year"
-                label="Year"
-                placeholder="Enter year"
-                defaultValue={`${currentYear}`}
-                isRequired
-              />
-              <Input
-                name="type"
-                label="Type"
-                placeholder="e.g., Firm Subscription"
-                isRequired
-              />
-              <Input
-                name="subscriptionPackage"
-                label="Subscription Package"
-                placeholder="e.g., Premium, Standard"
-                isRequired
-              />
-              <Input
-                name="numberOfFirms"
-                type="number"
-                label="Number of Firms"
-                placeholder="Enter number of firms"
-                isRequired
-              />
-              <Input
-                name="numberOfUsers"
-                type="number"
-                label="Number of Users"
-                placeholder="Enter number of users"
-                isRequired
-              />
-              <Input
-                name="amount"
-                type="number"
-                label="Amount (GHS)"
-                placeholder="Enter amount"
-                isRequired
-              />
+                  
+                  <div className="flex justify-end">
+                    <Button type="submit" color="primary" isLoading={isLoading}>
+                      Create Report
+                    </Button>
+                  </div>
+                </Form>
+              </Card>
             </div>
-            <Textarea
-              name="notes"
-              label="Notes"
-              placeholder="Additional notes or comments"
-            />
-            <Button
-              type="submit"
-              className="bg-pink-500 text-white"
-              isLoading={isLoading}
-            >
-              Create Report
-            </Button>
-          </Form>
-        )}
-
-        {activeTab === "edit" && selectedReport && (
-          <Form method="post" className="space-y-4 max-w-3xl mx-auto">
-            <input type="hidden" name="_action" value="update" />
-            <input type="hidden" name="reportId" value={selectedReport._id} />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                name="department"
-                label="Department"
-                value={selectedReport.department?.name || ""}
-                isReadOnly
-              />
-              <Input
-                name="month"
-                label="Month"
-                value={getMonthName(selectedReport.month)}
-                isReadOnly
-              />
-              <Input
-                name="year"
-                label="Year"
-                value={selectedReport.year}
-                isReadOnly
-              />
-              <Input
-                name="type"
-                label="Type"
-                value={selectedReport.type}
-                isReadOnly
-              />
-              <Input
-                name="subscriptionPackage"
-                label="Subscription Package"
-                defaultValue={selectedReport.subscriptionPackage}
-                isDisabled={selectedReport.status !== "draft"}
-              />
-              <Input
-                name="numberOfFirms"
-                type="number"
-                label="Number of Firms"
-                defaultValue={selectedReport.numberOfFirms}
-                isDisabled={selectedReport.status !== "draft"}
-              />
-              <Input
-                name="numberOfUsers"
-                type="number"
-                label="Number of Users"
-                defaultValue={selectedReport.numberOfUsers}
-                isDisabled={selectedReport.status !== "draft"}
-              />
-              <Input
-                name="amount"
-                type="number"
-                label="Amount (GHS)"
-                defaultValue={selectedReport.amount}
-                isDisabled={selectedReport.status !== "draft"}
-              />
-            </div>
-            <Textarea
-              name="notes"
-              label="Notes"
-              placeholder="Additional notes or comments"
-              defaultValue={selectedReport.notes || ""}
-              isDisabled={selectedReport.status !== "draft"}
-            />
-            {selectedReport.status === "draft" && (
-              <Button
-                type="submit"
-                className="bg-pink-500 text-white"
-                isLoading={isLoading}
-              >
-                Update Report
-              </Button>
-            )}
-          </Form>
-        )}
-
-        {activeTab === "analytics" && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">
-              Analytics feature coming soon. This will show charts and trends of monthly sales data.
-            </p>
-          </div>
-        )}
-
-        {showApprovalForm && selectedReport && (
-          <Card className="max-w-3xl mx-auto p-6 mt-6">
-            <h3 className="text-xl font-semibold mb-4">Review Report</h3>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <p className="text-sm text-gray-500">Department</p>
-                <p>{selectedReport.department?.name || "Unknown"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Period</p>
-                <p>{getMonthName(selectedReport.month)} {selectedReport.year}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Type</p>
-                <p>{selectedReport.type}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Package</p>
-                <p>{selectedReport.subscriptionPackage}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Firms</p>
-                <p>{selectedReport.numberOfFirms}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Users</p>
-                <p>{selectedReport.numberOfUsers}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Amount (GHS)</p>
-                <p>₵{selectedReport.amount.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Status</p>
-                <p className="capitalize">{selectedReport.status}</p>
-              </div>
-            </div>
-            <div className="mb-4">
-              <p className="text-sm text-gray-500">Notes</p>
-              <p>{selectedReport.notes || "No notes provided"}</p>
-            </div>
-            
-            <Form method="post" className="space-y-4">
-              <input type="hidden" name="reportId" value={selectedReport._id} />
-              <Textarea
-                name="notes"
-                label="Review Notes"
-                placeholder="Add comments about this report"
-              />
-              <div className="flex space-x-4">
-                <Button
-                  type="submit"
-                  name="_action"
-                  value="approve"
-                  color="success"
-                  className="flex-1"
-                  isLoading={isLoading}
-                >
-                  Approve Report
-                </Button>
-                <Button
-                  type="submit"
-                  name="_action"
-                  value="reject"
-                  color="danger"
-                  className="flex-1"
-                  isLoading={isLoading}
-                >
-                  Reject Report
-                </Button>
-                <Button
-                  type="button"
-                  variant="flat"
-                  className="flex-1"
-                  onClick={() => setShowApprovalForm(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </Form>
-          </Card>
-        )}
+          </Tab>
+        </Tabs>
       </div>
     </AdminLayout>
   );
