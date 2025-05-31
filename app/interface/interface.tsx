@@ -12,10 +12,18 @@ export interface RegistrationInterface {
     position: string,
     department: string,
     image: string,
+    permissions: Map<string, boolean>,
+    status: string,
+    lastLogin: Date,
+    workMode: string,  // Added workMode field
     // New education background fields
+    bio?: string,
     institutionName?: string,
     program?: string,
-    dateCompleted?: string,
+    dateCompletedProgram?: string,
+    institution?: string,
+    positionInstitution?: string,
+    dateCompletedInstitution?: string,
 }
 export interface ContactInterface {
     _id: string,

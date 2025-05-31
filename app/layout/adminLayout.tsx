@@ -11,15 +11,19 @@ import {
     Input,
     Spinner,
 } from "@nextui-org/react";
-import { Link, useNavigate, useNavigation } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate, useNavigation } from "@remix-run/react";
 import {
     ArrowLeft,
+    BarChart,
     Bell,
     BookOpen,
+    CheckSquare,
     ChevronDown,
+    Clock,
     FileText,
     Folder,
     LayoutDashboard,
+    LogOut,
     Mail,
     Menu,
     Search,
@@ -28,12 +32,107 @@ import {
     User,
     X,
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+
+// Define navigation items by role
+type NavItem = {
+    to: string;
+    icon: React.ReactNode;
+    label: string;
+    roles: string[];
+};
+
+const navItems: NavItem[] = [
+    {
+        to: "/admin",
+        icon: <LayoutDashboard className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Dashboard",
+        roles: ["admin", "department_head", "manager", "staff"]
+    },
+    {
+        to: "/admin/users",
+        icon: <User className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Users",
+        roles: ["admin", "manager"]
+    },
+    {
+        to: "/admin/departments",
+        icon: <Folder className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Department",
+        roles: ["admin", "manager"]
+    },
+    {
+        to: "/admin/attendance",
+        icon: <Clock className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Attendance",
+        roles: ["admin", "department_head", "manager", "staff"]
+    },
+    {
+        to: "/admin/tasks",
+        icon: <CheckSquare className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Tasks",
+        roles: ["admin", "department_head", "manager", "staff"]
+    },
+    {
+        to: "/admin/monthly-reports",
+        icon: <BarChart className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Monthly Reports",
+        roles: ["admin", "department_head", "manager"]
+    },
+    {
+        to: "/admin/blog",
+        icon: <BookOpen className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Blog",
+        roles: ["admin"]
+    },
+    {
+        to: "/admin/category",
+        icon: <Tag className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Blog Categories",
+        roles: ["admin"]
+    },
+    {
+        to: "/admin/contact",
+        icon: <Mail className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Messages",
+        roles: ["admin"]
+    },
+    {
+        to: "/admin/memorandum",
+        icon: <FileText className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Memorandum",
+        roles: ["admin", "department_head", "manager", "staff"]
+    }
+];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [userRole, setUserRole] = useState<string>("staff");
     const navigation = useNavigation();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    
+    // Fetch user role from session
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const response = await fetch("/api/user/profile", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    setUserRole(userData.role || "staff");
+                }
+            } catch (error) {
+                console.error("Failed to fetch user role:", error);
+            }
+        };
+        
+        fetchUserRole();
+    }, []);
 
     const isLoading = navigation.state === "loading";
 
@@ -61,57 +160,39 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
                 <div className="flex flex-col flex-1 px-2 py-4 space-y-6">
                     <ul className="flex flex-col">
-                        <Link to="/admin">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <LayoutDashboard className="h-5 w-5 hover:text-white text-pink-500" />
-                                Dashboard
-                            </li>
-                        </Link>
-                        <Link to="/admin/users">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <User className="h-5 w-5 hover:text-white text-pink-500" />
-                                Users
-                            </li>
-                        </Link>
-                        <Link to="/admin/departments">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <Folder className="h-5 w-5 hover:text-white text-pink-500" />
-                                Department
-                            </li>
-                        </Link>
-                        <Link to="/admin/blog">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <BookOpen className="h-5 w-5 hover:text-white text-pink-500" />
-                                Blog
-                            </li>
-                        </Link>
-                        <Link to="/admin/category">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <Tag className="h-5 w-5 hover:text-white text-pink-500" />
-                                Blog Categories
-                            </li>
-                        </Link>
-                        <Link to="/admin/contact">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <Mail className="h-5 w-5 hover:text-white text-pink-500" />
-                                Messages
-                            </li>
-                        </Link>
-                        <Link to="/admin/memorandum">
-                            <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50  font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out ">
-                                <FileText className="h-5 w-5 hover:text-white text-pink-500" />
-                                Memorandum
-                            </li>
-                        </Link>
+                        {navItems
+                            .filter(item => item.roles.includes(userRole))
+                            .map((item, index) => (
+                                <Link key={index} to={item.to}>
+                                    <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out">
+                                        {item.icon}
+                                        {item.label}
+                                    </li>
+                                </Link>
+                            ))
+                        }
                     </ul>
                     <Divider className="" />
                     <div className="mt-6">
                         <h3 className="text-xs font-semibold text-muted-foreground mb-2">
-                            SETTINGS
+                            ACCOUNT
                         </h3>
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="ghost" className="w-full justify-start mb-2">
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            className="w-full justify-start text-red-500 hover:text-red-700"
+                            onClick={() => {
+                                // Logout functionality
+                                fetch("/api/logout", { method: "POST" })
+                                    .then(() => navigate("/addentech-login"))
+                                    .catch(err => console.error("Logout failed:", err));
+                            }}
+                        >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Logout
                         </Button>
                     </div>
                 </div>

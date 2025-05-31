@@ -41,10 +41,12 @@ class LoginController {
 
             if (userCheck.role === "admin") {
                 return redirect("/admin", { headers: { "Set-Cookie": cookie } });
-            } else if (userCheck.role === "hod") {
-                return redirect("/hod", { headers: { "Set-Cookie": cookie } });
+            } else if (userCheck.role === "department_head") {
+                return redirect("/admin/department", { headers: { "Set-Cookie": cookie } });
+            } else if (userCheck.role === "manager") {
+                return redirect("/admin/manager", { headers: { "Set-Cookie": cookie } });
             } else if (userCheck.role === "staff") {
-                return redirect("/staff", { headers: { "Set-Cookie": cookie } });
+                return redirect("/admin/staff", { headers: { "Set-Cookie": cookie } });
             } else {
                 return json({
                     success: false,

@@ -1,0 +1,37 @@
+import { json, LoaderFunction } from "@remix-run/node";
+import { getSession } from "~/session";
+import Registration from "~/modal/registration";
+
+export const loader: LoaderFunction = async ({ request }) => {
+  try {
+    // Get the user's session
+    const session = await getSession(request.headers.get("Cookie"));
+    const email = session.get("email");
+    
+    // If no email in session, user is not logged in
+    if (!email) {
+      return json({ authenticated: false }, { status: 401 });
+    }
+    
+    // Find the user by email to get their role
+    const user = await Registration.findOne({ email });
+    
+    if (!user) {
+      return json({ authenticated: false }, { status: 404 });
+    }
+    
+    // Return user profile data (only include necessary fields for security)
+    return json({
+      authenticated: true,
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      department: user.department
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return json({ error: "Failed to fetch user profile" }, { status: 500 });
+  }
+};

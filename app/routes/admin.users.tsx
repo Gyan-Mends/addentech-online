@@ -291,7 +291,8 @@ const Users = () => {
                             >
                                 {[
                                     { key: "admin", value: "admin", display_name: "Admin" },
-                                    { key: "hod", value: "hod", display_name: "HOD" },
+                                    { key: "department_head", value: "department_head", display_name: "Department Head" },
+                                    { key: "manager", value: "manager", display_name: "Manager" },
                                     { key: "staff", value: "staff", display_name: "Staff" },
                                 ].map((role) => (
                                     <SelectItem key={role.key} value={role.value}>
@@ -569,7 +570,8 @@ const Users = () => {
                         >
                             {[
                                 { key: "admin", value: "admin", display_name: "Admin" },
-                                { key: "hod", value: "hod", display_name: "HOD" },
+                                { key: "department_head", value: "department_head", display_name: "Department Head" },
+                                { key: "manager", value: "manager", display_name: "Manager" },
                                 { key: "staff", value: "staff", display_name: "Staff" },
                             ].map((role) => (
                                 <SelectItem key={role.key}>{role.display_name}</SelectItem>
