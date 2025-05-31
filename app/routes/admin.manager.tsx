@@ -1,20 +1,40 @@
-import { Card, CardHeader, Progress } from "@nextui-org/react"
+import { Card, CardHeader, Divider, Progress } from "@nextui-org/react"
 import { json, LoaderFunction, redirect } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
-import { BarChart2, CheckSquare, Clock, FileText, PieChart, Users, UserCheck } from "lucide-react"
-import { useState } from "react"
+import { BarChart2, CheckSquare, Clock, FileText, Users, UserCheck } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import ChartComponent from "~/components/charts/Chart"
 import { CardBody } from "~/components/acternity/3d"
 import MetricCard from "~/components/ui/customCard"
 import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
 import Registration from "~/modal/registration"
+import dashboard from "~/controller/dashboard"
 
 const ManagerDashboard = () => {
   const data = useLoaderData<typeof loader>()
-  const { userProfile, departmentStats, taskStats, teamPerformance } = data
+  const { userProfile, departmentStats, taskStats, teamPerformance, taskDistribution, departmentTrends } = data
+  const [chartScript, setChartScript] = useState<React.ReactNode>(null)
+  
+  // Make sure Chart.js script is loaded client-side only
+  useEffect(() => {
+    setChartScript(
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            import('chart.js').then(module => {
+              window.Chart = module.Chart;
+              window.dispatchEvent(new Event('chartjsloaded'));
+            });
+          `
+        }}
+      />
+    )
+  }, [])
 
   return (
     <AdminLayout>
+      {chartScript}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Manager Dashboard</h1>
         <p className="text-gray-600">Welcome back, {userProfile?.firstName || "Manager"}</p>
@@ -52,13 +72,35 @@ const ManagerDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {taskDistribution && (
+          <ChartComponent
+            type="pie"
+            data={taskDistribution}
+            title="Task Distribution"
+            description="Tasks by current status"
+            colors={['#3B82F6', '#10B981', '#F59E0B', '#EF4444']}
+          />
+        )}
+        
+        {departmentTrends && (
+          <ChartComponent
+            type="bar"
+            data={departmentTrends}
+            title="Department Performance"
+            description="Current month performance by department"
+            colors={['#10B981']}
+          />
+        )}
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <Card className="p-4">
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
             <h4 className="font-bold text-large">Department Performance</h4>
             <p className="text-tiny uppercase font-bold">Current Month</p>
           </CardHeader>
           <CardBody className="overflow-visible py-2">
-            {departmentStats.departments.map((dept) => (
+            {departmentStats.departments.map((dept: any) => (
               <div key={dept.name} className="mb-4">
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium">{dept.name}</span>
@@ -80,33 +122,27 @@ const ManagerDashboard = () => {
 
         <Card className="p-4">
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-            <h4 className="font-bold text-large">Task Distribution</h4>
+            <h4 className="font-bold text-large">Task Statistics</h4>
             <p className="text-tiny uppercase font-bold">By Status</p>
           </CardHeader>
           <CardBody className="py-2">
             <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col items-center justify-center">
-                <PieChart className="h-24 w-24 text-gray-400 mb-2" />
-                <div className="text-center">
-                  <p className="text-sm text-gray-500">Task distribution by status</p>
+              <div className="col-span-2 grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg text-center">
+                  <div className="text-blue-600 font-bold text-3xl mb-1">{taskStats.inProgress}</div>
+                  <div className="text-blue-800 text-sm">In Progress</div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                  <span className="text-sm">In Progress ({taskStats.inProgress})</span>
+                <div className="bg-green-50 p-4 rounded-lg text-center">
+                  <div className="text-green-600 font-bold text-3xl mb-1">{taskStats.completed}</div>
+                  <div className="text-green-800 text-sm">Completed</div>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-sm">Completed ({taskStats.completed})</span>
+                <div className="bg-yellow-50 p-4 rounded-lg text-center">
+                  <div className="text-yellow-600 font-bold text-3xl mb-1">{taskStats.pending}</div>
+                  <div className="text-yellow-800 text-sm">Pending</div>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                  <span className="text-sm">Pending ({taskStats.pending})</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                  <span className="text-sm">Overdue ({taskStats.overdue})</span>
+                <div className="bg-red-50 p-4 rounded-lg text-center">
+                  <div className="text-red-600 font-bold text-3xl mb-1">{taskStats.overdue}</div>
+                  <div className="text-red-800 text-sm">Overdue</div>
                 </div>
               </div>
             </div>
@@ -114,6 +150,8 @@ const ManagerDashboard = () => {
         </Card>
       </div>
 
+      <Divider className="my-6" />
+      
       <Card className="p-4 mb-8">
         <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
           <h4 className="font-bold text-large">Team Performance</h4>
@@ -131,7 +169,7 @@ const ManagerDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {teamPerformance.map((member) => (
+                {teamPerformance.map((member: any) => (
                   <tr key={member.id} className="border-b hover:bg-gray-50">
                     <td className="py-2 px-4">{member.name}</td>
                     <td className="py-2 px-4">{member.department}</td>
@@ -206,9 +244,31 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/addentech-login");
   }
   
-  // Sample data - in a real app, these would come from actual queries
+  // Get role-specific dashboard data from controller
+  const dashboardData = await dashboard.getRoleDashboardData(
+    userProfile._id.toString(),
+    userProfile.role,
+    userProfile.department?.toString()
+  )
+  
+  if ('error' in dashboardData) {
+    return json({
+      error: dashboardData.error,
+      userProfile
+    }, { status: 500 })
+  }
+  
+  // Sample data - in a real app, these would be merged with dashboardData
   const mockData = {
     userProfile,
+    taskDistribution: {
+      labels: ["In Progress", "Completed", "Pending", "Overdue"],
+      values: [18, 24, 8, 5]
+    },
+    departmentTrends: {
+      labels: ["Legal Research", "Contract Management", "Corporate Law"],
+      values: [85, 72, 63]
+    },
     departmentStats: {
       total: 3,
       departments: [

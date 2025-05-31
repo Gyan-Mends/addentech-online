@@ -461,9 +461,7 @@ const Users = () => {
                                     />
                                     <CustomInput
                                         defaultValue={dataValue.dateCompletedProgram}
-                                        isRequired
                                         label="Date Completed"
-                                        isRequired
                                         name="date_c"
                                         isClearable
                                         placeholder=" "

@@ -1,20 +1,40 @@
-import { Card, CardHeader, Progress } from "@nextui-org/react"
+import { Card, CardHeader, Divider, Progress } from "@nextui-org/react"
 import { json, LoaderFunction, redirect } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import { CheckSquare, Clock, FileText, Calendar, ChevronRight, FileCheck, BookOpen } from "lucide-react"
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
+import ChartComponent from "~/components/charts/Chart"
 import { CardBody } from "~/components/acternity/3d"
 import MetricCard from "~/components/ui/customCard"
 import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
 import Registration from "~/modal/registration"
+import dashboard from "~/controller/dashboard"
 
 const StaffDashboard = () => {
   const data = useLoaderData<typeof loader>()
-  const { userProfile, tasks, attendance, recentActivity } = data
+  const { userProfile, tasks, attendance, recentActivity, performanceData, taskBreakdown, attendanceChart } = data
+  const [chartScript, setChartScript] = useState<React.ReactNode>(null)
+  
+  // Make sure Chart.js script is loaded client-side only
+  useEffect(() => {
+    setChartScript(
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            import('chart.js').then(module => {
+              window.Chart = module.Chart;
+              window.dispatchEvent(new Event('chartjsloaded'));
+            });
+          `
+        }}
+      />
+    )
+  }, [])
 
   return (
     <AdminLayout>
+      {chartScript}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Staff Dashboard</h1>
         <p className="text-gray-600">Welcome back, {userProfile?.firstName || "Staff Member"}</p>
@@ -48,6 +68,28 @@ const StaffDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {taskBreakdown && (
+          <ChartComponent
+            type="doughnut"
+            data={taskBreakdown}
+            title="My Task Distribution"
+            description="Breakdown of your current tasks by priority"
+            colors={['#EF4444', '#F59E0B', '#3B82F6']} 
+          />
+        )}
+        
+        {attendanceChart && (
+          <ChartComponent
+            type="bar"
+            data={attendanceChart}
+            title="Weekly Hours"
+            description="Your working hours for the past 7 days"
+            colors={['#10B981']} 
+          />
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <Card className="p-4">
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
             <h4 className="font-bold text-large">My Tasks</h4>
@@ -56,7 +98,7 @@ const StaffDashboard = () => {
           <CardBody className="overflow-visible py-2">
             {tasks.upcoming.length > 0 ? (
               <div className="space-y-4">
-                {tasks.upcoming.map((task) => (
+                {tasks.upcoming.map((task: any) => (
                   <div key={task.id} className="p-3 border rounded-lg hover:bg-gray-50">
                     <div className="flex justify-between items-start">
                       <div>
@@ -93,7 +135,7 @@ const StaffDashboard = () => {
           </CardHeader>
           <CardBody className="py-2">
             <div className="space-y-3">
-              {attendance.recentDays.map((day) => (
+              {attendance.recentDays.map((day: any) => (
                 <div key={day.date} className="flex justify-between items-center p-2 border-b">
                   <div className="flex items-center">
                     <div className={`w-3 h-3 rounded-full mr-2 ${
@@ -125,6 +167,23 @@ const StaffDashboard = () => {
         </Card>
       </div>
 
+      <Divider className="my-6" />
+      
+      {performanceData && (
+        <div className="mb-8"> 
+          <h2 className="text-xl font-semibold mb-4">My Performance</h2>
+          <ChartComponent
+            type="line"
+            data={performanceData}
+            title="Task Completion Rate"
+            description="Your task completion trends over time"
+            height={220}
+            className="w-full"
+            colors={['#3B82F6']}
+          />
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 mb-8">
         <Card className="p-4">
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
@@ -134,7 +193,7 @@ const StaffDashboard = () => {
             <div className="relative">
               <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-gray-200"></div>
               <div className="space-y-6 relative">
-                {recentActivity.map((activity, index) => (
+                {recentActivity.map((activity: any, index: number) => (
                   <div key={index} className="ml-10 relative">
                     <div className="absolute -left-10 mt-1.5">
                       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100">
@@ -207,9 +266,35 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/addentech-login");
   }
   
-  // Sample data - in a real app, these would come from actual queries
+  // Get role-specific dashboard data from controller
+  const dashboardData = await dashboard.getRoleDashboardData(
+    userProfile._id.toString(),
+    userProfile.role,
+    userProfile.department?.toString()
+  )
+  
+  if ('error' in dashboardData) {
+    return json({
+      error: dashboardData.error,
+      userProfile
+    }, { status: 500 })
+  }
+    
+  // Sample data - in a real app, these would be merged with the dashboardData from controller
   const mockData = {
     userProfile,
+    performanceData: {
+      labels: ["Apr 24", "May 1", "May 8", "May 15", "May 22", "May 29"],
+      values: [65, 72, 80, 75, 85, 90]
+    },
+    taskBreakdown: {
+      labels: ["High", "Medium", "Low"],
+      values: [2, 2, 1]
+    },
+    attendanceChart: {
+      labels: ["May 24", "May 25", "May 26", "May 27", "May 28", "May 29", "May 30"],
+      values: [8, 0, 0, 8, 7.5, 8, 6.5]
+    },
     tasks: {
       assigned: 5,
       completed: 12,
