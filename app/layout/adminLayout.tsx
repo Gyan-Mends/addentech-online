@@ -28,18 +28,20 @@ import {
     Menu,
     Search,
     Settings,
+    Shield,
     Tag,
     User,
     X,
 } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 
-// Define navigation items by role
+// Define navigation items by role and permission
 type NavItem = {
     to: string;
     icon: React.ReactNode;
     label: string;
     roles: string[];
+    permission?: string; // Optional permission key that allows access to this item
 };
 
 const navItems: NavItem[] = [
@@ -47,73 +49,91 @@ const navItems: NavItem[] = [
         to: "/admin",
         icon: <LayoutDashboard className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Dashboard",
-        roles: ["admin", "department_head", "manager", "staff"]
+        roles: ["admin", "department_head", "manager", "staff"],
+        permission: "view_dashboard"
     },
     {
         to: "/admin/users",
         icon: <User className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Users",
-        roles: ["admin", "manager"]
+        roles: ["admin", "manager"],
+        permission: "view_users"
     },
     {
         to: "/admin/departments",
         icon: <Folder className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Department",
-        roles: ["admin", "manager"]
+        roles: ["admin", "manager"],
+        permission: "view_departments"
     },
     {
         to: "/admin/attendance",
         icon: <Clock className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Attendance",
-        roles: ["admin", "department_head", "manager", "staff"]
+        roles: ["admin", "department_head", "manager", "staff"],
+        permission: "view_attendance"
     },
     {
         to: "/admin/tasks",
         icon: <CheckSquare className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Tasks",
-        roles: ["admin", "department_head", "manager", "staff"]
+        roles: ["admin", "department_head", "manager", "staff"],
+        permission: "view_tasks"
     },
     {
         to: "/admin/monthly-reports",
         icon: <BarChart className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Monthly Reports",
-        roles: ["admin", "head", "manager", "staff"]
+        roles: ["admin", "head", "manager", "staff", "department_head", "user", "*"],
+        permission: "view_reports"
     },
     {
         to: "/admin/blog",
         icon: <BookOpen className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Blog",
-        roles: ["admin"]
+        roles: ["admin"],
+        permission: "view_blog"
     },
     {
         to: "/admin/category",
         icon: <Tag className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Blog Categories",
-        roles: ["admin"]
+        roles: ["admin"],
+        permission: "view_categories"
     },
     {
         to: "/admin/contact",
         icon: <Mail className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Messages",
-        roles: ["admin"]
+        roles: ["admin"],
+        permission: "view_messages"
+    },
+    {
+        to: "/admin/permissions",
+        icon: <Shield className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "User Permissions",
+        roles: ["admin", "manager"]
+        // No permission needed as this is strictly role-based
     },
     {
         to: "/admin/memorandum",
         icon: <FileText className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Memorandum",
-        roles: ["admin", "department_head", "manager", "staff"]
+        roles: ["admin", "department_head", "manager", "staff"],
+        permission: "view_memorandum"
     }
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [userRole, setUserRole] = useState<string>("staff");
+    const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
     const navigation = useNavigation();
     const navigate = useNavigate();
     
-    // Fetch user role from session
+    // Fetch user role and permissions from session
     useEffect(() => {
-        const fetchUserRole = async () => {
+        const fetchUserProfile = async () => {
             try {
                 const response = await fetch("/api/user/profile", {
                     method: "GET",
@@ -125,13 +145,23 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 if (response.ok) {
                     const userData = await response.json();
                     setUserRole(userData.role || "staff");
+                    
+                    // Set user permissions
+                    if (userData.permissions) {
+                        setUserPermissions(userData.permissions);
+                    }
+                    
+                    console.log("User profile loaded:", {
+                        role: userData.role,
+                        permissions: userData.permissions
+                    });
                 }
             } catch (error) {
-                console.error("Failed to fetch user role:", error);
+                console.error("Failed to fetch user profile:", error);
             }
         };
         
-        fetchUserRole();
+        fetchUserProfile();
     }, []);
 
     const isLoading = navigation.state === "loading";
@@ -161,7 +191,19 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 <div className="flex flex-col flex-1 px-2 py-4 space-y-6">
                     <ul className="flex flex-col">
                         {navItems
-                            .filter(item => item.roles.includes(userRole))
+                            .filter(item => {
+                                // Include if user's role is in the allowed roles list
+                                const hasRole = item.roles.includes(userRole);
+                                
+                                // Include if user has the specific permission for this item
+                                const hasPermission = item.permission && userPermissions[item.permission];
+                                
+                                // Admin and manager always see all navigation items
+                                const isAdminOrManager = userRole === "admin" || userRole === "manager";
+                                
+                                // Include the item if user has either the role OR the specific permission
+                                return hasRole || hasPermission || isAdminOrManager;
+                            })
                             .map((item, index) => (
                                 <Link key={index} to={item.to}>
                                     <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out">
