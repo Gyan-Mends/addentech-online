@@ -82,6 +82,7 @@ class AttendanceController {
     workMode,
     latitude,
     longitude,
+    locationName,
   }: {
     userId: string;
     departmentId: string;
@@ -89,6 +90,7 @@ class AttendanceController {
     workMode: string;
     latitude?: number;
     longitude?: number;
+    locationName?: string;
   }) {
     try {
       console.log('Check-in attempt:', { userId, departmentId, workMode });
@@ -172,7 +174,20 @@ class AttendanceController {
       }
       
       // Create new attendance record
-      const attendanceData = {
+      const attendanceData: {
+        user: string;
+        department: string;
+        checkInTime: Date;
+        date: Date;
+        notes: string;
+        workMode: string;
+        status: string;
+        location?: {
+          latitude: number;
+          longitude: number;
+          locationName?: string;
+        };
+      } = {
         user: userId,
         department: departmentId,
         checkInTime: new Date(),
@@ -183,7 +198,11 @@ class AttendanceController {
       };
       
       if (latitude && longitude) {
-        attendanceData['location'] = { latitude, longitude };
+        attendanceData.location = { 
+          latitude, 
+          longitude,
+          locationName: locationName || 'Unknown location'
+        };
       }
       
       console.log('Creating attendance record with data:', attendanceData);

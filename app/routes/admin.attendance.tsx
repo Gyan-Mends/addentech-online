@@ -228,21 +228,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         });
       }
 
-      // Call check-in controller with the validated data
+      // Call the controller method to check in
       const result = await attendanceController.checkIn({
-        userId,
-        departmentId,
+        userId: currentUser.id,
+        departmentId: currentUser.department,
         notes,
-        workMode,
-        latitude,
-        longitude,
+        workMode: currentUser.workMode,
+        latitude: latitude ? parseFloat(latitude.toString()) : undefined,
+        longitude: longitude ? parseFloat(longitude.toString()) : undefined,
+        locationName: formData.get('locationName')?.toString() || 'Unknown location'
       });
-      
+
       // If check-in was successful, redirect to refresh the page data
       if (result.status === 201) {
         return redirect('/admin/attendance');
       }
-      
+
       return result;
     } catch (error: any) {
       return json({
@@ -256,14 +257,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (!["admin", "manager"].includes(currentUser.role)) {
       return json({ success: false, message: "Not authorized" }, { status: 403 });
     }
-    
+
     const targetUserId = formData.get("targetUserId") as string;
     const newWorkMode = formData.get("newWorkMode") as string;
-    
+
     if (!targetUserId || !newWorkMode || !['in-house', 'remote'].includes(newWorkMode)) {
       return json({ success: false, message: "Invalid parameters" }, { status: 400 });
     }
-    
+
     try {
       await Registration.findByIdAndUpdate(targetUserId, { workMode: newWorkMode });
       return json({ success: true, message: `Work mode updated to ${newWorkMode}` });
@@ -285,7 +286,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (!['admin', 'manager'].includes(currentUser.role)) {
       return json({ success: false, message: "You don't have permission to delete attendance records" }, { status: 403 });
     }
-    
+
     const attendanceId = formData.get("attendanceId") as string;
 
     if (!attendanceId) {
@@ -297,15 +298,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       attendanceId,
       userRole: currentUser.role
     });
-    
+
     // If successful, redirect to refresh the page
     if (result.success) {
       return redirect('/admin/attendance');
     }
-    
+
     return json(result);
   }
-  
+
   // If we get here, no valid action was specified
   return json({ success: false, message: "Invalid action" }, { status: 400 });
 };
@@ -323,6 +324,19 @@ export default function AttendancePage() {
   const actionData = useActionData<typeof action>();
   const isLoading = navigation.state === "loading";
   
+  // Helper function to calculate distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in kilometers
+  };
+
   // Debug output to check what data we're receiving
   useEffect(() => {
     console.log('Attendance data in component:', {
@@ -337,7 +351,7 @@ export default function AttendancePage() {
     if (actionData) {
       if (actionData.success) {
         successToast(actionData.message);
-          } else {
+      } else {
         errorToast(actionData.message);
       }
     }
@@ -392,6 +406,36 @@ export default function AttendancePage() {
       },
     },
     {
+      key: "location",
+      label: "LOCATION",
+      render: (row: any) => {
+        if (row.location && row.location.locationName) {
+          return (
+            <div className="max-w-xs truncate" title={row.location.locationName}>
+              <span className="text-xs">{row.location.locationName}</span>
+              {row.workMode === "in-house" && (
+                <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1 rounded">
+                  In-House
+                </span>
+              )}
+              {row.workMode === "remote" && (
+                <span className="ml-1 text-xs bg-purple-100 text-purple-800 px-1 rounded">
+                  Remote
+                </span>
+              )}
+            </div>
+          );
+        } else if (row.workMode) {
+          return (
+            <span className={`text-xs ${row.workMode === "in-house" ? "text-blue-600" : "text-purple-600"}`}>
+              {row.workMode === "in-house" ? "In-House" : "Remote"}
+            </span>
+          );
+        }
+        return "Unknown";
+      },
+    },
+    {
       key: "workHours",
       label: "WORK HOURS",
       render: (row: any) => {
@@ -442,7 +486,7 @@ export default function AttendancePage() {
                 </Button>
               </Form>
             )}
-            
+
             {/* Delete button for admin/manager roles */}
             {loaderData.isAdmin && (
               <Form method="post" className="inline" onSubmit={(e) => {
@@ -471,8 +515,8 @@ export default function AttendancePage() {
   return (
     <AdminLayout>
       <div className="bg-white p-6 rounded-lg shadow-md">
-      <Toaster position="top-right" />
-      <div className="flex justify-between items-center mb-6">
+        <Toaster position="top-right" />
+        <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">
               Attendance Management
@@ -484,18 +528,15 @@ export default function AttendancePage() {
               </p>
             )}
           </div>
-          
+
           {/* Check In Form */}
           <Form method="post" className="flex flex-col space-y-4 w-full max-w-lg p-4 border rounded-lg shadow">
             <h2 className="text-lg font-semibold text-gray-700">Check In</h2>
-            <input
-              type="hidden"
-              name="_action"
-              value="checkIn"
-            />
+            <input type="hidden" name="_action" value="checkIn" />
             <input type="hidden" name="latitude" id="latitude" />
             <input type="hidden" name="longitude" id="longitude" />
-            
+            <input type="hidden" name="locationName" id="locationName" />
+
             {/* Notes field only - user ID and department are automatically retrieved */}
             <div className="mb-4">
               <Input
@@ -504,13 +545,13 @@ export default function AttendancePage() {
                 placeholder="Any notes for today?"
               />
             </div>
-            
+
             {/* Attendance Status and Rules */}
             <div className="p-3 bg-blue-50 rounded-lg mb-4">
               <p className="text-sm text-blue-700 mb-2">
                 <span className="font-semibold">Work Mode:</span> {loaderData.currentUser?.workMode === "in-house" ? "In-House" : "Remote"}
               </p>
-              
+
               {/* Attendance Rules Section */}
               <div className="border-t border-blue-200 pt-2 mt-2">
                 <p className="text-xs font-semibold text-blue-800 mb-1">Attendance Rules:</p>
@@ -521,7 +562,7 @@ export default function AttendancePage() {
                   <li>System will automatically check you out at 6:00 PM if not done</li>
                 </ul>
               </div>
-              
+
               {loaderData.currentUser?.workMode === "in-house" && (
                 <div className="mt-3 border-t border-blue-200 pt-2">
                   <p className="text-xs font-semibold text-blue-800 mb-1">Location Requirements:</p>
@@ -530,38 +571,86 @@ export default function AttendancePage() {
                     type="button" 
                     className="text-xs bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
                     onClick={() => {
-                      // Get current location for in-house attendance
-                      if (navigator.geolocation) {
+                      // Handle location capture here
+                      if ("geolocation" in navigator) {
                         navigator.geolocation.getCurrentPosition(
-                          (position) => {
-                            const latElement = document.getElementById("latitude") as HTMLInputElement;
-                            const lngElement = document.getElementById("longitude") as HTMLInputElement;
-                            const statusElement = document.getElementById("locationStatus");
-                            
-                            if (latElement && lngElement && statusElement) {
-                              latElement.value = position.coords.latitude.toString();
-                              lngElement.value = position.coords.longitude.toString();
-                              
-                              // Calculate distance from office (simplified version)
-                              const officeLatitude = 5.660881;
-                              const officeLongitude = -0.156627;
-                              const distanceIndicator = Math.abs(position.coords.latitude - officeLatitude) < 0.01 && 
-                                                      Math.abs(position.coords.longitude - officeLongitude) < 0.01 ? 
-                                                      "potentially within" : "outside";
-                              
-                              statusElement.innerHTML = `Location captured successfully.<br>Your coordinates: [${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}]<br>You appear to be <strong>${distanceIndicator}</strong> office range.`;
-                              statusElement.className = distanceIndicator === "potentially within" ? 
-                                                      "text-green-600 text-sm" : "text-yellow-600 text-sm";
+                          async (position) => {
+                            const { latitude, longitude } = position.coords;
+
+                            // Set hidden inputs with location data
+                            document.getElementById("latitude").value = latitude.toString();
+                            document.getElementById("longitude").value = longitude.toString();
+
+                            // Calculate distance from office (assuming office coordinates are 5.660881, -0.156627)
+                            const officeLatitude = 5.660881;
+                            const officeLongitude = -0.156627;
+                            const distance = calculateDistance(
+                              latitude,
+                              longitude,
+                              officeLatitude,
+                              officeLongitude
+                            );
+
+                            // Get location name using reverse geocoding with Google Maps API
+                            try {
+                              const response = await fetch(
+                                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.GOOGLE_MAPS_API_KEY}`
+                              );
+                              const data = await response.json();
+                              let locationName = "Unknown location";
+
+                              if (data.status === "OK" && data.results && data.results.length > 0) {
+                                locationName = data.results[0].formatted_address;
+                                // Set the location name in the hidden input
+                                document.getElementById("locationName").value = locationName;
+                              } else {
+                                console.error("Geocoding failed:", data);
+                              }
+
+                              // Update location status message
+                              const locationStatus = document.getElementById("locationStatus");
+                              if (locationStatus) {
+                                locationStatus.innerHTML = `<div class="p-2 bg-green-100 rounded">
+                                  <p>Location captured: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
+                                  <p>Location name: ${locationName}</p>
+                                  <p>Distance from office: ${(distance * 1000).toFixed(0)} meters</p>
+                                  <p>Status: ${distance <= 0.1 ? "<span class='text-green-600 font-bold'>Within office range ✓</span>" : "<span class='text-red-600 font-bold'>Outside office range ✗</span>"}</p>
+                                </div>`;
+                              }
+                            } catch (error) {
+                              console.error("Error with geocoding:", error);
+                              // Still update location status without the name
+                              const locationStatus = document.getElementById("locationStatus");
+                              if (locationStatus) {
+                                locationStatus.innerHTML = `<div class="p-2 bg-green-100 rounded">
+                                  <p>Location captured: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
+                                  <p>Distance from office: ${(distance * 1000).toFixed(0)} meters</p>
+                                  <p>Status: ${distance <= 0.1 ? "<span class='text-green-600 font-bold'>Within office range ✓</span>" : "<span class='text-red-600 font-bold'>Outside office range ✗</span>"}</p>
+                                </div>`;
+                              }
                             }
+
+                            // Enable check-in button if location is captured
+                            const checkInBtn = document.getElementById("checkInBtn") as HTMLButtonElement;
+                            if (checkInBtn) {
+                              checkInBtn.disabled = false;
+                            }
+
+                            successToast("Location captured successfully!");
                           },
                           (error) => {
-                            const statusElement = document.getElementById("locationStatus");
-                            if (statusElement) {
-                              statusElement.textContent = "Error getting location: " + error.message;
-                              statusElement.className = "text-red-500 text-sm";
+                            console.error("Error getting location:", error);
+                            const locationStatus = document.getElementById("locationStatus");
+                            if (locationStatus) {
+                              locationStatus.innerHTML = `<div class="p-2 bg-red-100 rounded">
+                                <p>Error capturing location: ${error.message}</p>
+                              </div>`;
                             }
+                            errorToast(`Error capturing location: ${error.message}. Please allow location access to check in.`);
                           }
                         );
+                      } else {
+                        errorToast("Geolocation is not available in your browser.");
                       }
                     }}
                   >
@@ -574,9 +663,11 @@ export default function AttendancePage() {
             
             <Button
               type="submit"
+              id="checkInBtn"
               className="bg-pink-500 text-white w-full"
               isLoading={isLoading}
               startContent={<Clock className="h-4 w-4" />}
+              disabled={loaderData?.currentUser?.workMode === "in-house"}
             >
               Check In
             </Button>

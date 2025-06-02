@@ -15,6 +15,7 @@ interface AttendanceInterface {
   location?: {
     latitude: number;
     longitude: number;
+    locationName?: string; // Name of the location (address or place name)
   };
 }
 
@@ -53,6 +54,7 @@ const AttendanceSchema = new mongoose.Schema(
     location: {
       latitude: { type: Number },
       longitude: { type: Number },
+      locationName: { type: String },
     },
     workHours: {
       type: Number,
