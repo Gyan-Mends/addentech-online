@@ -12,6 +12,7 @@ import { getSession } from "~/session";
 import Registration from "~/modal/registration";
 import { redirect } from "@remix-run/node";
 import { errorToast, successToast } from "~/components/toast";
+import { Toaster } from "react-hot-toast";
 
 // Define the return type for the loader
 interface LoaderData {
@@ -336,9 +337,7 @@ export default function AttendancePage() {
     if (actionData) {
       if (actionData.success) {
         successToast(actionData.message);
-        // Force a page reload to refresh the data
-        window.location.reload();
-      } else {
+          } else {
         errorToast(actionData.message);
       }
     }
@@ -472,7 +471,8 @@ export default function AttendancePage() {
   return (
     <AdminLayout>
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-6">
+      <Toaster position="top-right" />
+      <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">
               Attendance Management
