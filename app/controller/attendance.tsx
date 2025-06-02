@@ -1,6 +1,42 @@
 import { json } from "@remix-run/node";
 import Attendance from "~/modal/attendance";
 import Registration from "~/modal/registration";
+import { scheduleJob } from "node-schedule";
+
+// Schedule auto-checkout job to run every day at 6pm
+scheduleJob('0 18 * * *', async function() {
+  try {
+    console.log('Running automatic checkout at 6pm');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Find all attendance records from today that don't have checkout times
+    const records = await Attendance.find({
+      date: {
+        $gte: today,
+        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      },
+      checkOutTime: { $exists: false }
+    });
+    
+    console.log(`Found ${records.length} attendance records without checkout`);
+    
+    // Auto checkout each record
+    const checkOutTime = new Date();
+    for (const record of records) {
+      const checkInTime = new Date(record.checkInTime);
+      const workHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+      
+      record.checkOutTime = checkOutTime;
+      record.workHours = parseFloat(workHours.toFixed(2));
+      await record.save();
+    }
+    
+    console.log(`Auto-checked out ${records.length} users`);
+  } catch (error) {
+    console.error('Error in auto-checkout job:', error);
+  }
+});
 
 class AttendanceController {
   // Helper method to calculate distance between two coordinates using Haversine formula
@@ -25,6 +61,20 @@ class AttendanceController {
   private deg2rad(deg: number): number {
     return deg * (Math.PI / 180);
   }
+  
+  // Helper to check if time is within check-in hours (7am to 5pm)
+  private isWithinCheckInHours(): boolean {
+    const now = new Date();
+    const hour = now.getHours();
+    return hour >= 7 && hour < 17; // 7am to 5pm
+  }
+  
+  // Helper to check if today is a weekend
+  private isWeekend(): boolean {
+    const now = new Date();
+    const day = now.getDay();
+    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+  }
   async checkIn({
     userId,
     departmentId,
@@ -42,6 +92,26 @@ class AttendanceController {
   }) {
     try {
       console.log('Check-in attempt:', { userId, departmentId, workMode });
+      
+      // Check if today is a weekend (Saturday or Sunday)
+      if (this.isWeekend()) {
+        console.log('Check-in failed: Attendance not allowed on weekends');
+        return json({
+          message: "Attendance cannot be taken on Saturday or Sunday.",
+          success: false,
+          status: 400,
+        });
+      }
+      
+      // Check if current time is within check-in hours (7am to 5pm)
+      if (!this.isWithinCheckInHours()) {
+        console.log('Check-in failed: Outside check-in hours');
+        return json({
+          message: "Check-in is only allowed between 7:00 AM and 5:00 PM.",
+          success: false,
+          status: 400,
+        });
+      }
       
       // Check if user exists
       const user = await Registration.findById(userId);
@@ -77,9 +147,9 @@ class AttendanceController {
 
       // Validate location for in-house attendance
       if (workMode === "in-house" && (latitude && longitude)) {
-        // Office location coordinates (example - replace with actual office coordinates)
-        const officeLatitude = 5.6037; // Replace with actual office latitude
-        const officeLongitude = -0.1870; // Replace with actual office longitude
+        // Office location coordinates (as specified in requirements)
+        const officeLatitude = 5.660881;
+        const officeLongitude = -0.156627;
         
         // Calculate distance between user and office (using Haversine formula)
         const distance = this.calculateDistance(

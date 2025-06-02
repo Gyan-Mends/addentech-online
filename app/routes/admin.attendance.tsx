@@ -505,17 +505,30 @@ export default function AttendancePage() {
               />
             </div>
             
-            {/* Attendance Status */}
+            {/* Attendance Status and Rules */}
             <div className="p-3 bg-blue-50 rounded-lg mb-4">
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-blue-700 mb-2">
                 <span className="font-semibold">Work Mode:</span> {loaderData.currentUser?.workMode === "in-house" ? "In-House" : "Remote"}
               </p>
+              
+              {/* Attendance Rules Section */}
+              <div className="border-t border-blue-200 pt-2 mt-2">
+                <p className="text-xs font-semibold text-blue-800 mb-1">Attendance Rules:</p>
+                <ul className="text-xs text-gray-700 list-disc pl-4 space-y-1">
+                  <li>Attendance cannot be taken on weekends (Saturday/Sunday)</li>
+                  <li>Check-in is only allowed between 7:00 AM and 5:00 PM</li>
+                  <li>You can check out anytime after check-in</li>
+                  <li>System will automatically check you out at 6:00 PM if not done</li>
+                </ul>
+              </div>
+              
               {loaderData.currentUser?.workMode === "in-house" && (
-                <div className="mt-2">
-                  <p className="text-xs text-gray-600 mb-1">Location is required for in-house attendance</p>
+                <div className="mt-3 border-t border-blue-200 pt-2">
+                  <p className="text-xs font-semibold text-blue-800 mb-1">Location Requirements:</p>
+                  <p className="text-xs text-gray-700 mb-2">In-house attendance requires you to be physically present at the office location.</p>
                   <button 
                     type="button" 
-                    className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-md"
+                    className="text-xs bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
                     onClick={() => {
                       // Get current location for in-house attendance
                       if (navigator.geolocation) {
@@ -528,8 +541,17 @@ export default function AttendancePage() {
                             if (latElement && lngElement && statusElement) {
                               latElement.value = position.coords.latitude.toString();
                               lngElement.value = position.coords.longitude.toString();
-                              statusElement.textContent = "Location captured successfully";
-                              statusElement.className = "text-green-500 text-sm";
+                              
+                              // Calculate distance from office (simplified version)
+                              const officeLatitude = 5.660881;
+                              const officeLongitude = -0.156627;
+                              const distanceIndicator = Math.abs(position.coords.latitude - officeLatitude) < 0.01 && 
+                                                      Math.abs(position.coords.longitude - officeLongitude) < 0.01 ? 
+                                                      "potentially within" : "outside";
+                              
+                              statusElement.innerHTML = `Location captured successfully.<br>Your coordinates: [${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}]<br>You appear to be <strong>${distanceIndicator}</strong> office range.`;
+                              statusElement.className = distanceIndicator === "potentially within" ? 
+                                                      "text-green-600 text-sm" : "text-yellow-600 text-sm";
                             }
                           },
                           (error) => {
@@ -545,7 +567,7 @@ export default function AttendancePage() {
                   >
                     Capture My Location
                   </button>
-                  <p id="locationStatus" className="text-sm text-gray-500 mt-1">Click to capture your location</p>
+                  <p id="locationStatus" className="text-sm text-gray-500 mt-2 p-2 border border-dashed border-gray-300 rounded">Click to capture your location</p>
                 </div>
               )}
             </div>
