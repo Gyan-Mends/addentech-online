@@ -514,10 +514,10 @@ export default function AttendancePage() {
 
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md ">
         <Toaster position="top-right" />
-        <div className="flex justify-between items-center mb-6">
-          <div>
+        <div className="lg:flex justify-between items-center">
+          <div className="mb-10 lg:mb-0">
             <h1 className="text-2xl font-bold text-gray-800">
               Attendance Management
             </h1>
@@ -676,7 +676,7 @@ export default function AttendancePage() {
         
         {/* Work Mode Management (Admins and Managers only) */}
         {loaderData.isAdmin && (
-          <div className="mb-8 p-4 border rounded-lg shadow">
+          <div className="mb-8 p-4 border rounded-lg shadow  mt-10">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">Manage Work Modes</h2>
             <Form method="post" className="flex flex-col space-y-4">
               <input type="hidden" name="_action" value="updateWorkMode" />
@@ -729,13 +729,21 @@ export default function AttendancePage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
+          variant="underlined"
+          classNames={{
+            base: "w-full overflow-x-auto",
+            tabList: "w-full flex flex-wrap sm:flex-nowrap gap-2 relative rounded-none p-0",
+            tab: "max-w-fit px-2 h-10 data-[selected=true]:text-pink-500",
+            cursor: "w-full bg-pink-500",
+            panel: "pt-3 px-1"
+          }}
         >
           <Tab
             key="today"
             title={
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4" />
-                <span>{loaderData.isAdmin ? "All Attendance" : "My Attendance"}</span>
+              <div className="flex items-center space-x-2 text-sm md:text-base whitespace-nowrap">
+                <Calendar className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{loaderData.isAdmin ? "All Attendance" : "My Attendance"}</span>
               </div>
             }
           >
@@ -744,13 +752,13 @@ export default function AttendancePage() {
               {loaderData.isAdmin && (
                 <div className="bg-white rounded-lg p-4 mb-6">
                   <h3 className="text-lg font-semibold mb-2">Filter Attendance</h3>
-                  <Form className="flex flex-wrap items-end gap-4">
+                  <Form className="flex flex-wrap items-end gap-4 w-full">
                     <div>
                       <label className="block text-sm text-gray-700 mb-1">
                         Department
                       </label>
                       <select
-                        className="border rounded px-3 py-2 w-full max-w-[250px]"
+                        className="border rounded px-3 py-2 lg:w-full !w-[70vw]"
                         name="department"
                         value={selectedDepartment}
                         onChange={(e) => setSelectedDepartment(e.target.value)}
@@ -768,7 +776,7 @@ export default function AttendancePage() {
                         User
                       </label>
                       <select
-                        className="border rounded px-3 py-2 w-full max-w-[250px]"
+                        className="border rounded px-3 py-2 lg:w-full !w-[70vw]"
                         name="userId"
                       >
                         <option value="">All Users</option>
@@ -794,16 +802,16 @@ export default function AttendancePage() {
           <Tab
             key="report"
             title={
-              <div className="flex items-center space-x-2">
-                <BarChart2 className="h-4 w-4" />
-                <span>Attendance Report</span>
+              <div className="flex items-center space-x-2 text-sm md:text-base whitespace-nowrap">
+                <BarChart2 className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Attendance Report</span>
               </div>
             }
           >
             <div className="mt-6">
               <div className="bg-white rounded-lg p-4 mb-6">
                 <h3 className="text-lg font-semibold mb-2">Generate Report</h3>
-                <Form className="flex flex-wrap gap-4">
+                <Form className="flex flex-wrap gap-4 w-full">
                   {/* Department filter (admin only) */}
                   {loaderData.isAdmin && (
                     <div>
@@ -811,7 +819,7 @@ export default function AttendancePage() {
                         Department
                       </label>
                       <select
-                        className="border rounded px-3 py-2 w-full max-w-[250px]"
+                        className="border rounded px-3 py-2 lg:w-full !w-[70vw]"
                         name="department"
                         value={selectedDepartment}
                         onChange={(e) => setSelectedDepartment(e.target.value)}
@@ -832,7 +840,7 @@ export default function AttendancePage() {
                     <input
                       type="date"
                       name="startDate"
-                      className="border rounded px-3 py-2"
+                      className="border rounded px-3 py-2 lg:w-full !w-[70vw]"
                       value={dateRange.startDate}
                       onChange={(e) =>
                         setDateRange({ ...dateRange, startDate: e.target.value })
@@ -846,7 +854,7 @@ export default function AttendancePage() {
                     <input
                       type="date"
                       name="endDate"
-                      className="border rounded px-3 py-2"
+                      className="border rounded px-3 py-2 lg:w-full !w-[70vw]"
                       value={dateRange.endDate}
                       onChange={(e) =>
                         setDateRange({ ...dateRange, endDate: e.target.value })
@@ -876,9 +884,9 @@ export default function AttendancePage() {
           <Tab
             key="department"
             title={
-              <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4" />
-                <span>Department Attendance</span>
+              <div className="flex items-center space-x-2 text-sm md:text-base whitespace-nowrap">
+                <Users className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Department Attendance</span>
               </div>
             }
           />

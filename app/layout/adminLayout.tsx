@@ -47,77 +47,77 @@ type NavItem = {
 const navItems: NavItem[] = [
     {
         to: "/admin",
-        icon: <LayoutDashboard className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <LayoutDashboard className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Dashboard",
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_dashboard"
     },
     {
         to: "/admin/users",
-        icon: <User className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <User className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Users",
         roles: ["admin", "manager"],
         permission: "view_users"
     },
     {
         to: "/admin/departments",
-        icon: <Folder className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <Folder className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Department",
         roles: ["admin", "manager"],
         permission: "view_departments"
     },
     {
         to: "/admin/attendance",
-        icon: <Clock className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <Clock className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Attendance",
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_attendance"
     },
     {
         to: "/admin/tasks",
-        icon: <CheckSquare className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Tasks",
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_tasks"
     },
     {
         to: "/admin/monthly-reports",
-        icon: <BarChart className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <BarChart className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Monthly Reports",
         roles: ["admin", "head", "manager", "staff", "department_head", "user", "*"],
         permission: "view_reports"
     },
     {
         to: "/admin/blog",
-        icon: <BookOpen className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <BookOpen className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Blog",
         roles: ["admin"],
         permission: "view_blog"
     },
     {
         to: "/admin/category",
-        icon: <Tag className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <Tag className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Blog Categories",
         roles: ["admin"],
         permission: "view_categories"
     },
     {
         to: "/admin/contact",
-        icon: <Mail className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <Mail className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Messages",
         roles: ["admin"],
         permission: "view_messages"
     },
     {
         to: "/admin/permissions",
-        icon: <Shield className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <Shield className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "User Permissions",
         roles: ["admin", "manager"]
         // No permission needed as this is strictly role-based
     },
     {
         to: "/admin/memorandum",
-        icon: <FileText className="h-5 w-5 hover:text-white text-pink-500" />,
+        icon: <FileText className="h-4 w-4  hover:text-white text-pink-500" />,
         label: "Memorandum",
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_memorandum"
@@ -167,7 +167,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const isLoading = navigation.state === "loading";
 
     return (
-        <div className="flex h-screen  font-nunito">
+        <div className="flex   font-nunito">
             {/* Sidebar */}
             <div
                 className={`${isSidebarOpen ? "w-64" : "w-0 -ml-64"} bg-white shadow-r-md transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative`}
@@ -206,7 +206,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             })
                             .map((item, index) => (
                                 <Link key={index} to={item.to}>
-                                    <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out">
+                                    <li className="text-sm hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out">
                                         {item.icon}
                                         {item.label}
                                     </li>
@@ -255,7 +255,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         </Button>
                         <Button
                             size="sm"
-                            className=" md:flex rounded-md text-md h-[35px] shadow-sm hover:bg-pink-300 text-pink-500 bg-pink-200 "
+                            className="hidden lg:d-block md:flex rounded-md text-md h-[35px] shadow-sm hover:bg-pink-300 text-pink-500 bg-pink-200 "
                         >
                             <ArrowLeft className="mr-2 h-4 w-4 " />
                             Back
@@ -294,7 +294,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-auto p-4 sm:p-6 rounded-lg bg-gray-50 rounded-tl-xl">
+                <main className="flex-1  p-4 sm:p-6 rounded-lg bg-gray-50 rounded-tl-xl">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full">
                             <Spinner className="!text-pink-500" size="lg" />
