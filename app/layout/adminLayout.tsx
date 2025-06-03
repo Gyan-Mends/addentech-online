@@ -167,7 +167,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const isLoading = navigation.state === "loading";
 
     return (
-        <div className="flex   font-nunito">
+        <div className="flex h-screen font-nunito">
             {/* Sidebar */}
             <div
                 className={`${isSidebarOpen ? "w-64" : "w-0 -ml-64"} bg-white shadow-r-md transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative`}
@@ -294,7 +294,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                 </header>
 
-                <main className="flex-1  p-4 sm:p-6 rounded-lg bg-gray-50 rounded-tl-xl">
+                <main className="flex-1 overflow-y-auto h-[calc(100vh-100px)]  p-4 sm:p-6 rounded-lg bg-gray-50 rounded-tl-xl mt-4">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full">
                             <Spinner className="!text-pink-500" size="lg" />
