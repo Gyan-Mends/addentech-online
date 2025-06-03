@@ -1,31 +1,43 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useActionData } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import {
-  Tabs, Tab, Card, CardBody, Button, Input,
+  Tabs, Tab, Card, CardBody, Button, Input, Textarea,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  useDisclosure, Spinner, Select, SelectItem
+  useDisclosure, Spinner, Select, SelectItem, Chip, Progress,
+  DatePicker, Badge, Avatar, Divider, Tooltip, Switch
 } from "@nextui-org/react";
-import { FileText, Plus, Calendar, BarChart, Edit, Eye, Trash2, CheckCircle } from "lucide-react";
+import { 
+  FileText, Plus, Calendar, BarChart, Edit, Eye, Trash2, CheckCircle,
+  Clock, AlertTriangle, Target, Users, TrendingUp, PlayCircle,
+  PauseCircle, CheckSquare, XCircle, Bell, Send, Save, ArrowRight
+} from "lucide-react";
 import { Form } from "@remix-run/react";
 import AdminLayout from "~/layout/adminLayout";
 import DataTable from "~/components/DataTable";
 import CustomInput from "~/components/ui/CustomInput";
 import RichEditor from "~/components/ui/RichEditor";
 import { getSession } from "~/session";
-import weeklyUpdateController from "~/controller/weeklyUpdate";
-import WeeklyUpdate from "~/modal/weeklyUpdate";
-import departmentController from "~/controller/departments";
+import dailyTaskController from "~/controller/dailyTaskController";
+import scheduledTaskController from "~/controller/scheduledTaskController";
 import Registration from "~/modal/registration";
 import department from "~/controller/departments";
 
-// Helper function to format dates
-const formatDate = (dateString: string) => {
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
+};
+
+// Helper functions
+const formatDate = (dateString: string | Date) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
-// Helper function to get current week range (Monday to Friday)
+const formatTime = (dateString: string | Date) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+};
+
 const getCurrentWeekRange = () => {
   const now = new Date();
   const currentDay = now.getDay();
@@ -45,11 +57,31 @@ const getCurrentWeekRange = () => {
   };
 };
 
+const getPriorityColor = (priority: string) => {
+  switch (priority) {
+    case "urgent": return "danger";
+    case "high": return "warning";
+    case "medium": return "primary";
+    case "low": return "default";
+    default: return "default";
+  }
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "completed": return "success";
+    case "in_progress": return "primary";
+    case "pending": return "default";
+    case "cancelled": return "danger";
+    default: return "default";
+  }
+};
+
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") as string) || 1;
   const search_term = url.searchParams.get("search_term") as string;
-  // Get the current user session
+  
   const session = await getSession(request.headers.get("Cookie"));
   const email = session.get("email");
 
@@ -57,186 +89,126 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ error: "Unauthorized" }, { status: 401 });
   }
   
-  // Fetch the complete user data from the database
   const user = await Registration.findOne({ email });
   
   if (!user) {
     return json({ error: "User not found" }, { status: 404 });
   }
 
-  // Get current week information
-  const weekInfo = weeklyUpdateController.getCurrentWeekInfo();
-
-  // Get all departments
+  const weekInfo = dailyTaskController.getWeekInfo();
+  const weekRange = getCurrentWeekRange();
   const {departmentsResponse} = await department.getDepartments({ request, page, search_term });
 
-  // Get updates based on user role
-  let updates;
-  if (user.role === "admin") {
-    // Admins can see all updates
-    const response = await weeklyUpdateController.getAllUpdates();
-    updates = response.data;
-   
-  } else if (user.role === "manager") {
-    // Managers can see updates from their department
-    const response = await weeklyUpdateController.getUpdatesByDepartment(user.department);
-    updates = response.data;
-   
-  } else if (user.role === "department_head") {
-    // Department heads can see updates from their department
-    const response = await weeklyUpdateController.getUpdatesByDepartment(user.department);
-    updates = response.data;   
-  } else {
-    // Regular staff can only see their own updates
-    const response = await weeklyUpdateController.getUpdatesByUser(user._id);
-    updates = response.data;   
-  }
-
-  return json({
+  try {
+    // Since we're in server context, we need to call the controller methods directly
+    // For now, return basic data structure
+    return json({
       user,
       weekInfo,
-      departmentsResponse,
-      updates,
-  });
-};
-
-// Permission helper functions
-const canViewUpdate = (update: any, user: any) => {
-  // Admins, managers, and department heads can view all updates in their scope
-  if (user.role === "admin") return true;
-  
-  // Managers and department heads can view updates from their department
-  if (["manager", "department_head"].includes(user.role)) {
-    return update.department._id.toString() === user.department.toString();
+      weekRange,
+      departmentsResponse: departmentsResponse || [],
+      currentWeekTasks: [],
+      weeklyPreview: null,
+      scheduledTasks: [],
+      upcomingTasks: [],
+      analytics: {},
+    });
+  } catch (error) {
+    console.error("Error in loader:", error);
+    return json({
+      user,
+      weekInfo,
+      weekRange,
+      departmentsResponse: departmentsResponse || [],
+      currentWeekTasks: [],
+      weeklyPreview: null,
+      scheduledTasks: [],
+      upcomingTasks: [],
+      analytics: {},
+      error: "Failed to load task data",
+    });
   }
-  
-  // Staff can only view their own updates
-  return update.user._id.toString() === user._id.toString();
-};
-
-const canEditUpdate = (update: any, user: any) => {
-  // Can only edit draft updates
-  if (update.status !== "draft") return false;
-  
-  // Staff can only edit their own updates
-  if (user.role === "staff") {
-    return update.user._id.toString() === user._id.toString();
-  }
-  
-  // Admins can edit any draft update
-  if (user.role === "admin") return true;
-  
-  // Managers and department heads can edit updates from their department
-  if (["manager", "department_head"].includes(user.role)) {
-    return update.department._id.toString() === user.department.toString();
-  }
-  
-  return false;
-};
-
-const canReviewUpdate = (update: any, user: any) => {
-  // Only submitted updates can be reviewed
-  if (update.status !== "submitted") return false;
-  
-  // Only admins, managers, and department heads can review
-  if (!["admin", "manager", "department_head"].includes(user.role)) {
-    return false;
-  }
-  
-  // Admins can review any update
-  if (user.role === "admin") return true;
-  
-  // Managers and department heads can only review updates from their department
-  return update.department._id.toString() === user.department.toString();
-};
-
-const canDeleteUpdate = (update: any, user: any) => {
-  // Can only delete draft updates
-  if (update.status !== "draft") return false;
-  
-  // Admins can delete any draft update
-  if (user.role === "admin") return true;
-  
-  // Users can only delete their own draft updates
-  return update.user._id.toString() === user._id.toString();
 };
 
 export const action = async ({ request }: { request: Request }) => {
   const session = await getSession(request.headers.get("Cookie"));
-  const user = session.get("user" as any);
-
-  if (!user) {
+  const email = session.get("email");
+  
+  if (!email) {
     return json({ success: false, message: "Unauthorized" }, { status: 401 });
+  }
+
+  const user = await Registration.findOne({ email });
+  if (!user) {
+    return json({ success: false, message: "User not found" }, { status: 404 });
   }
 
   const formData = await request.formData();
   const action = formData.get("_action");
 
-  console.log("Action:", action);
-
   switch (action) {
-    case "create": {
+    case "create_daily_task": {
       const data = {
         user: user._id,
-        department: formData.get("department"),
-        weekNumber: parseInt(formData.get("weekNumber") as string),
-        year: parseInt(formData.get("year") as string),
-        startDate: formData.get("startDate"),
-        endDate: formData.get("endDate"),
-        tasksCompleted: formData.get("tasksCompleted"),
-        challengesFaced: formData.get("challengesFaced"),
-        nextWeekPlans: formData.get("nextWeekPlans"),
-        additionalNotes: formData.get("additionalNotes"),
+        department: user.department,
+        date: formData.get("date"),
+        title: formData.get("title"),
+        description: formData.get("description"),
+        priority: formData.get("priority"),
+        estimatedHours: parseFloat(formData.get("estimatedHours") as string) || 0,
+        category: formData.get("category"),
+        notes: formData.get("notes") || "",
       };
-      return weeklyUpdateController.createUpdate(data);
+      return dailyTaskController.createTask(data);
     }
 
-    case "update": {
+    case "update_daily_task": {
       const data = {
-        updateId: formData.get("updateId"),
-        tasksCompleted: formData.get("tasksCompleted"),
-        challengesFaced: formData.get("challengesFaced"),
-        nextWeekPlans: formData.get("nextWeekPlans"),
-        additionalNotes: formData.get("additionalNotes"),
-      };
-      return weeklyUpdateController.updateUpdate(data);
-    }
-
-    case "submit": {
-      const data = {
-        updateId: formData.get("updateId"),
+        taskId: formData.get("taskId"),
         userId: user._id,
-        tasksCompleted: formData.get("tasksCompleted"),
-        challengesFaced: formData.get("challengesFaced"),
-        nextWeekPlans: formData.get("nextWeekPlans"),
-        additionalNotes: formData.get("additionalNotes"),
+        title: formData.get("title"),
+        description: formData.get("description"),
+        priority: formData.get("priority"),
+        estimatedHours: parseFloat(formData.get("estimatedHours") as string) || 0,
+        actualHours: parseFloat(formData.get("actualHours") as string) || 0,
+        status: formData.get("status"),
+        category: formData.get("category"),
+        notes: formData.get("notes") || "",
+        challenges: formData.get("challenges") || "",
       };
-      return weeklyUpdateController.submitUpdate(data);
+      return dailyTaskController.updateTask(data);
     }
 
-    case "review": {
-      // Only managers, department heads, and admins can review
-      if (!["admin", "manager", "department_head"].includes(user.role)) {
-        return json({
-          success: false,
-          message: "You do not have permission to review updates",
-        });
-      }
-
+    case "delete_daily_task": {
       const data = {
-        updateId: formData.get("updateId"),
-        reviewerComments: formData.get("reviewerComments"),
-        reviewerId: user._id,
-      };
-      return weeklyUpdateController.reviewUpdate(data);
-    }
-
-    case "delete": {
-      const data = {
-        updateId: formData.get("updateId"),
+        taskId: formData.get("taskId"),
         userId: user._id,
       };
-      return weeklyUpdateController.deleteUpdate(data);
+      return dailyTaskController.deleteTask(data);
+    }
+
+    case "submit_weekly": {
+      return dailyTaskController.submitWeeklyTasks(user._id);
+    }
+
+    case "create_scheduled_task": {
+      const data = {
+        user: user._id,
+        department: user.department,
+        title: formData.get("title"),
+        description: formData.get("description"),
+        dueDate: formData.get("dueDate"),
+        priority: formData.get("priority"),
+        category: formData.get("category"),
+        estimatedHours: parseFloat(formData.get("estimatedHours") as string) || 0,
+        notes: formData.get("notes") || "",
+        reminderSettings: {
+          enableReminders: formData.get("enableReminders") === "true",
+          daysBefore: parseInt(formData.get("daysBefore") as string) || 1,
+          onDueDate: formData.get("onDueDate") === "true",
+        },
+      };
+      return scheduledTaskController.createScheduledTask(data);
     }
 
     default:
@@ -244,887 +216,855 @@ export const action = async ({ request }: { request: Request }) => {
   }
 };
 
-// Main component
-export default function WeeklyUpdatesPage() {
-  const loaderData = useLoaderData();
+export default function TaskManagementPage() {
   const actionData = useActionData();
-  const { user, weekInfo, departmentsResponse, updates } = useLoaderData<{ user: { user: string }, weekInfo: any, departmentsResponse: any, updates: any }>()
+  const { 
+    user, 
+    weekInfo, 
+    weekRange, 
+    departmentsResponse, 
+    currentWeekTasks, 
+    weeklyPreview, 
+    scheduledTasks, 
+    upcomingTasks, 
+    analytics 
+  } = useLoaderData<{ 
+    user: any, 
+    weekInfo: any, 
+    weekRange: any, 
+    departmentsResponse: any, 
+    currentWeekTasks: any[], 
+    weeklyPreview: any, 
+    scheduledTasks: any[], 
+    upcomingTasks: any[], 
+    analytics: any 
+  }>();
   
-  // State for UI
-  const [activeTab, setActiveTab] = useState("view");
-  const [selectedUpdate, setSelectedUpdate] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("daily-tasks");
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedWeek, setSelectedWeek] = useState("");
   
-  // For the delete confirmation modal
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [updateToDelete, setUpdateToDelete] = useState<any>(null);
+  const { isOpen: isTaskModalOpen, onOpen: onTaskModalOpen, onClose: onTaskModalClose } = useDisclosure();
+  const { isOpen: isScheduledModalOpen, onOpen: onScheduledModalOpen, onClose: onScheduledModalClose } = useDisclosure();
+  const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
 
-  // Get current week range for new updates
-  const weekRange = getCurrentWeekRange();
-  
-  // Reset selected update when changing tabs
-  useEffect(() => {
-    if (activeTab !== "edit" && activeTab !== "view-details") {
-      setSelectedUpdate(null);
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    category: "other",
+    estimatedHours: 0,
+    notes: "",
+  });
+
+  const [scheduledForm, setScheduledForm] = useState({
+    title: "",
+    description: "",
+    dueDate: "",
+    priority: "medium",
+    category: "other",
+    estimatedHours: 0,
+    notes: "",
+    enableReminders: true,
+    daysBefore: 1,
+    onDueDate: true,
+  });
+
+  const resetTaskForm = () => {
+    setTaskForm({
+      title: "",
+      description: "",
+      priority: "medium",
+      category: "other",
+      estimatedHours: 0,
+      notes: "",
+    });
+    setSelectedTask(null);
+  };
+
+  const resetScheduledForm = () => {
+    setScheduledForm({
+      title: "",
+      description: "",
+      dueDate: "",
+      priority: "medium",
+      category: "other",
+      estimatedHours: 0,
+      notes: "",
+      enableReminders: true,
+      daysBefore: 1,
+      onDueDate: true,
+    });
+    setSelectedTask(null);
+  };
+
+  const isWeekSubmitted = weeklyPreview?.summary?.weeklySubmissionStatus !== "draft";
+
+  const tasksByDate = currentWeekTasks.reduce((acc: any, task: any) => {
+    const dateKey = task.date?.split('T')[0] || selectedDate;
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
     }
-  }, [activeTab]);
+    acc[dateKey].push(task);
+    return acc;
+  }, {});
 
-  // Table columns for the updates list
-  const columns = [
-    {
-      key: "weekNumber",
-      label: "WEEK",
-      render: (row: any) => {
-        return `Week ${row.weekNumber}, ${row.year}`;
-      },
-    },
-    {
-      key: "period",
-      label: "PERIOD",
-      render: (row: any) => {
-        return `${formatDate(row.startDate)} - ${formatDate(row.endDate)}`;
-      },
-    },
-    {
-      key: "user",
-      label: "STAFF",
-      render: (row: any) => {
-        return row.user ? `${row.user.firstName} ${row.user.lastName}` : "Unknown";
-      },
-    },
-    {
-      key: "department",
-      label: "DEPARTMENT",
-      render: (row: any) => {
-        return row.department ? row.department.name : "Unknown";
-      },
-    },
-    {
-      key: "status",
-      label: "STATUS",
-      render: (row: any) => {
-        return (
-          <span
-            className={`px-2 py-1 rounded text-xs font-semibold ${
-              row.status === "reviewed"
-                ? "bg-green-100 text-green-800"
-                : row.status === "submitted"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
-          </span>
-        );
-      },
-    },
-    {
-      key: "actions",
-      label: "ACTIONS",
-      render: (row: any) => {
-        return (
-          <div className="flex space-x-2">
-            {/* View button - available for all viewable updates */}
-            <Button
-              size="sm"
-              variant="light"
-              color="primary"
-              isIconOnly
-              onClick={() => {
-                setSelectedUpdate(row);
-                setActiveTab("view-details");
-              }}
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-
-            {/* Edit button - only for draft updates by the current user */}
-            {canEditUpdate(row, user) && (
-              <Button
-                size="sm"
-                variant="light"
-                color="secondary"
-                isIconOnly
-                onClick={() => {
-                  setSelectedUpdate(row);
-                  setActiveTab("edit");
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
-
-            {/* Submit button - only for draft updates by the current user */}
-            {row.status === "draft" && row.user._id.toString() === user._id.toString() && (
-              <Form method="post">
-                <input type="hidden" name="updateId" value={row._id} />
-                <input type="hidden" name="_action" value="submit" />
-                <input type="hidden" name="tasksCompleted" value={row.tasksCompleted || ''} />
-                <input type="hidden" name="challengesFaced" value={row.challengesFaced || ''} />
-                <input type="hidden" name="nextWeekPlans" value={row.nextWeekPlans || ''} />
-                <input type="hidden" name="additionalNotes" value={row.additionalNotes || ''} />
-                <Button
-                  size="sm"
-                  color="success"
-                  type="submit"
-                  isLoading={isLoading}
-                >
-                  Submit
-                </Button>
-              </Form>
-            )}
-
-            {/* Review button - only for managers/heads/admins */}
-            {canReviewUpdate(row, user) && (
-              <Button
-                size="sm"
-                variant="flat"
-                color="success"
-                onClick={() => {
-                  setSelectedUpdate(row);
-                  setActiveTab("review");
-                }}
-              >
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Review
-              </Button>
-            )}
-
-            {/* Delete button - only for admins or the user who created the draft */}
-            {canDeleteUpdate(row, user) && (
-              <Button
-                size="sm"
-                variant="light"
-                color="danger"
-                isIconOnly
-                onClick={() => {
-                  setUpdateToDelete(row);
-                  onOpen();
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        );
-      },
-    },
-  ];
+  const weekDays = [];
+  const startDate = new Date(weekRange.start);
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    weekDays.push({
+      date: date.toISOString().split('T')[0],
+      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayNumber: date.getDate(),
+      isToday: date.toDateString() === new Date().toDateString(),
+    });
+  }
 
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Weekly Progress Updates
-          </h1>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Daily Task Management</h1>
+            <p className="text-gray-600 mt-1">
+              Week {weekInfo.weekNumber}, {weekInfo.year} • {formatDate(weekRange.start)} - {formatDate(weekRange.end)}
+            </p>
+          </div>
+          
+          <div className="flex space-x-4">
+            <Card className="p-4">
+              <div className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-blue-500" />
+                <div>
+                  <p className="text-sm text-gray-600">This Week</p>
+                  <p className="font-semibold">{currentWeekTasks.length} tasks</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-4">
+              <div className="flex items-center space-x-2">
+                <CheckSquare className="h-5 w-5 text-green-500" />
+                <div>
+                  <p className="text-sm text-gray-600">Completed</p>
+                  <p className="font-semibold">
+                    {currentWeekTasks.filter(t => t.status === "completed").length}
+                  </p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-4">
+              <div className="flex items-center space-x-2">
+                <Bell className="h-5 w-5 text-orange-500" />
+                <div>
+                  <p className="text-sm text-gray-600">Upcoming</p>
+                  <p className="font-semibold">{upcomingTasks.length}</p>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
 
+        {/* Action messages */}
         {actionData && (
-          <div
-            className={`mb-4 p-4 rounded-md ${actionData.success
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-              }`}
-          >
-            {actionData.message}
-          </div>
+          <Card className={`p-4 ${(actionData as any)?.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+            <p className={`${(actionData as any)?.success ? 'text-green-800' : 'text-red-800'}`}>
+              {(actionData as any)?.message}
+            </p>
+          </Card>
         )}
 
+        {/* Weekly submission status */}
+        {!isWeekSubmitted && (
+          <Card className="p-4 bg-yellow-50 border-yellow-200">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                <div>
+                  <p className="font-medium text-yellow-800">Week Not Submitted</p>
+                  <p className="text-sm text-yellow-600">
+                    Your tasks for this week are still in draft mode. They will be auto-submitted on Friday at 12 PM.
+                  </p>
+                </div>
+              </div>
+              
+              <Form method="post">
+                <input type="hidden" name="_action" value="submit_weekly" />
+                <Button color="warning" type="submit" startContent={<Send className="h-4 w-4" />}>
+                  Submit Week Now
+                </Button>
+              </Form>
+            </div>
+          </Card>
+        )}
+
+        {/* Tabs */}
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
-          className="mb-6 overflow-x-auto whitespace-nowrap flex flex-wrap scrollbar-hide"
+          className="w-full"
         >
           <Tab
-            key="view"
+            key="daily-tasks"
             title={
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="sm:inline text-sm sm:text-base">View Updates</span>
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-4 w-4" />
+                <span>Daily Tasks</span>
               </div>
             }
           />
           <Tab
-            key="create"
+            key="scheduled-tasks"
             title={
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="sm:inline text-sm sm:text-base">Create Update</span>
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4" />
+                <span>Scheduled Tasks</span>
+                {upcomingTasks.length > 0 && (
+                  <Badge color="warning" content={upcomingTasks.length} size="sm" />
+                )}
               </div>
             }
           />
-          {selectedUpdate && (
-            <Tab
-              key="edit"
-              title={
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="sm:inline text-sm sm:text-base">Edit Update</span>
-                </div>
-              }
-            />
-          )}
-          {selectedUpdate && (
-            <Tab
-              key="view-details"
-              title={
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="sm:inline text-sm sm:text-base">View Details</span>
-                </div>
-              }
-            />
-          )}
-          {selectedUpdate && canReviewUpdate(selectedUpdate, user) && (
-            <Tab
-              key="review"
-              title={
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="sm:inline text-sm sm:text-base">Review Update</span>
-                </div>
-              }
-            />
-          )}
+          <Tab
+            key="weekly-overview"
+            title={
+              <div className="flex items-center space-x-2">
+                <BarChart className="h-4 w-4" />
+                <span>Weekly Overview</span>
+              </div>
+            }
+          />
           <Tab
             key="analytics"
             title={
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <BarChart className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="hidden sm:inline text-sm sm:text-base">Analytics</span>
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="h-4 w-4" />
+                <span>Analytics</span>
               </div>
             }
           />
         </Tabs>
 
-        {/* Tab content based on active tab */}
-        <div className="mt-4">
-          {/* View tab - shows all updates with filters */}
-          {activeTab === "view" && (
-            <div>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                {/* Department filter - only for admins */}
-                {user.role === "admin" && (
-                  <Select
-                    label="Department"
-                    placeholder="All Departments"
-                    className="max-w-xs"
-                    value={selectedDepartment}
-                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                  >
-                    <SelectItem key="" value="">
-                      All Departments
-                    </SelectItem>
-                    {departmentsResponse.map((dept: any) => (
-                      <SelectItem key={dept._id} value={dept._id}>
-                        {dept.name}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                )}
-
-                {/* Status filter */}
-                <Select
-                  label="Status"
-                  placeholder="All Statuses"
-                  className="max-w-xs"
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
+        {/* Tab Content */}
+        <div className="mt-6">
+          {/* Daily Tasks Tab */}
+          {activeTab === "daily-tasks" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Daily Tasks</h2>
+                <Button
+                  color="primary"
+                  startContent={<Plus className="h-4 w-4" />}
+                  onClick={() => {
+                    resetTaskForm();
+                    onTaskModalOpen();
+                  }}
+                  isDisabled={isWeekSubmitted}
                 >
-                  <SelectItem key="" value="">
-                    All Statuses
-                  </SelectItem>
-                  <SelectItem key="draft" value="draft">
-                    Draft
-                  </SelectItem>
-                  <SelectItem key="submitted" value="submitted">
-                    Submitted
-                  </SelectItem>
-                  <SelectItem key="reviewed" value="reviewed">
-                    Reviewed
-                  </SelectItem>
-                </Select>
-
-                {/* Week filter */}
-                <Select
-                  label="Week"
-                  placeholder="Current Week"
-                  className="max-w-xs"
-                  value={selectedWeek}
-                  onChange={(e) => setSelectedWeek(e.target.value)}
-                >
-                  <SelectItem key="" value="">
-                    All Weeks
-                  </SelectItem>
-                  <SelectItem key="current" value={`${weekInfo.weekNumber}-${weekInfo.year}`}>
-                    Current Week ({weekInfo.weekNumber}/{weekInfo.year})
-                  </SelectItem>
-                  {/* Could add previous weeks dynamically here */}
-                </Select>
+                  Add Task
+                </Button>
               </div>
 
-              {/* Data table */}
-              <DataTable
-                columns={columns}
-                data={updates.filter((update: any) => {
-                  // Apply department filter
-                  if (selectedDepartment && update.department._id !== selectedDepartment) {
-                    return false;
-                  }
-                  // Apply status filter
-                  if (selectedStatus && update.status !== selectedStatus) {
-                    return false;
-                  }
-                  // Apply week filter
-                  if (selectedWeek) {
-                    const [week, year] = selectedWeek.split('-');
-                    if (
-                      update.weekNumber.toString() !== week ||
-                      update.year.toString() !== year
-                    ) {
-                      return false;
-                    }
-                  }
-                  return true;
-                })}
-                emptyMessage="No weekly updates found"
-              />
+              {/* Week View */}
+              <div className="grid grid-cols-7 gap-4">
+                {weekDays.map((day) => (
+                  <Card 
+                    key={day.date} 
+                    className={`p-4 min-h-[200px] ${day.isToday ? 'ring-2 ring-blue-500' : ''}`}
+                  >
+                    <div className="text-center mb-3">
+                      <p className="font-medium">{day.dayName}</p>
+                      <p className="text-sm text-gray-600">{day.dayNumber}</p>
+                      {day.isToday && (
+                        <Badge color="primary" variant="flat" size="sm">Today</Badge>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {(tasksByDate[day.date] || []).map((task: any) => (
+                        <div
+                          key={task._id}
+                          className="p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                          onClick={() => {
+                            setSelectedTask(task);
+                            setTaskForm({
+                              title: task.title,
+                              description: task.description,
+                              priority: task.priority,
+                              category: task.category,
+                              estimatedHours: task.estimatedHours,
+                              notes: task.notes,
+                            });
+                            onTaskModalOpen();
+                          }}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <Chip
+                              size="sm"
+                              color={getPriorityColor(task.priority)}
+                              variant="flat"
+                            >
+                              {task.priority}
+                            </Chip>
+                            <Chip
+                              size="sm"
+                              color={getStatusColor(task.status)}
+                              variant="flat"
+                            >
+                              {task.status}
+                            </Chip>
+                          </div>
+                          <p className="text-sm font-medium truncate">{task.title}</p>
+                          <p className="text-xs text-gray-600 truncate">{task.description}</p>
+                          {task.estimatedHours > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Est: {task.estimatedHours}h
+                              {task.actualHours > 0 && ` / Act: ${task.actualHours}h`}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {(!tasksByDate[day.date] || tasksByDate[day.date].length === 0) && (
+                        <div 
+                          className="text-center py-4 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
+                          onClick={() => {
+                            setSelectedDate(day.date);
+                            resetTaskForm();
+                            onTaskModalOpen();
+                          }}
+                        >
+                          <Plus className="h-6 w-6 mx-auto mb-1" />
+                          <p className="text-xs">Add task</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Create tab - form to create a new update */}
-          {activeTab === "create" && (
-            <Card>
-              <CardBody>
-                <Form method="post" className="space-y-6">
-                  <input type="hidden" name="_action" value="create" />
-                  <input
-                    type="hidden"
-                    name="weekNumber"
-                    value={weekInfo.weekNumber}
-                  />
-                  <input type="hidden" name="year" value={weekInfo.year} />
-                  <input
-                    type="hidden"
-                    name="startDate"
-                    value={weekRange.startFormatted}
-                  />
-                  <input
-                    type="hidden"
-                    name="endDate"
-                    value={weekRange.endFormatted}
-                  />
+          {/* Scheduled Tasks Tab */}
+          {activeTab === "scheduled-tasks" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Scheduled Tasks</h2>
+                <Button
+                  color="primary"
+                  startContent={<Plus className="h-4 w-4" />}
+                  onClick={() => {
+                    resetScheduledForm();
+                    onScheduledModalOpen();
+                  }}
+                >
+                  Schedule Task
+                </Button>
+              </div>
 
-                  {/* Only admins can select department, others use their own */}
-                  {user.role === "admin" ? (
-                    <Select
-                      label="Department"
-                      placeholder="Select department"
-                      name="department"
-                      isRequired
-                    >
-                      {departments.map((dept: any) => (
-                        <SelectItem key={dept._id} value={dept._id}>
-                          {dept.name}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  ) : (
-                    <input
-                      type="hidden"
-                      name="department"
-                      value={user.department}
-                    />
-                  )}
-
-                  <div>
-                    <h3 className="text-md font-semibold mb-2">Week {weekInfo.weekNumber}, {weekInfo.year}</h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      {formatDate(weekRange.startFormatted)} - {formatDate(weekRange.endFormatted)}
-                    </p>
+              {/* Upcoming Tasks */}
+              {upcomingTasks.length > 0 && (
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-3 flex items-center">
+                    <Bell className="h-5 w-5 mr-2" />
+                    Upcoming Tasks (Next 7 Days)
+                  </h3>
+                  <div className="space-y-2">
+                    {upcomingTasks.map((task: any) => (
+                      <div key={task._id} className="flex items-center justify-between p-3 bg-orange-50 rounded">
+                        <div>
+                          <p className="font-medium">{task.title}</p>
+                          <p className="text-sm text-gray-600">{task.description}</p>
+                          <p className="text-xs text-orange-600 flex items-center mt-1">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Due: {formatDate(task.dueDate)}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Chip size="sm" color={getPriorityColor(task.priority)} variant="flat">
+                            {task.priority}
+                          </Chip>
+                          <Button
+                            size="sm"
+                            color="primary"
+                            variant="flat"
+                            startContent={<ArrowRight className="h-3 w-3" />}
+                          >
+                            Move to Daily
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </Card>
+              )}
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tasks Completed This Week
-                      </label>
-                      <RichEditor name="tasksCompleted" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Challenges Faced
-                      </label>
-                      <RichEditor name="challengesFaced" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Plans for Next Week
-                      </label>
-                      <RichEditor name="nextWeekPlans" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Additional Notes (Optional)
-                      </label>
-                      <RichEditor name="additionalNotes" />
-                    </div>
+              {/* All Scheduled Tasks */}
+              <Card className="p-4">
+                <h3 className="font-semibold mb-3">All Scheduled Tasks</h3>
+                {scheduledTasks.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Clock className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                    <p>No scheduled tasks yet</p>
+                    <p className="text-sm">Schedule tasks for future dates to get email reminders</p>
                   </div>
-
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <Button
-                      type="submit"
-                      color="primary"
-                      isLoading={isLoading}
-                    >
-                      Save as Draft
-                    </Button>
+                ) : (
+                  <div className="space-y-3">
+                    {scheduledTasks.map((task: any) => (
+                      <div key={task._id} className="p-3 border rounded hover:bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">{task.title}</p>
+                            <p className="text-sm text-gray-600">{task.description}</p>
+                            <div className="flex items-center space-x-4 mt-2">
+                              <span className="text-xs text-gray-500">Due: {formatDate(task.dueDate)}</span>
+                              <Chip size="sm" color={getPriorityColor(task.priority)} variant="flat">
+                                {task.priority}
+                              </Chip>
+                              <Chip size="sm" variant="flat">{task.category}</Chip>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button size="sm" variant="light" isIconOnly>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="light" color="danger" isIconOnly>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </Form>
-              </CardBody>
-            </Card>
+                )}
+              </Card>
+            </div>
           )}
 
-          {/* Edit tab - form to edit an existing update */}
-          {activeTab === "edit" && selectedUpdate && (
-            <Card>
-              <CardBody>
-                <Form method="post" className="space-y-6">
-                  <input type="hidden" name="_action" value="update" />
-                  <input
-                    type="hidden"
-                    name="updateId"
-                    value={selectedUpdate._id}
-                  />
-
-                  <div>
-                    <h3 className="text-md font-semibold mb-2">Week {selectedUpdate.weekNumber}, {selectedUpdate.year}</h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      {formatDate(selectedUpdate.startDate)} - {formatDate(selectedUpdate.endDate)}
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tasks Completed This Week
-                      </label>
-                      <RichEditor
-                        name="tasksCompleted"
-                        defaultValue={selectedUpdate.tasksCompleted}
-                      />
+          {/* Weekly Overview Tab */}
+          {activeTab === "weekly-overview" && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Weekly Overview</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">Progress</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Completed</span>
+                      <span>{currentWeekTasks.filter(t => t.status === "completed").length}/{currentWeekTasks.length}</span>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Challenges Faced
-                      </label>
-                      <RichEditor
-                        name="challengesFaced"
-                        defaultValue={selectedUpdate.challengesFaced}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Plans for Next Week
-                      </label>
-                      <RichEditor
-                        name="nextWeekPlans"
-                        defaultValue={selectedUpdate.nextWeekPlans}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Additional Notes (Optional)
-                      </label>
-                      <RichEditor
-                        name="additionalNotes"
-                        defaultValue={selectedUpdate.additionalNotes}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="flat"
-                      color="default"
-                      onClick={() => setActiveTab("view")}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      color="primary"
-                      isLoading={isLoading}
-                    >
-                      Update Draft
-                    </Button>
-                  </div>
-                </Form>
-              </CardBody>
-            </Card>
-          )}
-
-          {/* View Details tab - detailed view of a selected update */}
-          {activeTab === "view-details" && selectedUpdate && (
-            <Card>
-              <CardBody>
-                <div className="space-y-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2">
-                        Week {selectedUpdate.weekNumber}, {selectedUpdate.year}
-                      </h3>
-                      <p className="text-gray-500 text-sm">
-                        {formatDate(selectedUpdate.startDate)} - {formatDate(selectedUpdate.endDate)}
-                      </p>
-                    </div>
-                    <div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                          selectedUpdate.status === "reviewed"
-                            ? "bg-green-100 text-green-800"
-                            : selectedUpdate.status === "submitted"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {selectedUpdate.status.charAt(0).toUpperCase() + selectedUpdate.status.slice(1)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">Staff:</span>{" "}
-                      <span className="font-medium">
-                        {selectedUpdate.user
-                          ? `${selectedUpdate.user.firstName} ${selectedUpdate.user.lastName}`
-                          : "Unknown"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Department:</span>{" "}
-                      <span className="font-medium">
-                        {selectedUpdate.department
-                          ? selectedUpdate.department.name
-                          : "Unknown"}
-                      </span>
-                    </div>
-                    {selectedUpdate.status === "submitted" && (
-                      <div>
-                        <span className="text-gray-500">Submitted At:</span>{" "}
-                        <span className="font-medium">
-                          {formatDate(selectedUpdate.submittedAt)}
-                        </span>
-                      </div>
-                    )}
-                    {selectedUpdate.status === "reviewed" && (
-                      <>
-                        <div>
-                          <span className="text-gray-500">Submitted At:</span>{" "}
-                          <span className="font-medium">
-                            {formatDate(selectedUpdate.submittedAt)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Reviewed At:</span>{" "}
-                          <span className="font-medium">
-                            {formatDate(selectedUpdate.reviewedAt)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Reviewed By:</span>{" "}
-                          <span className="font-medium">
-                            {selectedUpdate.reviewer
-                              ? `${selectedUpdate.reviewer.firstName} ${selectedUpdate.reviewer.lastName}`
-                              : "Unknown"}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <hr className="my-4" />
-
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-md font-semibold mb-2">Tasks Completed This Week</h4>
-                      <div
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedUpdate.tasksCompleted || "None" }}
-                      />
-                    </div>
-
-                    <div>
-                      <h4 className="text-md font-semibold mb-2">Challenges Faced</h4>
-                      <div
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedUpdate.challengesFaced || "None" }}
-                      />
-                    </div>
-
-                    <div>
-                      <h4 className="text-md font-semibold mb-2">Plans for Next Week</h4>
-                      <div
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedUpdate.nextWeekPlans || "None" }}
-                      />
-                    </div>
-
-                    {selectedUpdate.additionalNotes && (
-                      <div>
-                        <h4 className="text-md font-semibold mb-2">Additional Notes</h4>
-                        <div
-                          className="prose max-w-none"
-                          dangerouslySetInnerHTML={{ __html: selectedUpdate.additionalNotes }}
-                        />
-                      </div>
-                    )}
-
-                    {selectedUpdate.status === "reviewed" && selectedUpdate.reviewerComments && (
-                      <div className="bg-blue-50 p-4 rounded-md">
-                        <h4 className="text-md font-semibold mb-2">Reviewer Comments</h4>
-                        <div
-                          className="prose max-w-none"
-                          dangerouslySetInnerHTML={{ __html: selectedUpdate.reviewerComments }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="flat"
-                      color="default"
-                      onClick={() => setActiveTab("view")}
-                    >
-                      Back to List
-                    </Button>
-
-                    {canEditUpdate(selectedUpdate, user) && (
-                      <Button
-                        color="secondary"
-                        onClick={() => setActiveTab("edit")}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                    )}
-
-                    {selectedUpdate.status === "draft" && selectedUpdate.user._id.toString() === user._id.toString() && (
-                      <Form method="post">
-                        <input type="hidden" name="updateId" value={selectedUpdate._id} />
-                        <input type="hidden" name="_action" value="submit" />
-                        <input type="hidden" name="tasksCompleted" value={selectedUpdate.tasksCompleted || ''} />
-                        <input type="hidden" name="challengesFaced" value={selectedUpdate.challengesFaced || ''} />
-                        <input type="hidden" name="nextWeekPlans" value={selectedUpdate.nextWeekPlans || ''} />
-                        <input type="hidden" name="additionalNotes" value={selectedUpdate.additionalNotes || ''} />
-                        <Button
-                          color="success"
-                          type="submit"
-                          isLoading={isLoading}
-                        >
-                          Submit Update
-                        </Button>
-                      </Form>
-                    )}
-
-                    {canReviewUpdate(selectedUpdate, user) && (
-                      <Button
-                        color="success"
-                        onClick={() => setActiveTab("review")}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Review
-                      </Button>
-                    )}
-
-                    {canDeleteUpdate(selectedUpdate, user) && (
-                      <Button
-                        color="danger"
-                        onClick={() => {
-                          setUpdateToDelete(selectedUpdate);
-                          onOpen();
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          )}
-
-          {/* Review tab - form to review a submitted update */}
-          {activeTab === "review" && selectedUpdate && canReviewUpdate(selectedUpdate, user) && (
-            <Card>
-              <CardBody>
-                <Form method="post" className="space-y-6">
-                  <input type="hidden" name="_action" value="review" />
-                  <input
-                    type="hidden"
-                    name="updateId"
-                    value={selectedUpdate._id}
-                  />
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">
-                      Review Weekly Update
-                    </h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      Week {selectedUpdate.weekNumber}, {selectedUpdate.year} ({formatDate(selectedUpdate.startDate)} - {formatDate(selectedUpdate.endDate)})
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                    <div>
-                      <span className="text-gray-500">Staff:</span>{" "}
-                      <span className="font-medium">
-                        {selectedUpdate.user
-                          ? `${selectedUpdate.user.firstName} ${selectedUpdate.user.lastName}`
-                          : "Unknown"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Department:</span>{" "}
-                      <span className="font-medium">
-                        {selectedUpdate.department
-                          ? selectedUpdate.department.name
-                          : "Unknown"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Submitted:</span>{" "}
-                      <span className="font-medium">
-                        {formatDate(selectedUpdate.submittedAt)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6 mb-4">
-                    <div>
-                      <h4 className="text-md font-semibold mb-2">Tasks Completed This Week</h4>
-                      <div
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedUpdate.tasksCompleted || "None" }}
-                      />
-                    </div>
-
-                    <div>
-                      <h4 className="text-md font-semibold mb-2">Challenges Faced</h4>
-                      <div
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedUpdate.challengesFaced || "None" }}
-                      />
-                    </div>
-
-                    <div>
-                      <h4 className="text-md font-semibold mb-2">Plans for Next Week</h4>
-                      <div
-                        className="prose max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedUpdate.nextWeekPlans || "None" }}
-                      />
-                    </div>
-
-                    {selectedUpdate.additionalNotes && (
-                      <div>
-                        <h4 className="text-md font-semibold mb-2">Additional Notes</h4>
-                        <div
-                          className="prose max-w-none"
-                          dangerouslySetInnerHTML={{ __html: selectedUpdate.additionalNotes }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Review Comments
-                    </label>
-                    <RichEditor name="reviewerComments" />
-                  </div>
-
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <Button
-                      type="button"
-                      variant="flat"
-                      color="default"
-                      onClick={() => setActiveTab("view-details")}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
+                    <Progress 
+                      value={currentWeekTasks.length > 0 ? (currentWeekTasks.filter(t => t.status === "completed").length / currentWeekTasks.length) * 100 : 0}
                       color="success"
-                      isLoading={isLoading}
-                    >
-                      Complete Review
-                    </Button>
+                    />
                   </div>
-                </Form>
-              </CardBody>
-            </Card>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">Time Tracking</h3>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Estimated:</span>
+                      <span>{currentWeekTasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)}h</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Actual:</span>
+                      <span>{currentWeekTasks.reduce((sum, t) => sum + (t.actualHours || 0), 0)}h</span>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">Status</h3>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Pending:</span>
+                      <span>{currentWeekTasks.filter(t => t.status === "pending").length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>In Progress:</span>
+                      <span>{currentWeekTasks.filter(t => t.status === "in_progress").length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Completed:</span>
+                      <span>{currentWeekTasks.filter(t => t.status === "completed").length}</span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Weekly Summary for Submission */}
+              {weeklyPreview && (
+                <Card className="p-6">
+                  <h3 className="font-semibold mb-4">Weekly Summary</h3>
+                  <div className="prose max-w-none">
+                    <p>This week I completed {weeklyPreview.summary?.completedTasks || 0} out of {weeklyPreview.summary?.totalTasks || 0} tasks.</p>
+                    {/* Add more summary content here */}
+                  </div>
+                </Card>
+              )}
+            </div>
           )}
 
-          {/* Analytics tab - basic stats and charts */}
+          {/* Analytics Tab */}
           {activeTab === "analytics" && (
-            <Card>
-              <CardBody>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-4">Weekly Update Analytics</h3>
-                  <p className="text-gray-500">
-                    Analytics features will be implemented in a future update.
-                  </p>
-                </div>
-              </CardBody>
-            </Card>
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Analytics</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="p-4 text-center">
+                  <Target className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                  <p className="text-2xl font-bold">{analytics.totalTasks || 0}</p>
+                  <p className="text-sm text-gray-600">Total Tasks</p>
+                </Card>
+
+                <Card className="p-4 text-center">
+                  <CheckSquare className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                  <p className="text-2xl font-bold">{analytics.completedTasks || 0}</p>
+                  <p className="text-sm text-gray-600">Completed</p>
+                </Card>
+
+                <Card className="p-4 text-center">
+                  <Clock className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
+                  <p className="text-2xl font-bold">{analytics.totalActualHours || 0}h</p>
+                  <p className="text-sm text-gray-600">Hours Worked</p>
+                </Card>
+
+                <Card className="p-4 text-center">
+                  <TrendingUp className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                  <p className="text-2xl font-bold">{analytics.productivityRate || 0}%</p>
+                  <p className="text-sm text-gray-600">Productivity</p>
+                </Card>
+              </div>
+
+              <Card className="p-6">
+                <h3 className="font-semibold mb-4">Coming Soon</h3>
+                <p className="text-gray-600">
+                  Advanced analytics including productivity trends, category breakdowns, 
+                  and performance insights will be available in future updates.
+                </p>
+              </Card>
+            </div>
           )}
         </div>
+      </div>
 
-        {/* Delete confirmation modal */}
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalContent>
-            <ModalHeader className="flex flex-col gap-1">
-              Confirm Delete
-            </ModalHeader>
-            <ModalBody>
-              <p>
-                Are you sure you want to delete this weekly update? This action cannot be undone.
-              </p>
+      {/* Task Modal */}
+      <Modal isOpen={isTaskModalOpen} onClose={onTaskModalClose} size="2xl">
+        <ModalContent>
+          <ModalHeader>
+            {selectedTask ? "Edit Task" : "Add New Task"}
+          </ModalHeader>
+          <Form method="post" onSubmit={() => setIsLoading(true)}>
+            <ModalBody className="space-y-4">
+              <input 
+                type="hidden" 
+                name="_action" 
+                value={selectedTask ? "update_daily_task" : "create_daily_task"} 
+              />
+              {selectedTask && <input type="hidden" name="taskId" value={selectedTask._id} />}
+              
+              <Input
+                name="date"
+                label="Date"
+                type="date"
+                value={selectedTask ? selectedTask.date?.split('T')[0] : selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                isRequired
+                isDisabled={!!selectedTask}
+              />
+
+              <Input
+                name="title"
+                label="Task Title"
+                value={taskForm.title}
+                onChange={(e) => setTaskForm({...taskForm, title: e.target.value})}
+                isRequired
+                placeholder="Enter task title..."
+              />
+
+              <Textarea
+                name="description"
+                label="Description"
+                value={taskForm.description}
+                onChange={(e) => setTaskForm({...taskForm, description: e.target.value})}
+                isRequired
+                placeholder="Describe the task..."
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  name="priority"
+                  label="Priority"
+                  selectedKeys={[taskForm.priority]}
+                  onChange={(e) => setTaskForm({...taskForm, priority: e.target.value})}
+                >
+                  <SelectItem key="low" value="low">Low</SelectItem>
+                  <SelectItem key="medium" value="medium">Medium</SelectItem>
+                  <SelectItem key="high" value="high">High</SelectItem>
+                  <SelectItem key="urgent" value="urgent">Urgent</SelectItem>
+                </Select>
+
+                <Select
+                  name="category"
+                  label="Category"
+                  selectedKeys={[taskForm.category]}
+                  onChange={(e) => setTaskForm({...taskForm, category: e.target.value})}
+                >
+                  <SelectItem key="development" value="development">Development</SelectItem>
+                  <SelectItem key="meeting" value="meeting">Meeting</SelectItem>
+                  <SelectItem key="documentation" value="documentation">Documentation</SelectItem>
+                  <SelectItem key="testing" value="testing">Testing</SelectItem>
+                  <SelectItem key="bug_fix" value="bug_fix">Bug Fix</SelectItem>
+                  <SelectItem key="client_work" value="client_work">Client Work</SelectItem>
+                  <SelectItem key="administrative" value="administrative">Administrative</SelectItem>
+                  <SelectItem key="training" value="training">Training</SelectItem>
+                  <SelectItem key="other" value="other">Other</SelectItem>
+                </Select>
+              </div>
+
+              <Input
+                name="estimatedHours"
+                label="Estimated Hours"
+                type="number"
+                step="0.5"
+                min="0"
+                value={taskForm.estimatedHours.toString()}
+                onChange={(e) => setTaskForm({...taskForm, estimatedHours: parseFloat(e.target.value) || 0})}
+              />
+
+              {selectedTask && (
+                <>
+                  <Input
+                    name="actualHours"
+                    label="Actual Hours"
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    defaultValue={selectedTask.actualHours?.toString() || "0"}
+                  />
+
+                  <Select
+                    name="status"
+                    label="Status"
+                    defaultSelectedKeys={[selectedTask.status]}
+                  >
+                    <SelectItem key="pending" value="pending">Pending</SelectItem>
+                    <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
+                    <SelectItem key="completed" value="completed">Completed</SelectItem>
+                    <SelectItem key="cancelled" value="cancelled">Cancelled</SelectItem>
+                  </Select>
+
+                  <Textarea
+                    name="challenges"
+                    label="Challenges Faced (Optional)"
+                    defaultValue={selectedTask.challenges || ""}
+                    placeholder="Describe any challenges or obstacles..."
+                  />
+                </>
+              )}
+
+              <Textarea
+                name="notes"
+                label="Notes (Optional)"
+                value={taskForm.notes}
+                onChange={(e) => setTaskForm({...taskForm, notes: e.target.value})}
+                placeholder="Additional notes..."
+              />
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" color="default" onClick={onClose}>
+              <Button variant="flat" onPress={onTaskModalClose}>
                 Cancel
               </Button>
-              <Form method="post">
-                <input type="hidden" name="_action" value="delete" />
-                <input
-                  type="hidden"
-                  name="updateId"
-                  value={updateToDelete?._id || ""}
-                />
-                <Button color="danger" type="submit">
+              {selectedTask && (
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onClick={() => {
+                    onTaskModalClose();
+                    onDeleteModalOpen();
+                  }}
+                >
                   Delete
                 </Button>
-              </Form>
+              )}
+              <Button color="primary" type="submit" isLoading={isLoading}>
+                {selectedTask ? "Update Task" : "Create Task"}
+              </Button>
             </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </div>
+          </Form>
+        </ModalContent>
+      </Modal>
+
+      {/* Scheduled Task Modal */}
+      <Modal isOpen={isScheduledModalOpen} onClose={onScheduledModalClose} size="2xl">
+        <ModalContent>
+          <ModalHeader>Schedule New Task</ModalHeader>
+          <Form method="post" onSubmit={() => setIsLoading(true)}>
+            <ModalBody className="space-y-4">
+              <input type="hidden" name="_action" value="create_scheduled_task" />
+              
+              <Input
+                name="title"
+                label="Task Title"
+                value={scheduledForm.title}
+                onChange={(e) => setScheduledForm({...scheduledForm, title: e.target.value})}
+                isRequired
+                placeholder="Enter task title..."
+              />
+
+              <Textarea
+                name="description"
+                label="Description"
+                value={scheduledForm.description}
+                onChange={(e) => setScheduledForm({...scheduledForm, description: e.target.value})}
+                isRequired
+                placeholder="Describe the task..."
+              />
+
+              <Input
+                name="dueDate"
+                label="Due Date"
+                type="date"
+                value={scheduledForm.dueDate}
+                onChange={(e) => setScheduledForm({...scheduledForm, dueDate: e.target.value})}
+                isRequired
+                min={new Date().toISOString().split('T')[0]}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  name="priority"
+                  label="Priority"
+                  selectedKeys={[scheduledForm.priority]}
+                  onChange={(e) => setScheduledForm({...scheduledForm, priority: e.target.value})}
+                >
+                  <SelectItem key="low" value="low">Low</SelectItem>
+                  <SelectItem key="medium" value="medium">Medium</SelectItem>
+                  <SelectItem key="high" value="high">High</SelectItem>
+                  <SelectItem key="urgent" value="urgent">Urgent</SelectItem>
+                </Select>
+
+                <Select
+                  name="category"
+                  label="Category"
+                  selectedKeys={[scheduledForm.category]}
+                  onChange={(e) => setScheduledForm({...scheduledForm, category: e.target.value})}
+                >
+                  <SelectItem key="development" value="development">Development</SelectItem>
+                  <SelectItem key="meeting" value="meeting">Meeting</SelectItem>
+                  <SelectItem key="documentation" value="documentation">Documentation</SelectItem>
+                  <SelectItem key="testing" value="testing">Testing</SelectItem>
+                  <SelectItem key="bug_fix" value="bug_fix">Bug Fix</SelectItem>
+                  <SelectItem key="client_work" value="client_work">Client Work</SelectItem>
+                  <SelectItem key="administrative" value="administrative">Administrative</SelectItem>
+                  <SelectItem key="training" value="training">Training</SelectItem>
+                  <SelectItem key="other" value="other">Other</SelectItem>
+                </Select>
+              </div>
+
+              <Input
+                name="estimatedHours"
+                label="Estimated Hours"
+                type="number"
+                step="0.5"
+                min="0"
+                value={scheduledForm.estimatedHours.toString()}
+                onChange={(e) => setScheduledForm({...scheduledForm, estimatedHours: parseFloat(e.target.value) || 0})}
+              />
+
+              <Divider />
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Reminder Settings</h4>
+                
+                <div className="flex items-center justify-between">
+                  <span>Enable email reminders</span>
+                  <Switch
+                    name="enableReminders"
+                    isSelected={scheduledForm.enableReminders}
+                    onValueChange={(value) => setScheduledForm({...scheduledForm, enableReminders: value})}
+                  />
+                </div>
+
+                {scheduledForm.enableReminders && (
+                  <>
+                    <Input
+                      name="daysBefore"
+                      label="Days before due date"
+                      type="number"
+                      min="0"
+                      max="30"
+                      value={scheduledForm.daysBefore.toString()}
+                      onChange={(e) => setScheduledForm({...scheduledForm, daysBefore: parseInt(e.target.value) || 1})}
+                      description="Send reminder email this many days before the due date"
+                    />
+
+                    <div className="flex items-center justify-between">
+                      <span>Send reminder on due date</span>
+                      <Switch
+                        name="onDueDate"
+                        isSelected={scheduledForm.onDueDate}
+                        onValueChange={(value) => setScheduledForm({...scheduledForm, onDueDate: value})}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <Textarea
+                name="notes"
+                label="Notes (Optional)"
+                value={scheduledForm.notes}
+                onChange={(e) => setScheduledForm({...scheduledForm, notes: e.target.value})}
+                placeholder="Additional notes..."
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="flat" onPress={onScheduledModalClose}>
+                Cancel
+              </Button>
+              <Button color="primary" type="submit" isLoading={isLoading}>
+                Schedule Task
+              </Button>
+            </ModalFooter>
+          </Form>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalBody>
+            <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+            {selectedTask && (
+              <div className="mt-2 p-3 bg-gray-50 rounded">
+                <p className="font-medium">{selectedTask.title}</p>
+                <p className="text-sm text-gray-600">{selectedTask.description}</p>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={onDeleteModalClose}>
+              Cancel
+            </Button>
+            <Form method="post">
+              <input type="hidden" name="_action" value="delete_daily_task" />
+              <input type="hidden" name="taskId" value={selectedTask?._id || ""} />
+              <Button color="danger" type="submit">
+                Delete Task
+              </Button>
+            </Form>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </AdminLayout>
   );
-}
+} 
