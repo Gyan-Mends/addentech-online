@@ -1,16 +1,20 @@
-import { Button, Card, Input, Select, SelectItem, Spinner, Tab, Tabs, Textarea } from "@nextui-org/react";
+import { Button, Card, Input, Select, SelectItem, Spinner, Tab, Tabs, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { DataTable } from "../components/DataTable";
 import AdminLayout from "~/layout/adminLayout";
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import monthlyReportController from "~/controller/monthlyReport";
 import Registration from "~/modal/registration";
 import Departments from "~/modal/department";
 import { ActionFunctionArgs } from "@remix-run/node";
-import { BarChart, Calendar, FileText, Plus } from "lucide-react";
+import { BarChart, Calendar, FileText, Plus, Trash2, Eye } from "lucide-react";
 import { commitSession, getSession } from "~/session";
+import RichEditor from "~/components/ui/RichEditor";
 import CustomInput from "~/components/ui/CustomInput";
+export const links: LinksFunction = () => {
+    return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 
@@ -163,7 +167,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const formDataObj: Record<string, any> = {};
     formDataObj.reportId = formData.get("reportId") as string;
     formDataObj.submittedBy = user._id;
-    formDataObj.notes = formData.get("notes") as string;
+    
+    // Make sure we get the notes from the form data
+    const notes = formData.get("notes");
+    console.log('Submit notes:', notes);
+    formDataObj.notes = notes;
 
     console.log('Sending submit data to controller:', formDataObj);
 
@@ -213,6 +221,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     console.log('Sending reject data to controller:', formDataObj);
 
     return await monthlyReportController.rejectReport(formDataObj);
+  } else if (action === "delete") {
+    console.log('Processing delete report action');
+    
+    // Collect form data for deletion
+    const formDataObj: Record<string, any> = {};
+    formDataObj.reportId = formData.get("reportId") as string;
+    formDataObj.userId = user._id;
+    
+    console.log('Sending delete data to controller:', formDataObj);
+    
+    return await monthlyReportController.deleteReport(formDataObj);
   } else if (action === "analyze") {
     console.log('Processing AI analysis request');
 
@@ -272,6 +291,9 @@ export default function MonthlyReportsPage() {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [reportToDelete, setReportToDelete] = useState<any>(null);
 
   const isLoading = navigation.state === "loading";
 
@@ -323,20 +345,42 @@ export default function MonthlyReportsPage() {
   // Helper function to determine if the user can edit a report
   const canEditReport = (report: any) => {
     if (!currentUser) return false;
-
-    // Admin and manager can edit all reports
+    
+    // Can only edit draft reports
+    if (report.status !== 'draft') return false;
+    
+    // Admin can edit any draft report
     if ((currentUser as any).role === 'admin' || (currentUser as any).role === 'manager') {
       return true;
     }
-
-    // Others can only edit their own reports in draft status
-    if (report.status === 'draft' &&
-      (currentUser as any)._id &&
-      report.createdBy &&
-      (currentUser as any)._id.toString() === report.createdBy._id?.toString()) {
+    
+    // Users can only edit their own draft reports
+    if ((currentUser as any)._id && 
+        report.createdBy && 
+        (currentUser as any)._id.toString() === report.createdBy._id?.toString()) {
       return true;
     }
 
+    return false;
+  };
+  
+  // Helper function to determine if the user can delete a report
+  const canDeleteReport = (report: any) => {
+    if (!currentUser) return false;
+    
+    // Admin and manager can delete any report
+    if ((currentUser as any).role === 'admin' || (currentUser as any).role === 'manager') {
+      return true;
+    }
+    
+    // Report creators can only delete their own reports if they're in draft status
+    if (report.status === 'draft' && 
+        (currentUser as any)._id && 
+        report.createdBy && 
+        (currentUser as any)._id.toString() === report.createdBy._id?.toString()) {
+      return true;
+    }
+    
     return false;
   };
 
@@ -470,21 +514,51 @@ export default function MonthlyReportsPage() {
       render: (row: any) => {
         return (
           <div className="flex space-x-2">
+            {canEditReport(row) && (
+              <Button
+                size="sm"
+                color="primary"
+                className="bg-pink-500"
+                onClick={() => {
+                  setSelectedReport(row);
+                  setActiveTab("edit");
+                }}
+              >
+                Edit
+              </Button>
+            )}
+            
             <Button
               size="sm"
-              color="primary"
-              className="bg-pink-500"
+              color="default"
               onClick={() => {
                 setSelectedReport(row);
-                setActiveTab("edit");
+                setActiveTab("view");
               }}
+              startContent={<Eye size={16} />}
             >
-              Edit
+              View
             </Button>
+            
+            {canDeleteReport(row) && (
+              <Button
+                size="sm"
+                color="danger"
+                onClick={() => {
+                  setReportToDelete(row);
+                  onOpen();
+                }}
+                startContent={<Trash2 size={16} />}
+              >
+                Delete
+              </Button>
+            )}
             {row.status === "draft" && (
               <Form method="post">
                 <input type="hidden" name="reportId" value={row._id} />
                 <input type="hidden" name="_action" value="submit" />
+                {/* Use the full notes content from the row data */}
+                <input type="hidden" name="notes" value={row.notes || ''} />
                 <Button
                   size="sm"
                   color="success"
@@ -580,7 +654,7 @@ export default function MonthlyReportsPage() {
         </Tabs>
 
 
-        {activeTab === "view" && (
+        {activeTab === "view" && !selectedReport && (
           <>
             {/* Filter controls */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
@@ -661,17 +735,28 @@ export default function MonthlyReportsPage() {
                   // Apply date filters if provided
                   if (startDate || endDate) {
                     filteredReports = filteredReports.filter(report => {
-                      // Convert year and month to date string for comparison
-                      const reportDate = new Date(report.year, report.month - 1, 1);
-                      const reportDateStr = reportDate.toISOString().split('T')[0];
-
-                      if (startDate && endDate) {
-                        return reportDateStr >= startDate && reportDateStr <= endDate;
-                      } else if (startDate) {
-                        return reportDateStr >= startDate;
-                      } else if (endDate) {
-                        return reportDateStr <= endDate;
+                      // Validate report data
+                      if (!report.year || !report.month) return false;
+                      
+                      try {
+                        // Convert year and month to date for comparison
+                        // Month is 0-based in JavaScript Date, so subtract 1
+                        const reportDate = new Date(parseInt(report.year), parseInt(report.month) - 1, 1);
+                        const reportDateStr = reportDate.toISOString().split('T')[0];
+                        
+                        // Compare with the filter dates
+                        if (startDate && endDate) {
+                          return reportDateStr >= startDate && reportDateStr <= endDate;
+                        } else if (startDate) {
+                          return reportDateStr >= startDate;
+                        } else if (endDate) {
+                          return reportDateStr <= endDate;
+                        }
+                      } catch (error) {
+                        // If there's an error with date conversion, skip this report
+                        return false;
                       }
+                      
                       return true;
                     });
                   }
@@ -698,6 +783,110 @@ export default function MonthlyReportsPage() {
               </>
             )}
           </>
+        )}
+        
+        {/* Individual Report View - Show when a report is selected */}
+        {activeTab === "view" && selectedReport && (
+          <Card className="max-w-3xl mx-auto p-6 mt-6">
+            <div className="flex justify-between mb-6">
+              <h3 className="text-xl font-semibold">Report Details</h3>
+              <Button 
+                size="sm"
+                color="default"
+                onClick={() => setSelectedReport(null)}
+              >
+                Back to List
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-sm text-gray-500">Department</p>
+                <p className="font-medium">{selectedReport.department?.name || "Unknown"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Period</p>
+                <p className="font-medium">{getMonthName(selectedReport.month)} {selectedReport.year}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Type</p>
+                <p className="font-medium">{selectedReport.type}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <p className="font-medium capitalize">{selectedReport.status}</p>
+              </div>
+              
+              {/* Department-specific fields */}
+              {selectedReport.subscriptionPackage && (
+                <div>
+                  <p className="text-sm text-gray-500">Subscription Package</p>
+                  <p className="font-medium">{selectedReport.subscriptionPackage}</p>
+                </div>
+              )}
+              {selectedReport.numberOfFirms !== undefined && (
+                <div>
+                  <p className="text-sm text-gray-500">Number of Firms</p>
+                  <p className="font-medium">{selectedReport.numberOfFirms}</p>
+                </div>
+              )}
+              {selectedReport.numberOfUsers !== undefined && (
+                <div>
+                  <p className="text-sm text-gray-500">Number of Users</p>
+                  <p className="font-medium">{selectedReport.numberOfUsers}</p>
+                </div>
+              )}
+              {selectedReport.amount !== undefined && (
+                <div>
+                  <p className="text-sm text-gray-500">Amount</p>
+                  <p className="font-medium">₵{selectedReport.amount.toLocaleString()}</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Notes */}
+            {selectedReport.notes && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-500 mb-1">Notes</p>
+                <div className="p-3 bg-gray-50 rounded-md">
+                  <div dangerouslySetInnerHTML={{ __html: selectedReport.notes }} />
+                </div>
+              </div>
+            )}
+            
+            {/* Review Notes (if applicable) */}
+            {selectedReport.reviewNotes && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-500 mb-1">Review Notes</p>
+                <div className="p-3 bg-gray-50 rounded-md">
+                  <div dangerouslySetInnerHTML={{ __html: selectedReport.reviewNotes }} />
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-6 flex justify-end space-x-3">
+              {canEditReport(selectedReport) && (
+                <Button 
+                  color="primary" 
+                  className="bg-pink-500"
+                  onClick={() => setActiveTab("edit")}
+                >
+                  Edit Report
+                </Button>
+              )}
+              {canDeleteReport(selectedReport) && (
+                <Button 
+                  color="danger"
+                  onClick={() => {
+                    setReportToDelete(selectedReport);
+                    onOpen();
+                  }}
+                >
+                  Delete Report
+                </Button>
+              )}
+            </div>
+          </Card>
         )}
 
         {activeTab === "create" && (
@@ -993,7 +1182,7 @@ export default function MonthlyReportsPage() {
               }
             })()}
 
-            <Textarea
+            <RichEditor
               name="notes"
               label="Notes"
               placeholder="Additional notes or comments"
@@ -1067,7 +1256,7 @@ export default function MonthlyReportsPage() {
                 isDisabled={selectedReport.status !== "draft"}
               />
             </div>
-            <Textarea
+            <RichEditor
               name="notes"
               label="Notes"
               placeholder="Additional notes or comments"
@@ -1133,12 +1322,12 @@ export default function MonthlyReportsPage() {
             </div>
             <div className="mb-4">
               <p className="text-sm text-gray-500">Notes</p>
-              <p>{selectedReport.notes || "No notes provided"}</p>
+              <div dangerouslySetInnerHTML={{ __html: selectedReport.notes || "No notes provided" }} />
             </div>
 
             <Form method="post" className="space-y-4">
               <input type="hidden" name="reportId" value={selectedReport._id} />
-              <Textarea
+              <RichEditor
                 name="notes"
                 label="Review Notes"
                 placeholder="Add comments about this report"
@@ -1178,6 +1367,29 @@ export default function MonthlyReportsPage() {
 
 
       </div>
+      
+      {/* Delete Report Confirmation Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalBody>
+            Are you sure you want to delete this report for {reportToDelete?.department?.name || 'this department'} from {reportToDelete ? getMonthName(reportToDelete.month) : ''}  {reportToDelete?.year}?
+            <p className="text-sm text-red-600 mt-2">This action cannot be undone.</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="default" onClick={onClose}>
+              Cancel
+            </Button>
+            <Form method="post">
+              <input type="hidden" name="_action" value="delete" />
+              <input type="hidden" name="reportId" value={reportToDelete?._id} />
+              <Button color="danger" type="submit" onClick={onClose}>
+                Delete
+              </Button>
+            </Form>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </AdminLayout>
   );
 }

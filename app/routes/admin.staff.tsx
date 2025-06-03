@@ -10,10 +10,12 @@ import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
 import Registration from "~/modal/registration"
 import dashboard from "~/controller/dashboard"
+import weeklyUpdateController from "~/controller/weeklyUpdate"
+import WeeklyUpdateReminder from "~/components/notifications/WeeklyUpdateReminder"
 
 const StaffDashboard = () => {
   const data = useLoaderData<typeof loader>()
-  const { userProfile, tasks, attendance, recentActivity, performanceData, taskBreakdown, attendanceChart } = data
+  const { userProfile, tasks, attendance, recentActivity, performanceData, taskBreakdown, attendanceChart, weeklyUpdateInfo } = data
   const [chartScript, setChartScript] = useState<React.ReactNode>(null)
   
   // Make sure Chart.js script is loaded client-side only
@@ -35,6 +37,16 @@ const StaffDashboard = () => {
   return (
     <AdminLayout>
       {chartScript}
+      
+      {/* Weekly Update Reminder */}
+      {weeklyUpdateInfo && (
+        <WeeklyUpdateReminder
+          currentWeek={weeklyUpdateInfo.weekNumber}
+          currentYear={weeklyUpdateInfo.year}
+          hasSubmittedUpdate={weeklyUpdateInfo.hasSubmittedUpdate}
+        />
+      )}
+      
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Staff Dashboard</h1>
         <p className="text-gray-600">Welcome back, {userProfile?.firstName || "Staff Member"}</p>
@@ -279,6 +291,14 @@ export const loader: LoaderFunction = async ({ request }) => {
       userProfile
     }, { status: 500 })
   }
+  
+  // Check if user has submitted weekly update for current week
+  const { weekNumber, year } = weeklyUpdateController.getCurrentWeekInfo();
+  const hasSubmittedUpdate = await weeklyUpdateController.hasUserSubmittedUpdate(
+    userProfile._id.toString(),
+    weekNumber,
+    year
+  );
     
   // Sample data - in a real app, these would be merged with the dashboardData from controller
   const mockData = {
@@ -358,5 +378,13 @@ export const loader: LoaderFunction = async ({ request }) => {
     ]
   };
   
-  return json(mockData);
+  return json({
+    ...mockData,
+    ...dashboardData,
+    weeklyUpdateInfo: {
+      weekNumber,
+      year,
+      hasSubmittedUpdate
+    }
+  });
 }

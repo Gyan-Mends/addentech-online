@@ -10,10 +10,12 @@ import AdminLayout from "~/layout/adminLayout"
 import { getSession } from "~/session"
 import Registration from "~/modal/registration"
 import dashboard from "~/controller/dashboard"
+import weeklyUpdateController from "~/controller/weeklyUpdate"
+import WeeklyUpdateReminder from "~/components/notifications/WeeklyUpdateReminder"
 
 const ManagerDashboard = () => {
   const data = useLoaderData<typeof loader>()
-  const { userProfile, departmentStats, taskStats, teamPerformance, taskDistribution, departmentTrends } = data
+  const { userProfile, departmentStats, taskStats, teamPerformance, taskDistribution, departmentTrends, weeklyUpdateInfo } = data
   const [chartScript, setChartScript] = useState<React.ReactNode>(null)
   
   // Make sure Chart.js script is loaded client-side only
@@ -35,6 +37,16 @@ const ManagerDashboard = () => {
   return (
     <AdminLayout>
       {chartScript}
+      
+      {/* Weekly Update Reminder */}
+      {weeklyUpdateInfo && (
+        <WeeklyUpdateReminder
+          currentWeek={weeklyUpdateInfo.weekNumber}
+          currentYear={weeklyUpdateInfo.year}
+          hasSubmittedUpdate={weeklyUpdateInfo.hasSubmittedUpdate}
+        />
+      )}
+      
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Manager Dashboard</h1>
         <p className="text-gray-600">Welcome back, {userProfile?.firstName || "Manager"}</p>
@@ -243,6 +255,14 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!userProfile || userProfile.role !== "manager") {
     return redirect("/addentech-login");
   }
+  
+  // Check if user has submitted weekly update for current week
+  const { weekNumber, year } = weeklyUpdateController.getCurrentWeekInfo();
+  const hasSubmittedUpdate = await weeklyUpdateController.hasUserSubmittedUpdate(
+    userProfile._id.toString(),
+    weekNumber,
+    year
+  );
   
   // Get role-specific dashboard data from controller
   const dashboardData = await dashboard.getRoleDashboardData(

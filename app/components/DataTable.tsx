@@ -135,3 +135,5 @@ export const DataTable: React.FC<DataTableProps> = ({
     </div>
   );
 };
+
+export default DataTable;

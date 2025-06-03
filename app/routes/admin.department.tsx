@@ -12,6 +12,8 @@ import AdminLayout from "~/layout/adminLayout"
 import Registration from "~/modal/registration"
 import Department from "~/modal/department"
 import { getSession } from "~/session"
+import weeklyUpdateController from "~/controller/weeklyUpdate"
+import WeeklyUpdateReminder from "~/components/notifications/WeeklyUpdateReminder"
 
 const DepartmentHeadDashboard = () => {
   const data = useLoaderData<typeof loader>()
@@ -22,7 +24,8 @@ const DepartmentHeadDashboard = () => {
     staffPerformance,
     departmentAttendance,
     workModeBreakdown,
-    workModeAttendance
+    workModeAttendance,
+    weeklyUpdateInfo
   } = data
   
   const [chartScript, setChartScript] = useState<React.ReactNode>(null)
@@ -58,6 +61,15 @@ const DepartmentHeadDashboard = () => {
   return (
     <AdminLayout>
       {chartScript}
+      
+      {/* Weekly Update Reminder */}
+      {weeklyUpdateInfo && (
+        <WeeklyUpdateReminder
+          currentWeek={weeklyUpdateInfo.weekNumber}
+          currentYear={weeklyUpdateInfo.year}
+          hasSubmittedUpdate={weeklyUpdateInfo.hasSubmittedUpdate}
+        />
+      )}
       <div className="mb-6">
         <div className="flex flex-col space-y-2">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Department Head Dashboard</h1>
@@ -335,9 +347,22 @@ export const loader: LoaderFunction = async ({ request }) => {
       }, { status: 500 })
     }
     
+    // Check if user has submitted weekly update for current week
+    const { weekNumber, year } = weeklyUpdateController.getCurrentWeekInfo();
+    const hasSubmittedUpdate = await weeklyUpdateController.hasUserSubmittedUpdate(
+      user._id.toString(),
+      weekNumber,
+      year
+    );
+    
     return json({
       ...dashboardData,
       departmentName,
+      weeklyUpdateInfo: {
+        weekNumber,
+        year,
+        hasSubmittedUpdate
+      }
     })
     
   } catch (error) {

@@ -357,10 +357,18 @@ class MonthlyReportController {
         });
       }
 
-      // Update with a single operation
+      // Log notes from form data for debugging
+      console.log('Notes from form data:', formData.notes);
+      
+      // Update with a single operation, including notes
       const updatedReport = await MonthlyReport.findByIdAndUpdate(
         reportId,
-        { status: "submitted" },
+        { 
+          status: "submitted",
+          notes: formData.notes,
+          submittedBy: formData.submittedBy,
+          submittedAt: new Date()
+        },
         { new: true }
       );
 
@@ -511,6 +519,69 @@ class MonthlyReportController {
           status: 500,
         });
       }
+    } catch (error: any) {
+      return json({
+        message: error.message,
+        success: false,
+        status: 500,
+      });
+    }
+  }
+  
+  async deleteReport(formData: any) {
+    try {
+      console.log('Delete report with form data:', formData);
+      const reportId = formData.reportId;
+      const userId = formData.userId;
+      
+      if (!reportId) {
+        return json({
+          message: "Report ID is required",
+          success: false,
+          status: 400,
+        });
+      }
+
+      // Find the report to check permissions
+      const report = await MonthlyReport.findById(reportId);
+      if (!report) {
+        return json({
+          message: "Report not found",
+          success: false,
+          status: 404,
+        });
+      }
+
+      // Find user for role check
+      const user = await Registration.findById(userId);
+      if (!user) {
+        return json({
+          message: "User not found",
+          success: false,
+          status: 404,
+        });
+      }
+
+      // Check permissions: creator can delete own draft reports, admin/manager can delete any
+      const isCreator = user._id.toString() === (report.createdBy ? report.createdBy.toString() : null);
+      const isAdmin = user.role === 'admin' || user.role === 'manager';
+      
+      if (!isAdmin && (!isCreator || report.status !== 'draft')) {
+        return json({
+          message: "You don't have permission to delete this report",
+          success: false,
+          status: 403,
+        });
+      }
+
+      // Delete the report
+      await MonthlyReport.findByIdAndDelete(reportId);
+
+      return json({
+        message: "Report deleted successfully",
+        success: true,
+        status: 200,
+      });
     } catch (error: any) {
       return json({
         message: error.message,
