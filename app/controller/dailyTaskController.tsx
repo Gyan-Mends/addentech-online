@@ -591,4 +591,6 @@ class DailyTaskController {
   }
 }
 
-export default new DailyTaskController(); 
+const dailyTaskController = new DailyTaskController();
+
+export default dailyTaskController;
