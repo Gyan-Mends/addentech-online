@@ -17,6 +17,7 @@ import weeklyUpdateController from "~/controller/weeklyUpdate";
 import WeeklyUpdate from "~/modal/weeklyUpdate";
 import departmentController from "~/controller/departments";
 import Registration from "~/modal/registration";
+import department from "~/controller/departments";
 
 // Helper function to format dates
 const formatDate = (dateString: string) => {
@@ -45,6 +46,9 @@ const getCurrentWeekRange = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") as string) || 1;
+  const search_term = url.searchParams.get("search_term") as string;
   // Get the current user session
   const session = await getSession(request.headers.get("Cookie"));
   const email = session.get("email");
@@ -64,34 +68,35 @@ export const loader: LoaderFunction = async ({ request }) => {
   const weekInfo = weeklyUpdateController.getCurrentWeekInfo();
 
   // Get all departments
-  const departmentsResponse = await departmentController.getAllDepartments();
-  const departments = departmentsResponse.data;
+  const {departmentsResponse} = await department.getDepartments({ request, page, search_term });
 
   // Get updates based on user role
   let updates;
   if (user.role === "admin") {
     // Admins can see all updates
-    const updatesResponse = await weeklyUpdateController.getAllUpdates();
-    updates = updatesResponse.data;
+    const response = await weeklyUpdateController.getAllUpdates();
+    updates = response.data;
+   
   } else if (user.role === "manager") {
     // Managers can see updates from their department
-    const updatesResponse = await weeklyUpdateController.getUpdatesByDepartment(user.department);
-    updates = updatesResponse.data;
+    const response = await weeklyUpdateController.getUpdatesByDepartment(user.department);
+    updates = response.data;
+   
   } else if (user.role === "department_head") {
     // Department heads can see updates from their department
-    const updatesResponse = await weeklyUpdateController.getUpdatesByDepartment(user.department);
-    updates = updatesResponse.data;
+    const response = await weeklyUpdateController.getUpdatesByDepartment(user.department);
+    updates = response.data;   
   } else {
     // Regular staff can only see their own updates
-    const updatesResponse = await weeklyUpdateController.getUpdatesByUser(user._id);
-    updates = updatesResponse.data;
+    const response = await weeklyUpdateController.getUpdatesByUser(user._id);
+    updates = response.data;   
   }
 
   return json({
-    user,
-    weekInfo,
-    departments,
-    updates,
+      user,
+      weekInfo,
+      departmentsResponse,
+      updates,
   });
 };
 
@@ -243,7 +248,7 @@ export const action = async ({ request }: { request: Request }) => {
 export default function WeeklyUpdatesPage() {
   const loaderData = useLoaderData();
   const actionData = useActionData();
-  const { user, weekInfo, departments, updates } = loaderData;
+  const { user, weekInfo, departmentsResponse, updates } = useLoaderData<{ user: { user: string }, weekInfo: any, departmentsResponse: any, updates: any }>()
   
   // State for UI
   const [activeTab, setActiveTab] = useState("view");
@@ -514,7 +519,7 @@ export default function WeeklyUpdatesPage() {
                     <SelectItem key="" value="">
                       All Departments
                     </SelectItem>
-                    {departments.map((dept: any) => (
+                    {departmentsResponse.map((dept: any) => (
                       <SelectItem key={dept._id} value={dept._id}>
                         {dept.name}
                       </SelectItem>
