@@ -78,6 +78,11 @@ const MemoSchema: Schema = new mongoose.Schema(
             required: true
 
         },
+        createdBy: {
+            ref: "registration",
+            type: Schema.Types.ObjectId,
+            required: false
+        },
         createdAt: {
             type: Date,
             default: Date.now

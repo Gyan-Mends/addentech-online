@@ -26,6 +26,7 @@ export const UserColumns = [
     { title: "Name", allowSort: true },
     { title: "Email", allowSort: true },
     { title: "Phone", allowSort: true },
+    { title: "Department", allowSort: true },
     { title: "Role", allowSort: true },
     { title: "Action", allowSort: true }
 

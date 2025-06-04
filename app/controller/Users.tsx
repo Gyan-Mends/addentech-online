@@ -344,6 +344,7 @@ class UsersController {
 
             // Find users with pagination and search filter
             const users = await Registration.find(searchFilter)
+                .populate("department")
                 .skip(skipCount)
                 .limit(limit || 9)
                 .exec()

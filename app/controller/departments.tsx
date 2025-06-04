@@ -120,6 +120,7 @@ class DepartmentController {
 
             // Find users with pagination and search filter
             const departments = await Departments.find(searchFilter)
+                
                 .skip(skipCount)
                 .limit(limit)
                 .exec();

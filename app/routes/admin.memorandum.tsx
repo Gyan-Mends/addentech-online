@@ -64,6 +64,15 @@ const Users = () => {
     const [memoTypeValue, setMemoTypeValue] = useState("");
     const [frequencyValue, setFrequencyValue] = useState("");
     const [dueDateValue, setDueDateValue] = useState("");
+    
+    // Add state for filtered users based on department selection
+    const [filteredToUsers, setFilteredToUsers] = useState<RegistrationInterface[]>([]);
+    const [filteredCcUsers, setFilteredCcUsers] = useState<RegistrationInterface[]>([]);
+    
+    // Add separate state for edit form
+    const [editFilteredToUsers, setEditFilteredToUsers] = useState<RegistrationInterface[]>([]);
+    const [editFilteredCcUsers, setEditFilteredCcUsers] = useState<RegistrationInterface[]>([]);
+
     function formatTime(date: Date) {
         const now = new Date();
         const isToday = date.toDateString() === now.toDateString();
@@ -76,16 +85,17 @@ const Users = () => {
 
 
     const {
-
         departments,
         memos,
         totalPages,
-        users
+        users,
+        currentUser
     } = useLoaderData<{
         departments: DepartmentInterface[]
         users: RegistrationInterface[]
         memos: MemoInterface[]
         totalPages: number
+        currentUser: RegistrationInterface
     }>()
 
     useEffect(() => {
@@ -117,6 +127,12 @@ const Users = () => {
         setIsDrawerOpen(!isDrawerOpen)
         const randomRef = generateRandomReference();
         setReferenceNumber(randomRef);
+        
+        // Reset form states when opening create drawer
+        setToDepartmentValue("");
+        setCcDepartmentValue("");
+        setFilteredToUsers([]);
+        setFilteredCcUsers([]);
     };
     const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
     const modules = {
@@ -146,6 +162,82 @@ const Users = () => {
             setFromNameValue(dataValue.fromName._id);
         }
     }, [dataValue]);
+
+    // Filter users when to department changes
+    useEffect(() => {
+        if (toDepartmentValue) {
+            const filtered = users.filter(user => {
+                const userDeptId = typeof user.department === 'object' && user.department !== null 
+                    ? user.department._id 
+                    : user.department;
+                return userDeptId === toDepartmentValue;
+            });
+            setFilteredToUsers(filtered);
+        } else {
+            setFilteredToUsers([]);
+        }
+    }, [toDepartmentValue, users]);
+
+    // Filter users when cc department changes
+    useEffect(() => {
+        if (ccDepartmentValue) {
+            const filtered = users.filter(user => {
+                const userDeptId = typeof user.department === 'object' && user.department !== null 
+                    ? user.department._id 
+                    : user.department;
+                return userDeptId === ccDepartmentValue;
+            });
+            setFilteredCcUsers(filtered);
+        } else {
+            setFilteredCcUsers([]);
+        }
+    }, [ccDepartmentValue, users]);
+
+    // Filter users for edit form when to department changes
+    useEffect(() => {
+        if (dataValue?.toDepartment?._id) {
+            const filtered = users.filter(user => {
+                const userDeptId = typeof user.department === 'object' && user.department !== null 
+                    ? user.department._id 
+                    : user.department;
+                return userDeptId === dataValue.toDepartment._id;
+            });
+            setEditFilteredToUsers(filtered);
+        } else if (toDepartmentValue && isEditDrawerOpen) {
+            const filtered = users.filter(user => {
+                const userDeptId = typeof user.department === 'object' && user.department !== null 
+                    ? user.department._id 
+                    : user.department;
+                return userDeptId === toDepartmentValue;
+            });
+            setEditFilteredToUsers(filtered);
+        } else {
+            setEditFilteredToUsers([]);
+        }
+    }, [dataValue?.toDepartment, toDepartmentValue, users, isEditDrawerOpen]);
+
+    // Filter users for edit form when cc department changes
+    useEffect(() => {
+        if (dataValue?.ccDepartment?._id) {
+            const filtered = users.filter(user => {
+                const userDeptId = typeof user.department === 'object' && user.department !== null 
+                    ? user.department._id 
+                    : user.department;
+                return userDeptId === dataValue.ccDepartment._id;
+            });
+            setEditFilteredCcUsers(filtered);
+        } else if (ccDepartmentValue && isEditDrawerOpen) {
+            const filtered = users.filter(user => {
+                const userDeptId = typeof user.department === 'object' && user.department !== null 
+                    ? user.department._id 
+                    : user.department;
+                return userDeptId === ccDepartmentValue;
+            });
+            setEditFilteredCcUsers(filtered);
+        } else {
+            setEditFilteredCcUsers([]);
+        }
+    }, [dataValue?.ccDepartment, ccDepartmentValue, users, isEditDrawerOpen]);
 
     const handleEdit = (data: MemoInterface) => {
         // Set the content for the Quill editors
@@ -257,7 +349,6 @@ const Users = () => {
 
 
                 {/* Create memo drawer */}
-                {/* Create memo drawer */}
                 <Drawer
                     isDrawerOpened={isDrawerOpen}
                     handleDrawerClosed={() => {
@@ -272,38 +363,33 @@ const Users = () => {
                             value={referenceNumber} type="text" />
 
                         <div className="flex gap-6">
-                            <Select
-                                label="From Department"
-                                labelPlacement="outside"
-                                placeholder="Select department"
-                                isRequired
-                                name="fromDepartment"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
-                                ))}
-                            </Select>
-                            <Select
-                                label="From Name"
-                                labelPlacement="outside"
-                                placeholder="Select department"
-                                isRequired
-                                name="fromName"
-                                classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
-                                }}
-                            >
-                                {users.map((user: RegistrationInterface) => (
-                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
-                                ))}
-                            </Select>
+                            {/* From Department - Read only, showing current user's department */}
+                            <div className="flex-1 flex flex-col gap-1">
+                                <label className="text-sm font-medium text-foreground-700">
+                                    From Department <span className="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    readOnly
+                                    className="w-full px-3 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                                    value={currentUser.department?.name || 'No Department Assigned'}
+                                />
+                                <input name="fromDepartment" type="hidden" value={currentUser.department?._id || ''} />
+                            </div>
+                            
+                            {/* From Name - Read only, showing current user's name */}
+                            <div className="flex-1 flex flex-col gap-1">
+                                <label className="text-sm font-medium text-foreground-700">
+                                    From Name <span className="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    readOnly
+                                    className="w-full px-3 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                                    value={`${currentUser.firstName} ${currentUser.middleName || ''} ${currentUser.lastName}`.trim()}
+                                />
+                                <input name="fromName" type="hidden" value={currentUser._id} />
+                            </div>
                         </div>
 
                         <CustomInput
@@ -322,6 +408,13 @@ const Users = () => {
                                 placeholder="Select department"
                                 isRequired
                                 name="toDepartment"
+                                value={toDepartmentValue}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    setToDepartmentValue(selectedKey);
+                                    // Reset to name when department changes
+                                    setToNameValue("");
+                                }}
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
@@ -335,17 +428,23 @@ const Users = () => {
                             <Select
                                 label="To Name"
                                 labelPlacement="outside"
-                                placeholder="Select department"
+                                placeholder="Select user"
                                 isRequired
                                 name="toName"
+                                value={toNameValue}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    setToNameValue(selectedKey);
+                                }}
+                                isDisabled={!toDepartmentValue}
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
                                     trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
-                                {users.map((user: RegistrationInterface) => (
-                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
+                                {filteredToUsers.map((user: RegistrationInterface) => (
+                                    <SelectItem key={user._id}>{`${user.firstName} ${user.middleName || ''} ${user.lastName}`.trim()}</SelectItem>
                                 ))}
                             </Select>
                         </div>
@@ -436,6 +535,13 @@ const Users = () => {
                                 placeholder="Select department"
                                 isRequired
                                 name="ccDepartment"
+                                value={ccDepartmentValue}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    setCcDepartmentValue(selectedKey);
+                                    // Reset cc name when department changes
+                                    setCcNameValue("");
+                                }}
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
@@ -449,17 +555,23 @@ const Users = () => {
                             <Select
                                 label="CC Name"
                                 labelPlacement="outside"
-                                placeholder="Select department"
+                                placeholder="Select user"
                                 isRequired
                                 name="ccName"
+                                value={ccNameValue}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    setCcNameValue(selectedKey);
+                                }}
+                                isDisabled={!ccDepartmentValue}
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
                                     trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
                                 }}
                             >
-                                {users.map((user: RegistrationInterface) => (
-                                    <SelectItem key={user._id}>{user.firstName}</SelectItem>
+                                {filteredCcUsers.map((user: RegistrationInterface) => (
+                                    <SelectItem key={user._id}>{`${user.firstName} ${user.middleName || ''} ${user.lastName}`.trim()}</SelectItem>
                                 ))}
                             </Select>
                         </div>
@@ -489,16 +601,14 @@ const Users = () => {
                             </div>
                         </div>
 
-
-                        <Checkbox name="emailCheck" className="font-nunito" defaultSelected>Send Email Notification</Checkbox>
-
                         <div className="flex gap-6 mt-6">
                             <button color="primary" className="font-montserrat w-40">Send Memo</button>
                         </div>
 
-                        <input name="admin" value="{user?._id}" type="hidden" />
+                        <input name="admin" value={currentUser._id} type="hidden" />
                         <input name="intent" value="create" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
+                        <input name="emailCheck" value="on" type="hidden" />
 
                     </Form>
                 </Drawer>
@@ -632,34 +742,63 @@ const Users = () => {
                         </div>
 
                         <div className="flex gap-6">
-                            <FormSelect
+                            <Select
                                 label="To Department"
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
                                 name="toDepartment"
-                                options={departments}
-                                optionKey="_id"
-                                optionLabel="name"
-                                dataValue={dataValue || {}}
-                                setDataValue={setDataValue}
-                                fieldName="toDepartment"
-                                isObject={true}
-                            />
-                            <FormSelect
+                                selectedKeys={dataValue?.toDepartment?._id ? new Set([dataValue.toDepartment._id]) : new Set()}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    const selectedDept = departments.find(dept => dept._id === selectedKey);
+                                    if (selectedDept) {
+                                        setDataValue(prev => ({
+                                            ...prev,
+                                            toDepartment: selectedDept,
+                                            toName: null // Reset to name when department changes
+                                        }));
+                                        setToDepartmentValue(selectedKey);
+                                    }
+                                }}
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                    trigger: "shadow-sm border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white"
+                                }}
+                            >
+                                {departments.map((department: DepartmentInterface) => (
+                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                ))}
+                            </Select>
+                            <Select
                                 label="To Name"
                                 labelPlacement="outside"
                                 placeholder="Select user"
                                 isRequired
                                 name="toName"
-                                options={users}
-                                optionKey="_id"
-                                optionLabel="firstName"
-                                dataValue={dataValue || {}}
-                                setDataValue={setDataValue}
-                                fieldName="toName"
-                                isObject={true}
-                            />
+                                selectedKeys={dataValue?.toName?._id ? new Set([dataValue.toName._id]) : new Set()}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    const selectedUser = editFilteredToUsers.find(user => user._id === selectedKey);
+                                    if (selectedUser) {
+                                        setDataValue(prev => ({
+                                            ...prev,
+                                            toName: selectedUser
+                                        }));
+                                    }
+                                }}
+                                isDisabled={!dataValue?.toDepartment}
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                    trigger: "shadow-sm border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white"
+                                }}
+                            >
+                                {editFilteredToUsers.map((user: RegistrationInterface) => (
+                                    <SelectItem key={user._id}>{`${user.firstName} ${user.middleName || ''} ${user.lastName}`.trim()}</SelectItem>
+                                ))}
+                            </Select>
                         </div>
 
                         <div>
@@ -739,34 +878,63 @@ const Users = () => {
                         </div>
 
                         <div className="flex gap-6 mt-6">
-                            <FormSelect
+                            <Select
                                 label="CC Department"
                                 labelPlacement="outside"
                                 placeholder="Select department"
                                 isRequired
                                 name="ccDepartment"
-                                options={departments}
-                                optionKey="_id"
-                                optionLabel="name"
-                                dataValue={dataValue || {}}
-                                setDataValue={setDataValue}
-                                fieldName="ccDepartment"
-                                isObject={true}
-                            />
-                            <FormSelect
+                                selectedKeys={dataValue?.ccDepartment?._id ? new Set([dataValue.ccDepartment._id]) : new Set()}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    const selectedDept = departments.find(dept => dept._id === selectedKey);
+                                    if (selectedDept) {
+                                        setDataValue(prev => ({
+                                            ...prev,
+                                            ccDepartment: selectedDept,
+                                            ccName: null // Reset cc name when department changes
+                                        }));
+                                        setCcDepartmentValue(selectedKey);
+                                    }
+                                }}
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                    trigger: "shadow-sm border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white"
+                                }}
+                            >
+                                {departments.map((department: DepartmentInterface) => (
+                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                ))}
+                            </Select>
+                            <Select
                                 label="CC Name"
                                 labelPlacement="outside"
                                 placeholder="Select user"
                                 isRequired
                                 name="ccName"
-                                options={users}
-                                optionKey="_id"
-                                optionLabel="firstName"
-                                dataValue={dataValue || {}}
-                                setDataValue={setDataValue}
-                                fieldName="ccName"
-                                isObject={true}
-                            />
+                                selectedKeys={dataValue?.ccName?._id ? new Set([dataValue.ccName._id]) : new Set()}
+                                onSelectionChange={(keys) => {
+                                    const selectedKey = Array.from(keys)[0] as string;
+                                    const selectedUser = editFilteredCcUsers.find(user => user._id === selectedKey);
+                                    if (selectedUser) {
+                                        setDataValue(prev => ({
+                                            ...prev,
+                                            ccName: selectedUser
+                                        }));
+                                    }
+                                }}
+                                isDisabled={!dataValue?.ccDepartment}
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                    trigger: "shadow-sm border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white"
+                                }}
+                            >
+                                {editFilteredCcUsers.map((user: RegistrationInterface) => (
+                                    <SelectItem key={user._id}>{`${user.firstName} ${user.middleName || ''} ${user.lastName}`.trim()}</SelectItem>
+                                ))}
+                            </Select>
                         </div>
 
                         <div className=" ">
@@ -809,16 +977,15 @@ const Users = () => {
                         </div>
 
 
-                        <Checkbox name="emailCheck" className="font-nunito" defaultSelected>Send Email Notification</Checkbox>
-
                         <div className="flex gap-6 mt-6">
                             <button color="primary" className="font-montserrat w-40">Update Memo</button>
                         </div>
 
-                        <input name="admin" value="{user?._id}" type="hidden" />
+                        <input name="admin" value={currentUser._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
                         <input name="id" value={dataValue?._id} type="text" />
+                        <input name="emailCheck" value="on" type="hidden" />
 
                     </Form>
                 </Drawer>
@@ -870,8 +1037,22 @@ export const action: ActionFunction = async ({ request }) => {
     const intent = formData.get("intent") as string
     const id = formData.get("id") as string;
 
+    // Get current user ID from session
+    const session = await getSession(request.headers.get("Cookie"));
+    const token = session.get("email");
+    
+    if (!token) {
+        return json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
 
+    const Registration = await import("~/modal/registration").then(m => m.default);
+    const currentUser = await Registration.findOne({ email: token });
+    
+    if (!currentUser) {
+        return json({ success: false, message: "User not found" }, { status: 404 });
+    }
 
+    const currentUserId = currentUser._id.toString();
 
     switch (intent) {
         case "create":
@@ -891,6 +1072,7 @@ export const action: ActionFunction = async ({ request }) => {
                 ccName,
                 emailCheck,
                 base64Image,
+                currentUserId,
             })
             return memo
 
@@ -928,11 +1110,6 @@ export const action: ActionFunction = async ({ request }) => {
         default:
             break;
     }
-
-
-
-
-
 };
 
 
@@ -942,6 +1119,18 @@ export const loader: LoaderFunction = async ({ request }) => {
     const search_term = url.searchParams.get("search_term") as string;
     const session = await getSession(request.headers.get("Cookie"));
     const token = session.get("email");
+
+    if (!token) {
+        return redirect("/addentech-login");
+    }
+
+    // Get current user information
+    const Registration = await import("~/modal/registration").then(m => m.default);
+    const currentUser = await Registration.findOne({ email: token }).populate("department");
+    
+    if (!currentUser) {
+        return redirect("/addentech-login");
+    }
 
     const { departments } = await department.getDepartments({
         request,
@@ -954,13 +1143,16 @@ export const loader: LoaderFunction = async ({ request }) => {
         page,
         search_term,
     });
+
+    // Modify memo fetching to only show memos relevant to the current user
     const { memos, totalPages } = await memoController.FetchMemo({
         request,
         page,
         search_term,
+        currentUserId: currentUser._id.toString(),
     });
 
-    return json({ departments, memos, totalPages, users });
+    return json({ departments, memos, totalPages, users, currentUser });
 };
 
 

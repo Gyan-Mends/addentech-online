@@ -73,13 +73,13 @@ const navItems: NavItem[] = [
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_attendance"
     },
-    {
-        to: "/admin/tasks",
-        icon: <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />,
-        label: "Tasks",
-        roles: ["admin", "department_head", "manager", "staff"],
-        permission: "view_tasks"
-    },
+    // {
+    //     to: "/admin/tasks",
+    //     icon: <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />,
+    //     label: "Tasks",
+    //     roles: ["admin", "department_head", "manager", "staff"],
+    //     permission: "view_tasks"
+    // },
     {
         to: "/admin/monthly-reports",
         icon: <BarChart className="h-4 w-4 hover:text-white text-pink-500" />,

@@ -156,6 +156,7 @@ const Users = () => {
                             </TableCell>
                             <TableCell className="text-xs">{user.email}</TableCell>
                             <TableCell>{user.phone}</TableCell>
+                            <TableCell>{user.department.name}</TableCell>
                             <TableCell>{user.role}</TableCell>
                             <TableCell className="relative flex items-center gap-4 mt-2">
                                 <button className="text-primary " onClick={() => {
