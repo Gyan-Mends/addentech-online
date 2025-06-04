@@ -1,5 +1,5 @@
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useActionData, useRevalidator } from "@remix-run/react";
+import { useLoaderData, useActionData } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import {
   Tabs, Tab, Card, CardBody, Button, Input, Textarea,
@@ -100,95 +100,18 @@ export const loader: LoaderFunction = async ({ request }) => {
   const {departmentsResponse} = await department.getDepartments({ request, page, search_term });
 
   try {
-    // Connect to database and fetch real data
-    const DailyTask = (await import("~/modal/dailyTask")).default;
-    const ScheduledTask = (await import("~/modal/scheduledTask")).default;
-
-    // Calculate date range for current week
-    const startDate = new Date(weekRange.start);
-    const endDate = new Date(weekRange.end);
-
-    // Fetch current week tasks from database
-    const currentWeekTasks = await DailyTask.find({
-      user: user._id,
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    })
-    .populate("department", "name")
-    .sort({ date: 1, createdAt: 1 })
-    .lean();
-
-    // Fetch weekly preview data
-    const weeklyTasks = await DailyTask.find({
-      user: user._id,
-      weekNumber: weekInfo.weekNumber,
-      year: weekInfo.year,
-    })
-    .populate("department", "name")
-    .sort({ date: 1, createdAt: 1 })
-    .lean();
-
-    // Calculate weekly summary
-    const weeklyPreview = {
-      weekNumber: weekInfo.weekNumber,
-      year: weekInfo.year,
-      summary: {
-        totalTasks: weeklyTasks.length,
-        completedTasks: weeklyTasks.filter(t => t.status === "completed").length,
-        pendingTasks: weeklyTasks.filter(t => t.status === "pending").length,
-        inProgressTasks: weeklyTasks.filter(t => t.status === "in_progress").length,
-        totalEstimatedHours: weeklyTasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0),
-        totalActualHours: weeklyTasks.reduce((sum, t) => sum + (t.actualHours || 0), 0),
-        weeklySubmissionStatus: weeklyTasks.length > 0 ? weeklyTasks[0].weeklySubmissionStatus : "draft",
-      },
-      tasks: weeklyTasks,
-    };
-
-    // Fetch scheduled tasks
-    const scheduledTasks = await ScheduledTask.find({
-      user: user._id,
-      status: "scheduled",
-    })
-    .populate("department", "name")
-    .sort({ dueDate: 1 })
-    .lean();
-
-    // Fetch upcoming tasks (next 7 days)
-    const upcomingDate = new Date();
-    upcomingDate.setDate(upcomingDate.getDate() + 7);
-    
-    const upcomingTasks = await ScheduledTask.find({
-      user: user._id,
-      status: "scheduled",
-      dueDate: {
-        $gte: new Date(),
-        $lte: upcomingDate,
-      },
-    })
-    .populate("department", "name")
-    .sort({ dueDate: 1 })
-    .lean();
-
-    // Calculate analytics
-    const analytics = {
-      totalTasks: currentWeekTasks.length,
-      completedTasks: currentWeekTasks.filter(t => t.status === "completed").length,
-      pendingTasks: currentWeekTasks.filter(t => t.status === "pending").length,
-      inProgressTasks: currentWeekTasks.filter(t => t.status === "in_progress").length,
-    };
-
+    // Since we're in server context, we need to call the controller methods directly
+    // For now, return basic data structure
     return json({
       user,
       weekInfo,
       weekRange,
       departmentsResponse: departmentsResponse || [],
-      currentWeekTasks,
-      weeklyPreview,
-      scheduledTasks,
-      upcomingTasks,
-      analytics,
+      currentWeekTasks: [],
+      weeklyPreview: null,
+      scheduledTasks: [],
+      upcomingTasks: [],
+      analytics: {},
     });
   } catch (error) {
     console.error("Error in loader:", error);
@@ -210,7 +133,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action = async ({ request }: { request: Request }) => {
   const session = await getSession(request.headers.get("Cookie"));
   const email = session.get("email");
-
+  
   if (!email) {
     return json({ success: false, message: "Unauthorized" }, { status: 401 });
   }
@@ -294,8 +217,7 @@ export const action = async ({ request }: { request: Request }) => {
 };
 
 export default function TaskManagementPage() {
-  const actionData = useActionData() as { success?: boolean; message?: string } | undefined;
-  const revalidator = useRevalidator();
+  const actionData = useActionData();
   const { 
     user, 
     weekInfo, 
@@ -317,17 +239,15 @@ export default function TaskManagementPage() {
     upcomingTasks: any[], 
     analytics: any 
   }>();
-   
+  
   const [activeTab, setActiveTab] = useState("daily-tasks");
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [selectedDayTasks, setSelectedDayTasks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
   const { isOpen: isTaskModalOpen, onOpen: onTaskModalOpen, onClose: onTaskModalClose } = useDisclosure();
   const { isOpen: isScheduledModalOpen, onOpen: onScheduledModalOpen, onClose: onScheduledModalClose } = useDisclosure();
   const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
-  const { isOpen: isDayDetailModalOpen, onOpen: onDayDetailModalOpen, onClose: onDayDetailModalClose } = useDisclosure();
 
   const [taskForm, setTaskForm] = useState({
     title: "",
@@ -379,32 +299,10 @@ export default function TaskManagementPage() {
     setSelectedTask(null);
   };
 
-  // Handle action responses
-  useEffect(() => {
-    if (actionData) {
-      setIsLoading(false);
-      if (actionData?.success) {
-        // Close modals on success
-        onTaskModalClose();
-        onScheduledModalClose();
-        onDeleteModalClose();
-        onDayDetailModalClose();
-        
-        // Reset forms
-        resetTaskForm();
-        resetScheduledForm();
-        
-        // Trigger revalidation to refresh data
-        revalidator.revalidate();
-      }
-    }
-  }, [actionData, onTaskModalClose, onScheduledModalClose, onDeleteModalClose, onDayDetailModalClose, revalidator]);
-
   const isWeekSubmitted = weeklyPreview?.summary?.weeklySubmissionStatus !== "draft";
 
   const tasksByDate = currentWeekTasks.reduce((acc: any, task: any) => {
-    const taskDate = new Date(task.date);
-    const dateKey = taskDate.toISOString().split('T')[0];
+    const dateKey = task.date?.split('T')[0] || selectedDate;
     if (!acc[dateKey]) {
       acc[dateKey] = [];
     }
@@ -414,7 +312,7 @@ export default function TaskManagementPage() {
 
   const weekDays = [];
   const startDate = new Date(weekRange.start);
-  for (let i = 0; i < 5; i++) { // Only show Monday to Friday (5 days)
+  for (let i = 0; i < 7; i++) {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
     weekDays.push({
@@ -435,8 +333,8 @@ export default function TaskManagementPage() {
             <p className="text-gray-600 mt-1">
               Week {weekInfo.weekNumber}, {weekInfo.year} • {formatDate(weekRange.start)} - {formatDate(weekRange.end)}
             </p>
-        </div>
-
+          </div>
+          
           <div className="flex space-x-4">
             <Card className="p-4">
               <div className="flex items-center space-x-2">
@@ -474,9 +372,9 @@ export default function TaskManagementPage() {
 
         {/* Action messages */}
         {actionData && (
-          <Card className={`p-4 ${actionData?.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-            <p className={`${actionData?.success ? 'text-green-800' : 'text-red-800'}`}>
-              {actionData?.message}
+          <Card className={`p-4 ${(actionData as any)?.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+            <p className={`${(actionData as any)?.success ? 'text-green-800' : 'text-red-800'}`}>
+              {(actionData as any)?.message}
             </p>
           </Card>
         )}
@@ -492,7 +390,7 @@ export default function TaskManagementPage() {
                   <p className="text-sm text-yellow-600">
                     Your tasks for this week are still in draft mode. They will be auto-submitted on Friday at 12 PM.
                   </p>
-          </div>
+                </div>
               </div>
               
               <Form method="post">
@@ -527,22 +425,20 @@ export default function TaskManagementPage() {
                 <Clock className="h-4 w-4" />
                 <span>Scheduled Tasks</span>
                 {upcomingTasks.length > 0 && (
-                  <Badge color="warning" size="sm">
-                    {upcomingTasks.length}
-                  </Badge>
+                  <Badge color="warning" content={upcomingTasks.length} size="sm" />
                 )}
               </div>
             }
           />
-            <Tab
+          <Tab
             key="weekly-overview"
-              title={
+            title={
               <div className="flex items-center space-x-2">
                 <BarChart className="h-4 w-4" />
                 <span>Weekly Overview</span>
-                </div>
-              }
-            />
+              </div>
+            }
+          />
           <Tab
             key="analytics"
             title={
@@ -575,130 +471,81 @@ export default function TaskManagementPage() {
               </div>
 
               {/* Week View */}
-              <div className="grid grid-cols-5 gap-4">
-                {weekDays.map((day) => {
-                  const dayTasks = tasksByDate[day.date] || [];
-                  const completedTasks = dayTasks.filter((t: any) => t.status === "completed").length;
-                  const pendingTasks = dayTasks.filter((t: any) => t.status === "pending").length;
-                  const inProgressTasks = dayTasks.filter((t: any) => t.status === "in_progress").length;
-
-                  return (
-                    <Card 
-                      key={day.date} 
-                      className={`p-4 min-h-[200px] cursor-pointer hover:shadow-lg transition-all ${day.isToday ? 'ring-2 ring-blue-500' : ''}`}
-                      isPressable
-                      onPress={() => {
-                        setSelectedDate(day.date);
-                        setSelectedDayTasks(dayTasks);
-                        onDayDetailModalOpen();
-                      }}
-                    >
-                      <div className="text-center mb-3">
-                        <div className="flex justify-between items-center">
-                          <div className="flex-1">
-                            <p className="font-medium text-lg">{day.dayName}</p>
-                            <p className="text-sm text-gray-600">{day.dayNumber}</p>
-                            {day.isToday && (
-                              <Badge color="primary" variant="flat" size="sm">Today</Badge>
-                            )}
-                          </div>
-                          {!isWeekSubmitted && (
-                            <div 
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent day card click
-                              }}
+              <div className="grid grid-cols-7 gap-4">
+                {weekDays.map((day) => (
+                  <Card 
+                    key={day.date} 
+                    className={`p-4 min-h-[200px] ${day.isToday ? 'ring-2 ring-blue-500' : ''}`}
+                  >
+                    <div className="text-center mb-3">
+                      <p className="font-medium">{day.dayName}</p>
+                      <p className="text-sm text-gray-600">{day.dayNumber}</p>
+                      {day.isToday && (
+                        <Badge color="primary" variant="flat" size="sm">Today</Badge>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {(tasksByDate[day.date] || []).map((task: any) => (
+                        <div
+                          key={task._id}
+                          className="p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                          onClick={() => {
+                            setSelectedTask(task);
+                            setTaskForm({
+                              title: task.title,
+                              description: task.description,
+                              priority: task.priority,
+                              category: task.category,
+                              estimatedHours: task.estimatedHours,
+                              notes: task.notes,
+                            });
+                            onTaskModalOpen();
+                          }}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <Chip
+                              size="sm"
+                              color={getPriorityColor(task.priority)}
+                              variant="flat"
                             >
-                              <Button
-                                size="sm"
-                                color="primary"
-                                variant="light"
-                                isIconOnly
-                                onPress={() => {
-                                  setSelectedDate(day.date);
-                                  resetTaskForm();
-                                  onTaskModalOpen();
-                                }}
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                            </div>
+                              {task.priority}
+                            </Chip>
+                            <Chip
+                              size="sm"
+                              color={getStatusColor(task.status)}
+                              variant="flat"
+                            >
+                              {task.status}
+                            </Chip>
+                          </div>
+                          <p className="text-sm font-medium truncate">{task.title}</p>
+                          <p className="text-xs text-gray-600 truncate">{task.description}</p>
+                          {task.estimatedHours > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Est: {task.estimatedHours}h
+                              {task.actualHours > 0 && ` / Act: ${task.actualHours}h`}
+                            </p>
                           )}
                         </div>
-                      </div>
+                      ))}
                       
-                      <div className="space-y-2">
-                        {dayTasks.length > 0 ? (
-                          <div className="text-center">
-                            <div className="text-2xl font-bold text-gray-800 mb-2">
-                              {dayTasks.length}
-                            </div>
-                            <p className="text-sm text-gray-600 mb-3">
-                              {dayTasks.length === 1 ? 'Task' : 'Tasks'}
-                            </p>
-                            
-                            <div className="space-y-1">
-                              {completedTasks > 0 && (
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-green-600">Completed</span>
-                                  <Badge color="success" size="sm">{completedTasks}</Badge>
-                                </div>
-                              )}
-                              {inProgressTasks > 0 && (
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-blue-600">In Progress</span>
-                                  <Badge color="primary" size="sm">{inProgressTasks}</Badge>
-                                </div>
-                              )}
-                              {pendingTasks > 0 && (
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-orange-600">Pending</span>
-                                  <Badge color="warning" size="sm">{pendingTasks}</Badge>
-                                </div>
-                              )}
-                            </div>
-                            
-                            <div className="mt-3 text-xs text-gray-500">
-                              Click to view details
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center py-4">
-                            <div className="text-gray-300 mb-2">
-                              <Calendar className="h-8 w-8 mx-auto" />
-                            </div>
-                            <p className="text-sm text-gray-400">No tasks</p>
-                            {!isWeekSubmitted && (
-                              <div className="mt-2">
-                                <p className="text-xs text-gray-400 mb-2">
-                                  Click + to add tasks
-                                </p>
-                                <div 
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Prevent day card click
-                                  }}
-                                >
-                                  <Button
-                                    size="sm"
-                                    color="primary"
-                                    variant="flat"
-                                    startContent={<Plus className="h-4 w-4" />}
-                                    onPress={() => {
-                                      setSelectedDate(day.date);
-                                      resetTaskForm();
-                                      onTaskModalOpen();
-                                    }}
-                                  >
-                                    Add Task
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  );
-                })}
+                      {(!tasksByDate[day.date] || tasksByDate[day.date].length === 0) && (
+                        <div 
+                          className="text-center py-4 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
+                          onClick={() => {
+                            setSelectedDate(day.date);
+                            resetTaskForm();
+                            onTaskModalOpen();
+                          }}
+                        >
+                          <Plus className="h-6 w-6 mx-auto mb-1" />
+                          <p className="text-xs">Add task</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
               </div>
             </div>
           )}
@@ -718,7 +565,7 @@ export default function TaskManagementPage() {
                 >
                   Schedule Task
                 </Button>
-                    </div>
+              </div>
 
               {/* Upcoming Tasks */}
               {upcomingTasks.length > 0 && (
@@ -730,32 +577,32 @@ export default function TaskManagementPage() {
                   <div className="space-y-2">
                     {upcomingTasks.map((task: any) => (
                       <div key={task._id} className="flex items-center justify-between p-3 bg-orange-50 rounded">
-                    <div>
+                        <div>
                           <p className="font-medium">{task.title}</p>
                           <p className="text-sm text-gray-600">{task.description}</p>
                           <p className="text-xs text-orange-600 flex items-center mt-1">
                             <Clock className="h-3 w-3 mr-1" />
                             Due: {formatDate(task.dueDate)}
                           </p>
-                    </div>
+                        </div>
                         <div className="flex items-center space-x-2">
                           <Chip size="sm" color={getPriorityColor(task.priority)} variant="flat">
                             {task.priority}
                           </Chip>
-                    <Button
+                          <Button
                             size="sm"
-                      color="primary"
+                            color="primary"
                             variant="flat"
                             startContent={<ArrowRight className="h-3 w-3" />}
-                    >
+                          >
                             Move to Daily
-                    </Button>
-                  </div>
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
-            </Card>
-          )}
+                </Card>
+              )}
 
               {/* All Scheduled Tasks */}
               <Card className="p-4">
@@ -771,7 +618,7 @@ export default function TaskManagementPage() {
                     {scheduledTasks.map((task: any) => (
                       <div key={task._id} className="p-3 border rounded hover:bg-gray-50">
                         <div className="flex items-center justify-between">
-                    <div>
+                          <div>
                             <p className="font-medium">{task.title}</p>
                             <p className="text-sm text-gray-600">{task.description}</p>
                             <div className="flex items-center space-x-4 mt-2">
@@ -780,8 +627,8 @@ export default function TaskManagementPage() {
                                 {task.priority}
                               </Chip>
                               <Chip size="sm" variant="flat">{task.category}</Chip>
-                    </div>
-                    </div>
+                            </div>
+                          </div>
                           <div className="flex items-center space-x-2">
                             <Button size="sm" variant="light" isIconOnly>
                               <Edit className="h-4 w-4" />
@@ -789,19 +636,19 @@ export default function TaskManagementPage() {
                             <Button size="sm" variant="light" color="danger" isIconOnly>
                               <Trash2 className="h-4 w-4" />
                             </Button>
-                    </div>
-                    </div>
-                  </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
-            </Card>
+              </Card>
             </div>
           )}
 
           {/* Weekly Overview Tab */}
           {activeTab === "weekly-overview" && (
-                <div className="space-y-6">
+            <div className="space-y-6">
               <h2 className="text-xl font-semibold">Weekly Overview</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -816,7 +663,7 @@ export default function TaskManagementPage() {
                       value={currentWeekTasks.length > 0 ? (currentWeekTasks.filter(t => t.status === "completed").length / currentWeekTasks.length) * 100 : 0}
                       color="success"
                     />
-                    </div>
+                  </div>
                 </Card>
 
                 <Card className="p-4">
@@ -825,7 +672,7 @@ export default function TaskManagementPage() {
                     <div className="flex justify-between">
                       <span>Estimated:</span>
                       <span>{currentWeekTasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)}h</span>
-                  </div>
+                    </div>
                     <div className="flex justify-between">
                       <span>Actual:</span>
                       <span>{currentWeekTasks.reduce((sum, t) => sum + (t.actualHours || 0), 0)}h</span>
@@ -847,10 +694,10 @@ export default function TaskManagementPage() {
                     <div className="flex justify-between">
                       <span>Completed:</span>
                       <span>{currentWeekTasks.filter(t => t.status === "completed").length}</span>
-                      </div>
-                        </div>
+                    </div>
+                  </div>
                 </Card>
-                        </div>
+              </div>
 
               {/* Weekly Summary for Submission */}
               {weeklyPreview && (
@@ -859,15 +706,15 @@ export default function TaskManagementPage() {
                   <div className="prose max-w-none">
                     <p>This week I completed {weeklyPreview.summary?.completedTasks || 0} out of {weeklyPreview.summary?.totalTasks || 0} tasks.</p>
                     {/* Add more summary content here */}
-                        </div>
-                </Card>
-                    )}
                   </div>
+                </Card>
+              )}
+            </div>
           )}
 
           {/* Analytics Tab */}
           {activeTab === "analytics" && (
-                  <div className="space-y-6">
+            <div className="space-y-6">
               <h2 className="text-xl font-semibold">Analytics</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -894,7 +741,7 @@ export default function TaskManagementPage() {
                   <p className="text-2xl font-bold">{analytics.productivityRate || 0}%</p>
                   <p className="text-sm text-gray-600">Productivity</p>
                 </Card>
-                    </div>
+              </div>
 
               <Card className="p-6">
                 <h3 className="font-semibold mb-4">Coming Soon</h3>
@@ -906,7 +753,7 @@ export default function TaskManagementPage() {
             </div>
           )}
         </div>
-                    </div>
+      </div>
 
       {/* Task Modal */}
       <Modal isOpen={isTaskModalOpen} onClose={onTaskModalClose} size="2xl">
@@ -1036,17 +883,17 @@ export default function TaskManagementPage() {
                 Cancel
               </Button>
               {selectedTask && (
-                      <Button
-                        color="danger"
+                <Button
+                  color="danger"
                   variant="flat"
-                        onPress={() => {
+                  onClick={() => {
                     onTaskModalClose();
                     onDeleteModalOpen();
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    )}
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
               <Button color="primary" type="submit" isLoading={isLoading}>
                 {selectedTask ? "Update Task" : "Create Task"}
               </Button>
@@ -1120,7 +967,7 @@ export default function TaskManagementPage() {
                   <SelectItem key="training" value="training">Training</SelectItem>
                   <SelectItem key="other" value="other">Other</SelectItem>
                 </Select>
-                  </div>
+              </div>
 
               <Input
                 name="estimatedHours"
@@ -1143,8 +990,8 @@ export default function TaskManagementPage() {
                     name="enableReminders"
                     isSelected={scheduledForm.enableReminders}
                     onValueChange={(value) => setScheduledForm({...scheduledForm, enableReminders: value})}
-                      />
-                    </div>
+                  />
+                </div>
 
                 {scheduledForm.enableReminders && (
                   <>
@@ -1165,11 +1012,11 @@ export default function TaskManagementPage() {
                         name="onDueDate"
                         isSelected={scheduledForm.onDueDate}
                         onValueChange={(value) => setScheduledForm({...scheduledForm, onDueDate: value})}
-                        />
-                      </div>
+                      />
+                    </div>
                   </>
-                    )}
-                  </div>
+                )}
+              </div>
 
               <Textarea
                 name="notes"
@@ -1181,13 +1028,13 @@ export default function TaskManagementPage() {
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={onScheduledModalClose}>
-                      Cancel
-                    </Button>
+                Cancel
+              </Button>
               <Button color="primary" type="submit" isLoading={isLoading}>
                 Schedule Task
-                    </Button>
+              </Button>
             </ModalFooter>
-                </Form>
+          </Form>
         </ModalContent>
       </Modal>
 
@@ -1210,174 +1057,14 @@ export default function TaskManagementPage() {
             </Button>
             <Form method="post">
               <input type="hidden" name="_action" value="delete_daily_task" />
-              <input type="hidden" name="taskId" value={selectedTask?._id} />
-              <Button color="danger" type="submit" isLoading={isLoading}>
+              <input type="hidden" name="taskId" value={selectedTask?._id || ""} />
+              <Button color="danger" type="submit">
                 Delete Task
               </Button>
             </Form>
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* Day Detail Modal */}
-      <Modal isOpen={isDayDetailModalOpen} onClose={onDayDetailModalClose} size="5xl">
-        <ModalContent>
-          <ModalHeader className="flex justify-between items-center">
-            <div>
-              <h3 className="text-xl font-semibold">
-                Tasks for {new Date(selectedDate).toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {selectedDayTasks.length} {selectedDayTasks.length === 1 ? 'task' : 'tasks'}
-              </p>
-            </div>
-            {!isWeekSubmitted && (
-              <Button
-                color="primary"
-                startContent={<Plus className="h-4 w-4" />}
-                onPress={() => {
-                  resetTaskForm();
-                  onDayDetailModalClose();
-                  onTaskModalOpen();
-                }}
-              >
-                Add Task
-              </Button>
-            )}
-          </ModalHeader>
-          <ModalBody>
-            {selectedDayTasks.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full table-auto">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Task</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Priority</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Status</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Category</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Hours</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {selectedDayTasks.map((task) => (
-                      <tr key={task._id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium text-sm">{task.title}</p>
-                            <p className="text-xs text-gray-600 truncate max-w-xs">
-                              {task.description}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Chip
-                            size="sm"
-                            color={getPriorityColor(task.priority)}
-                            variant="flat"
-                          >
-                            {task.priority}
-                          </Chip>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Chip
-                            size="sm"
-                            color={getStatusColor(task.status)}
-                            variant="flat"
-                          >
-                            {task.status}
-                          </Chip>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="text-sm text-gray-600 capitalize">
-                            {task.category.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm">
-                            <div>Est: {task.estimatedHours || 0}h</div>
-                            <div className="text-gray-600">Act: {task.actualHours || 0}h</div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="light"
-                              isIconOnly
-                              onPress={() => {
-                                setSelectedTask(task);
-                                setTaskForm({
-                                  title: task.title,
-                                  description: task.description,
-                                  priority: task.priority,
-                                  category: task.category,
-                                  estimatedHours: task.estimatedHours,
-                                  notes: task.notes,
-                                });
-                                onDayDetailModalClose();
-                                onTaskModalOpen();
-                              }}
-                              isDisabled={isWeekSubmitted}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            {!isWeekSubmitted && (
-                              <Button
-                                size="sm"
-                                variant="light"
-                                color="danger"
-                                isIconOnly
-                                onPress={() => {
-                                  setSelectedTask(task);
-                                  onDayDetailModalClose();
-                                  onDeleteModalOpen();
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks for this day</h3>
-                <p className="text-gray-600 mb-4">
-                  Get started by adding your first task for this day.
-                </p>
-                {!isWeekSubmitted && (
-                  <Button
-                    color="primary"
-                    startContent={<Plus className="h-4 w-4" />}
-                    onPress={() => {
-                      resetTaskForm();
-                      onDayDetailModalClose();
-                      onTaskModalOpen();
-                    }}
-                  >
-                    Add Your First Task
-                  </Button>
-                )}
-              </div>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="flat" onPress={onDayDetailModalClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </AdminLayout>
   );
-}
+} 

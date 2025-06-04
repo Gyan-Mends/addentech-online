@@ -1,15 +1,15 @@
-import mongoose from "~/mongoose.server";
+import mongoose from "mongoose";
 
 const dailyTaskSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "registration",
+      ref: "User",
       required: true,
     },
     department: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "departments",
+      ref: "Department",
       required: true,
     },
     date: {
@@ -89,7 +89,7 @@ const dailyTaskSchema = new mongoose.Schema(
     },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "registration",
+      ref: "User",
       default: null,
     },
     approvedAt: {
@@ -120,12 +120,6 @@ dailyTaskSchema.statics.getWeekNumber = function(date: Date) {
   return Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
 };
 
-let DailyTask: mongoose.Model<any>;
-
-try {
-  DailyTask = mongoose.model<any>("DailyTask");
-} catch (error) {
-  DailyTask = mongoose.model<any>("DailyTask", dailyTaskSchema);
-}
+const DailyTask = mongoose.models.DailyTask || mongoose.model("DailyTask", dailyTaskSchema);
 
 export default DailyTask; 

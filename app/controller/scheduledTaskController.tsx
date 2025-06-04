@@ -472,8 +472,8 @@ class ScheduledTaskController {
           new Date(t.dueDate) >= now && 
           new Date(t.dueDate) <= nextMonth
         ).length,
-        tasksByPriority: {} as Record<string, number>,
-        tasksByCategory: {} as Record<string, number>,
+        tasksByPriority: {},
+        tasksByCategory: {},
       };
 
       // Group by priority and category

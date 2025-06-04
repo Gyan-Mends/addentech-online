@@ -1,15 +1,15 @@
-import mongoose from "~/mongoose.server";
+import mongoose from "mongoose";
 
 const scheduledTaskSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "registration",
+      ref: "User",
       required: true,
     },
     department: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "departments",
+      ref: "Department",
       required: true,
     },
     title: {
@@ -164,12 +164,6 @@ scheduledTaskSchema.methods.shouldSendReminder = function() {
   return false;
 };
 
-let ScheduledTask: mongoose.Model<any>;
-
-try {
-  ScheduledTask = mongoose.model<any>("ScheduledTask");
-} catch (error) {
-  ScheduledTask = mongoose.model<any>("ScheduledTask", scheduledTaskSchema);
-}
+const ScheduledTask = mongoose.models.ScheduledTask || mongoose.model("ScheduledTask", scheduledTaskSchema);
 
 export default ScheduledTask; 
