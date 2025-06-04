@@ -296,14 +296,20 @@ export const loader: LoaderFunction = async ({ request }) => {
       return redirect("/addentech-login")
     }
     
-    // Verify user is a department head
-    if (user.role !== 'department_head') {
+    // Verify user is a department head or manager
+    if (user.role !== 'department_head' && user.role !== 'head' && user.role !== 'manager') {
       return redirect("/admin?error=You do not have permission to access the department head dashboard")
     }
     
-    // Check if user has permission to view dashboard
+    // Check if user has permission to view dashboard (handle undefined permissions gracefully)
     const permissions = user.permissions ? Object.fromEntries(user.permissions) : {};
-    if (!permissions || !permissions.view_dashboard) {
+    
+    // For managers and department heads, allow access even if permissions are not explicitly set
+    const hasViewPermission = 
+      ['manager', 'department_head', 'head'].includes(user.role) || 
+      (permissions && permissions.view_dashboard);
+      
+    if (!hasViewPermission) {
       return redirect("/admin?error=You do not have permission to view the dashboard")
     }
     

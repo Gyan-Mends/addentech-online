@@ -17,7 +17,7 @@ const canCreateTaskForDepartment = (user: any, departmentId: string) => {
     if (user.role === "admin" || user.role === "manager") return true;
     
     // Department heads can only create tasks for their own department
-    if (user.role === "head" && user.department.toString() === departmentId) return true;
+    if ((user.role === "head" || user.role === "department_head") && user.department.toString() === departmentId) return true;
     
     return false;
 };
@@ -50,7 +50,7 @@ const canModifyTask = (user: any, task: any) => {
     if (user.role === "admin" || user.role === "manager") return true;
     
     // Department heads can modify tasks in their department
-    if (user.role === "head" && user.department.toString() === task.department.toString()) return true;
+    if ((user.role === "head" || user.role === "department_head") && user.department.toString() === task.department.toString()) return true;
     
     // Task owner can modify their task
     if (task.assignedOwner && task.assignedOwner.toString() === user._id.toString()) return true;
@@ -760,7 +760,10 @@ class TaskController {
             // Find department head for assignment notification
             const departmentHead = await Registration.findOne({ 
                 department: departmentId, 
-                role: "department_head" 
+                $or: [
+                    { role: "department_head" },
+                    { role: "head" }
+                ]
             });
             
             if (!departmentHead) {

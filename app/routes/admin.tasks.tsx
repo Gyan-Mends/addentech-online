@@ -50,6 +50,7 @@ import {
 import { useState, useEffect } from "react";
 import { commitSession, getSession } from "~/session";
 import Registration from "~/modal/registration";
+import Task from "~/modal/task";
 import { DepartmentInterface, RegistrationInterface, TaskInterface } from "~/interface/interface";
 import department from "~/controller/departments";
 import TaskController from "~/controller/task";
@@ -98,23 +99,39 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     
     // Check for user authorization
     if (!email) {
+        console.log("No email in session, redirecting to login");
         return redirect("/addentech-login");
     }
     
     // Get user data from database using email
     const userData = await Registration.findOne({ email }).populate('department');
     if (!userData) {
+        console.log("User not found in database, redirecting to login");
         return redirect("/addentech-login");
     }
     
-    // Check role-based permissions
+    console.log("User found:", {
+        email: userData.email,
+        role: userData.role,
+        department: userData.department,
+        permissions: userData.permissions
+    });
+    
+    // Check role-based permissions - include both variations of department head role
     const hasTaskPermission = 
         userData.role === "admin" || 
         userData.role === "manager" ||
         userData.role === "department_head" ||
+        userData.role === "head" || // Include this variation too
         userData.role === "staff";
     
+    console.log("Task permission check:", {
+        userRole: userData.role,
+        hasPermission: hasTaskPermission
+    });
+    
     if (!hasTaskPermission) {
+        console.log("User does not have task permission, redirecting");
         return redirect("/admin?error=You do not have permission to access tasks");
     }
 
@@ -128,53 +145,161 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const assignedTo = url.searchParams.get("assignedTo") || "";
     const searchTerm = url.searchParams.get("search") || "";
 
-    // Get tasks with filters using the real controller
-    const tasksResult = await TaskController.GetTasksWithFilters({
-        user: userData,
-        page,
-        limit,
-        status,
-        priority,
-        category,
-        departmentId,
-        assignedTo,
-        searchTerm
-    });
-
-    // Mock analytics data (you can implement this in the controller later)
-    const analytics = {
-        totalTasks: tasksResult.tasks?.length || 0,
-        completedTasks: tasksResult.tasks?.filter((t: any) => t.status === "Completed").length || 0,
-        overdueTasks: tasksResult.tasks?.filter((t: any) => new Date(t.dueDate) < new Date() && t.status !== "Completed").length || 0,
-        avgCompletionTime: 0,
-        tasksByStatus: [],
-        tasksByPriority: []
-    };
-
-    // Get departments and users for filters - matching the pattern from admin.users.tsx
-    const departmentResult = await department.getDepartments({
-        request,
-        page: 1,
-        search_term: ""
-    });
-    const users = await Registration.find({}, 'firstName lastName email role department');
-
-    return json({
-        tasks: tasksResult.tasks || [],
-        pagination: tasksResult.pagination || {},
-        analytics,
-        departments: departmentResult.departments || [],
-        users: users || [],
-        currentUser: userData,
-        filters: {
-            status,
-            priority,
-            category,
-            departmentId,
-            assignedTo,
-            searchTerm
+    // Get tasks with filters - using direct database query like usersController pattern
+    try {
+        const query: any = {};
+        
+        // Base visibility rules - more specific based on role and task assignment level
+        if (userData.role === "admin" || userData.role === "manager") {
+            // Admin and managers can see all tasks
+            // No additional filters needed
+        } else if (userData.role === "department_head" || userData.role === "head") {
+            // Department heads can see:
+            // 1. Tasks assigned to their department (department-level tasks)
+            // 2. Tasks they created 
+            // 3. Tasks assigned to them personally
+            // 4. Tasks they collaborate on
+            query.$or = [
+                { 
+                    department: userData.department,
+                    taskAssignmentLevel: "department" // Department-level tasks
+                },
+                { 
+                    department: userData.department,
+                    assignedOwner: userData._id // Tasks assigned to them personally
+                },
+                { createdBy: userData._id }, // Tasks they created
+                { 'collaborators.user': userData._id } // Tasks they collaborate on
+            ];
+        } else if (userData.role === "staff") {
+            // Staff can only see:
+            // 1. Tasks assigned to them personally
+            // 2. Tasks they created (if any)
+            // 3. Tasks they collaborate on
+            query.$or = [
+                { assignedOwner: userData._id }, // Tasks assigned to them
+                { createdBy: userData._id }, // Tasks they created (if any)
+                { 'collaborators.user': userData._id } // Tasks they collaborate on
+            ];
+        } else {
+            // Unknown role - no access to tasks
+            query._id = null; // This will return no results
         }
-    });
+        
+        // Apply filters
+        if (status) query.status = status;
+        if (priority) query.priority = priority;
+        if (category) query.category = category;
+        if (departmentId) query.department = departmentId;
+        if (assignedTo) query.assignedOwner = assignedTo;
+        query.archived = false; // Don't include archived tasks
+        
+        // Search filter
+        if (searchTerm) {
+            query.$and = query.$and || [];
+            query.$and.push({
+                $or: [
+                    { title: { $regex: searchTerm, $options: 'i' } },
+                    { description: { $regex: searchTerm, $options: 'i' } }
+                ]
+            });
+        }
+        
+        const skip = (page - 1) * limit;
+        
+        const tasks = await Task.find(query)
+            .populate('department')
+            .populate('assignedOwner')
+            .populate('createdBy')
+            .populate('collaborators.user')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalTasks = await Task.countDocuments(query);
+        
+        console.log("Tasks fetched:", {
+            totalFound: tasks.length,
+            totalInDB: totalTasks,
+            userRole: userData.role,
+            userDepartment: userData.department,
+            query: JSON.stringify(query, null, 2),
+            taskTitles: tasks.map((t: any) => t.title)
+        });
+        
+        // Calculate analytics from the fetched tasks
+        const analytics = {
+            totalTasks: tasks?.length || 0,
+            completedTasks: tasks?.filter((t: any) => t.status === "Completed").length || 0,
+            overdueTasks: tasks?.filter((t: any) => new Date(t.dueDate) < new Date() && t.status !== "Completed").length || 0,
+            avgCompletionTime: 0,
+            tasksByStatus: [],
+            tasksByPriority: []
+        };
+
+        // Get departments and users for filters - matching the pattern from admin.users.tsx
+        const departmentResult = await department.getDepartments({
+            request,
+            page: 1,
+            search_term: ""
+        });
+        const users = await Registration.find({}, 'firstName lastName email role department');
+
+        return json({
+            tasks: tasks || [],
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalTasks / limit),
+                totalTasks,
+                hasNextPage: page < Math.ceil(totalTasks / limit),
+                hasPrevPage: page > 1
+            },
+            analytics,
+            departments: departmentResult.departments || [],
+            users: users || [],
+            currentUser: userData,
+            filters: {
+                status,
+                priority,
+                category,
+                departmentId,
+                assignedTo,
+                searchTerm
+            }
+        });
+        
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+        return json({
+            tasks: [],
+            pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                totalTasks: 0,
+                hasNextPage: false,
+                hasPrevPage: false
+            },
+            analytics: {
+                totalTasks: 0,
+                completedTasks: 0,
+                overdueTasks: 0,
+                avgCompletionTime: 0,
+                tasksByStatus: [],
+                tasksByPriority: []
+            },
+            departments: [],
+            users: [],
+            currentUser: userData,
+            filters: {
+                status,
+                priority,
+                category,
+                departmentId,
+                assignedTo,
+                searchTerm
+            }
+        });
+    }
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -195,6 +320,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const intent = formData.get("intent") as string;
 
     try {
+        console.log("Task action attempted:", {
+            intent,
+            userRole: userData.role,
+            userDepartment: userData.department,
+            userId: userData._id
+        });
+        
         switch (intent) {
             case "create_task_for_department":
                 // Admin/Manager creates task for department
@@ -212,7 +344,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
             case "create_task_for_member":
                 // HOD creates task directly for member
-                return await TaskController.CreateTaskForMember({
+                const memberTaskResult = await TaskController.CreateTaskForMember({
                     title: formData.get("title") as string,
                     description: formData.get("description") as string,
                     category: formData.get("category") as string || "Operational Tasks",
@@ -222,6 +354,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                     hodInstructions: formData.get("hodInstructions") as string,
                     user: userData
                 });
+                console.log("Task for member result:", memberTaskResult);
+                return memberTaskResult;
 
             case "update_status":
                 return await TaskController.UpdateTaskStatusWithPermissions({
@@ -310,7 +444,7 @@ export default function ComprehensiveTaskManagement() {
 
     // Determine what task creation options user has based on role
     const canCreateForDepartment = ["admin", "manager"].includes(loaderData.currentUser.role);
-    const canCreateForMember = loaderData.currentUser.role === "department_head";
+    const canCreateForMember = ["department_head", "head", "manager"].includes(loaderData.currentUser.role);
 
     return (
         <AdminLayout>
@@ -321,8 +455,8 @@ export default function ComprehensiveTaskManagement() {
                         <h1 className="text-2xl font-bold text-gray-800">Task Management System</h1>
                         <p className="text-gray-600">
                             {loaderData.currentUser.role === "admin" && "Admin view - Manage all organizational tasks"}
-                            {loaderData.currentUser.role === "manager" && "Manager view - Oversee departmental tasks"}
-                            {loaderData.currentUser.role === "department_head" && "HOD view - Manage your department's tasks"}
+                            {loaderData.currentUser.role === "manager" && "Manager view - Oversee and create tasks for departments"}
+                            {(loaderData.currentUser.role === "department_head" || loaderData.currentUser.role === "head") && "HOD view - Manage your department's tasks"}
                             {loaderData.currentUser.role === "staff" && "Staff view - Your assigned tasks"}
                         </p>
                     </div>
@@ -436,7 +570,19 @@ export default function ComprehensiveTaskManagement() {
                             </div>
                         ) : loaderData.tasks.length === 0 ? (
                             <div className="text-center py-8">
-                                <p className="text-gray-500">No tasks found. Create your first task!</p>
+                                <p className="text-gray-500">
+                                    {loaderData.currentUser.role === "staff" 
+                                        ? "No tasks assigned to you yet."
+                                        : (loaderData.currentUser.role === "department_head" || loaderData.currentUser.role === "head")
+                                        ? "No tasks for your department yet. Tasks created for your department will appear here."
+                                        : "No tasks found. Create your first task!"
+                                    }
+                                </p>
+                                {(loaderData.currentUser.role === "department_head" || loaderData.currentUser.role === "head") && (
+                                    <p className="text-sm text-gray-400 mt-2">
+                                        As a department head, you'll see tasks assigned to your department and tasks assigned to you personally.
+                                    </p>
+                                )}
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -444,7 +590,19 @@ export default function ComprehensiveTaskManagement() {
                                     <div key={task._id} className="border rounded-lg p-4 hover:bg-gray-50">
                                         <div className="flex justify-between items-start">
                                             <div className="flex-1">
-                                                <h3 className="font-semibold text-lg">{task.title}</h3>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h3 className="font-semibold text-lg">{task.title}</h3>
+                                                    {task.taskAssignmentLevel === "department" && (
+                                                        <Chip size="sm" color="warning" variant="flat">
+                                                            Department Task
+                                                        </Chip>
+                                                    )}
+                                                    {task.assignedOwner?._id === loaderData.currentUser._id && (
+                                                        <Chip size="sm" color="success" variant="flat">
+                                                            Assigned to You
+                                                        </Chip>
+                                                    )}
+                                                </div>
                                                 <p className="text-gray-600 text-sm mt-1">{task.description}</p>
                                                 <div className="flex gap-2 mt-2">
                                                     <Chip size="sm" color="primary" variant="flat">
@@ -473,19 +631,29 @@ export default function ComprehensiveTaskManagement() {
                                                         {task.status}
                                                     </Chip>
                                                 </div>
-                                                <p className="text-sm text-gray-500 mt-2">
-                                                    Due: {new Date(task.dueDate).toLocaleDateString()}
-                                                </p>
+                                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                                    <p>Due: {new Date(task.dueDate).toLocaleDateString()}</p>
+                                                    {task.assignedOwner && (
+                                                        <p>Assigned: {task.assignedOwner.firstName} {task.assignedOwner.lastName}</p>
+                                                    )}
+                                                    {task.department && (
+                                                        <p>Dept: {task.department.name}</p>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                                <p className="text-sm text-gray-500">
-                                    Current user role: <strong>{loaderData.currentUser.role}</strong>
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    Department: <strong>{(loaderData.currentUser.department as any)?.name || "Not assigned"}</strong>
-                                </p>
+                                <div className="border-t pt-4 mt-4">
+                                    <p className="text-sm text-gray-500">
+                                        Current user: <strong>{loaderData.currentUser.firstName} {loaderData.currentUser.lastName}</strong> | 
+                                        Role: <strong>{loaderData.currentUser.role}</strong> | 
+                                        Department: <strong>{(loaderData.currentUser.department as any)?.name || "Not assigned"}</strong>
+                                    </p>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        Showing {loaderData.tasks.length} tasks based on your role permissions
+                                    </p>
+                                </div>
                             </div>
                         )}
                     </CardBody>
