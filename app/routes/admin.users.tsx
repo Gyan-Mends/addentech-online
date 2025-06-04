@@ -218,7 +218,7 @@ const Users = () => {
                             type="text"
                             labelPlacement="outside"
                         />
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
                             <CustomInput
                                 label="Middle Name"
                                 name="middlename"
@@ -303,10 +303,10 @@ const Users = () => {
                         </div>
 
 
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
                             <Select
                                 isRequired
-                                className="max-w-xs"
+                                className="flex-1"
                                 label="Department"
                                 labelPlacement="outside"
                                 placeholder="Select Department"
@@ -328,7 +328,7 @@ const Users = () => {
                             </Select>
 
                             <CustomInput
-                                label=" Position"
+                                label="Position"
                                 isRequired
                                 name="position"
                                 defaultValue={dataValue.role}
@@ -336,7 +336,7 @@ const Users = () => {
                                 placeholder=" "
                                 type="text"
                                 labelPlacement="outside"
-
+                                className="flex-1"
                             />
                         </div>
                             <div className=" ">

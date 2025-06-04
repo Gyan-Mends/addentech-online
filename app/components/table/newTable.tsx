@@ -28,13 +28,13 @@ export default function NewCustomTable(
 
     return (
         <div className="z-0">
-            <Table className="mt-6 " aria-label="Example table with custom cells"
+            <Table className="mt-6" aria-label="Example table with custom cells"
                 classNames={{
-                    base: "h-[68vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none",
+                    base: "h-[68vh] overflow-y-auto w-full overflow-x-auto shadow-none",
                     wrapper:
-                        "dark:bg-default-50 !bg-white vertical-scrollbar horizontal-scrollbar shadow-md  rounded-2xl dark:border border-white/20",
+                        "dark:bg-default-50 !bg-white vertical-scrollbar horizontal-scrollbar shadow-md rounded-2xl dark:border border-white/20 min-w-full",
                     th: "dark: ",
-                    td: "font-nunito text-xs text-slate-500 dark:text-slate-200 ",
+                    td: "font-nunito text-xs text-slate-500 dark:text-slate-200 whitespace-nowrap",
                 }}
             >
                 <TableHeader className="" >

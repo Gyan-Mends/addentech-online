@@ -125,12 +125,30 @@ const navItems: NavItem[] = [
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Start closed on mobile
     const [userRole, setUserRole] = useState<string>("staff");
     const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
     const navigation = useNavigation();
     const navigate = useNavigate();
     
+    // Auto-open sidebar on desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setIsSidebarOpen(true);
+            } else {
+                setIsSidebarOpen(false);
+            }
+        };
+        
+        // Set initial state
+        handleResize();
+        
+        // Add resize listener
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Fetch user role and permissions from session
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -167,10 +185,18 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const isLoading = navigation.state === "loading";
 
     return (
-        <div className="flex h-screen  font-nunito">
+        <div className="flex h-screen font-nunito">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+            
             {/* Sidebar */}
             <div
-                className={`${isSidebarOpen ? "w-64" : "w-0 -ml-64"} bg-white shadow-r-md transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative`}
+                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0`}
             >
                 <div className="flex items-center justify-between p-4 border-b border-b-white/20">
                     <div className="flex items-center">
@@ -249,20 +275,20 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         <Button
                             variant="ghost"
                             onClick={() => setIsSidebarOpen(true)}
-                            className={isSidebarOpen ? "md:hidden" : ""}
+                            className={`${isSidebarOpen ? "hidden md:hidden" : ""} md:hidden`}
                         >
                             <Menu className="h-5 w-5" />
                         </Button>
                         <Button
                             size="sm"
-                            className=" md:flex rounded-md text-md h-[35px] shadow-sm hover:bg-pink-300 text-pink-500 bg-pink-200 "
+                            className="hidden sm:flex rounded-md text-md h-[35px] shadow-sm hover:bg-pink-300 text-pink-500 bg-pink-200"
                         >
-                            <ArrowLeft className="mr-2 h-4 w-4 " />
+                            <ArrowLeft className="mr-2 h-4 w-4" />
                             Back
                         </Button>
                     </div>
 
-                    <div className="flex-1 max-w-md mx-4 rounded">
+                    <div className="flex-1 max-w-md mx-2 sm:mx-4 rounded hidden sm:block">
                         <Input
                             startContent={
                                 <Search className="h-4 w-4 text-pink-500" />
@@ -278,13 +304,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             className="w-full"
                             classNames={{
                                 inputWrapper:
-                                    "border hover:bg-gray-50 shadow-sm focus:bg-gray-50 focus:ring-1 focus:ring-pink-500 rounded-md border-black/20 bg-white ",
+                                    "border hover:bg-gray-50 shadow-sm focus:bg-gray-50 focus:ring-1 focus:ring-pink-500 rounded-md border-black/20 bg-white",
                             }}
                         />
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        {/* <ThemeSwitcher /> */}
                         <div className="relative h-10 w-10 rounded-full flex items-center justify-center border border-white/20">
                             <div>
                                 <Bell className="h-5 w-5" />
