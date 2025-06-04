@@ -1,4 +1,3 @@
-
 export interface RegistrationInterface {
     _id: string,
     firstName: string,
@@ -65,23 +64,22 @@ export interface TaskInterface {
     dueDate: string
 }
 
-
 export interface MemoInterface {
     _id: string;
     refNumber: string;
-    fromDepartment: string;
-    fromName: string;
+    fromDepartment: string | DepartmentInterface;
+    fromName: string | RegistrationInterface;
     memoDate: string;
-    toDepartment: string;        
-    toName: string;              // Name of the recipient
+    toDepartment: string | DepartmentInterface;        
+    toName: string | RegistrationInterface;              // Name of the recipient
     subject: string;             // Subject of the memo
     memoType: string;            // Type of the memo
     dueDate: string;            // Optional due date
     frequency: string;          // Optional frequency (e.g., daily, weekly)
     remark: string;             // Optional remarks
-    ccDepartment: string;       // Optional CC department
-    ccName: string;             // Optional CC recipient name
-    image: File;                // Optional image attachment
+    ccDepartment: string | DepartmentInterface;       // Optional CC department
+    ccName: string | RegistrationInterface;             // Optional CC recipient name
+    image: string;                // Optional image attachment (base64 string)
     emailCheck: boolean;         // Whether to send via email
     createdAt: string;           // Timestamp for when the memo is created
     updatedAt: string;          // Optional, for tracking updates

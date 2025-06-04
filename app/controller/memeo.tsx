@@ -1,6 +1,8 @@
 import { json } from "@remix-run/node"
 import Memo from "~/modal/memo"
 import { getSession } from "~/session"
+import Registration from "~/modal/registration"
+import { sendEmail, createMemoEmailTemplate } from "~/utils/email"
 
 class MemoController {
     // Create a new memo
@@ -20,6 +22,7 @@ class MemoController {
         ccName,
         emailCheck,
         base64Image,
+        currentUser,
     }: {
         refNumber: string
         fromDepartment: string
@@ -36,44 +39,108 @@ class MemoController {
         ccName: string
         emailCheck: boolean
         base64Image: string
+        currentUser: any
     }) {
 
-        const memo = new Memo({
-            refNumber,
-            fromDepartment,
-            fromName,
-            memoDate,
-            toDepartment,
-            toName,
-            subject,
-            memoType,
-            dueDate,
-            frequency,
-            remark,
-            ccDepartment,
-            ccName,
-            emailCheck,
-            image: base64Image,
-        })
-
-        const saveMemo = await memo.save()
-
-        if (saveMemo) {
-            return json({
-                message: "Memo created successfully",
-                success: true,
-                status: 500
+        try {
+            const memo = new Memo({
+                refNumber,
+                fromDepartment,
+                fromName,
+                memoDate,
+                toDepartment,
+                toName,
+                subject,
+                memoType,
+                dueDate,
+                frequency,
+                remark,
+                ccDepartment,
+                ccName,
+                emailCheck: true, // Always set to true as requested
+                image: base64Image,
             })
-        } else {
+
+            const saveMemo = await memo.save()
+
+            if (saveMemo) {
+                // Send emails if emailCheck is true (which is always true now)
+                try {
+                    // Get recipient details for emails
+                    const toUser = await Registration.findById(toName).populate('department');
+                    const ccUser = await Registration.findById(ccName).populate('department');
+                    const fromUser = await Registration.findById(fromName).populate('department');
+
+                    if (toUser && ccUser && fromUser) {
+                        const memoData = {
+                            refNumber,
+                            fromName: `${fromUser.firstName} ${fromUser.lastName}`,
+                            fromDepartment: (fromUser.department as any)?.name || '',
+                            subject,
+                            memoDate,
+                            dueDate,
+                            memoType,
+                            frequency,
+                            remark
+                        };
+
+                        // Send email to the "To" recipient
+                        const toEmailTemplate = createMemoEmailTemplate(
+                            memoData,
+                            `${toUser.firstName} ${toUser.lastName}`,
+                            'TO'
+                        );
+
+                        await sendEmail({
+                            from: currentUser.email,
+                            to: toUser.email,
+                            subject: `New Memo: ${subject} (Ref: ${refNumber})`,
+                            html: toEmailTemplate
+                        });
+
+                        // Send email to the "CC" recipient
+                        const ccEmailTemplate = createMemoEmailTemplate(
+                            memoData,
+                            `${ccUser.firstName} ${ccUser.lastName}`,
+                            'CC'
+                        );
+
+                        await sendEmail({
+                            from: currentUser.email,
+                            to: ccUser.email,
+                            subject: `CC: New Memo - ${subject} (Ref: ${refNumber})`,
+                            html: ccEmailTemplate
+                        });
+
+                        console.log('Emails sent successfully for memo:', refNumber);
+                    }
+                } catch (emailError) {
+                    console.error('Error sending emails:', emailError);
+                    // Don't fail the memo creation if email fails
+                }
+
+                return json({
+                    message: "Memo created successfully",
+                    success: true,
+                    status: 201
+                })
+            } else {
+                return json({
+                    message: "Unable to create Memo",
+                    success: false,
+                    status: 500
+                })
+            }
+        } catch (error: any) {
             return json({
-                message: "Unable to create Memo",
+                message: error.message,
                 success: false,
                 status: 500
             })
         }
+    }
 
-    };
-
+    // Update memo
     async UpdateMemo({
         id,
         refNumber,
@@ -91,6 +158,7 @@ class MemoController {
         ccName,
         emailCheck,
         base64Image,
+        currentUser,
     }: {
         id: string;
         refNumber: string;
@@ -107,74 +175,171 @@ class MemoController {
         ccDepartment?: string;
         ccName?: string;
         emailCheck?: boolean;
-        base64Image?: string; // Make image optional
+        base64Image?: string;
+        currentUser?: any;
     }) {
         try {
             // Find the existing memo
             const existingMemo = await Memo.findById(id);
-    
+
             if (!existingMemo) {
-                return json(
-                    { message: "Memo not found", success: false },
-                    { status: 404 }
-                );
+                return json({
+                    message: "Memo not found. Unable to update.",
+                    success: false,
+                    status: 404,
+                });
             }
-    
-            // Update image only if a new one is provided
+
+            // Update the image only if a new one is provided
             const updatedImage = base64Image ? base64Image : existingMemo.image;
-    
-            // Update the memo with the new or existing image
-            const updatedMemo = await Memo.findByIdAndUpdate(
-                id,
-                {
-                    refNumber,
-                    fromDepartment,
-                    fromName,
-                    memoDate,
-                    toDepartment,
-                    toName,
-                    subject,
-                    memoType,
-                    dueDate,
-                    frequency,
-                    remark,
-                    ccDepartment,
-                    ccName,
-                    emailCheck,
-                    image: updatedImage,
-                },
-                { new: true } // Return the updated document
-            );
-    
+
+            // Prepare update payload
+            const updatePayload: Record<string, any> = {
+                refNumber,
+                fromDepartment,
+                fromName,
+                memoDate,
+                toDepartment,
+                toName,
+                subject,
+                memoType,
+                dueDate,
+                frequency,
+                remark,
+                ccDepartment,
+                ccName,
+                emailCheck: true, // Always set to true
+                image: updatedImage,
+                updatedAt: new Date(),
+            };
+
+            // Remove undefined values from the payload
+            Object.keys(updatePayload).forEach((key) => {
+                if (updatePayload[key] === undefined) {
+                    delete updatePayload[key];
+                }
+            });
+
+            // Perform the update
+            const updatedMemo = await Memo.findByIdAndUpdate(id, updatePayload, { new: true });
+
             if (updatedMemo) {
-                return json(
-                    { message: "Memo updated successfully", success: true, data: updatedMemo },
-                    { status: 200 }
-                );
+                // Send update emails if recipients changed or if requested
+                if (currentUser && (
+                    existingMemo.toName.toString() !== toName ||
+                    existingMemo.ccName.toString() !== ccName
+                )) {
+                    try {
+                        const toUser = await Registration.findById(toName).populate('department');
+                        const ccUser = await Registration.findById(ccName).populate('department');
+                        const fromUser = await Registration.findById(fromName).populate('department');
+
+                        if (toUser && ccUser && fromUser) {
+                            const memoData = {
+                                refNumber,
+                                fromName: `${fromUser.firstName} ${fromUser.lastName}`,
+                                fromDepartment: (fromUser.department as any)?.name || '',
+                                subject,
+                                memoDate,
+                                dueDate: dueDate || '',
+                                memoType,
+                                frequency: frequency || '',
+                                remark: remark || ''
+                            };
+
+                            // Send updated memo emails
+                            const toEmailTemplate = createMemoEmailTemplate(
+                                memoData,
+                                `${toUser.firstName} ${toUser.lastName}`,
+                                'TO'
+                            );
+
+                            await sendEmail({
+                                from: currentUser.email,
+                                to: toUser.email,
+                                subject: `Updated Memo: ${subject} (Ref: ${refNumber})`,
+                                html: toEmailTemplate
+                            });
+
+                            const ccEmailTemplate = createMemoEmailTemplate(
+                                memoData,
+                                `${ccUser.firstName} ${ccUser.lastName}`,
+                                'CC'
+                            );
+
+                            await sendEmail({
+                                from: currentUser.email,
+                                to: ccUser.email,
+                                subject: `CC: Updated Memo - ${subject} (Ref: ${refNumber})`,
+                                html: ccEmailTemplate
+                            });
+                        }
+                    } catch (emailError) {
+                        console.error('Error sending update emails:', emailError);
+                    }
+                }
+
+                return json({
+                    message: "Memo updated successfully",
+                    success: true,
+                    status: 200,
+                    data: updatedMemo,
+                });
             } else {
-                return json(
-                    { message: "Unable to update memo", success: false },
-                    { status: 500 }
-                );
+                return json({
+                    message: "Unable to update this record.",
+                    success: false,
+                    status: 500,
+                });
             }
         } catch (error: any) {
-            return json(
-                { message: error.message || "An error occurred while updating the memo.", success: false },
-                { status: 500 }
-            );
+            return json({
+                message: error.message || "An error occurred while updating the memo.",
+                success: false,
+                status: 500,
+            });
         }
     }
-    
 
+    // Delete memo
+    async DeleteMemo({
+        id,
+    }: {
+        id: string,
+    }) {
+        try {
+            const deleteMemo = await Memo.findByIdAndDelete(id);
+            if (deleteMemo) {
+                return json({
+                    message: "Memo deleted successfully",
+                    success: true,
+                    status: 200,
+                })
+            } else {
+                return json({
+                    message: "Unable to delete memo",
+                    success: false,
+                    status: 500
+                })
+            }
+        } catch (error: any) {
+            return json({
+                message: error.message,
+                success: false,
+                status: 500
+            })
+        }
+    }
 
+    // Fetch memos with role-based visibility
     async FetchMemo({
         request,
-        page,
+        page = 1,
         search_term,
         limit = 7,
     }: {
         request?: Request;
-        page: number;
+        page?: number;
         search_term?: string;
         limit?: number;
     } = { page: 1 }) {
@@ -194,31 +359,73 @@ class MemoController {
                             ),
                         },
                     },
-
+                    {
+                        subject: {
+                            $regex: new RegExp(
+                                search_term
+                                    .split(" ")
+                                    .map((term) => `(?=.*${term})`)
+                                    .join(""),
+                                "i"
+                            ),
+                        },
+                    }
                 ],
             }
             : {};
 
         try {
-            // Get session and user information if request is provided
+            // Get session and user information
             const session = request ? await getSession(request.headers.get("Cookie")) : null;
             const token = session?.get("email");
-            const user = token ? await Memo.findOne({ email: token }) : null;
+            const user = token ? await Registration.findOne({ email: token }).populate('department') : null;
 
-            // Get total employee count and calculate total pages       
-            const totalEmployeeCount = await Memo.countDocuments(searchFilter).exec();
-            const totalPages = Math.ceil(totalEmployeeCount / (limit || 9));
+            if (!user) {
+                return {
+                    message: "User not authenticated",
+                    success: false,
+                    status: 401
+                };
+            }
 
-            // Find users with pagination and search filter
-            const memos = await Memo.find(searchFilter)
+            // Apply role-based filtering for memo visibility
+            let roleBasedFilter: any = {};
+
+            if (user.role === "admin" || user.role === "manager") {
+                // Admin and manager can see all memos
+                roleBasedFilter = {};
+            } else {
+                // For all other roles, they can only see memos where they are:
+                // 1. The sender (fromName)
+                // 2. The recipient (toName) 
+                // 3. CC'd (ccName)
+                roleBasedFilter = {
+                    $or: [
+                        { fromName: user._id },
+                        { toName: user._id },
+                        { ccName: user._id }
+                    ]
+                };
+            }
+
+            // Combine search filter with role-based filter
+            const combinedFilter = { ...searchFilter, ...roleBasedFilter };
+
+            // Get total memo count and calculate total pages       
+            const totalMemoCount = await Memo.countDocuments(combinedFilter).exec();
+            const totalPages = Math.ceil(totalMemoCount / (limit || 9));
+
+            // Find memos with pagination and search filter
+            const memos = await Memo.find(combinedFilter)
                 .skip(skipCount)
                 .limit(limit || 9)
-                .populate("fromDepartment")
-                .populate("toDepartment")
-                .populate("toName")
-                .populate("fromName")
-                .populate("ccDepartment")
-                .populate("ccName")
+                .populate("fromDepartment", "name")
+                .populate("toDepartment", "name")
+                .populate("toName", "firstName middleName lastName email")
+                .populate("fromName", "firstName middleName lastName email")
+                .populate("ccDepartment", "name")
+                .populate("ccName", "firstName middleName lastName email")
+                .sort({ createdAt: -1 }) // Sort by newest first
                 .exec();
 
             return { user, memos, totalPages };
@@ -230,32 +437,7 @@ class MemoController {
             };
         }
     }
-
-    async DeleteMemo(
-        {
-            id,
-        }: {
-            id: string,
-        }
-    ) {
-
-        const deleteMemo = await Memo.findByIdAndDelete(id);
-        if (deleteMemo) {
-            return json({
-                message: "memo delete successfully",
-                success: true,
-                status: 500,
-            })
-        } else {
-            return json({
-                message: "Unable to delete memo",
-                success: false,
-                status: 500
-            })
-        }
-
-    }
 }
 
-const memoController = new MemoController;
+const memoController = new MemoController
 export default memoController
