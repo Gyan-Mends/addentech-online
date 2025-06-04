@@ -3,10 +3,13 @@ import Registration from "~/modal/registration";
 import Task from "~/modal/task";
 import Departments from "~/modal/department";
 import { getSession } from "~/session";
+import nodemailer from "nodemailer";
+
+// =============================================
+// TASK MANAGEMENT SYSTEM FRAMEWORK CONTROLLER
+// =============================================
 
 // Role-based access control helper functions
-
-// Check if user can create tasks for a specific department
 const canCreateTaskForDepartment = (user: any, departmentId: string) => {
     if (!user) return false;
     
@@ -19,7 +22,6 @@ const canCreateTaskForDepartment = (user: any, departmentId: string) => {
     return false;
 };
 
-// Check if user can assign tasks to a specific user
 const canAssignTaskToUser = async (currentUser: any, taskDepartmentId: string, assigneeId: string) => {
     if (!currentUser) return false;
     
@@ -41,775 +43,1447 @@ const canAssignTaskToUser = async (currentUser: any, taskDepartmentId: string, a
     return false;
 };
 
-// Check if user can comment on a task
-const canCommentOnTask = (user: any, task: any) => {
+const canModifyTask = (user: any, task: any) => {
     if (!user || !task) return false;
     
-    // Admin and managers can comment on any task
+    // Admin and managers can modify any task
     if (user.role === "admin" || user.role === "manager") return true;
     
-    // Department heads can comment on tasks in their department
+    // Department heads can modify tasks in their department
     if (user.role === "head" && user.department.toString() === task.department.toString()) return true;
     
-    // Any user assigned to the task can comment
-    if (task.assignment && task.assignment.length > 0) {
-        const isAssignee = task.assignment.some((assignment: any) => 
-            assignment.assignee && assignment.assignee.toString() === user._id.toString());
-        if (isAssignee) return true;
-    }
+    // Task owner can modify their task
+    if (task.assignedOwner && task.assignedOwner.toString() === user._id.toString()) return true;
     
-    // Creator of the task can comment
+    // Task creator can modify their task
     if (task.createdBy.toString() === user._id.toString()) return true;
     
     return false;
 };
 
-// Define valid task status types to ensure type safety
-type TaskStatus = 'Unclaimed' | 'Approved' | 'Assigned' | 'In Progress' | 'On Hold' | 
-                 'Under Review' | 'Completed' | 'Rejected' | 'Cancelled' | 'Closed';
-
-// Valid task status transitions with proper typing
-const TASK_STATUS_TRANSITIONS: Record<TaskStatus, string[]> = {
-    "Unclaimed": ["In Progress", "Approved"],
-    "Approved": ["Assigned", "In Progress", "Completed"],
-    "Assigned": ["In Progress", "On Hold"],
-    "In Progress": ["On Hold", "Under Review", "Completed"],
+// Valid task status transitions
+const TASK_STATUS_TRANSITIONS: Record<string, string[]> = {
+    "Not Started": ["In Progress", "Blocked", "Cancelled"],
+    "In Progress": ["Under Review", "Completed", "Blocked", "On Hold"],
+    "Under Review": ["In Progress", "Completed", "Blocked"],
+    "Completed": [],
+    "Blocked": ["Not Started", "In Progress", "Cancelled"],
     "On Hold": ["In Progress", "Cancelled"],
-    "Under Review": ["In Progress", "Completed", "Rejected"],
-    "Completed": ["Closed"],
-    "Rejected": ["In Progress"],
-    "Cancelled": [],
-    "Closed": []
+    "Cancelled": []
 };
 
-// Check if status transition is valid
 const isValidStatusTransition = (currentStatus: string, newStatus: string) => {
-    if (!currentStatus || !TASK_STATUS_TRANSITIONS[currentStatus as TaskStatus]) return false;
-    return TASK_STATUS_TRANSITIONS[currentStatus as TaskStatus].includes(newStatus);
+    if (!currentStatus || !TASK_STATUS_TRANSITIONS[currentStatus]) return false;
+    return TASK_STATUS_TRANSITIONS[currentStatus].includes(newStatus);
+};
+
+// Email notification setup
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || "587"),
+        secure: false,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
 };
 
 class TaskController {
+    
+    // =============================================
+    // STAGE 1: Task Creation and Planning
+    // =============================================
+    
     async CreateTask({
         title,
         description,
+        category = "Operational Tasks",
+        priority = "Medium (P3)",
         department,
-        priority,
+        assignedOwner,
         dueDate,
-        status,
+        estimatedTimeInvestment = { hours: 0, unit: "hours" },
+        successCriteria = [],
+        requiredResources = [],
+        stakeholders = [],
+        budgetImplications = {
+            estimatedCost: 0,
+            actualCost: 0,
+            currency: "USD",
+            approved: false
+        },
+        riskFactors = [],
+        dependencies = [],
+        collaborators = [],
         createdBy,
-        intent,
         user,
-        assignee
+        isTemplate = false,
+        templateName,
+        templateDescription
     }: {
         title: string;
         description: string;
+        category?: string;
+        priority?: string;
         department: string;
-        createdBy: string;
-        priority: string;
+        assignedOwner: string;
         dueDate: string;
-        status: string;
-        intent: string;
+        estimatedTimeInvestment?: { hours: number; unit: string };
+        successCriteria?: Array<{ criterion: string }>;
+        requiredResources?: Array<{ name: string; type: string; status?: string }>;
+        stakeholders?: Array<{ name: string; role: string; involvement: string }>;
+        budgetImplications?: any;
+        riskFactors?: Array<{ risk: string; probability: string; impact: string }>;
+        dependencies?: Array<{ taskId: string; type: string; description?: string }>;
+        collaborators?: Array<{ user: string; role: string }>;
+        createdBy: string;
         user: any;
-        assignee?: string[];
+        isTemplate?: boolean;
+        templateName?: string;
+        templateDescription?: string;
     }) {
         try {
-            if (intent === "create") {
-                // Check if user has permission to create task for this department
-                if (!canCreateTaskForDepartment(user, department)) {
-                    return json({
-                        message: 'You do not have permission to create tasks for this department',
-                        success: false,
-                        status: 403
-                    });
-                }
-                
-                // Check if a task with the same name already exists
-                const taskCheck = await Task.findOne({ title });
-
-                if (taskCheck) {
-                    return json({
-                        message: "Task with this name already exists",
-                        success: false,
-                        status: 400,
-                    });
-                }
-
-                // Create task data
-                const taskData: any = {
-                    createdBy,
-                    title,
-                    description,
-                    priority: priority || 'Medium',
-                    department,
-                    dueDate,
-                    status: status || 'Unclaimed',
-                    assignment: []
-                };
-                
-                // Handle assignees if provided
-                if (assignee && assignee.length > 0) {
-                    // Check if user can assign tasks to these users
-                    for (const assigneeId of assignee) {
-                        const canAssign = await canAssignTaskToUser(user, department, assigneeId);
-                        if (!canAssign) {
-                            return json({
-                                message: 'You do not have permission to assign tasks to one or more of the selected users',
-                                success: false,
-                                status: 403
-                            });
-                        }
-                    }
-                    
-                    taskData.assignment = assignee.map(a => ({
-                        assignee: a,
-                        assignedAt: new Date(),
-                        status: 'Assigned'
-                    }));
-                    taskData.status = 'Assigned';
-                }
-
-                // Create new task
-                const task = new Task(taskData);
-
-                // Save task details
-                const saveTaskDetails = await task.save();
-
-                if (saveTaskDetails) {
-                    // Fetch the created task with populated references
-                    const createdTask = await Task.findById(task._id)
-                        .populate('department')
-                        .populate('createdBy')
-                        .populate({
-                            path: 'assignment',
-                            populate: {
-                                path: 'assignee',
-                                model: 'registration'
-                            }
-                        })
-                        .populate({
-                            path: 'comments',
-                            populate: {
-                                path: 'createdBy',
-                                model: 'registration'
-                            }
+            // Check permissions
+            if (!canCreateTaskForDepartment(user, department)) {
+                return json({
+                    message: 'You do not have permission to create tasks for this department',
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Check if task title already exists
+            const existingTask = await Task.findOne({ title, archived: false });
+            if (existingTask) {
+                return json({
+                    message: "Task with this title already exists",
+                    success: false,
+                    status: 400,
+                });
+            }
+            
+            // Validate dependencies
+            if (dependencies.length > 0) {
+                for (const dep of dependencies) {
+                    const dependentTask = await Task.findById(dep.taskId);
+                    if (!dependentTask) {
+                        return json({
+                            message: `Dependent task with ID ${dep.taskId} not found`,
+                            success: false,
+                            status: 400,
                         });
-                        
-                    return json({
-                        message: "Task created successfully",
-                        task: createdTask,
-                        success: true,
-                        status: 200,
-                    });
+                    }
                 }
-
-                return json({
-                    message: "Unable to create task",
-                    success: false,
-                    status: 500,
-                });
-            }
-
-            return json({
-                message: "Invalid intent",
-                success: false,
-                status: 400,
-            });
-        } catch (error: any) {
-            console.log(error);
-            return json({
-                message: error.message,
-                success: false,
-                status: 500,
-            });
-        }
-    }
-
-    async AssignTask({
-        id,
-        team,
-        lead,
-        assignee,
-        description,
-        priority,
-        dueDate,
-        status,
-        createdBy,
-        user
-    }: {
-        id: string;
-        team: string;
-        lead: string;
-        assignee: string;
-        description: string;
-        priority: string;
-        dueDate: string;
-        status: string;
-        createdBy: string;
-        user: any;
-    }) {
-        try {
-            // Check if the task exists
-            const task = await Task.findById(id).populate('department');
-
-            if (!task) {
-                return json({
-                    message: "Task not found",
-                    success: false,
-                    status: 404, // Not Found
-                });
             }
             
-            // Check if user has permission to assign tasks for this department
-            const departmentId = typeof task.department === 'string' 
-                ? task.department 
-                : (task.department && typeof task.department === 'object' && task.department._id) 
-                ? task.department._id.toString() 
-                : '';
-                
-            if (!canCreateTaskForDepartment(user, departmentId)) {
-                return json({
-                    message: "You do not have permission to assign tasks for this department",
-                    success: false,
-                    status: 403
-                });
-            }
-            
-            // Check if user can assign to the specified assignee
-            const canAssign = await canAssignTaskToUser(user, departmentId, assignee);
-            if (!canAssign) {
-                return json({
-                    message: "You do not have permission to assign tasks to this user",
-                    success: false,
-                    status: 403
-                });
-            }
-
-            // Validate the task status
-            if (task.status !== "Approved") {
-                return json({
-                    message: "Task cannot be assigned because it is not Approved",
-                    success: false,
-                    status: 400, // Bad Request
-                });
-            }
-
-            // Update task with assignment details
-            const assign = await Task.findByIdAndUpdate(
-                id,
-                {
-                    $push: {
-                        assignment: {
-                            lead,
-                            description,
-                            team,
-                            priority,
-                            dueDate,
-                            status,
-                            createdBy,
-                            assignee,
-                        },
-                    },
-                },
-                { new: true }
-            );
-        } catch (error: any) {
-            return json({
-                message: error.message,
-                success: false,
-                status: 500,
-            });
-        }
-    }
-
-    async assignmentComment({
-        AssignmentId,
-        id,
-        comment,
-        createdBy,
-        user
-    }: {
-        AssignmentId: string
-        id: string;
-        comment: string;
-        createdBy: string;
-        user: any;
-    }) {
-        try {
-            // Find the task by ID with proper typecasting
-            const task = await Task.findById(id).populate('department').populate('createdBy');
-
-            if (!task) {
-                return json({
-                    message: "Task not found",
-                    success: false,
-                    status: 404,
-                });
-            }
-            
-            // Check if user has permission to comment on this task
-            if (!canCommentOnTask(user, task)) {
-                return json({
-                    message: "You do not have permission to comment on this task",
-                    success: false,
-                    status: 403
-                });
-            }
-
-            // Ensure task has assignment property and type cast appropriately
-            const taskWithAssignments = task as any;
-            
-            // Find the assignment by ID within the task
-            const assignmentIndex = taskWithAssignments.assignment ? 
-                taskWithAssignments.assignment.findIndex(
-                    (assignment: any) => assignment._id.toString() === AssignmentId
-                ) : -1;
-
-            if (assignmentIndex === -1) {
-                return json({
-                    message: "Assignment not found",
-                    success: false,
-                    status: 404,
-                });
-            }
-            
-            // Check if user is assigned to this assignment or has admin/manager role
-            const isAssignee = taskWithAssignments.assignment[assignmentIndex].assignee &&
-                taskWithAssignments.assignment[assignmentIndex].assignee.toString() === user._id.toString();
-                
-            if (!isAssignee && user.role !== 'admin' && user.role !== 'manager' && 
-                !(user.role === 'head' && user.department.toString() === task.department.toString())) {
-                return json({
-                    message: "You do not have permission to comment on this assignment",
-                    success: false,
-                    status: 403
-                });
-            }
-
-            // Add comment to the assignment using type casting to avoid errors
-            taskWithAssignments.assignment[assignmentIndex].comments = 
-                taskWithAssignments.assignment[assignmentIndex].comments || [];
-                
-            taskWithAssignments.assignment[assignmentIndex].comments.push({
-                comment,
+            // Create task data
+            const taskData = {
+                title,
+                description,
+                category,
+                priority,
+                department,
+                assignedOwner,
                 createdBy,
-                createdAt: new Date(),
-            });
-
-            // Save the updated task
-            const updatedTask = await taskWithAssignments.save();
+                dueDate: new Date(dueDate),
+                status: "Not Started",
+                estimatedTimeInvestment,
+                actualTimeSpent: { hours: 0, unit: "hours" },
+                successCriteria: successCriteria.map(sc => ({ 
+                    ...sc, 
+                    completed: false 
+                })),
+                requiredResources: requiredResources.map(rr => ({ 
+                    ...rr, 
+                    status: rr.status || "Available" 
+                })),
+                stakeholders,
+                budgetImplications,
+                riskFactors: riskFactors.map(rf => ({ 
+                    ...rf, 
+                    status: "Identified" 
+                })),
+                dependencies,
+                collaborators: collaborators.map(c => ({ 
+                    ...c, 
+                    addedAt: new Date() 
+                })),
+                comments: [],
+                progressUpdates: [],
+                attachments: [],
+                approvalWorkflow: [],
+                metrics: {
+                    viewCount: 0,
+                    editCount: 0,
+                    completionScore: 0,
+                    qualityScore: 0,
+                    stakeholderSatisfaction: 0
+                },
+                recurrence: {
+                    isRecurring: false,
+                    interval: 1
+                },
+                archived: false,
+                isTemplate,
+                templateName,
+                templateDescription,
+                usageCount: 0
+            };
             
-            // Fetch the updated task with populated references
-            const populatedTask = await Task.findById(taskWithAssignments._id)
+            const task = new Task(taskData);
+            const savedTask = await task.save();
+            
+            // Populate the saved task
+            const populatedTask = await Task.findById(savedTask._id)
                 .populate('department')
                 .populate('createdBy')
-                .populate({
-                    path: 'assignment.assignee',
-                    model: 'registration'
-                })
-                .populate({
-                    path: 'assignment.comments.createdBy',
-                    model: 'registration',
-                    select: 'firstName lastName image'
-                });
-
-            if (populatedTask) {
-                return json({
-                    message: "Comment added to assignment successfully",
-                    task: populatedTask,
-                    success: true,
-                    status: 200,
-                });
-            }
-
+                .populate('assignedOwner')
+                .populate('collaborators.user')
+                .populate('dependencies.taskId');
+            
+            // Send notification to assigned owner
+            await this.sendTaskNotification(populatedTask, 'task_assigned');
+            
             return json({
-                message: "Unable to add comment to assignment",
-                success: false,
-                status: 500,
+                message: "Task created successfully",
+                task: populatedTask,
+                success: true,
+                status: 201
             });
-        } catch (error: any) {
-            console.log(error);
+            
+        } catch (error) {
+            console.error("Create task error:", error);
             return json({
-                message: error.message,
+                message: "Failed to create task",
                 success: false,
                 status: 500,
+                error: error instanceof Error ? error.message : String(error)
             });
         }
     }
-
-    async FetchTasks({
-        request,
-        page,
-        search_term,
-        limit = 7,
-        departmentFilter,
-        user: providedUser
+    
+    // =============================================
+    // STAGE 3: Execution and Progress Tracking
+    // =============================================
+    
+    async UpdateTaskProgress({
+        taskId,
+        update,
+        percentComplete,
+        milestone,
+        blockers = [],
+        user
     }: {
-        request?: Request;
-        page: number;
-        search_term?: string;
-        limit?: number;
-        departmentFilter?: string;
-        user?: any;
-    } = { page: 1 }) {
-        // Calculate the number of documents to skip
-        const skipCount = (page - 1) * limit;
-
-        // Create a search filter based on the search term
-        const searchFilter: any = {};
-        if (search_term) {
-            searchFilter.$or = [
-                { title: { $regex: search_term, $options: "i" } },
-                { description: { $regex: search_term, $options: "i" } },
-            ];
-        }
-
+        taskId: string;
+        update: string;
+        percentComplete: number;
+        milestone?: string;
+        blockers?: Array<{ description: string; severity: string }>;
+        user: any;
+    }) {
         try {
-            // Determine the current user - either from the provided user parameter or from the session
-            let user = providedUser;
-            
-            if (!user && request) {
-                const session = await getSession(request.headers.get("Cookie"));
-                const token = session?.get("email");
-                if (token) {
-                    user = await Registration.findOne({ email: token });
-                }
-            }
-            
-            if (!user) {
+            const task = await Task.findById(taskId);
+            if (!task) {
                 return json({
-                    message: "User not authenticated",
+                    message: "Task not found",
                     success: false,
-                    status: 401
+                    status: 404
                 });
             }
             
-            // Apply role-based filtering
-            let taskQuery: any = {};
+            if (!canModifyTask(user, task)) {
+                return json({
+                    message: "You don't have permission to update this task",
+                    success: false,
+                    status: 403
+                });
+            }
             
-            // Admin and manager can see all tasks (optionally filtered by department)
-            if (user.role === "admin" || user.role === "manager") {
-                if (departmentFilter) {
-                    taskQuery.department = departmentFilter;
-                }
+            const progressUpdate = {
+                createdBy: user._id,
+                update,
+                percentComplete: Math.max(0, Math.min(100, percentComplete)),
+                milestone,
+                blockers: blockers.map(b => ({
+                    ...b,
+                    severity: b.severity || "Medium"
+                })),
+                createdAt: new Date()
+            };
+            
+            const updatedTask = await Task.findByIdAndUpdate(
+                taskId,
+                {
+                    $push: { progressUpdates: progressUpdate },
+                    $inc: { 'metrics.editCount': 1 }
+                },
+                { new: true }
+            ).populate('assignedOwner')
+             .populate('createdBy');
+            
+            return json({
+                message: "Task progress updated successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Update task progress error:", error);
+            return json({
+                message: "Failed to update task progress",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    async UpdateTaskStatus({
+        taskId,
+        status,
+        user,
+        comments
+    }: {
+        taskId: string;
+        status: string;
+        user: any;
+        comments?: string;
+    }) {
+        try {
+            const task = await Task.findById(taskId);
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
             }
-            // Department head can only see their department's tasks
-            else if (user.role === "head") {
-                taskQuery.department = user.department;
+            
+            if (!canModifyTask(user, task)) {
+                return json({
+                    message: "You don't have permission to update this task",
+                    success: false,
+                    status: 403
+                });
             }
-            // Staff can only see tasks they're assigned to or created
-            else {
-                taskQuery.$or = [
+            
+            const updateData: any = { 
+                status,
+                $inc: { 'metrics.editCount': 1 }
+            };
+            
+            if (status === "Completed") {
+                updateData.completedAt = new Date();
+            }
+            
+            const updatedTask = await Task.findByIdAndUpdate(
+                taskId,
+                updateData,
+                { new: true }
+            ).populate('assignedOwner')
+             .populate('createdBy');
+            
+            return json({
+                message: "Task status updated successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Update task status error:", error);
+            return json({
+                message: "Failed to update task status",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // =============================================
+    // Comments and Communication
+    // =============================================
+    
+    async addComment({
+        taskId,
+        comment,
+        type = "General",
+        visibility = "Public",
+        user
+    }: {
+        taskId: string;
+        comment: string;
+        type?: string;
+        visibility?: string;
+        user: any;
+    }) {
+        try {
+            const task = await Task.findById(taskId);
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            const commentData = {
+                createdBy: user._id,
+                comment,
+                type,
+                visibility,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                reactions: []
+            };
+            
+            const updatedTask = await Task.findByIdAndUpdate(
+                taskId,
+                {
+                    $push: { comments: commentData },
+                    $inc: { 'metrics.editCount': 1 }
+                },
+                { new: true }
+            ).populate('comments.createdBy');
+            
+            return json({
+                message: "Comment added successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Add comment error:", error);
+            return json({
+                message: "Failed to add comment",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // =============================================
+    // Task Retrieval and Filtering
+    // =============================================
+    
+    async GetTasksWithFilters({
+        user,
+        page = 1,
+        limit = 20,
+        status,
+        priority,
+        category,
+        departmentId,
+        assignedTo,
+        createdBy,
+        dueDateFrom,
+        dueDateTo,
+        searchTerm,
+        includeArchived = false
+    }: {
+        user: any;
+        page?: number;
+        limit?: number;
+        status?: string;
+        priority?: string;
+        category?: string;
+        departmentId?: string;
+        assignedTo?: string;
+        createdBy?: string;
+        dueDateFrom?: string;
+        dueDateTo?: string;
+        searchTerm?: string;
+        includeArchived?: boolean;
+    }) {
+        try {
+            const query: any = {};
+            
+            // Base visibility rules
+            if (user.role !== "admin" && user.role !== "manager") {
+                // Non-admin users can only see tasks from their department or assigned to them
+                query.$or = [
+                    { department: user.department },
+                    { assignedOwner: user._id },
                     { createdBy: user._id },
-                    { "assignment.assignee": user._id }
+                    { 'collaborators.user': user._id }
                 ];
             }
             
-            // Combine search filter with role-based filter
-            const combinedFilter = { ...taskQuery, ...searchFilter };
-
-            // Count total tasks based on the user's permissions
-            const taskCount = await Task.countDocuments(combinedFilter).exec();
-            const totalPages = Math.ceil(taskCount / limit);
-
-            // Fetch tasks based on the combined filter
-            const filteredTasks = await Task.find(combinedFilter)
-                .skip(skipCount)
-                .limit(limit)
-                .sort({ createdAt: -1 }) // Sort by most recent first
-                .populate("department")
-                .populate("createdBy")
-                .populate({
-                    path: "assignment",
-                    populate: {
-                        path: "assignee",
-                        model: "registration",
-                        select: "firstName lastName email image role department"
-                    }
-                })
-                .populate({
-                    path: "comments",
-                    populate: {
-                        path: "createdBy",
-                        model: "registration",
-                        select: "firstName lastName image"
-                    }
-                })
-                .exec();
-                
-            // Get task counts by status for statistics
-            const totalUnclaimed = await Task.countDocuments({ ...combinedFilter, status: "Unclaimed" });
-            const totalApproved = await Task.countDocuments({ ...combinedFilter, status: "Approved" });
-            const totalInProgress = await Task.countDocuments({ ...combinedFilter, status: "In Progress" });
-            const totalUnderReview = await Task.countDocuments({ ...combinedFilter, status: "Under Review" });
-            const totalCompleted = await Task.countDocuments({ ...combinedFilter, status: "Completed" });
-            const totalRejected = await Task.countDocuments({ ...combinedFilter, status: "Rejected" });
-            const totalClosed = await Task.countDocuments({ ...combinedFilter, status: "Closed" });
+            // Apply filters
+            if (status) query.status = status;
+            if (priority) query.priority = priority;
+            if (category) query.category = category;
+            if (departmentId) query.department = departmentId;
+            if (assignedTo) query.assignedOwner = assignedTo;
+            if (createdBy) query.createdBy = createdBy;
+            if (!includeArchived) query.archived = false;
             
-            // Get department staff if user is a department head
-            let departmentStaff: any[] = [];
-            if (user.role === "head") {
-                departmentStaff = await Registration.find(
-                    { department: user.department, role: "staff" },
-                    "_id firstName lastName email image"
-                );
+            // Date range filter
+            if (dueDateFrom || dueDateTo) {
+                query.dueDate = {};
+                if (dueDateFrom) query.dueDate.$gte = new Date(dueDateFrom);
+                if (dueDateTo) query.dueDate.$lte = new Date(dueDateTo);
             }
-
+            
+            // Search filter
+            if (searchTerm) {
+                query.$and = query.$and || [];
+                query.$and.push({
+                    $or: [
+                        { title: { $regex: searchTerm, $options: 'i' } },
+                        { description: { $regex: searchTerm, $options: 'i' } }
+                    ]
+                });
+            }
+            
+            const skip = (page - 1) * limit;
+            
+            const tasks = await Task.find(query)
+                .populate('department')
+                .populate('assignedOwner')
+                .populate('createdBy')
+                .populate('collaborators.user')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit);
+            
+            const totalTasks = await Task.countDocuments(query);
+            
             return json({
-                tasks: filteredTasks,
-                user: {
-                    id: user._id,
-                    role: user.role,
-                    department: user.department
+                tasks,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(totalTasks / limit),
+                    totalTasks,
+                    hasNextPage: page < Math.ceil(totalTasks / limit),
+                    hasPrevPage: page > 1
                 },
-                departmentStaff: departmentStaff || [],
-                totals: {
-                    unclaimed: totalUnclaimed,
-                    approved: totalApproved,
-                    inProgress: totalInProgress,
-                    underReview: totalUnderReview,
-                    completed: totalCompleted,
-                    rejected: totalRejected,
-                    closed: totalClosed,
-                    pages: {
-                        totalPages,
-                        page,
-                    },
-                    taskCount,
-                },
-                success: true,
-                status: 200
+                success: true
             });
-        } catch (error: any) {
-            console.error("Error Fetching Tasks:", error.message);
-
+            
+        } catch (error) {
+            console.error("Get tasks with filters error:", error);
             return json({
-                message: error.message,
-                success: false,
-                status: 500,
-            });
-        }
-    }
-
-    async UpdateProjectkStatus({
-        status,
-        id,
-    }: {
-        id: string,
-        status: string
-    }) {
-        try {
-            // Validate status against schema enum values
-            const validStatuses = ["Unclaimed", "Approved"];
-            if (!validStatuses.includes(status)) {
-                return json({
-                    message: "Invalid status value. Allowed values are 'Unclaimed' and 'Approved'.",
-                    success: false,
-                    status: 400, // Bad Request
-                });
-            }
-
-            const updateUser = await Task.findByIdAndUpdate(
-                id,
-                { status },
-                { new: true } // Return the updated document
-            );
-
-            if (updateUser) {
-                return json({
-                    message: "Task Status Updated Successfully",
-                    success: true,
-                    status: 200, // Success
-                });
-            } else {
-                return json({
-                    message: "Unable to update this record",
-                    success: false,
-                    status: 404, // Not Found
-                });
-            }
-        } catch (error: any) {
-            return json({
-                message: error.message,
-                success: false,
-                status: 500, // Internal Server Error
-            });
-        }
-    }
-
-    async UpdateTaskkStatus({
-        status,
-        id,
-    }: {
-        id: string,
-        status: string
-    }) {
-        try {
-            const updateUser = await Task.findByIdAndUpdate(
-                id,
-                { status },
-                { new: true } // Return the updated document
-            );
-
-            if (updateUser) {
-                return json({
-                    message: "Task Status Updated Successfully",
-                    success: true,
-                    status: 200, // Success
-                });
-            } else {
-                return json({
-                    message: "Unable to update this record",
-                    success: false,
-                    status: 404, // Not Found
-                });
-            }
-        } catch (error: any) {
-            return json({
-                message: error.message,
-                success: false,
-                status: 500, // Internal Server Error
-            });
-        }
-    }
-
-    async UpdatePriority({
-        priority,
-        id,
-    }: {
-        id: string,
-        priority: string
-    }) {
-        try {
-            const updateUser = await Task.findByIdAndUpdate(
-                id,
-                { priority },
-                { new: true } // Return the updated document
-            );
-
-            if (updateUser) {
-                return json({
-                    message: "Task Status Updated Successfully",
-                    success: true,
-                    status: 200, // Success
-                });
-            } else {
-                return json({
-                    message: "Unable to update this record",
-                    success: false,
-                    status: 404, // Not Found
-                });
-            }
-        } catch (error: any) {
-            return json({
-                message: error.message,
-                success: false,
-                status: 500, // Internal Server Error
-            });
-        }
-    }
-
-    async DeleteProject({
-        id,
-    }: {
-        id: string,
-    }) {
-        const deleteUser = await Task.findByIdAndDelete(id);
-        if (deleteUser) {
-            return json({
-                message: "Project delete successfully",
-                success: true,
-                status: 500,
-            })
-        } else {
-            return json({
-                message: "Unable to delete project",
+                message: "Failed to retrieve tasks",
                 success: false,
                 status: 500
-            })
+            });
         }
     }
-
-    // New methods to support the task management feature
-
-    // Get a single task by ID
-    async GetSingleTask(taskId: string) {
+    
+    async GetSingleTask(taskId: string, user?: any) {
         try {
             const task = await Task.findById(taskId)
-                .populate("department", "name")
-                .populate("createdBy", "firstName lastName email")
-                .populate("comments.createdBy", "firstName lastName email")
-                .populate("assignment.lead", "firstName lastName email")
-                .populate("assignment.assignee", "firstName lastName email");
-
+                .populate('department')
+                .populate('assignedOwner')
+                .populate('createdBy')
+                .populate('collaborators.user')
+                .populate('dependencies.taskId')
+                .populate('comments.createdBy')
+                .populate('progressUpdates.createdBy')
+                .populate('approvalWorkflow.approver');
+            
             if (!task) {
                 return json({
                     message: "Task not found",
                     success: false,
-                    status: 404,
+                    status: 404
                 });
             }
-
-            return json({
-                message: "Task retrieved successfully",
-                success: true,
-                status: 200,
-                data: task,
+            
+            // Increment view count
+            await Task.findByIdAndUpdate(taskId, {
+                $inc: { 'metrics.viewCount': 1 }
             });
-        } catch (error: any) {
+            
             return json({
-                message: error.message,
+                task,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Get single task error:", error);
+            return json({
+                message: "Failed to retrieve task",
                 success: false,
-                status: 500,
+                status: 500
             });
         }
     }
-
-    // Get tasks by department
-    async GetTasksByDepartment(departmentId: string) {
+    
+    // =============================================
+    // Notification System
+    // =============================================
+    
+    async sendTaskNotification(task: any, notificationType: string) {
         try {
-            const tasks = await Task.find({ department: departmentId })
-                .populate("department", "name")
-                .populate("createdBy", "firstName lastName email")
-                .sort({ createdAt: -1 });
-
-            return json({
-                message: "Department tasks retrieved successfully",
-                success: true,
-                status: 200,
-                data: tasks,
-            });
-        } catch (error: any) {
-            return json({
-                message: error.message,
-                success: false,
-                status: 500,
-            });
+            if (!process.env.SMTP_HOST) return;
+            
+            const transporter = createTransporter();
+            let subject = "";
+            let body = "";
+            
+            switch (notificationType) {
+                case 'task_assigned':
+                    subject = `New Task Assigned: ${task.title}`;
+                    body = `You have been assigned a new task: ${task.title}\n\nDescription: ${task.description}\n\nDue Date: ${task.dueDate}\n\nPriority: ${task.priority}`;
+                    break;
+                case 'task_reassigned':
+                    subject = `Task Reassigned: ${task.title}`;
+                    body = `A task has been reassigned to you: ${task.title}`;
+                    break;
+                case 'progress_update':
+                    subject = `Task Progress Update: ${task.title}`;
+                    body = `Progress has been updated for task: ${task.title}`;
+                    break;
+                case 'status_changed':
+                    subject = `Task Status Changed: ${task.title}`;
+                    body = `Task status has been changed to: ${task.status}`;
+                    break;
+                case 'task_completed':
+                    subject = `Task Completed: ${task.title}`;
+                    body = `Task has been completed: ${task.title}`;
+                    break;
+            }
+            
+            // Send to assigned owner
+            if (task.assignedOwner && task.assignedOwner.email) {
+                await transporter.sendMail({
+                    from: process.env.SMTP_FROM,
+                    to: task.assignedOwner.email,
+                    subject,
+                    text: body
+                });
+            }
+            
+        } catch (error) {
+            console.error("Send notification error:", error);
         }
     }
-
-    // Get all tasks
+    
+    // =============================================
+    // Legacy Method Support (for backward compatibility)
+    // =============================================
+    
+    async CreateTask_Legacy(data: any) {
+        // Map legacy data to new format
+        return this.CreateTask({
+            title: data.title,
+            description: data.description,
+            department: data.department,
+            assignedOwner: data.assignedOwner || data.createdBy,
+            dueDate: data.dueDate,
+            priority: data.priority === "low" ? "Low (P4)" : 
+                     data.priority === "medium" ? "Medium (P3)" : 
+                     data.priority === "high" ? "High (P2)" : "Medium (P3)",
+            category: "Operational Tasks",
+            createdBy: data.createdBy,
+            user: data.user
+        });
+    }
+    
     async GetAllTasks() {
+        return this.GetTasksWithFilters({ user: { role: "admin" } });
+    }
+    
+    async GetTasksByDepartment(departmentId: string) {
+        return this.GetTasksWithFilters({ 
+            user: { role: "admin" }, 
+            departmentId 
+        });
+    }
+    
+    // Legacy comment method
+    async comment({ id, comment, createdBy }: { id: string; comment: string; createdBy: string; }) {
+        return this.addComment({
+            taskId: id,
+            comment,
+            user: { _id: createdBy }
+        });
+    }
+    
+    // =============================================
+    // ENHANCED WORKFLOW METHODS FOR SPECIFIC REQUIREMENTS
+    // =============================================
+    
+    // Method for Admin/Manager to create task and assign to department
+    async CreateTaskForDepartment({
+        title,
+        description,
+        category = "Operational Tasks",
+        priority = "Medium (P3)",
+        departmentId,
+        dueDate,
+        estimatedTimeInvestment = { hours: 0, unit: "hours" },
+        successCriteria = [],
+        requiredResources = [],
+        stakeholders = [],
+        budgetImplications = {
+            estimatedCost: 0,
+            actualCost: 0,
+            currency: "USD",
+            approved: false
+        },
+        riskFactors = [],
+        dependencies = [],
+        createdBy,
+        user,
+        specialInstructions
+    }: {
+        title: string;
+        description: string;
+        category?: string;
+        priority?: string;
+        departmentId: string;
+        dueDate: string;
+        estimatedTimeInvestment?: { hours: number; unit: string };
+        successCriteria?: Array<{ criterion: string }>;
+        requiredResources?: Array<{ name: string; type: string; status?: string }>;
+        stakeholders?: Array<{ name: string; role: string; involvement: string }>;
+        budgetImplications?: any;
+        riskFactors?: Array<{ risk: string; probability: string; impact: string }>;
+        dependencies?: Array<{ taskId: string; type: string; description?: string }>;
+        createdBy: string;
+        user: any;
+        specialInstructions?: string;
+    }) {
         try {
-            const tasks = await Task.find()
-                .populate("department", "name")
-                .populate("createdBy", "firstName lastName email")
-                .sort({ createdAt: -1 });
-
-            return json({
-                message: "All tasks retrieved successfully",
-                success: true,
-                status: 200,
-                data: tasks,
+            // Verify user can create tasks for departments (Admin/Manager only)
+            if (!user || !["admin", "manager"].includes(user.role)) {
+                return json({
+                    message: 'Only Admin and Manager can create tasks for departments',
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Find department head for assignment notification
+            const departmentHead = await Registration.findOne({ 
+                department: departmentId, 
+                role: "department_head" 
             });
-        } catch (error: any) {
+            
+            if (!departmentHead) {
+                return json({
+                    message: 'No department head found for this department',
+                    success: false,
+                    status: 400
+                });
+            }
+            
+            // Create task assigned to department (initially to HOD for further assignment)
+            const taskData = {
+                title,
+                description,
+                category,
+                priority,
+                department: departmentId,
+                assignedOwner: departmentHead._id, // Initially assign to HOD
+                createdBy,
+                dueDate: new Date(dueDate),
+                status: "Not Started",
+                estimatedTimeInvestment,
+                actualTimeSpent: { hours: 0, unit: "hours" },
+                successCriteria: successCriteria.map(sc => ({ 
+                    ...sc, 
+                    completed: false 
+                })),
+                requiredResources: requiredResources.map(rr => ({ 
+                    ...rr, 
+                    status: rr.status || "Available" 
+                })),
+                stakeholders,
+                budgetImplications,
+                riskFactors: riskFactors.map(rf => ({ 
+                    ...rf, 
+                    status: "Identified" 
+                })),
+                dependencies,
+                collaborators: [],
+                comments: specialInstructions ? [{
+                    createdBy,
+                    comment: `Task assigned to department. Special Instructions: ${specialInstructions}`,
+                    type: "Status Update",
+                    visibility: "Team Only",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    reactions: []
+                }] : [],
+                progressUpdates: [],
+                attachments: [],
+                approvalWorkflow: [],
+                metrics: {
+                    viewCount: 0,
+                    editCount: 0,
+                    completionScore: 0,
+                    qualityScore: 0,
+                    stakeholderSatisfaction: 0
+                },
+                recurrence: {
+                    isRecurring: false,
+                    interval: 1
+                },
+                archived: false,
+                isTemplate: false,
+                usageCount: 0,
+                taskAssignmentLevel: "department", // Track assignment level
+                departmentAssignmentComplete: false
+            };
+            
+            const task = new Task(taskData);
+            const savedTask = await task.save();
+            
+            // Populate the saved task
+            const populatedTask = await Task.findById(savedTask._id)
+                .populate('department')
+                .populate('createdBy')
+                .populate('assignedOwner');
+            
+            // Send notification to department head
+            await this.sendTaskNotification(populatedTask, 'task_assigned_to_department');
+            
             return json({
-                message: error.message,
+                message: "Task created and assigned to department successfully",
+                task: populatedTask,
+                success: true,
+                status: 201
+            });
+            
+        } catch (error) {
+            console.error("Create task for department error:", error);
+            return json({
+                message: "Failed to create task for department",
                 success: false,
                 status: 500,
+                error: error instanceof Error ? error.message : String(error)
+            });
+        }
+    }
+    
+    // Method for HOD to assign task to department members
+    async AssignTaskToMember({
+        taskId,
+        assignedMemberId,
+        hodInstructions,
+        modifyDueDate,
+        modifyPriority,
+        additionalResources = [],
+        user
+    }: {
+        taskId: string;
+        assignedMemberId: string;
+        hodInstructions?: string;
+        modifyDueDate?: string;
+        modifyPriority?: string;
+        additionalResources?: Array<{ name: string; type: string; description?: string }>;
+        user: any;
+    }) {
+        try {
+            const task = await Task.findById(taskId).populate('department');
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            // Verify user is HOD of the task's department
+            if (!user || user.role !== "department_head" || 
+                user.department.toString() !== task.department._id.toString()) {
+                return json({
+                    message: 'Only the department head can assign tasks to members',
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Verify assigned member belongs to the same department
+            const assignedMember = await Registration.findById(assignedMemberId);
+            if (!assignedMember || assignedMember.department.toString() !== task.department._id.toString()) {
+                return json({
+                    message: 'Assigned member must belong to the same department',
+                    success: false,
+                    status: 400
+                });
+            }
+            
+            // Update task with new assignment
+            const updateData: any = {
+                assignedOwner: assignedMemberId,
+                departmentAssignmentComplete: true,
+                taskAssignmentLevel: "member",
+                $inc: { 'metrics.editCount': 1 }
+            };
+            
+            if (modifyDueDate) {
+                updateData.dueDate = new Date(modifyDueDate);
+            }
+            
+            if (modifyPriority) {
+                updateData.priority = modifyPriority;
+            }
+            
+            if (additionalResources.length > 0) {
+                updateData.$push = {
+                    requiredResources: { $each: additionalResources.map(r => ({ ...r, status: "Available" })) }
+                };
+            }
+            
+            const updatedTask = await Task.findByIdAndUpdate(taskId, updateData, { new: true })
+                .populate('assignedOwner')
+                .populate('createdBy')
+                .populate('department');
+            
+            // Add assignment comment
+            if (hodInstructions || modifyDueDate || modifyPriority) {
+                const assignmentComment = {
+                    createdBy: user._id,
+                    comment: `Task assigned to ${assignedMember.firstName} ${assignedMember.lastName}. ${hodInstructions ? `HOD Instructions: ${hodInstructions}` : ''}${modifyDueDate ? ` Due date modified to: ${modifyDueDate}` : ''}${modifyPriority ? ` Priority changed to: ${modifyPriority}` : ''}`,
+                    type: "Status Update",
+                    visibility: "Team Only",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    reactions: []
+                };
+                
+                await Task.findByIdAndUpdate(taskId, {
+                    $push: { comments: assignmentComment }
+                });
+            }
+            
+            // Send notification to assigned member
+            await this.sendTaskNotification(updatedTask, 'task_assigned');
+            
+            return json({
+                message: "Task assigned to member successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Assign task to member error:", error);
+            return json({
+                message: "Failed to assign task to member",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // Enhanced method for HOD to create task directly for department members
+    async CreateTaskForMember({
+        title,
+        description,
+        category = "Operational Tasks",
+        priority = "Medium (P3)",
+        assignedMemberId,
+        dueDate,
+        estimatedTimeInvestment = { hours: 0, unit: "hours" },
+        successCriteria = [],
+        requiredResources = [],
+        stakeholders = [],
+        riskFactors = [],
+        user,
+        hodInstructions
+    }: {
+        title: string;
+        description: string;
+        category?: string;
+        priority?: string;
+        assignedMemberId: string;
+        dueDate: string;
+        estimatedTimeInvestment?: { hours: number; unit: string };
+        successCriteria?: Array<{ criterion: string }>;
+        requiredResources?: Array<{ name: string; type: string; status?: string }>;
+        stakeholders?: Array<{ name: string; role: string; involvement: string }>;
+        riskFactors?: Array<{ risk: string; probability: string; impact: string }>;
+        user: any;
+        hodInstructions?: string;
+    }) {
+        try {
+            // Verify user is HOD
+            if (!user || user.role !== "department_head") {
+                return json({
+                    message: 'Only department heads can create tasks for their members',
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Verify assigned member belongs to the same department
+            const assignedMember = await Registration.findById(assignedMemberId);
+            if (!assignedMember || assignedMember.department.toString() !== user.department.toString()) {
+                return json({
+                    message: 'You can only assign tasks to members of your department',
+                    success: false,
+                    status: 400
+                });
+            }
+            
+            // Create task directly assigned to member
+            const taskData = {
+                title,
+                description,
+                category,
+                priority,
+                department: user.department,
+                assignedOwner: assignedMemberId,
+                createdBy: user._id,
+                dueDate: new Date(dueDate),
+                status: "Not Started",
+                estimatedTimeInvestment,
+                actualTimeSpent: { hours: 0, unit: "hours" },
+                successCriteria: successCriteria.map(sc => ({ 
+                    ...sc, 
+                    completed: false 
+                })),
+                requiredResources: requiredResources.map(rr => ({ 
+                    ...rr, 
+                    status: rr.status || "Available" 
+                })),
+                stakeholders,
+                budgetImplications: {
+                    estimatedCost: 0,
+                    actualCost: 0,
+                    currency: "USD",
+                    approved: false
+                },
+                riskFactors: riskFactors.map(rf => ({ 
+                    ...rf, 
+                    status: "Identified" 
+                })),
+                dependencies: [],
+                collaborators: [],
+                comments: hodInstructions ? [{
+                    createdBy: user._id,
+                    comment: `Task created by HOD. Instructions: ${hodInstructions}`,
+                    type: "Status Update",
+                    visibility: "Team Only",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    reactions: []
+                }] : [],
+                progressUpdates: [],
+                attachments: [],
+                approvalWorkflow: [],
+                metrics: {
+                    viewCount: 0,
+                    editCount: 0,
+                    completionScore: 0,
+                    qualityScore: 0,
+                    stakeholderSatisfaction: 0
+                },
+                recurrence: {
+                    isRecurring: false,
+                    interval: 1
+                },
+                archived: false,
+                isTemplate: false,
+                usageCount: 0,
+                taskAssignmentLevel: "member",
+                departmentAssignmentComplete: true
+            };
+            
+            const task = new Task(taskData);
+            const savedTask = await task.save();
+            
+            // Populate the saved task
+            const populatedTask = await Task.findById(savedTask._id)
+                .populate('department')
+                .populate('createdBy')
+                .populate('assignedOwner');
+            
+            // Send notification to assigned member
+            await this.sendTaskNotification(populatedTask, 'task_assigned');
+            
+            return json({
+                message: "Task created and assigned to member successfully",
+                task: populatedTask,
+                success: true,
+                status: 201
+            });
+            
+        } catch (error) {
+            console.error("Create task for member error:", error);
+            return json({
+                message: "Failed to create task for member",
+                success: false,
+                status: 500,
+                error: error instanceof Error ? error.message : String(error)
+            });
+        }
+    }
+    
+    // Enhanced status update with role-based permissions
+    async UpdateTaskStatusWithPermissions({
+        taskId,
+        status,
+        user,
+        statusChangeReason
+    }: {
+        taskId: string;
+        status: string;
+        user: any;
+        statusChangeReason?: string;
+    }) {
+        try {
+            const task = await Task.findById(taskId).populate('assignedOwner').populate('department');
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            // Check permissions: Only assigned owner, HOD, admin, or manager can change status
+            const canUpdateStatus = 
+                task.assignedOwner._id.toString() === user._id.toString() || // Assigned person
+                (user.role === "department_head" && user.department.toString() === task.department._id.toString()) || // HOD of department
+                ["admin", "manager"].includes(user.role); // Admin or Manager
+            
+            if (!canUpdateStatus) {
+                return json({
+                    message: "You don't have permission to update this task status",
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Validate status transition
+            if (!isValidStatusTransition(task.status, status)) {
+                return json({
+                    message: `Invalid status transition from ${task.status} to ${status}`,
+                    success: false,
+                    status: 400
+                });
+            }
+            
+            const updateData: any = { 
+                status,
+                $inc: { 'metrics.editCount': 1 }
+            };
+            
+            if (status === "Completed") {
+                updateData.completedAt = new Date();
+            }
+            
+            const updatedTask = await Task.findByIdAndUpdate(taskId, updateData, { new: true })
+                .populate('assignedOwner')
+                .populate('createdBy')
+                .populate('department');
+            
+            // Add status change comment
+            const statusComment = {
+                createdBy: user._id,
+                comment: `Status changed from "${task.status}" to "${status}"${statusChangeReason ? `. Reason: ${statusChangeReason}` : ''}`,
+                type: "Status Update",
+                visibility: "Public",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                reactions: []
+            };
+            
+            await Task.findByIdAndUpdate(taskId, {
+                $push: { comments: statusComment }
+            });
+            
+            // Send notifications
+            await this.sendTaskNotification(updatedTask, 'status_changed');
+            
+            return json({
+                message: "Task status updated successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Update task status error:", error);
+            return json({
+                message: "Failed to update task status",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // Enhanced commenting system with replies and security
+    async AddCommentWithReply({
+        taskId,
+        comment,
+        type = "General",
+        visibility = "Public",
+        parentCommentId, // For replies
+        mentionedUsers = [], // Array of user IDs to mention
+        user
+    }: {
+        taskId: string;
+        comment: string;
+        type?: string;
+        visibility?: string;
+        parentCommentId?: string;
+        mentionedUsers?: string[];
+        user: any;
+    }) {
+        try {
+            const task = await Task.findById(taskId).populate('assignedOwner').populate('department');
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            // Check if user can comment on this task
+            const canComment = 
+                task.assignedOwner._id.toString() === user._id.toString() || // Assigned person
+                task.createdBy.toString() === user._id.toString() || // Task creator
+                (user.role === "department_head" && user.department.toString() === task.department._id.toString()) || // HOD of department
+                ["admin", "manager"].includes(user.role) || // Admin or Manager
+                task.collaborators?.some(c => c.user.toString() === user._id.toString()); // Collaborator
+            
+            if (!canComment) {
+                return json({
+                    message: "You don't have permission to comment on this task",
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Validate parent comment if this is a reply
+            if (parentCommentId) {
+                const parentCommentExists = task.comments?.some(c => c._id?.toString() === parentCommentId);
+                if (!parentCommentExists) {
+                    return json({
+                        message: "Parent comment not found",
+                        success: false,
+                        status: 400
+                    });
+                }
+            }
+            
+            const commentData = {
+                createdBy: user._id,
+                comment,
+                type,
+                visibility,
+                parentCommentId: parentCommentId || null,
+                mentionedUsers,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                reactions: []
+            };
+            
+            const updatedTask = await Task.findByIdAndUpdate(
+                taskId,
+                {
+                    $push: { comments: commentData },
+                    $inc: { 'metrics.editCount': 1 }
+                },
+                { new: true }
+            ).populate('comments.createdBy').populate('assignedOwner').populate('createdBy');
+            
+            // Send notifications to mentioned users and task stakeholders
+            if (mentionedUsers.length > 0) {
+                for (const userId of mentionedUsers) {
+                    // Send mention notification
+                    await this.sendMentionNotification(updatedTask, userId, comment, user);
+                }
+            }
+            
+            // Notify task owner and creator about new comment
+            await this.sendCommentNotification(updatedTask, user, comment);
+            
+            return json({
+                message: "Comment added successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Add comment error:", error);
+            return json({
+                message: "Failed to add comment",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // Method to get task comments with replies structure
+    async GetTaskCommentsWithReplies(taskId: string, user: any) {
+        try {
+            const task = await Task.findById(taskId)
+                .populate('comments.createdBy')
+                .populate('assignedOwner')
+                .populate('department');
+            
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            // Check if user can view comments
+            const canViewComments = 
+                task.assignedOwner._id.toString() === user._id.toString() ||
+                task.createdBy.toString() === user._id.toString() ||
+                (user.role === "department_head" && user.department.toString() === task.department._id.toString()) ||
+                ["admin", "manager"].includes(user.role) ||
+                task.collaborators?.some(c => c.user.toString() === user._id.toString());
+            
+            if (!canViewComments) {
+                return json({
+                    message: "You don't have permission to view comments on this task",
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Filter comments based on visibility and user role
+            let visibleComments = task.comments || [];
+            
+            if (user.role !== "admin" && user.role !== "manager") {
+                visibleComments = visibleComments.filter(comment => {
+                    if (comment.visibility === "Public") return true;
+                    if (comment.visibility === "Team Only" && 
+                        (user.department.toString() === task.department._id.toString() || 
+                         task.collaborators?.some(c => c.user.toString() === user._id.toString()))) return true;
+                    if (comment.visibility === "Private" && comment.createdBy.toString() === user._id.toString()) return true;
+                    return false;
+                });
+            }
+            
+            // Organize comments into threaded structure
+            const mainComments = visibleComments.filter(comment => !comment.parentCommentId);
+            const replies = visibleComments.filter(comment => comment.parentCommentId);
+            
+            const commentsWithReplies = mainComments.map(comment => ({
+                ...comment.toObject(),
+                replies: replies.filter(reply => reply.parentCommentId?.toString() === comment._id?.toString())
+            }));
+            
+            return json({
+                comments: commentsWithReplies,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Get task comments error:", error);
+            return json({
+                message: "Failed to retrieve comments",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // Enhanced notification methods
+    async sendMentionNotification(task: any, mentionedUserId: string, comment: string, mentioner: any) {
+        try {
+            const mentionedUser = await Registration.findById(mentionedUserId);
+            if (!mentionedUser || !mentionedUser.email) return;
+            
+            if (!process.env.SMTP_HOST) return;
+            
+            const transporter = createTransporter();
+            const subject = `You were mentioned in task: ${task.title}`;
+            const body = `You were mentioned by ${mentioner.firstName} ${mentioner.lastName} in task "${task.title}".\n\nComment: ${comment}\n\nView task: [Task Link]`;
+            
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM,
+                to: mentionedUser.email,
+                subject,
+                text: body
+            });
+            
+        } catch (error) {
+            console.error("Send mention notification error:", error);
+        }
+    }
+    
+    async sendCommentNotification(task: any, commenter: any, comment: string) {
+        try {
+            if (!process.env.SMTP_HOST) return;
+            
+            const transporter = createTransporter();
+            const subject = `New comment on task: ${task.title}`;
+            const body = `${commenter.firstName} ${commenter.lastName} commented on task "${task.title}".\n\nComment: ${comment}\n\nView task: [Task Link]`;
+            
+            // Notify task owner and creator
+            const notifyUsers = [task.assignedOwner, task.createdBy].filter(user => 
+                user && user.email && user._id.toString() !== commenter._id.toString()
+            );
+            
+            for (const user of notifyUsers) {
+                await transporter.sendMail({
+                    from: process.env.SMTP_FROM,
+                    to: user.email,
+                    subject,
+                    text: body
+                });
+            }
+            
+        } catch (error) {
+            console.error("Send comment notification error:", error);
+        }
+    }
+    
+    // Method to get tasks based on user role and department
+    async GetTasksByUserRole(user: any, filters: any = {}) {
+        try {
+            let query: any = { archived: false };
+            
+            // Role-based filtering
+            switch (user.role) {
+                case "admin":
+                case "manager":
+                    // Can see all tasks
+                    break;
+                case "department_head":
+                    // Can see all tasks in their department
+                    query.department = user.department;
+                    break;
+                case "staff":
+                default:
+                    // Can only see tasks assigned to them or in their department
+                    query.$or = [
+                        { assignedOwner: user._id },
+                        { 'collaborators.user': user._id },
+                        { createdBy: user._id }
+                    ];
+                    break;
+            }
+            
+            // Apply additional filters
+            Object.assign(query, filters);
+            
+            const tasks = await Task.find(query)
+                .populate('department')
+                .populate('assignedOwner')
+                .populate('createdBy')
+                .populate('collaborators.user')
+                .sort({ createdAt: -1 });
+            
+            return json({
+                tasks,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Get tasks by user role error:", error);
+            return json({
+                message: "Failed to retrieve tasks",
+                success: false,
+                status: 500
             });
         }
     }
 }
 
 const taskController = new TaskController();
-export default taskController;
+export default taskController; 
