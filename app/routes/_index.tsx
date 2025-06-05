@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 
 
 const Home = () => {
-  const truncateText = (text, wordLimit) => {
+  const truncateText = (text: string, wordLimit: number): string => {
     const words = text.split(" ");
     if (words.length > wordLimit) {
       return words.slice(0, wordLimit).join(" ") + "...";
@@ -83,7 +83,7 @@ const Home = () => {
     setTimeout(() => setIsPaused(false), 10000)
   }
 
-  const goToSlide = (index) => {
+  const goToSlide = (index: number) => {
     setActiveTestimonial(index)
     setIsPaused(true)
     setTimeout(() => setIsPaused(false), 10000)
@@ -94,73 +94,66 @@ const Home = () => {
     <PublicLayout>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden  py-2 lg:py-20 md:py-32 dark:bg-gradient-to-br from-black to-gray-900 px-4 lg:px-[125px]">
-          <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
-          <div className="container relative">
-            <div className="grid gap-10 md:grid-cols-2 items-center">
-              <div className="space-y-10">
-                <div className="space-y-10">
-                  <ScrollAnimation>
-                    <h1 className="text-4xl  md:text-6xl font-montserrat font-bold leading-tight tracking-tighter">
-                      Transforming the{" "}
-                      <span className="text-pink-500">
-                        Legal Landscape
-                      </span>{" "}
-                      with Technology
-                    </h1>
-                  </ScrollAnimation>
-                  <ScrollAnimation delay={0.3}>
-                    <p className="font-montserrat lg:text-xl text-lg text-default-400 max-w-[600px]">
-                      Powering the future of legal services with cutting-edge technology solutions designed for modern law
-                      practices.
-                    </p>
-                  </ScrollAnimation>
+        <section className="relative min-h-screen overflow-hidden bg-black">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <img
+              src="https://res.cloudinary.com/djlnjjzvt/image/upload/v1747070545/hero1_rfu05r.jpg"
+              alt="Fresh sushi on dark background"
+              className="w-full h-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+          </div>
+          
+          {/* Content */}
+          <div className="relative z-10 flex items-center min-h-screen px-4 lg:px-[125px]">
+            <div className="max-w-4xl">
+              <ScrollAnimation>
+                <div className="mb-6">
+                  <p className="text-white/80 text-lg md:text-xl font-light tracking-widest mb-4">
+                    一口ごとに純粋な喜び
+                  </p>
                 </div>
-                <ScrollAnimation delay={0.4}>
-                  <div className="flex  gap-4">
-                    <Link to="/about">
-                      <Button className="">
-                        Learn More<ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                </ScrollAnimation>
-                {/* <ScrollAnimation delay={0.5}>
-                  <div className="flex items-center gap-4">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <img src="https://assets-cdn.123rf.com/index/static/assets/all-in-one-plan/photos_v2.jpg" key={i} className="h-8 w-8 rounded-full border-2 border-background bg-gray-800" />
-                    ))}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-nunito">
-                    Trusted by <span className="font-medium text-pink-500">500+</span> law firms
-                  </div>
-                </div>
-                </ScrollAnimation> */}
-              </div>
-              <div className="relative hidden md:block">
-                <ScrollAnimation >
-                  <div
-                    className="relative  h-[500px] w-full overflow-hidden rounded-lg border border-border/40 border-black/20 bg-default-300 p-2 backdrop-blur hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500"
+              </ScrollAnimation>
+              
+              <ScrollAnimation delay={0.2}>
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight tracking-tight mb-8">
+                  FRESH, FLAVORFUL,
+                  <br />
+                  <span className="block">AUTHENTIC</span>
+                </h1>
+              </ScrollAnimation>
+              
+              <ScrollAnimation delay={0.4}>
+                <p className="text-white/70 text-lg md:text-xl max-w-2xl mb-12 font-light leading-relaxed">
+                  Experience the art of Japanese cuisine with the finest ingredients, 
+                  traditional techniques, and modern presentation that celebrates authentic flavors.
+                </p>
+              </ScrollAnimation>
+              
+              <ScrollAnimation delay={0.6}>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button 
+                    size="lg"
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300 transform hover:scale-105"
                   >
-                    <img
-                      src="https://res.cloudinary.com/djlnjjzvt/image/upload/v1747070545/hero1_rfu05r.jpg"
-                      alt="Legal dashboard interface"
-                      className="rounded-md object-cover h-full w-full"
-                    />
-                  </div>
-                </ScrollAnimation>
-
-                <ScrollAnimation delay={0.3}>
-                  <div className="absolute -bottom-6 -left-6 h-24 w-24 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-110 transition-transform duration-500 rounded-lg border border-black/20 bg-default-300 p-1 backdrop-blur">
-                    <div className="h-full w-full rounded bg-pink-500 flex items-center justify-center">
-                      <CheckedIcon className="h-10 w-10 text-white" />
-                    </div>
-                  </div>
-                </ScrollAnimation>
-              </div>
+                    ORDER ONLINE
+                  </Button>
+                  <Button 
+                    variant="bordered"
+                    size="lg"
+                    className="border-white text-white hover:bg-white hover:text-black font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300"
+                  >
+                    VIEW MENU
+                  </Button>
+                </div>
+              </ScrollAnimation>
             </div>
           </div>
+          
+          {/* Decorative Elements */}
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-t from-red-600/20 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-t from-orange-500/10 to-transparent rounded-full blur-2xl"></div>
         </section>
 
         {/* Products Section */}
@@ -316,7 +309,7 @@ const Home = () => {
                   <Card key={i} className="overflow-hidden border-border/40 bg-background/50 backdrop-blur hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500 border hover:border-pink-500/20">
                     <div className="aspect-video overflow-hidden">
                       <img
-                        src={article.image || "/placeholder.svg"}
+                        src={(article as any).image || "/placeholder.svg"}
                         alt={article.name}
                         width={400}
                         height={200}
@@ -324,7 +317,7 @@ const Home = () => {
                       />
                     </div>
                     <div className="p-4 flex flex-col gap-2">
-                      <div className="text-sm text-default-400 font-nunito">{new Date(article?.createdAt).toLocaleDateString("en-US", {
+                      <div className="text-sm text-default-400 font-nunito">{new Date((article as any)?.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
