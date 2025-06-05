@@ -75,20 +75,21 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
                   {/* Desktop Navigation */}
                   <nav className="hidden md:flex gap-6">
-                      {Object.entries(navigationLinks).map(([name, path]) => (
-                          <Link
-                    key={name}
-                    to={path}
-                              className={`text-sm font-medium transition-colors duration-300 ${
-                                  isScrolled 
-                                      ? 'text-default-500 hover:text-foreground' 
-                                      : 'text-white/80 hover:text-white'
-                              }`}
-                >
-                    {name}
-                </Link>
-            ))}
-                  </nav>
+  {Object.entries(navigationLinks).map(([name, path]) => (
+    <Link
+      key={name}
+      to={path}
+      className={`text-sm font-medium transition-colors duration-300 ${
+        isScrolled && path === "/"
+          ? 'text-default-500 hover:text-foreground' 
+          : ' '
+      }`}
+    >
+      {name}
+    </Link>
+  ))}
+</nav>
+
 
                   {/* Mobile Menu Toggle */}
                   <div className="md:hidden flex items-center">

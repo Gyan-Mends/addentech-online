@@ -55,8 +55,8 @@ export default function BlogPage() {
 
 
         <PublicLayout>
-           <main className="flex-1">
-                <div className="bg-gray-50 py-12 md:py-10 flex flex-col justify-center items-center">
+           <main className="flex-1 ">
+                <div className="bg-gray-50 py-12 !pt-20 md:py-10 flex flex-col justify-center items-center">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                      
                             <h1 className="text-3xl font-bold text-center tracking-tight text-gray-900 md:text-4xl">

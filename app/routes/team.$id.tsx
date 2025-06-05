@@ -48,7 +48,7 @@ export default function TeamMemberDetailPage() {
 
 
             {/* Team Member Hero Section */}
-            <section className="py-12  relative">
+            <section className="py-12 mt-10 relative">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
