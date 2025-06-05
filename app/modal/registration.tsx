@@ -88,6 +88,13 @@ const RegistrationSchema = new mongoose.Schema({
       view_attendance: true,
       manage_attendance: false,
       view_attendance_report: false,
+      
+      // Leave management
+      view_leaves: true,
+      create_leave: true,
+      edit_leave: false,
+      approve_leave: false,
+      manage_leaves: false,
     }
   },
   // User status
@@ -162,12 +169,18 @@ RegistrationSchema.pre("save", function(next) {
     permissions.edit_report = true;
     permissions.manage_attendance = true;
     permissions.view_attendance_report = true;
+    permissions.edit_leave = true;
+    permissions.approve_leave = true;
+    permissions.manage_leaves = true;
   } else if (user.role === "manager") {
     permissions.create_task = true;
     permissions.edit_task = true;
     permissions.assign_task = true;
     permissions.view_report = true;
     permissions.view_attendance_report = true;
+    permissions.edit_leave = true;
+    permissions.approve_leave = true;
+    permissions.manage_leaves = true;
   }
   
   // Convert the permissions object back to a Map

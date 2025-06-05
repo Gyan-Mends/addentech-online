@@ -13,11 +13,19 @@ export const loader: LoaderFunction = async ({ request }) => {
       return json({ authenticated: false }, { status: 401 });
     }
     
-    // Find the user by email to get their role
+    // Find the user by email to get their role and permissions
     const user = await Registration.findOne({ email });
     
     if (!user) {
       return json({ authenticated: false }, { status: 404 });
+    }
+    
+    // Convert permissions Map to plain object
+    const permissions: Record<string, boolean> = {};
+    if (user.permissions && user.permissions instanceof Map) {
+      for (const [key, value] of user.permissions.entries()) {
+        permissions[key] = value;
+      }
     }
     
     // Return user profile data (only include necessary fields for security)
@@ -28,7 +36,8 @@ export const loader: LoaderFunction = async ({ request }) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
-      department: user.department
+      department: user.department,
+      permissions: permissions
     });
   } catch (error) {
     console.error("Error fetching user profile:", error);

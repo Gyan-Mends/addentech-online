@@ -17,6 +17,7 @@ import {
     BarChart,
     Bell,
     BookOpen,
+    CalendarDays,
     CheckSquare,
     ChevronDown,
     Clock,
@@ -114,6 +115,13 @@ const navItems: NavItem[] = [
         label: "User Permissions",
         roles: ["admin", "manager"]
         // No permission needed as this is strictly role-based
+    },
+    {
+        to: "/admin/leaves",
+        icon: <CalendarDays className="h-5 w-5 hover:text-white text-pink-500" />,
+        label: "Leave Management",
+        roles: ["admin", "department_head", "manager", "staff"]
+        // Removed permission requirement as all roles should have access
     },
     {
         to: "/admin/memorandum",

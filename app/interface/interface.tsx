@@ -24,6 +24,31 @@ export interface RegistrationInterface {
     positionInstitution?: string,
     dateCompletedInstitution?: string,
 }
+
+export interface LeaveInterface {
+    _id: string;
+    employee: string;
+    leaveType: string;
+    startDate: Date;
+    endDate: Date;
+    totalDays: number;
+    reason: string;
+    status: string;
+    priority: string;
+    approvalWorkflow: Array<{
+        approver: string;
+        approverRole: string;
+        status: string;
+        comments?: string;
+        actionDate?: Date;
+        order: number;
+    }>;
+    department: string;
+    submissionDate: Date;
+    lastModified: Date;
+    modifiedBy?: string;
+    isActive: boolean;
+}
 export interface ContactInterface {
     _id: string,
     firstName: string,

@@ -36,6 +36,13 @@ const availablePermissions = {
   // Attendance
   manage_attendance: "Manage Attendance",
   view_attendance_report: "View Attendance Reports",
+  
+  // Leave management
+  view_leaves: "View Leaves",
+  create_leave: "Create Leave Applications",
+  edit_leave: "Edit Leave Applications",
+  approve_leave: "Approve/Reject Leaves",
+  manage_leaves: "Manage All Leaves",
 };
 
 // Group permissions by category
@@ -47,7 +54,8 @@ const permissionCategories = {
   "Task Management": ["create_task", "edit_task", "assign_task"],
   "Department Management": ["manage_department"],
   "Reports": ["create_report", "edit_report", "approve_report"],
-  "Attendance": ["manage_attendance", "view_attendance_report"]
+  "Attendance": ["manage_attendance", "view_attendance_report"],
+  "Leave Management": ["view_leaves", "create_leave", "edit_leave", "approve_leave", "manage_leaves"]
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
