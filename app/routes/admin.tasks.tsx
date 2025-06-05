@@ -114,6 +114,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         email: userData.email,
         role: userData.role,
         department: userData.department,
+        departmentName: (userData.department as any)?.name || "No department name",
+        departmentId: (userData.department as any)?._id || userData.department,
         permissions: userData.permissions
     });
     
@@ -375,6 +377,44 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                     user: userData
                 });
 
+            case "update_task":
+                // Update existing task
+                return await TaskController.UpdateTask({
+                    taskId: formData.get("taskId") as string,
+                    title: formData.get("title") as string,
+                    description: formData.get("description") as string,
+                    category: formData.get("category") as string,
+                    priority: formData.get("priority") as string,
+                    dueDate: formData.get("dueDate") as string,
+                    user: userData
+                });
+
+            case "delete_task":
+                // Delete task (archive it)
+                return await TaskController.DeleteTask({
+                    taskId: formData.get("taskId") as string,
+                    deleteReason: formData.get("deleteReason") as string,
+                    user: userData
+                });
+
+            case "assign_task":
+                // Assign task to member
+                console.log("Frontend: assign_task action called with:", {
+                    taskId: formData.get("taskId"),
+                    assignedMemberId: formData.get("assignedMemberId"),
+                    hodInstructions: formData.get("hodInstructions"),
+                    userRole: userData.role,
+                    userDepartment: userData.department
+                });
+                return await TaskController.AssignTaskToMember({
+                    taskId: formData.get("taskId") as string,
+                    assignedMemberId: formData.get("assignedMemberId") as string,
+                    hodInstructions: formData.get("hodInstructions") as string,
+                    modifyDueDate: formData.get("modifyDueDate") as string,
+                    modifyPriority: formData.get("modifyPriority") as string,
+                    user: userData
+                });
+
             default:
                 return json({ success: false, message: "Invalid action" });
         }
@@ -397,6 +437,14 @@ export default function ComprehensiveTaskManagement() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [createTaskType, setCreateTaskType] = useState<"department" | "member">("department");
     const [filters, setFilters] = useState(loaderData.filters);
+    
+    // New state for CRUD operations
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [showStatusModal, setShowStatusModal] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<any>(null);
 
     const isLoading = navigation.state === "loading";
 
@@ -431,7 +479,16 @@ export default function ComprehensiveTaskManagement() {
         if (actionData) {
             if (actionData.success) {
                 // Success toast notification would go here
+                console.log("Action successful:", actionData.message);
+                
+                // Close appropriate modals based on the action
                 setShowCreateModal(false);
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                setShowAssignModal(false);
+                setShowStatusModal(false);
+                setSelectedTask(null);
+                
                 // You can add a page refresh or revalidation here
                 window.location.reload();
             } else {
@@ -445,6 +502,89 @@ export default function ComprehensiveTaskManagement() {
     // Determine what task creation options user has based on role
     const canCreateForDepartment = ["admin", "manager"].includes(loaderData.currentUser.role);
     const canCreateForMember = ["department_head", "head", "manager"].includes(loaderData.currentUser.role);
+    
+    // Helper functions for task permissions
+    const canViewTask = (task: any) => {
+        return true; // All visible tasks can be viewed in detail
+    };
+    
+    const canEditTask = (task: any) => {
+        // Only creator can edit
+        return (task.createdBy && typeof task.createdBy === 'object' && task.createdBy._id === loaderData.currentUser._id) ||
+               ["admin"].includes(loaderData.currentUser.role); // Only admin as fallback
+    };
+    
+    const canDeleteTask = (task: any) => {
+        // Only creator can delete
+        return (task.createdBy && typeof task.createdBy === 'object' && task.createdBy._id === loaderData.currentUser._id) ||
+               ["admin"].includes(loaderData.currentUser.role); // Only admin as fallback
+    };
+    
+    const canAssignTask = (task: any) => {
+        // Admin and managers can assign any task, HOD can assign department tasks
+        const isAdmin = ["admin"].includes(loaderData.currentUser.role);
+        const isManager = ["manager"].includes(loaderData.currentUser.role);
+        const isHOD = ["department_head", "head"].includes(loaderData.currentUser.role);
+        
+        console.log("canAssignTask check:", {
+            taskId: task._id,
+            taskAssignmentLevel: task.taskAssignmentLevel,
+            currentUserRole: loaderData.currentUser.role,
+            isAdmin,
+            isManager,
+            isHOD,
+            taskDept: task.department?.name,
+            userDept: (loaderData.currentUser.department as any)?.name
+        });
+        
+        // Admins and managers can assign any task
+        if (isAdmin || isManager) {
+            return true;
+        }
+        
+        // HODs can assign department-level tasks from their department
+        if (isHOD && task.taskAssignmentLevel === "department" && 
+            task.department && typeof task.department === 'object' && 
+            task.department._id === (loaderData.currentUser.department as any)?._id) {
+            return true;
+        }
+        
+        return false;
+    };
+    
+    const canChangeStatus = (task: any) => {
+        // Assigned user, HOD of department, admin, manager can change status
+        return (task.assignedOwner && typeof task.assignedOwner === 'object' && task.assignedOwner._id === loaderData.currentUser._id) ||
+               (["department_head", "head", "manager"].includes(loaderData.currentUser.role) && 
+                task.department && typeof task.department === 'object' && task.department._id === (loaderData.currentUser.department as any)?._id) ||
+               ["admin", "manager"].includes(loaderData.currentUser.role);
+    };
+    
+    // Handle CRUD operations
+    const handleViewTask = (task: any) => {
+        setSelectedTask(task);
+        setShowViewModal(true);
+    };
+    
+    const handleEditTask = (task: any) => {
+        setSelectedTask(task);
+        setShowEditModal(true);
+    };
+    
+    const handleDeleteTask = (task: any) => {
+        setSelectedTask(task);
+        setShowDeleteModal(true);
+    };
+    
+    const handleAssignTask = (task: any) => {
+        setSelectedTask(task);
+        setShowAssignModal(true);
+    };
+    
+    const handleStatusChange = (task: any) => {
+        setSelectedTask(task);
+        setShowStatusModal(true);
+    };
 
     return (
         <AdminLayout>
@@ -641,6 +781,68 @@ export default function ComprehensiveTaskManagement() {
                                                     )}
                                                 </div>
                                             </div>
+                                            <div className="flex flex-col gap-2 ml-4">
+                                                {/* Action Buttons */}
+                                                <div className="flex gap-1">
+                                                    {canViewTask(task) && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="light"
+                                                            color="primary"
+                                                            onPress={() => handleViewTask(task)}
+                                                            startContent={<Eye className="h-3 w-3" />}
+                                                        >
+                                                            View
+                                                        </Button>
+                                                    )}
+                                                    {canEditTask(task) && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="light"
+                                                            color="warning"
+                                                            onPress={() => handleEditTask(task)}
+                                                            startContent={<Edit className="h-3 w-3" />}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                    )}
+                                                    {canDeleteTask(task) && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="light"
+                                                            color="danger"
+                                                            onPress={() => handleDeleteTask(task)}
+                                                            startContent={<Archive className="h-3 w-3" />}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    {canAssignTask(task) && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="light"
+                                                            color="secondary"
+                                                            onPress={() => handleAssignTask(task)}
+                                                            startContent={<Users className="h-3 w-3" />}
+                                                        >
+                                                            Assign
+                                                        </Button>
+                                                    )}
+                                                    {canChangeStatus(task) && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="light"
+                                                            color="success"
+                                                            onPress={() => handleStatusChange(task)}
+                                                            startContent={<Settings className="h-3 w-3" />}
+                                                        >
+                                                            Status
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -722,16 +924,17 @@ export default function ComprehensiveTaskManagement() {
                                             <Select
                                                 name="assignedMemberId"
                                                 label="Assign to Member"
-                                                placeholder="Select member"
+                                                placeholder="Select a team member"
                                                 isRequired
                                             >
                                                 {loaderData.users
                                                     .filter((user: any) => 
-                                                        user.department?.toString() === (loaderData.currentUser.department as any)?._id?.toString()
+                                                        user.department?.toString() === (loaderData.currentUser.department as any)?._id?.toString() &&
+                                                        user.role === "staff"
                                                     )
                                                     .map((user: any) => (
                                                         <SelectItem key={user._id} value={user._id}>
-                                                            {user.firstName} {user.lastName}
+                                                            {user.firstName} {user.lastName} ({user.email})
                                                         </SelectItem>
                                                     ))
                                                 }
@@ -807,6 +1010,351 @@ export default function ComprehensiveTaskManagement() {
                                 isLoading={navigation.state === "submitting"}
                             >
                                 {createTaskType === "department" ? "Assign to Department" : "Assign to Member"}
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                
+                {/* View Task Modal */}
+                <Modal 
+                    isOpen={showViewModal} 
+                    onClose={() => setShowViewModal(false)}
+                    size="3xl"
+                    scrollBehavior="inside"
+                >
+                    <ModalContent>
+                        <ModalHeader>Task Details</ModalHeader>
+                        <ModalBody>
+                            {selectedTask && (
+                                <div className="space-y-4">
+                                    <div>
+                                        <h3 className="font-semibold text-lg">{selectedTask.title}</h3>
+                                        <p className="text-gray-600 mt-2">{selectedTask.description}</p>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="font-medium">Category:</label>
+                                            <p>{selectedTask.category}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Priority:</label>
+                                            <p>{selectedTask.priority}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Status:</label>
+                                            <p>{selectedTask.status}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Due Date:</label>
+                                            <p>{new Date(selectedTask.dueDate).toLocaleDateString()}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Department:</label>
+                                            <p>{selectedTask.department?.name}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Assigned To:</label>
+                                            <p>{selectedTask.assignedOwner?.firstName} {selectedTask.assignedOwner?.lastName}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Created By:</label>
+                                            <p>{selectedTask.createdBy?.firstName} {selectedTask.createdBy?.lastName}</p>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium">Assignment Level:</label>
+                                            <p>{selectedTask.taskAssignmentLevel}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {selectedTask.comments && selectedTask.comments.length > 0 && (
+                                        <div>
+                                            <h4 className="font-medium mb-2">Comments:</h4>
+                                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                                                {selectedTask.comments.map((comment: any, index: number) => (
+                                                    <div key={index} className="bg-gray-50 p-2 rounded">
+                                                        <p className="text-sm">{comment.comment}</p>
+                                                        <p className="text-xs text-gray-500 mt-1">
+                                                            {comment.createdBy?.firstName} - {new Date(comment.createdAt).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="light" onPress={() => setShowViewModal(false)}>Close</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+
+                {/* Edit Task Modal */}
+                <Modal 
+                    isOpen={showEditModal} 
+                    onClose={() => setShowEditModal(false)}
+                    size="3xl"
+                    scrollBehavior="inside"
+                >
+                    <ModalContent>
+                        <ModalHeader>Edit Task</ModalHeader>
+                        <ModalBody>
+                            {selectedTask && (
+                                <Form method="post" className="space-y-6" id="task-edit-form">
+                                    <input type="hidden" name="intent" value="update_task" />
+                                    <input type="hidden" name="taskId" value={selectedTask._id} />
+                                    
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold">Basic Information</h3>
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <Input
+                                                name="title"
+                                                label="Task Title"
+                                                defaultValue={selectedTask.title}
+                                                isRequired
+                                            />
+                                            <Textarea
+                                                name="description"
+                                                label="Description"
+                                                defaultValue={selectedTask.description}
+                                                minRows={3}
+                                                isRequired
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold">Details</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <Input
+                                                name="dueDate"
+                                                label="Due Date"
+                                                type="date"
+                                                defaultValue={selectedTask.dueDate ? new Date(selectedTask.dueDate).toISOString().split('T')[0] : ''}
+                                                isRequired
+                                            />
+                                            <Select
+                                                name="priority"
+                                                label="Priority Level"
+                                                defaultSelectedKeys={[selectedTask.priority]}
+                                                isRequired
+                                            >
+                                                {priorityLevels.map(priority => (
+                                                    <SelectItem key={priority} value={priority}>
+                                                        {priority}
+                                                    </SelectItem>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                        <Select
+                                            name="category"
+                                            label="Category"
+                                            defaultSelectedKeys={[selectedTask.category]}
+                                        >
+                                            {taskCategories.map(category => (
+                                                <SelectItem key={category} value={category}>
+                                                    {category}
+                                                </SelectItem>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </Form>
+                            )}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="light" onPress={() => setShowEditModal(false)}>Cancel</Button>
+                            <Button
+                                color="primary" 
+                                type="submit"
+                                form="task-edit-form"
+                                isLoading={navigation.state === "submitting"}
+                            >
+                                Update Task
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+
+                {/* Delete Task Modal */}
+                <Modal 
+                    isOpen={showDeleteModal} 
+                    onClose={() => setShowDeleteModal(false)}
+                    size="md"
+                >
+                    <ModalContent>
+                        <ModalHeader>Delete Task</ModalHeader>
+                        <ModalBody>
+                            {selectedTask && (
+                                <div>
+                                    <p>Are you sure you want to delete the task <strong>"{selectedTask.title}"</strong>?</p>
+                                    <p className="text-red-500 text-sm mt-2">This action cannot be undone.</p>
+                                    
+                                    <Form method="post" id="task-delete-form" className="mt-4">
+                                        <input type="hidden" name="intent" value="delete_task" />
+                                        <input type="hidden" name="taskId" value={selectedTask._id} />
+                                        <Textarea
+                                            name="deleteReason"
+                                            label="Reason for deletion (optional)"
+                                            placeholder="Why are you deleting this task?"
+                                            minRows={2}
+                                        />
+                                    </Form>
+                                </div>
+                            )}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="light" onPress={() => setShowDeleteModal(false)}>Cancel</Button>
+                            <Button
+                                color="danger" 
+                                type="submit"
+                                form="task-delete-form"
+                                isLoading={navigation.state === "submitting"}
+                            >
+                                Delete Task
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+
+                {/* Assign Task Modal */}
+                <Modal 
+                    isOpen={showAssignModal} 
+                    onClose={() => setShowAssignModal(false)}
+                    size="2xl"
+                >
+                    <ModalContent>
+                        <ModalHeader>Assign Task to Member</ModalHeader>
+                        <ModalBody>
+                            {selectedTask && (
+                                <Form method="post" className="space-y-6" id="task-assign-form">
+                                    <input type="hidden" name="intent" value="assign_task" />
+                                    <input type="hidden" name="taskId" value={selectedTask._id} />
+                                    
+                                    <div>
+                                        <h3 className="font-semibold text-lg mb-2">Task: {selectedTask.title}</h3>
+                                        <p className="text-gray-600 text-sm">{selectedTask.description}</p>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        <Select
+                                            name="assignedMemberId"
+                                            label="Assign to Member"
+                                            placeholder="Select a team member"
+                                            isRequired
+                                        >
+                                            {loaderData.users
+                                                .filter((user: any) => 
+                                                    user.department?.toString() === (loaderData.currentUser.department as any)?._id?.toString() &&
+                                                    user.role === "staff"
+                                                )
+                                                .map((user: any) => (
+                                                    <SelectItem key={user._id} value={user._id}>
+                                                        {user.firstName} {user.lastName} ({user.email})
+                                                    </SelectItem>
+                                                ))
+                                            }
+                                        </Select>
+                                        
+                                        <Textarea
+                                            name="hodInstructions"
+                                            label="Instructions for Member"
+                                            placeholder="Any specific instructions or notes for the assigned member..."
+                                            minRows={3}
+                                        />
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <Input
+                                                name="modifyDueDate"
+                                                label="Modify Due Date (optional)"
+                                                type="date"
+                                                defaultValue={selectedTask.dueDate ? new Date(selectedTask.dueDate).toISOString().split('T')[0] : ''}
+                                            />
+                                            <Select
+                                                name="modifyPriority"
+                                                label="Modify Priority (optional)"
+                                                placeholder="Keep current priority"
+                                                defaultSelectedKeys={[selectedTask.priority]}
+                                            >
+                                                {priorityLevels.map(priority => (
+                                                    <SelectItem key={priority} value={priority}>
+                                                        {priority}
+                                                    </SelectItem>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                    </div>
+                                </Form>
+                            )}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="light" onPress={() => setShowAssignModal(false)}>Cancel</Button>
+                            <Button
+                                color="primary" 
+                                type="submit"
+                                form="task-assign-form"
+                                isLoading={navigation.state === "submitting"}
+                            >
+                                Assign Task
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+
+                {/* Status Update Modal */}
+                <Modal 
+                    isOpen={showStatusModal} 
+                    onClose={() => setShowStatusModal(false)}
+                    size="lg"
+                >
+                    <ModalContent>
+                        <ModalHeader>Update Task Status</ModalHeader>
+                        <ModalBody>
+                            {selectedTask && (
+                                <Form method="post" className="space-y-6" id="task-status-form">
+                                    <input type="hidden" name="intent" value="update_status" />
+                                    <input type="hidden" name="taskId" value={selectedTask._id} />
+                                    
+                                    <div>
+                                        <h3 className="font-semibold text-lg mb-2">Task: {selectedTask.title}</h3>
+                                        <p className="text-sm text-gray-600">Current Status: <span className="font-medium">{selectedTask.status}</span></p>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        <Select
+                                            name="status"
+                                            label="New Status"
+                                            placeholder="Select new status"
+                                            defaultSelectedKeys={[selectedTask.status]}
+                                            isRequired
+                                        >
+                                            {taskStatuses.map(status => (
+                                                <SelectItem key={status} value={status}>
+                                                    {status}
+                                                </SelectItem>
+                                            ))}
+                                        </Select>
+                                        
+                                        <Textarea
+                                            name="statusChangeReason"
+                                            label="Reason for Status Change"
+                                            placeholder="Why are you changing the status? (optional)"
+                                            minRows={3}
+                                        />
+                                    </div>
+                                </Form>
+                            )}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="light" onPress={() => setShowStatusModal(false)}>Cancel</Button>
+                            <Button
+                                color="primary" 
+                                type="submit"
+                                form="task-status-form"
+                                isLoading={navigation.state === "submitting"}
+                            >
+                                Update Status
                             </Button>
                         </ModalFooter>
                     </ModalContent>

@@ -622,35 +622,87 @@ class TaskController {
             const transporter = createTransporter();
             let subject = "";
             let body = "";
+            let recipients: string[] = [];
             
             switch (notificationType) {
                 case 'task_assigned':
                     subject = `New Task Assigned: ${task.title}`;
                     body = `You have been assigned a new task: ${task.title}\n\nDescription: ${task.description}\n\nDue Date: ${task.dueDate}\n\nPriority: ${task.priority}`;
+                    if (task.assignedOwner && task.assignedOwner.email) {
+                        recipients.push(task.assignedOwner.email);
+                    }
                     break;
+                    
+                case 'task_assigned_to_department':
+                    subject = `New Department Task: ${task.title}`;
+                    body = `A new task has been assigned to your department: ${task.title}\n\nDescription: ${task.description}\n\nDue Date: ${task.dueDate}\n\nPriority: ${task.priority}\n\nAs the department head, please review and assign this task to an appropriate team member.`;
+                    if (task.assignedOwner && task.assignedOwner.email) {
+                        recipients.push(task.assignedOwner.email);
+                    }
+                    break;
+                    
                 case 'task_reassigned':
                     subject = `Task Reassigned: ${task.title}`;
-                    body = `A task has been reassigned to you: ${task.title}`;
+                    body = `A task has been reassigned to you: ${task.title}\n\nDescription: ${task.description}\n\nDue Date: ${task.dueDate}\n\nPriority: ${task.priority}`;
+                    if (task.assignedOwner && task.assignedOwner.email) {
+                        recipients.push(task.assignedOwner.email);
+                    }
                     break;
+                    
                 case 'progress_update':
                     subject = `Task Progress Update: ${task.title}`;
                     body = `Progress has been updated for task: ${task.title}`;
+                    // Notify task creator and department head
+                    if (task.createdBy && task.createdBy.email) {
+                        recipients.push(task.createdBy.email);
+                    }
+                    // Find department head
+                    const deptHead = await Registration.findOne({
+                        department: task.department,
+                        $or: [{ role: "department_head" }, { role: "head" }]
+                    });
+                    if (deptHead && deptHead.email) {
+                        recipients.push(deptHead.email);
+                    }
                     break;
+                    
                 case 'status_changed':
                     subject = `Task Status Changed: ${task.title}`;
                     body = `Task status has been changed to: ${task.status}`;
+                    // Notify task creator, assigned owner, and department head
+                    if (task.createdBy && task.createdBy.email) {
+                        recipients.push(task.createdBy.email);
+                    }
+                    if (task.assignedOwner && task.assignedOwner.email) {
+                        recipients.push(task.assignedOwner.email);
+                    }
                     break;
+                    
                 case 'task_completed':
                     subject = `Task Completed: ${task.title}`;
                     body = `Task has been completed: ${task.title}`;
+                    // Notify task creator and department head
+                    if (task.createdBy && task.createdBy.email) {
+                        recipients.push(task.createdBy.email);
+                    }
+                    const deptHeadCompleted = await Registration.findOne({
+                        department: task.department,
+                        $or: [{ role: "department_head" }, { role: "head" }]
+                    });
+                    if (deptHeadCompleted && deptHeadCompleted.email) {
+                        recipients.push(deptHeadCompleted.email);
+                    }
                     break;
             }
             
-            // Send to assigned owner
-            if (task.assignedOwner && task.assignedOwner.email) {
+            // Remove duplicates from recipients
+            const uniqueRecipients = [...new Set(recipients)];
+            
+            // Send emails to all recipients
+            for (const email of uniqueRecipients) {
                 await transporter.sendMail({
                     from: process.env.SMTP_FROM,
-                    to: task.assignedOwner.email,
+                    to: email,
                     subject,
                     text: body
                 });
@@ -882,6 +934,14 @@ class TaskController {
         user: any;
     }) {
         try {
+            console.log("AssignTaskToMember called:", {
+                taskId,
+                assignedMemberId,
+                userRole: user.role,
+                userDepartment: user.department,
+                userId: user._id
+            });
+            
             const task = await Task.findById(taskId).populate('department');
             if (!task) {
                 return json({
@@ -891,11 +951,37 @@ class TaskController {
                 });
             }
             
+            console.log("Task found:", {
+                taskId: task._id,
+                taskDepartment: task.department,
+                taskDepartmentId: task.department?._id || task.department,
+                taskAssignmentLevel: task.taskAssignmentLevel
+            });
+            
+            // Extract department IDs for comparison - handle multiple formats
+            const userDeptId = user.department?._id?.toString() || user.department?.toString();
+            const taskDeptId = task.department?._id?.toString() || task.department?.toString();
+            
+            console.log("Department comparison:", {
+                userDeptId,
+                taskDeptId,
+                userDeptObject: user.department,
+                taskDeptObject: task.department,
+                match: userDeptId === taskDeptId
+            });
+            
             // Verify user is HOD of the task's department
-            if (!user || user.role !== "department_head" || 
-                user.department.toString() !== task.department._id.toString()) {
+            if (!user || !["department_head", "head", "manager"].includes(user.role) || 
+                userDeptId !== taskDeptId) {
+                console.log("Permission denied:", {
+                    userRole: user.role,
+                    hasValidRole: ["department_head", "head", "manager"].includes(user.role),
+                    userDeptId,
+                    taskDeptId,
+                    deptMatch: userDeptId === taskDeptId
+                });
                 return json({
-                    message: 'Only the department head can assign tasks to members',
+                    message: 'Only the department head or manager can assign tasks to members. Check your department assignment.',
                     success: false,
                     status: 403
                 });
@@ -903,7 +989,7 @@ class TaskController {
             
             // Verify assigned member belongs to the same department
             const assignedMember = await Registration.findById(assignedMemberId);
-            if (!assignedMember || assignedMember.department.toString() !== task.department._id.toString()) {
+            if (!assignedMember || assignedMember.department.toString() !== task.department.toString()) {
                 return json({
                     message: 'Assigned member must belong to the same department',
                     success: false,
@@ -1005,10 +1091,10 @@ class TaskController {
         hodInstructions?: string;
     }) {
         try {
-            // Verify user is HOD
-            if (!user || user.role !== "department_head") {
+            // Verify user is HOD or manager
+            if (!user || !["department_head", "head", "manager"].includes(user.role)) {
                 return json({
-                    message: 'Only department heads can create tasks for their members',
+                    message: 'Only department heads and managers can create tasks for their members',
                     success: false,
                     status: 403
                 });
@@ -1481,6 +1567,168 @@ class TaskController {
             console.error("Get tasks by user role error:", error);
             return json({
                 message: "Failed to retrieve tasks",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // Update existing task
+    async UpdateTask({
+        taskId,
+        title,
+        description,
+        category,
+        priority,
+        dueDate,
+        user
+    }: {
+        taskId: string;
+        title: string;
+        description: string;
+        category?: string;
+        priority?: string;
+        dueDate?: string;
+        user: any;
+    }) {
+        try {
+            const task = await Task.findById(taskId);
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            // Check permissions - only creator or admin can edit
+            const canEdit = 
+                task.createdBy.toString() === user._id.toString() ||
+                ["admin"].includes(user.role);
+            
+            if (!canEdit) {
+                return json({
+                    message: "Only the task creator can edit this task",
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Update task data
+            const updateData: any = {
+                title,
+                description,
+                $inc: { 'metrics.editCount': 1 }
+            };
+            
+            if (category) updateData.category = category;
+            if (priority) updateData.priority = priority;
+            if (dueDate) updateData.dueDate = new Date(dueDate);
+            
+            const updatedTask = await Task.findByIdAndUpdate(taskId, updateData, { new: true })
+                .populate('department')
+                .populate('assignedOwner')
+                .populate('createdBy');
+            
+            // Add update comment
+            const updateComment = {
+                createdBy: user._id,
+                comment: `Task updated by ${user.firstName} ${user.lastName}`,
+                type: "Status Update",
+                visibility: "Team Only",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                reactions: []
+            };
+            
+            await Task.findByIdAndUpdate(taskId, {
+                $push: { comments: updateComment }
+            });
+            
+            return json({
+                message: "Task updated successfully",
+                task: updatedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Update task error:", error);
+            return json({
+                message: "Failed to update task",
+                success: false,
+                status: 500
+            });
+        }
+    }
+    
+    // Delete task (archive it)
+    async DeleteTask({
+        taskId,
+        deleteReason,
+        user
+    }: {
+        taskId: string;
+        deleteReason?: string;
+        user: any;
+    }) {
+        try {
+            const task = await Task.findById(taskId);
+            if (!task) {
+                return json({
+                    message: "Task not found",
+                    success: false,
+                    status: 404
+                });
+            }
+            
+            // Check permissions - only creator or admin can delete
+            const canDelete = 
+                task.createdBy.toString() === user._id.toString() ||
+                ["admin"].includes(user.role);
+            
+            if (!canDelete) {
+                return json({
+                    message: "Only the task creator can delete this task",
+                    success: false,
+                    status: 403
+                });
+            }
+            
+            // Archive the task instead of deleting
+            const updateData = {
+                archived: true,
+                archivedAt: new Date(),
+                archivedBy: user._id,
+                $inc: { 'metrics.editCount': 1 }
+            };
+            
+            const archivedTask = await Task.findByIdAndUpdate(taskId, updateData, { new: true });
+            
+            // Add deletion comment
+            const deleteComment = {
+                createdBy: user._id,
+                comment: `Task archived by ${user.firstName} ${user.lastName}${deleteReason ? `. Reason: ${deleteReason}` : ''}`,
+                type: "Status Update",
+                visibility: "Team Only",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                reactions: []
+            };
+            
+            await Task.findByIdAndUpdate(taskId, {
+                $push: { comments: deleteComment }
+            });
+            
+            return json({
+                message: "Task archived successfully",
+                task: archivedTask,
+                success: true
+            });
+            
+        } catch (error) {
+            console.error("Delete task error:", error);
+            return json({
+                message: "Failed to archive task",
                 success: false,
                 status: 500
             });
