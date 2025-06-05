@@ -988,8 +988,29 @@ class TaskController {
             }
             
             // Verify assigned member belongs to the same department
-            const assignedMember = await Registration.findById(assignedMemberId);
-            if (!assignedMember || assignedMember.department.toString() !== task.department.toString()) {
+            const assignedMember = await Registration.findById(assignedMemberId).populate('department');
+            if (!assignedMember) {
+                return json({
+                    message: 'Assigned member not found',
+                    success: false,
+                    status: 400
+                });
+            }
+            
+            // Extract department IDs for proper comparison
+            const assignedMemberDeptId = (assignedMember.department as any)?._id?.toString() || assignedMember.department?.toString();
+            const assignTaskDeptId = (task.department as any)?._id?.toString() || task.department?.toString();
+            
+            console.log("AssignTaskToMember department check:", {
+                assignedMemberName: `${assignedMember.firstName} ${assignedMember.lastName}`,
+                assignedMemberDept: assignedMember.department,
+                assignedMemberDeptId,
+                taskDept: task.department,
+                assignTaskDeptId,
+                match: assignedMemberDeptId === assignTaskDeptId
+            });
+            
+            if (assignedMemberDeptId !== assignTaskDeptId) {
                 return json({
                     message: 'Assigned member must belong to the same department',
                     success: false,
@@ -1101,10 +1122,31 @@ class TaskController {
             }
             
             // Verify assigned member belongs to the same department
-            const assignedMember = await Registration.findById(assignedMemberId);
-            if (!assignedMember || assignedMember.department.toString() !== user.department.toString()) {
+            const assignedMember = await Registration.findById(assignedMemberId).populate('department');
+            if (!assignedMember) {
                 return json({
-                    message: 'You can only assign tasks to members of your department',
+                    message: 'Assigned member not found',
+                    success: false,
+                    status: 400
+                });
+            }
+            
+            // Extract department IDs for comparison
+            const assignedMemberDeptId = (assignedMember.department as any)?._id?.toString() || assignedMember.department?.toString();
+            const userDeptId = (user.department as any)?._id?.toString() || user.department?.toString();
+            
+            console.log("CreateTaskForMember department check:", {
+                assignedMemberName: `${assignedMember.firstName} ${assignedMember.lastName}`,
+                assignedMemberDept: assignedMember.department,
+                assignedMemberDeptId,
+                userDept: user.department,
+                userDeptId,
+                match: assignedMemberDeptId === userDeptId
+            });
+            
+            if (assignedMemberDeptId !== userDeptId) {
+                return json({
+                    message: 'Assigned member must belong to the same department',
                     success: false,
                     status: 400
                 });

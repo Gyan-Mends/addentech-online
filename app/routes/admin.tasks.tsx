@@ -364,6 +364,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
             case "create_task_for_member":
                 // HOD creates task directly for member
+                console.log("Creating task for member with data:", {
+                    title: formData.get("title"),
+                    assignedMemberId: formData.get("assignedMemberId"),
+                    formUserDepartmentId: formData.get("userDepartmentId"),
+                    userRole: userData.role,
+                    userDepartment: userData.department,
+                    userDepartmentId: (userData.department as any)?._id || userData.department
+                });
+                
                 const memberTaskResult = await TaskController.CreateTaskForMember({
                     title: formData.get("title") as string,
                     description: formData.get("description") as string,
@@ -900,6 +909,14 @@ export default function ComprehensiveTaskManagement() {
                                     name="intent" 
                                     value={createTaskType === "department" ? "create_task_for_department" : "create_task_for_member"} 
                                 />
+                                {/* Include current user's department for member tasks */}
+                                {createTaskType === "member" && (
+                                    <input 
+                                        type="hidden" 
+                                        name="userDepartmentId" 
+                                        value={(loaderData.currentUser.department as any)?._id || loaderData.currentUser.department} 
+                                    />
+                                )}
                                 
                                 {/* Basic Information */}
                                 <div className="space-y-4">
@@ -925,20 +942,13 @@ export default function ComprehensiveTaskManagement() {
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-semibold">Assignment</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {createTaskType === "department" ? (
+                                        {
+                                        createTaskType === "department" ? (
                                             <Select
                                                 name="departmentId"
                                                 label="Assign to Department"
                                                 placeholder="Select department"
                                                 isRequired
-                                                onSelectionChange={(e) => {
-                                                        // get the selected department id
-                                                        const selectedDepartmentId = e.target.value;
-                                                        // get the selected department name
-                                                        const selectedDepartment = loaderData.departments.find((dept: any) => dept._id === selectedDepartmentId);
-                                                        // set the selected department name in the form
-                                                        setSelectedDepartmentName(selectedDepartment?.name);
-                                                }}
                                             >
                                                 {loaderData.departments.map((dept: any) => (
                                                     <SelectItem key={dept._id} value={dept._id}>
@@ -952,50 +962,39 @@ export default function ComprehensiveTaskManagement() {
                                                 label="Assign to Member"
                                                 placeholder="Select a team member"
                                                 isRequired
+                                                classNames={{
+                                                    label: "font-nunito text-sm text-default-100",
+                                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                                    trigger: "shadow-sm border border-black/5 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white",
+                                                }}
                                             >
-                                                {(() => {
-                                                    const availableUsers = loaderData.users.filter((user: any) => {
-                                                        // Get the department ID from user (could be populated or just ID)
-                                                        const userDeptId = user.department?._id?.toString() || user.department?.toString();
-                                                        // Get the current user's department ID
-                                                        const currentUserDeptId = (loaderData.currentUser.department as any)?._id?.toString();
-                                                        
-                                                        console.log("Filtering user for assignment:", {
-                                                            userName: `${user.firstName} ${user.lastName}`,
-                                                            userRole: user.role,
-                                                            userDeptId,
-                                                            currentUserDeptId,
-                                                            match: userDeptId === currentUserDeptId && user.role === "staff"
-                                                        });
-                                                        
-                                                        return userDeptId === currentUserDeptId && user.role === "staff";
-                                                    });
-
-                                                    console.log("Available users for assignment:", {
-                                                        totalUsers: loaderData.users.length,
-                                                        availableCount: availableUsers.length,
-                                                        currentUserDept: (loaderData.currentUser.department as any)?.name,
-                                                        availableUsers: availableUsers.map(u => ({
-                                                            name: `${u.firstName} ${u.lastName}`,
-                                                            email: u.email,
-                                                            id: u._id
-                                                        }))
-                                                    });
-
-                                                    if (availableUsers.length === 0) {
-                                                        return [
-                                                            <SelectItem key="no-staff" value="" isDisabled>
-                                                                No staff members available in your department ({(loaderData.currentUser.department as any)?.name || 'Unknown Department'})
-                                                            </SelectItem>
-                                                        ];
-                                                    }
-
-                                                    return availableUsers.map((user: any) => (
+                                                                                             {loaderData.users
+                                                 .filter((user: any) => {
+                                                     // Only staff members in the same department
+                                                     if (user.role !== "staff") return false;
+                                                     
+                                                     // Extract department IDs properly
+                                                     const userDeptId = user.department?._id?.toString() || user.department?.toString();
+                                                     const currentUserDeptId = (loaderData.currentUser.department as any)?._id?.toString() || (loaderData.currentUser.department as any)?.toString();
+                                                     
+                                                     // Debug logging for assignment modal
+                                                     console.log("Assignment modal department comparison:", {
+                                                         userName: `${user.firstName} ${user.lastName}`,
+                                                         userDepartment: user.department,
+                                                         userDeptId,
+                                                         currentUserDepartment: loaderData.currentUser.department,
+                                                         currentUserDeptId,
+                                                         match: userDeptId === currentUserDeptId
+                                                     });
+                                                     
+                                                     return userDeptId === currentUserDeptId;
+                                                    })
+                                                    .map((user: any) => (
                                                         <SelectItem key={user._id} value={user._id}>
-                                                            {user.firstName} {user.lastName} ({user.email}) - {user.department?.name || 'No dept'}
+                                                            {user.firstName} {user.lastName} ({user.email})
                                                         </SelectItem>
-                                                    ));
-                                                })()}
+                                                    ))
+                                                }
                                             </Select>
                                         )}
                                         
@@ -1018,11 +1017,14 @@ export default function ComprehensiveTaskManagement() {
                                     <div className="p-3 bg-gray-100 rounded text-xs">
                                         <p><strong>Debug Info:</strong></p>
                                         <p>Current User: {loaderData.currentUser.firstName} {loaderData.currentUser.lastName}</p>
+                                        <p>Role: {loaderData.currentUser.role}</p>
                                         <p>Department: {(loaderData.currentUser.department as any)?.name || 'Not assigned'}</p>
+                                        <p>Department ID: {(loaderData.currentUser.department as any)?._id || loaderData.currentUser.department}</p>
+                                        <p>Task Type: {createTaskType}</p>
                                         <p>Total Users: {loaderData.users.length}</p>
                                         <p>Staff in Dept: {loaderData.users.filter((user: any) => {
                                             const userDeptId = user.department?._id?.toString() || user.department?.toString();
-                                            const currentUserDeptId = (loaderData.currentUser.department as any)?._id?.toString();
+                                            const currentUserDeptId = (loaderData.currentUser.department as any)?._id?.toString() || (loaderData.currentUser.department as any)?.toString();
                                             return userDeptId === currentUserDeptId && user.role === "staff";
                                         }).length}</p>
                                     </div>
@@ -1314,50 +1316,38 @@ export default function ComprehensiveTaskManagement() {
                                             label="Assign to Member"
                                             placeholder="Select a team member"
                                             isRequired
+                                            classNames={{
+                                                label: "font-nunito text-sm text-default-100",
+                                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                                trigger: "shadow-sm border border-black/5 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white",
+                                            }}
                                         >
-                                            {(() => {
-                                                const availableUsers = loaderData.users.filter((user: any) => {
-                                                    // Get the department ID from user (could be populated or just ID)
-                                                    const userDeptId = user.department?._id?.toString() || user.department?.toString();
-                                                    // Get the current user's department ID
-                                                    const currentUserDeptId = (loaderData.currentUser.department as any)?._id?.toString();
-                                                    
-                                                    console.log("Filtering user for assignment:", {
-                                                        userName: `${user.firstName} ${user.lastName}`,
-                                                        userRole: user.role,
-                                                        userDeptId,
-                                                        currentUserDeptId,
-                                                        match: userDeptId === currentUserDeptId && user.role === "staff"
-                                                    });
-                                                    
-                                                    return userDeptId === currentUserDeptId && user.role === "staff";
-                                                });
-
-                                                console.log("Available users for assignment:", {
-                                                    totalUsers: loaderData.users.length,
-                                                    availableCount: availableUsers.length,
-                                                    currentUserDept: (loaderData.currentUser.department as any)?.name,
-                                                    availableUsers: availableUsers.map(u => ({
-                                                        name: `${u.firstName} ${u.lastName}`,
-                                                        email: u.email,
-                                                        id: u._id
-                                                    }))
-                                                });
-
-                                                if (availableUsers.length === 0) {
-                                                    return [
-                                                        <SelectItem key="no-staff" value="" isDisabled>
-                                                            No staff members available in your department ({(loaderData.currentUser.department as any)?.name || 'Unknown Department'})
-                                                        </SelectItem>
-                                                    ];
-                                                }
-
-                                                return availableUsers.map((user: any) => (
+                                                                                         {loaderData.users.filter((user: any) => {
+                                                 // Only staff members in the same department
+                                                 if (user.role !== "staff") return false;
+                                                 
+                                                 // Extract department IDs properly
+                                                 const userDeptId = user.department?._id?.toString() || user.department?.toString();
+                                                 const currentUserDeptId = (loaderData.currentUser.department as any)?._id?.toString() || (loaderData.currentUser.department as any)?.toString();
+                                                 
+                                                 // Debug logging
+                                                 console.log("Department comparison debug:", {
+                                                     userName: `${user.firstName} ${user.lastName}`,
+                                                     userDepartment: user.department,
+                                                     userDeptId,
+                                                     currentUserDepartment: loaderData.currentUser.department,
+                                                     currentUserDeptId,
+                                                     match: userDeptId === currentUserDeptId
+                                                 });
+                                                 
+                                                 return userDeptId === currentUserDeptId;
+                                                })
+                                                .map((user: any) => (
                                                     <SelectItem key={user._id} value={user._id}>
-                                                        {user.firstName} {user.lastName} ({user.email}) - {user.department?.name || 'No dept'}
+                                                        {user.firstName} {user.lastName} ({user.email})
                                                     </SelectItem>
-                                                ));
-                                            })()}
+                                                ))
+                                            }
                                         </Select>
                                         
                                         <Textarea
