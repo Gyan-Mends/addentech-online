@@ -111,7 +111,7 @@ const Home = () => {
       </style>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative min-h-screen overflow-hidden pt-10 bg-black">
+        <section className="relative min-h-screen overflow-hidden bg-black">
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
@@ -119,46 +119,38 @@ const Home = () => {
               alt="Modern legal technology workspace"
               className="w-full h-full object-cover opacity-60"
             />
-           
+
             <div className="absolute inset-0 bg-black/50"></div>
           </div>
-          
+
           {/* Animated Background Elements */}
-          
+
           {/* Content */}
-          <div className="relative z-10  flex items-center min-h-screen px-4 lg:px-[125px]">
-            <div className="max-w-6xl">
+          <div className="relative z-10  flex justify-center items-center min-h-screen px-4 lg:px-[125px]">
+            <div className="max-w-6xl flex flex-col">
               <ScrollAnimation delay={0.2}>
-                <h1 className="text-5xl font-montserrat flex flex-col gap-2 md:text-7xl lg:text-[80px] font-bold text-white leading-[0.9] tracking-tight mb-8">
-                  <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
-                    Transforming the
-                  </span>
-                  <span className="">
-                    Legal Landscape
-                  </span>
-                  <span className="flex items-center gap-4">
-                    <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">with</span>
-                    <span className="relative">
-                      <span className="">
-                        Technology
-                      </span>
-                     
-                    </span>
-                  </span>
-                </h1>
+                  <p className="text-5xl font-montserrat flex flex-col gap-2 md:text-7xl text-center lg:text-[70px] font-bold text-white leading-[0.9] tracking-tight mb-3">
+                    Transforming the  Legal
+                  </p>
+                  <p className="text-5xl font-montserrat flex flex-col  md:text-7xl text-center lg:text-[70px] font-bold text-white leading-[0.9] tracking-tight mb-3">
+                    Landscape
+                  </p>
+                  <p className="text-5xl font-montserrat flex flex-col gap-2 md:text-7xl text-center lg:text-[70px] font-bold text-white leading-[0.9] tracking-tight mb-8">
+                    with Technology
+                  </p>
               </ScrollAnimation>
-              
+
               <ScrollAnimation delay={0.4}>
-                <p className="text-white/80 text-md md:text-lg max-w-3xl mb-12 font-light leading-relaxed">
-                  Empowering law firms with cutting-edge solutions that streamline operations, 
+                <p className="text-white/80 text-center text-md md:text-lg max-w-3xl mb-12 font-light leading-relaxed">
+                  Empowering law firms with cutting-edge solutions that streamline operations,
                   enhance client experiences, and drive unprecedented growth in the digital age.
                 </p>
               </ScrollAnimation>
-              
+
               <ScrollAnimation delay={0.6}>
-                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex flex-col justify-center items-center sm:flex-row gap-6 items-start">
                   <Link to="/about">
-                    <Button 
+                    <Button
                       size="lg"
                       className="bg-pink-500 text-white font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/25 border border-pink-500/20"
                     >
@@ -169,7 +161,7 @@ const Home = () => {
                     </Button>
                   </Link>
                   <Link to="/services">
-                    <Button 
+                    <Button
                       variant="bordered"
                       size="lg"
                       className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300 backdrop-blur-sm"
@@ -183,35 +175,16 @@ const Home = () => {
                 </div>
               </ScrollAnimation>
 
-              {/* Stats Section */}
-              <ScrollAnimation delay={0.8}>
-                <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl">
-                  {[
-                    { number: "500+", label: "Legal Firms Served" },
-                    { number: "99.9%", label: "Uptime Guarantee" },
-                    { number: "24/7", label: "Expert Support" }
-                  ].map((stat, index) => (
-                    <div key={index} className="text-center group">
-                      <div className="text-3xl text-white md:text-4xl font-bold  mb-2 group-hover:scale-110 transition-transform duration-300">
-                        {stat.number}
-                      </div>
-                      <div className="text-white/70 text-sm uppercase tracking-wider">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollAnimation>
             </div>
           </div>
-          
+
           {/* Enhanced Decorative Elements */}
           <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl"></div>
           <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-t from-cyan-500/20 to-blue-500/10 rounded-full blur-2xl"></div>
-          
+
           {/* Scroll Indicator */}
           <ScrollAnimation delay={1.0}>
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 animate-bounce">
+            <div className="absolute bottom-8 left-1/2 !-ml-20 transform -translate-x-1/2 text-white/60 animate-bounce">
               <div className="flex flex-col items-center gap-2">
                 <span className="text-sm tracking-wider uppercase">Scroll to explore</span>
                 <div className="w-0.5 h-8 bg-gradient-to-b from-white/60 to-transparent"></div>
@@ -290,11 +263,11 @@ const Home = () => {
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-pink-100 to-purple-100 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-cyan-100 to-blue-100 rounded-full blur-3xl"></div>
           </div>
-          
+
           <div className="container relative z-10">
             <ScrollAnimation>
               <div className="text-center mb-16">
-               
+
                 <h2 className="text-4xl md:text-5xl font-bold mb-6 font-montserrat">
                   <span className="bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
                     Comprehensive Services
@@ -321,13 +294,13 @@ const Home = () => {
                   title: "Design & Development",
                   description: "Innovative website design and development tailored to your business needs with responsive layouts and modern user experiences.",
                   icon: "🎨",
-                 
+
                 },
                 {
                   title: "IT Services & Support",
                   description: "Comprehensive support and management of IT systems, including business software, networks, security, and 24/7 technical assistance.",
                   icon: "🔧",
-                 
+
                 },
               ].map((service, i) => (
                 <ScrollAnimation key={i} delay={0.1 * i}>
@@ -356,7 +329,7 @@ const Home = () => {
                       </CardBody>
                       <CardFooter className="pt-0">
                         <Link to="/services/#services-section" className="w-full">
-                          <Button 
+                          <Button
                             className={`w-fulltext-white font-semibold hover:shadow-xl $ transition-all duration-300 group-hover:scale-105`}
                           >
                             <span className="flex items-center justify-center gap-2">
@@ -371,11 +344,11 @@ const Home = () => {
                 </ScrollAnimation>
               ))}
             </div>
-            
+
             <ScrollAnimation>
               <div className="flex justify-center items-center mt-16">
                 <Link to="/services#services-section">
-                  <Button 
+                  <Button
                     size="lg"
                     className="bg-pink-500 hover:to-purple-700 text-white font-semibold px-8 py-6 text-lg shadow-xl hover:shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105 transition-all duration-300"
                   >
@@ -401,10 +374,10 @@ const Home = () => {
                   <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
                 </div>
                 <Link to="/blog">
-                    <Button variant="bordered" className="font-montserrat border border-2">
-                        View all articles
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                  <Button variant="bordered" className="font-montserrat border border-2">
+                    View all articles
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </Link>
               </div>
             </ScrollAnimation>
