@@ -5,7 +5,7 @@ import CheckedIcon from "~/components/icons/CheckedIcon";
 import { Link, useLoaderData } from "@remix-run/react";
 import img5 from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
 import { ProductCard } from "~/components/produt";
-import { ArrowRight, ChevronRight, Star, User } from "lucide-react";
+import { ArrowRight, ChevronRight, Star, User, ExternalLink } from "lucide-react";
 import { json, LoaderFunction } from "@remix-run/node";
 import blog from "~/controller/blog";
 import { BlogInterface } from "~/interface/interface";
@@ -92,68 +92,132 @@ const Home = () => {
 
   return (
     <PublicLayout>
+      <style>
+        {`
+          @keyframes gradient-x {
+            0%, 100% {
+              background-size: 200% 200%;
+              background-position: left center;
+            }
+            50% {
+              background-size: 200% 200%;
+              background-position: right center;
+            }
+          }
+          .animate-gradient-x {
+            animation: gradient-x 3s ease infinite;
+          }
+        `}
+      </style>
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative min-h-screen overflow-hidden bg-black">
+        <section className="relative min-h-screen overflow-hidden pt-10 bg-black">
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
               src="https://res.cloudinary.com/djlnjjzvt/image/upload/v1747070545/hero1_rfu05r.jpg"
-              alt="Fresh sushi on dark background"
+              alt="Modern legal technology workspace"
               className="w-full h-full object-cover opacity-60"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+           
+            <div className="absolute inset-0 bg-black/50"></div>
           </div>
           
+          {/* Animated Background Elements */}
+          
           {/* Content */}
-          <div className="relative z-10 flex items-center min-h-screen px-4 lg:px-[125px]">
-            <div className="max-w-4xl">
-              <ScrollAnimation>
-                <div className="mb-6">
-                  <p className="text-white/80 text-lg md:text-xl font-light tracking-widest mb-4">
-                    一口ごとに純粋な喜び
-                  </p>
-                </div>
-              </ScrollAnimation>
-              
+          <div className="relative z-10  flex items-center min-h-screen px-4 lg:px-[125px]">
+            <div className="max-w-6xl">
               <ScrollAnimation delay={0.2}>
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight tracking-tight mb-8">
-                  FRESH, FLAVORFUL,
-                  <br />
-                  <span className="block">AUTHENTIC</span>
+                <h1 className="text-5xl font-montserrat flex flex-col gap-2 md:text-7xl lg:text-[80px] font-bold text-white leading-[0.9] tracking-tight mb-8">
+                  <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+                    Transforming the
+                  </span>
+                  <span className="">
+                    Legal Landscape
+                  </span>
+                  <span className="flex items-center gap-4">
+                    <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">with</span>
+                    <span className="relative">
+                      <span className="">
+                        Technology
+                      </span>
+                     
+                    </span>
+                  </span>
                 </h1>
               </ScrollAnimation>
               
               <ScrollAnimation delay={0.4}>
-                <p className="text-white/70 text-lg md:text-xl max-w-2xl mb-12 font-light leading-relaxed">
-                  Experience the art of Japanese cuisine with the finest ingredients, 
-                  traditional techniques, and modern presentation that celebrates authentic flavors.
+                <p className="text-white/80 text-md md:text-lg max-w-3xl mb-12 font-light leading-relaxed">
+                  Empowering law firms with cutting-edge solutions that streamline operations, 
+                  enhance client experiences, and drive unprecedented growth in the digital age.
                 </p>
               </ScrollAnimation>
               
               <ScrollAnimation delay={0.6}>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button 
-                    size="lg"
-                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300 transform hover:scale-105"
-                  >
-                    ORDER ONLINE
-                  </Button>
-                  <Button 
-                    variant="bordered"
-                    size="lg"
-                    className="border-white text-white hover:bg-white hover:text-black font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300"
-                  >
-                    VIEW MENU
-                  </Button>
+                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                  <Link to="/about">
+                    <Button 
+                      size="lg"
+                      className="bg-pink-500 text-white font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/25 border border-pink-500/20"
+                    >
+                      <span className="flex items-center gap-2">
+                        About Us
+                        <ArrowRight className="w-5 h-5" />
+                      </span>
+                    </Button>
+                  </Link>
+                  <Link to="/services">
+                    <Button 
+                      variant="bordered"
+                      size="lg"
+                      className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 font-semibold px-8 py-6 text-lg tracking-wide transition-all duration-300 backdrop-blur-sm"
+                    >
+                      <span className="flex items-center gap-2">
+                        View Services
+                        <ExternalLink className="w-5 h-5" />
+                      </span>
+                    </Button>
+                  </Link>
+                </div>
+              </ScrollAnimation>
+
+              {/* Stats Section */}
+              <ScrollAnimation delay={0.8}>
+                <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl">
+                  {[
+                    { number: "500+", label: "Legal Firms Served" },
+                    { number: "99.9%", label: "Uptime Guarantee" },
+                    { number: "24/7", label: "Expert Support" }
+                  ].map((stat, index) => (
+                    <div key={index} className="text-center group">
+                      <div className="text-3xl text-white md:text-4xl font-bold  mb-2 group-hover:scale-110 transition-transform duration-300">
+                        {stat.number}
+                      </div>
+                      <div className="text-white/70 text-sm uppercase tracking-wider">
+                        {stat.label}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </ScrollAnimation>
             </div>
           </div>
           
-          {/* Decorative Elements */}
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-t from-red-600/20 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-t from-orange-500/10 to-transparent rounded-full blur-2xl"></div>
+          {/* Enhanced Decorative Elements */}
+          <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-t from-cyan-500/20 to-blue-500/10 rounded-full blur-2xl"></div>
+          
+          {/* Scroll Indicator */}
+          <ScrollAnimation delay={1.0}>
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 animate-bounce">
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-sm tracking-wider uppercase">Scroll to explore</span>
+                <div className="w-0.5 h-8 bg-gradient-to-b from-white/60 to-transparent"></div>
+              </div>
+            </div>
+          </ScrollAnimation>
         </section>
 
         {/* Products Section */}
@@ -220,68 +284,110 @@ const Home = () => {
         </section>
 
         {/* Services Section */}
-        <section id="services" className="lg:py-20 py-10 lg:px-[125px] px-4 bg-gray-100">
-          <div className="container">
+        <section id="services" className="lg:py-20 py-10 lg:px-[125px] px-4 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-pink-100 to-purple-100 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-cyan-100 to-blue-100 rounded-full blur-3xl"></div>
+          </div>
+          
+          <div className="container relative z-10">
             <ScrollAnimation>
               <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 font-montserrat">Comprehensive Services Tailored to Your Needs</h2>
-                <p className="text-muted-foreground max-w-[800px] mx-auto font-montserrat">
-                  We offer a wide range of legal technology services designed to meet the specific needs of modern law
-                  firms.
+               
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 font-montserrat">
+                  <span className="bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
+                    Comprehensive Services
+                  </span>
+                  <br />
+                  <span className="">
+                    Tailored to Your Needs
+                  </span>
+                </h2>
+                <p className="text-gray-600 max-w-[800px] mx-auto text-lg leading-relaxed">
+                  We offer a wide range of legal technology services designed to meet the specific needs of modern law firms and accelerate their digital transformation.
                 </p>
               </div>
             </ScrollAnimation>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
                   title: "Digital Marketing & Consultation",
-                  description: "Maximize digital presence with expert SEO, social media strategies, email campaigns, and...",
-                  icon: "laptop",
+                  description: "Maximize digital presence with expert SEO, social media strategies, email campaigns, and comprehensive analytics to drive client acquisition.",
+                  icon: "💻",
                 },
                 {
                   title: "Design & Development",
-                  description:
-                    "Innovative website design and development tailored to your business needs...",
-                  icon: "brain",
+                  description: "Innovative website design and development tailored to your business needs with responsive layouts and modern user experiences.",
+                  icon: "🎨",
+                 
                 },
                 {
-                  title: "IT Services",
-                  description: "Support and management of IT systems, including business software, networks, and security...",
-                  icon: "search",
+                  title: "IT Services & Support",
+                  description: "Comprehensive support and management of IT systems, including business software, networks, security, and 24/7 technical assistance.",
+                  icon: "🔧",
+                 
                 },
-
               ].map((service, i) => (
-                <ScrollAnimation>
-                  <Card
-                    key={i}
-                    className="border group  border-black/20 h-48 backdrop-blur transition-all hover:border-pink-500/50 hover:bg-background/80 p-6 hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500"
-                  >
-                    <div className="flex flex-col gap-4">
-                      <p className="font-bold font-montserrat   text-xl">{service.title}</p>
-                      <p>{service.description}</p>
+                <ScrollAnimation key={i} delay={0.1 * i}>
+                  <Card className="group border shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-white/80 backdrop-blur-sm overflow-hidden relative">
+                    {/* Gradient Border Effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${service.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl`}></div>
+                    <div className="relative bg-white m-0.5 rounded-xl">
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${service.gradient} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                            {service.icon}
+                          </div>
+                          <div>
+                            <h3 className="font-bold font-montserrat text-xl text-gray-900 group-hover:text-gray-700 transition-colors">
+                              {service.title}
+                            </h3>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardBody className="pt-0">
+                        <p className="text-gray-600 leading-relaxed mb-4">{service.description}</p>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <CheckedIcon className="w-4 h-4 text-green-500 mr-2" />
+                          <span>Available 24/7</span>
+                        </div>
+                      </CardBody>
+                      <CardFooter className="pt-0">
+                        <Link to="/services/#services-section" className="w-full">
+                          <Button 
+                            className={`w-fulltext-white font-semibold hover:shadow-xl $ transition-all duration-300 group-hover:scale-105`}
+                          >
+                            <span className="flex items-center justify-center gap-2">
+                              Learn More
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </span>
+                          </Button>
+                        </Link>
+                      </CardFooter>
                     </div>
-                    <CardFooter className="mt-4">
-                      <Link to="/services/#services-section">
-                        <Button variant="ghost" size="sm" className="group">
-                          Learn more
-                          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                      </Link>
-                    </CardFooter>
                   </Card>
                 </ScrollAnimation>
               ))}
             </div>
+            
+            <ScrollAnimation>
+              <div className="flex justify-center items-center mt-16">
+                <Link to="/services#services-section">
+                  <Button 
+                    size="lg"
+                    className="bg-pink-500 hover:to-purple-700 text-white font-semibold px-8 py-6 text-lg shadow-xl hover:shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105 transition-all duration-300"
+                  >
+                    <span className="flex items-center gap-2">
+                      View All Services
+                      <ArrowRight className="w-5 h-5" />
+                    </span>
+                  </Button>
+                </Link>
+              </div>
+            </ScrollAnimation>
           </div>
-          <ScrollAnimation>
-            <div className="flex justify-center items-center h-[100px] mt-12">
-              <Link to="/services#services-section">
-                <Button>View More Services <ArrowRight className="ml-2 h-4 w-4" /></Button>
-              </Link>
-            </div>
-
-          </ScrollAnimation>
         </section>
 
         <AdvertBanner />

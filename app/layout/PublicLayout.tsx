@@ -1,7 +1,4 @@
-
-
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Navbar, Spinner } from "@nextui-org/react";
 import { Link } from "@remix-run/react";
 import {
@@ -14,12 +11,24 @@ import {
     Menu,
     X,
 } from "lucide-react";
+import logo from "~/components/images/addentech_logo.png";
 import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 import ScrollAnimation from "~/components/animation";
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsScrolled(scrollTop > 100);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const socialLinks = {
       twitter: { icon: Twitter, url: "https://twitter.com/yourprofile" },
@@ -50,17 +59,16 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className="scroll-smooth">
           {/* Navbar */}
-            <header className="px-4 lg:px-[125px] sticky top-0 z-40 w-full border-b border-black/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className={`px-4 lg:px-[125px] top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
+                isScrolled 
+                    ? 'fixed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-black/10' 
+                    : 'absolute'
+            }`}>
               <div className="container flex h-16 items-center justify-between">
                   {/* Logo */}
                     <div className="flex  items-center">
                         <Link to="/" className="flex flex-col items-center space-x-2">
-                            <p className="text-xl font-bold text-gradient">
-                                ADDENTECH
-                            </p>
-                            <p className="font-montserrat text-lg">
-                                Addens Technology Ltd
-                            </p>
+                           <img src={logo} alt="Addentech Logo" className="w-40 h-20" />
 
                         </Link>
                   </div>
@@ -71,7 +79,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                           <Link
                     key={name}
                     to={path}
-                              className="text-sm font-medium text-default-500 transition-colors hover:text-foreground"
+                              className={`text-sm font-medium transition-colors duration-300 ${
+                                  isScrolled 
+                                      ? 'text-default-500 hover:text-foreground' 
+                                      : 'text-white/80 hover:text-white'
+                              }`}
                 >
                     {name}
                 </Link>
@@ -81,11 +93,15 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                   {/* Mobile Menu Toggle */}
                   <div className="md:hidden flex items-center">
                       <Button
-                          auto
                           variant="ghost"
                           size="sm"
                           onClick={handleToggleMenu}
                           aria-label="Toggle menu"
+                          className={`transition-colors duration-300 ${
+                              isScrolled 
+                                  ? 'text-foreground hover:bg-default-100' 
+                                  : 'text-white hover:bg-white/10'
+                          }`}
                       >
                           {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                       </Button>
@@ -101,7 +117,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                         </Link> */}
                       <Link to="/contact">
                             <button
-                                className="bg-gradient py-1 px-2 rounded"
+                                className="bg-gradient py-2 px-4 rounded text-white font-semibold hover:bg-pink-600 transition-colors"
                           >
                               Contact Us
                             </button>
@@ -111,12 +127,12 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
               {/* Mobile Navigation */}
               {isMobileMenuOpen && (
-                  <nav className="flex flex-col mt-4 space-y-2 md:hidden">
+                  <nav className="flex flex-col mt-4 space-y-2 md:hidden bg-black/90 backdrop-blur rounded-lg p-4">
                       {Object.entries(navigationLinks).map(([name, path]) => (
                           <Link
                               key={name}
                               to={path}
-                              className="px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                              className="px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
                               onClick={() => setIsMobileMenuOpen(false)}
                           >
                               {name}
