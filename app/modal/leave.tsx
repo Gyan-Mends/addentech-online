@@ -35,7 +35,7 @@ const LeaveSchema = new mongoose.Schema({
   // Employee Information
   employee: {
     type: Schema.Types.ObjectId,
-    ref: "registrations",
+    ref: "registration",
     required: true,
     index: true
   },
@@ -90,7 +90,7 @@ const LeaveSchema = new mongoose.Schema({
   approvalWorkflow: [{
     approver: {
       type: Schema.Types.ObjectId,
-      ref: "registrations",
+      ref: "registration",
       required: true
     },
     approverRole: {
@@ -125,7 +125,7 @@ const LeaveSchema = new mongoose.Schema({
   // Final approval details
   finalApprover: {
     type: Schema.Types.ObjectId,
-    ref: "registrations"
+    ref: "registration"
   },
   
   finalApprovalDate: {
@@ -159,7 +159,7 @@ const LeaveSchema = new mongoose.Schema({
   // Handover Details
   handoverTo: {
     type: Schema.Types.ObjectId,
-    ref: "registrations"
+    ref: "registration"
   },
   
   handoverNotes: {
@@ -195,7 +195,7 @@ const LeaveSchema = new mongoose.Schema({
   
   modifiedBy: {
     type: Schema.Types.ObjectId,
-    ref: "registrations"
+    ref: "registration"
   },
   
   // System fields
@@ -208,7 +208,7 @@ const LeaveSchema = new mongoose.Schema({
   notificationsSent: [{
     recipient: {
       type: Schema.Types.ObjectId,
-      ref: "registrations"
+      ref: "registration"
     },
     type: {
       type: String,
@@ -246,7 +246,7 @@ LeaveSchema.pre("save", async function(next) {
   if (leave.isNew && leave.status === LeaveStatus.PENDING) {
     try {
       // Get employee details
-      const Registration = mongoose.model('registrations');
+      const Registration = mongoose.model('registration');
       const employee = await Registration.findById(leave.employee).populate('department');
       
       if (employee) {
@@ -274,7 +274,7 @@ LeaveSchema.pre("save", async function(next) {
         // Step 2: Manager approval (for leaves > 5 days or specific types)
         const needsManagerApproval = 
           leave.totalDays > 5 || 
-          [LeaveTypes.MATERNITY, LeaveTypes.PATERNITY, LeaveTypes.STUDY].includes(leave.leaveType);
+          [LeaveTypes.MATERNITY, LeaveTypes.PATERNITY, LeaveTypes.STUDY].includes(leave.leaveType as typeof LeaveTypes.MATERNITY | typeof LeaveTypes.PATERNITY | typeof LeaveTypes.STUDY);
           
         if (needsManagerApproval) {
           const manager = await Registration.findOne({
@@ -296,7 +296,7 @@ LeaveSchema.pre("save", async function(next) {
         const needsAdminApproval = 
           leave.totalDays > 10 || 
           leave.priority === LeavePriority.URGENT ||
-          [LeaveTypes.UNPAID, LeaveTypes.STUDY].includes(leave.leaveType);
+          [LeaveTypes.UNPAID, LeaveTypes.STUDY].includes(leave.leaveType as typeof LeaveTypes.UNPAID | typeof LeaveTypes.STUDY);
           
         if (needsAdminApproval) {
           const admin = await Registration.findOne({
@@ -314,7 +314,7 @@ LeaveSchema.pre("save", async function(next) {
           }
         }
         
-        leave.approvalWorkflow = workflow;
+        leave.approvalWorkflow = workflow as any;
         leave.currentApprovalLevel = workflow.length > 0 ? 1 : 0;
       }
     } catch (error) {

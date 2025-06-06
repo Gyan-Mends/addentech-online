@@ -113,14 +113,16 @@ const navItems: NavItem[] = [
         to: "/admin/permissions",
         icon: <Shield className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "User Permissions",
-        roles: ["admin", "manager"]
+        roles: ["admin", "manager", "department_head"]
         // No permission needed as this is strictly role-based
     },
     {
-        to: "/admin/leaves",
+        to: "/admin/leave-dashboard",
         icon: <CalendarDays className="h-5 w-5 hover:text-white text-pink-500" />,
         label: "Leave Management",
-        roles: ["admin", "department_head", "manager", "staff"]
+        roles: ["admin", "department_head", "manager", "staff"],
+        permission: "view_leave_management"
+        
         // Removed permission requirement as all roles should have access
     },
     {

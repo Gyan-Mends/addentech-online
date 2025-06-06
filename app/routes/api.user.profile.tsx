@@ -1,4 +1,4 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { getSession } from "~/session";
 import Registration from "~/modal/registration";
 
@@ -10,7 +10,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     
     // If no email in session, user is not logged in
     if (!email) {
-      return json({ authenticated: false }, { status: 401 });
+      return redirect("/addentech-login");
     }
     
     // Find the user by email to get their role and permissions
