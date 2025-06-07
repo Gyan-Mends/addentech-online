@@ -9,8 +9,8 @@ const leaveSchema = new mongoose.Schema<LeaveInterface>({
     employee: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
     leaveType: { 
         type: String, 
-        required: true,
-        enum: ['annual', 'sick', 'maternity', 'paternity', 'emergency', 'bereavement', 'personal', 'study']
+        required: true
+        // Removed enum constraint to allow dynamic leave types from policies
     },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
