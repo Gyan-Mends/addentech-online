@@ -113,7 +113,7 @@ const navItems: NavItem[] = [
         to: "/admin/leave-management",
         icon: <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Leave Management",
-        roles: ["admin"],
+        roles: ["admin","manager","department_head","staff"],
         permission: "view_messages"
     },
     {

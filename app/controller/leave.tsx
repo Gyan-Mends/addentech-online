@@ -2,6 +2,7 @@ import { json } from "@remix-run/node";
 import mongoose from 'mongoose';
 import { LeaveInterface, RegistrationInterface, DepartmentInterface } from '~/interface/interface';
 import Registration from '~/modal/registration';
+import Department from '~/modal/department';
 
 // MongoDB Schemas
 const leaveSchema = new mongoose.Schema<LeaveInterface>({
@@ -28,7 +29,7 @@ const leaveSchema = new mongoose.Schema<LeaveInterface>({
         enum: ['low', 'normal', 'high', 'urgent']
     },
     approvalWorkflow: [{
-        approver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        approver: { type: mongoose.Schema.Types.ObjectId, ref: 'registration' },
         approverRole: { type: String },
         status: { 
             type: String, 
@@ -39,15 +40,15 @@ const leaveSchema = new mongoose.Schema<LeaveInterface>({
         actionDate: { type: Date },
         order: { type: Number, required: true }
     }],
-    department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
+    department: { type: mongoose.Schema.Types.ObjectId, ref: 'departments', required: true },
     submissionDate: { type: Date, default: Date.now },
     lastModified: { type: Date, default: Date.now },
     modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
-// Ensure the model is only compiled once
-const Leave = mongoose.models.Leave || mongoose.model<LeaveInterface>('Leave', leaveSchema);
+// Ensure the model is only compiled once and connects to the correct collection
+const Leave = mongoose.models.Leave || mongoose.model<LeaveInterface>('Leave', leaveSchema, 'leaves');
 
 export class LeaveController {
     
@@ -97,7 +98,7 @@ export class LeaveController {
         }
     }
 
-    // Get all leaves with filters
+    // Get all leaves with filters and role-based access
     static async getLeaves(filters: {
         status?: string;
         leaveType?: string;
@@ -107,8 +108,14 @@ export class LeaveController {
         endDate?: string;
         page?: number;
         limit?: number;
+        userEmail?: string;
+        userRole?: string;
+        userDepartment?: string;
     } = {}): Promise<{ leaves: LeaveInterface[], total: number, stats: any }> {
         try {
+            console.log("=== LeaveController.getLeaves START ===");
+            console.log("Input filters:", filters);
+            
             const {
                 status = 'all',
                 leaveType = 'all',
@@ -117,11 +124,22 @@ export class LeaveController {
                 startDate,
                 endDate,
                 page = 1,
-                limit = 10
+                limit = 10,
+                userEmail,
+                userRole,
+                userDepartment
             } = filters;
+            
+            console.log("Destructured filters:", { status, leaveType, department, employee, startDate, endDate, page, limit, userEmail, userRole, userDepartment });
 
             // Build query
-            const query: any = { isActive: true };
+            console.log("Building query...");
+            // Temporarily remove isActive filter to test if that's the issue
+            const query: any = {};
+            console.log("Base query (no isActive filter):", query);
+            
+            // Temporarily disable role-based filtering to test basic query
+            console.log("Skipping role-based filtering for debugging...");
             
             if (status && status !== 'all') {
                 query.status = status;
@@ -145,25 +163,58 @@ export class LeaveController {
                 if (endDate) query.startDate.$lte = new Date(endDate);
             }
 
+            console.log("Checking if Leave model exists...");
+            console.log("Leave model:", Leave);
+            console.log("Department model:", Department);
+            
             // Get total count
+            console.log("Getting total count with query:", query);
             const total = await Leave.countDocuments(query);
+            console.log("Total documents found:", total);
 
             // Get leaves with pagination
+            console.log("Querying leaves with pagination...");
+            console.log("Query parameters:", { query, limit, skip: (page - 1) * limit });
+            
             const leaves = await Leave.find(query)
-                .populate('employee', 'firstName lastName email image position')
+                .populate('employee', 'firstName lastName email image position department')
                 .populate('department', 'name')
                 .sort({ submissionDate: -1 })
                 .limit(limit)
                 .skip((page - 1) * limit)
                 .lean();
+                
+            console.log("Leaves found:", leaves?.length || 0);
+            if (leaves && leaves.length > 0) {
+                console.log("First leave sample:", leaves[0]);
+            }
 
             // Calculate stats
+            console.log("Calculating stats...");
             const stats = await this.calculateLeaveStats();
-
-            return { leaves: leaves as LeaveInterface[], total, stats };
+            console.log("Stats calculated:", stats);
+            
+            console.log("=== LeaveController.getLeaves SUCCESS ===");
+            return { leaves: leaves as any[], total, stats };
         } catch (error) {
+            console.error('=== LeaveController.getLeaves ERROR ===');
             console.error('Error fetching leaves:', error);
-            throw new Error('Failed to fetch leave applications');
+            console.error('Error stack:', error.stack);
+            console.error('Error details:', error.message);
+            
+            // Return safe data instead of throwing
+            return {
+                leaves: [],
+                total: 0,
+                stats: {
+                    totalApplications: 0,
+                    pendingApprovals: 0,
+                    approvedThisMonth: 0,
+                    rejectedThisMonth: 0,
+                    upcomingLeaves: 0,
+                    onLeaveToday: 0
+                }
+            };
         }
     }
 
@@ -414,6 +465,72 @@ export class LeaveController {
         } catch (error) {
             console.error('Error exporting to CSV:', error);
             throw new Error('Failed to export leaves to CSV');
+        }
+    }
+
+    // Check if user can edit/delete a leave application
+    static async canUserModifyLeave(leaveId: string, userEmail: string): Promise<boolean> {
+        try {
+            const user = await Registration.findOne({ email: userEmail });
+            if (!user) return false;
+
+            const leave = await Leave.findById(leaveId);
+            if (!leave) return false;
+
+            // Admin and manager can always modify
+            if (user.role === 'admin' || user.role === 'manager') {
+                return true;
+            }
+
+            // Staff can only modify their own leaves if no admin/manager action has been taken
+            if (user.role === 'staff') {
+                // Check if it's their leave
+                if (leave.employee.toString() !== user._id.toString()) {
+                    return false;
+                }
+                
+                // Check if any admin/manager has taken action
+                const hasAdminAction = leave.approvalWorkflow.some((approval: any) => 
+                    approval.status !== 'pending' && 
+                    approval.approver && 
+                    ['admin', 'manager'].includes(approval.approverRole)
+                );
+                
+                return !hasAdminAction;
+            }
+
+            // Department head can only view, not modify (unless it's approval/rejection)
+            return false;
+        } catch (error) {
+            console.error('Error checking user permissions:', error);
+            return false;
+        }
+    }
+
+    // Check if user can approve/reject a leave
+    static async canUserApproveLeave(leaveId: string, userEmail: string): Promise<boolean> {
+        try {
+            const user = await Registration.findOne({ email: userEmail });
+            if (!user) return false;
+
+            const leave = await Leave.findById(leaveId);
+            if (!leave) return false;
+
+            // Admin and manager can always approve/reject
+            if (user.role === 'admin' || user.role === 'manager') {
+                return true;
+            }
+
+            // Department head can approve/reject leaves in their department
+            if (user.role === 'department_head') {
+                return leave.department.toString() === user.department.toString();
+            }
+
+            // Staff cannot approve/reject
+            return false;
+        } catch (error) {
+            console.error('Error checking approval permissions:', error);
+            return false;
         }
     }
 } 

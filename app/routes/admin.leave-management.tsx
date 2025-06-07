@@ -1,53 +1,90 @@
 import { Card, CardHeader, CardBody, CardFooter, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Chip } from "@nextui-org/react";
 import { Form, Link, useLoaderData, useActionData, useFetcher, useSubmit } from "@remix-run/react";
 import { CalendarDays, CheckCircle, Clock, Filter, Plus, TrendingUp, Users, XCircle, Eye, Download, AlertCircle } from "lucide-react";
-import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
+import { json, LoaderFunction, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "~/session";
 import { LeaveController } from "~/controller/leave";
+import Registration from "~/modal/registration";
+import Department from "~/modal/department";
 import { useState, useEffect } from "react";
 import AdminLayout from "~/layout/adminLayout";
 
 // Loader function to fetch leave data
-export async function loader({ request }: LoaderFunctionArgs) {
+export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
     try {
+        console.log("=== LOADER START ===");
         const session = await getSession(request.headers.get("Cookie"));
         const userId = session.get("email");
+        console.log("User ID from session:", userId);
         
         if (!userId) {
             return redirect("/addentech-login");
         }
 
+        // Test database connection first
+        console.log("Testing database connection...");
+        
+        // Get current user information for role-based access
+        console.log("Finding user by email:", userId);
+        const currentUser = await Registration.findOne({ email: userId });
+        console.log("Current user found:", currentUser ? `${currentUser.firstName} ${currentUser.lastName} (${currentUser.role})` : 'Not found');
+        
+        // Ensure Department model is loaded
+        console.log("Department model available:", Department);
+        
         const url = new URL(request.url);
         const filters = {
             status: url.searchParams.get('status') || 'all',
             leaveType: url.searchParams.get('leaveType') || 'all',
             department: url.searchParams.get('department') || 'all',
             page: parseInt(url.searchParams.get('page') || '1'),
-            limit: parseInt(url.searchParams.get('limit') || '10')
+            limit: parseInt(url.searchParams.get('limit') || '10'),
+            userEmail: userId,
+            userRole: currentUser?.role,
+            userDepartment: currentUser?.department
         };
+        
+        console.log("Filters being passed:", filters);
 
+        console.log("Calling LeaveController.getLeaves...");
         const result = await LeaveController.getLeaves(filters);
+        console.log("Result from controller:", {
+            leavesCount: result.leaves?.length || 0,
+            total: result.total,
+            statsKeys: Object.keys(result.stats || {})
+        });
+        
         const leaves = result.leaves || [];
         const total = result.total || 0;
         const stats = result.stats || {};
         
+        console.log("=== LOADER SUCCESS ===");
         return json({ 
             leaves, 
             total, 
             stats, 
             filters,
-            currentUser: { id: userId },
+            currentUser: { id: userId, role: currentUser?.role, department: currentUser?.department },
             success: url.searchParams.get('success')
         });
     } catch (error) {
+        console.error('=== LOADER ERROR ===');
         console.error('Error loading leave data:', error);
+        console.error('Stack trace:', error.stack);
         return json({ 
             leaves: [], 
             total: 0, 
-            stats: {}, 
+            stats: {
+                totalApplications: 0,
+                pendingApprovals: 0,
+                approvedThisMonth: 0,
+                rejectedThisMonth: 0,
+                upcomingLeaves: 0,
+                onLeaveToday: 0
+            }, 
             filters: { status: 'all', leaveType: 'all', department: 'all' },
             currentUser: null,
-            error: "Failed to load leave data"
+            error: `Failed to load leave data: ${error.message}`
         });
     }
 }
@@ -191,11 +228,13 @@ const LeaveManagement = () => {
                             Leave Management Dashboard
                         </h1>
                         <p className="text-gray-600 dark:text-gray-300 mt-2">
-                            Manage employee leave applications and approvals
+                            {currentUser?.role === 'staff' && 'View and manage your leave applications'}
+                            {currentUser?.role === 'department_head' && 'Manage leave applications for your department'}
+                            {(currentUser?.role === 'admin' || currentUser?.role === 'manager') && 'Manage all employee leave applications and approvals'}
                         </p>
                         {currentUser && (
                             <p className="text-gray-600 mt-1">
-                                Total Applications: {total} | Active Filters Applied
+                                Total Applications: {total} | Role: {currentUser.role} | Active Filters Applied
                             </p>
                         )}
                     </div>
@@ -207,14 +246,17 @@ const LeaveManagement = () => {
                         >
                             Export CSV
                         </Button>
-                        <Link to="/employee-leave-application">
-                            <Button
-                                color="success"
-                                startContent={<Plus size={16} />}
-                            >
-                                New Leave Application
-                            </Button>
-                        </Link>
+                        {/* Only show New Leave Application for staff, admin, and manager */}
+                        {(currentUser?.role === 'staff' || currentUser?.role === 'admin' || currentUser?.role === 'manager') && (
+                            <Link to="/employee-leave-application">
+                                <Button
+                                    color="success"
+                                    startContent={<Plus size={16} />}
+                                >
+                                    New Leave Application
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
 
@@ -422,7 +464,12 @@ const LeaveManagement = () => {
                                                         </Button>
                                                     </Link>
 
+                                                    {/* Show approve/reject buttons based on role and permissions */}
                                                     {leave.status === 'pending' && (
+                                                        currentUser?.role === 'admin' || 
+                                                        currentUser?.role === 'manager' || 
+                                                        (currentUser?.role === 'department_head' && leave.department?._id === currentUser?.department)
+                                                    ) && (
                                                         <>
                                                             <Button
                                                                 size="sm"
