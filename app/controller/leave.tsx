@@ -44,7 +44,10 @@ const leaveSchema = new mongoose.Schema<LeaveInterface>({
     submissionDate: { type: Date, default: Date.now },
     lastModified: { type: Date, default: Date.now },
     modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    // Email reminder fields
+    reminderSent: { type: Boolean, default: false },
+    reminderSentAt: { type: Date }
 }, { timestamps: true });
 
 // Ensure the model is only compiled once and connects to the correct collection
@@ -134,12 +137,33 @@ export class LeaveController {
 
             // Build query
             console.log("Building query...");
-            // Temporarily remove isActive filter to test if that's the issue
-            const query: any = {};
-            console.log("Base query (no isActive filter):", query);
+            const query: any = { isActive: true };
+            console.log("Base query:", query);
             
-            // Temporarily disable role-based filtering to test basic query
-            console.log("Skipping role-based filtering for debugging...");
+            // Apply role-based filtering
+            console.log("Applying role-based filtering...");
+            if (userRole && userEmail) {
+                console.log("User has role:", userRole);
+                if (userRole === 'staff') {
+                    // Staff can only see their own leaves
+                    console.log("Finding staff user by email:", userEmail);
+                    const user = await Registration.findOne({ email: userEmail });
+                    if (user) {
+                        console.log("Staff user found, setting employee filter:", user._id);
+                        query.employee = user._id;
+                    } else {
+                        console.log("Staff user not found!");
+                    }
+                } else if (userRole === 'department_head' && userDepartment) {
+                    // Department heads can see leaves from their department
+                    console.log("Setting department filter for dept head:", userDepartment);
+                    query.department = userDepartment;
+                }
+                // Admin and manager can see all leaves (no additional filtering)
+                console.log("Role-based filtering applied. Final query:", query);
+            } else {
+                console.log("No role-based filtering applied");
+            }
             
             if (status && status !== 'all') {
                 query.status = status;
@@ -247,6 +271,7 @@ export class LeaveController {
         approverEmail: string;
     }) {
         try {
+            console.log('=== updateLeaveStatus called ===');
             console.log('Updating leave status:', { leaveId, status, comments, approverEmail });
             
             // Find the approver by email

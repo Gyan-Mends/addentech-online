@@ -67,10 +67,10 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             currentUser: { id: userId, role: currentUser?.role, department: currentUser?.department },
             success: url.searchParams.get('success')
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('=== LOADER ERROR ===');
         console.error('Error loading leave data:', error);
-        console.error('Stack trace:', error.stack);
+        console.error('Stack trace:', error?.stack);
         return json({ 
             leaves: [], 
             total: 0, 
@@ -84,7 +84,7 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             }, 
             filters: { status: 'all', leaveType: 'all', department: 'all' },
             currentUser: null,
-            error: `Failed to load leave data: ${error.message}`
+            error: `Failed to load leave data: ${error?.message || error}`
         });
     }
 }
@@ -105,6 +105,8 @@ export async function action({ request }: ActionFunctionArgs) {
         const status = formData.get('status') as 'approved' | 'rejected';
         const comments = formData.get('comments') as string;
 
+        console.log('Action function called with:', { action, leaveId, status, comments, userId });
+
         if (action === 'updateStatus') {
             // Direct controller call following admin.users.tsx pattern
             const result = await LeaveController.updateLeaveStatus({
@@ -114,13 +116,39 @@ export async function action({ request }: ActionFunctionArgs) {
                 approverEmail: userId
             });
             
+            // Send email notification to employee about approval/rejection
+            if (result.success) {
+                try {
+                    // Get the updated leave details for email notification
+                    const updatedLeave = await LeaveController.getLeaveById(leaveId);
+                    
+                    if (updatedLeave && updatedLeave.employee) {
+                        const { EmailService } = await import('~/services/emailService');
+                        const employee = updatedLeave.employee as any;
+                        
+                        if (employee && employee.email) {
+                            await EmailService.sendLeaveApprovalNotification(
+                                employee.email,
+                                `${employee.firstName} ${employee.lastName}`,
+                                updatedLeave.leaveType,
+                                status,
+                                comments
+                            );
+                        }
+                    }
+                } catch (emailError: any) {
+                    console.error('Failed to send approval notification email:', emailError?.message || emailError);
+                    // Don't fail the entire operation if email fails
+                }
+            }
+            
             return json(result);
         }
 
         return json({ success: false, error: "Invalid action" });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in action:', error);
-        return json({ success: false, error: "Action failed" });
+        return json({ success: false, error: `Action failed: ${error?.message || error}` });
     }
 }
 
@@ -134,6 +162,17 @@ const LeaveManagement = () => {
     const [approvalAction, setApprovalAction] = useState<'approve' | 'reject' | null>(null);
     const [comments, setComments] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    // Handle successful actions
+    useEffect(() => {
+        if (actionData?.success) {
+            console.log('Action successful, reloading page...');
+            // Reload the page to get fresh data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        }
+    }, [actionData]);
 
     // Utility functions
     const formatDate = (dateString: string) => {
@@ -173,10 +212,16 @@ const LeaveManagement = () => {
     const handleSubmitApproval = () => {
         if (!selectedLeave || !approvalAction) return;
 
+        console.log('Submitting approval with data:', {
+            leaveId: selectedLeave._id,
+            status: approvalAction === 'approve' ? 'approved' : 'rejected',
+            comments
+        });
+
         const formData = new FormData();
         formData.set('_action', 'updateStatus');
         formData.set('leaveId', selectedLeave._id);
-        formData.set('status', approvalAction);
+        formData.set('status', approvalAction === 'approve' ? 'approved' : 'rejected');
         formData.set('comments', comments);
 
         submit(formData, { method: 'POST' });
