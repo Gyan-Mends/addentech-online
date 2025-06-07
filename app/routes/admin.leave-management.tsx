@@ -1,6 +1,6 @@
-import { Card, CardHeader, CardBody, CardFooter, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Chip } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Chip, DatePicker } from "@nextui-org/react";
 import { Form, Link, useLoaderData, useActionData, useFetcher, useSubmit } from "@remix-run/react";
-import { CalendarDays, CheckCircle, Clock, Filter, Plus, TrendingUp, Users, XCircle, Eye, Download, AlertCircle } from "lucide-react";
+import { CalendarDays, CheckCircle, Clock, Filter, Plus, TrendingUp, Users, XCircle, Eye, Download, AlertCircle, Search, Calendar } from "lucide-react";
 import { json, LoaderFunction, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "~/session";
 import { LeaveController } from "~/controller/leave";
@@ -39,6 +39,12 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             department: url.searchParams.get('department') || 'all',
             page: parseInt(url.searchParams.get('page') || '1'),
             limit: parseInt(url.searchParams.get('limit') || '10'),
+            // Date range filtering
+            startDate: url.searchParams.get('startDate'),
+            endDate: url.searchParams.get('endDate'),
+            // Name filtering
+            employeeName: url.searchParams.get('employeeName'),
+            // Role-based access
             userEmail: userId,
             userRole: currentUser?.role,
             userDepartment: currentUser?.department
@@ -56,7 +62,77 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
         
         const leaves = result.leaves || [];
         const total = result.total || 0;
-        const stats = result.stats || {};
+        let stats = result.stats || {};
+
+        // Role-based stats filtering
+        if (currentUser?.role === 'staff') {
+            // Staff can only see their own statistics
+            const userLeaves = leaves.filter(leave => 
+                leave.employee?.email === userId || 
+                leave.employee?._id?.toString() === currentUser.id
+            );
+            stats = {
+                totalApplications: userLeaves.length,
+                pendingApprovals: userLeaves.filter(l => l.status === 'pending').length,
+                approvedThisMonth: userLeaves.filter(l => 
+                    l.status === 'approved' && 
+                    new Date(l.lastModified).getMonth() === new Date().getMonth()
+                ).length,
+                rejectedThisMonth: userLeaves.filter(l => 
+                    l.status === 'rejected' && 
+                    new Date(l.lastModified).getMonth() === new Date().getMonth()
+                ).length,
+                upcomingLeaves: userLeaves.filter(l => 
+                    l.status === 'approved' && 
+                    new Date(l.startDate) > new Date()
+                ).length,
+                onLeaveToday: userLeaves.filter(l => {
+                    const today = new Date();
+                    const start = new Date(l.startDate);
+                    const end = new Date(l.endDate);
+                    return l.status === 'approved' && start <= today && end >= today;
+                }).length
+            };
+        } else if (currentUser?.role === 'department_head') {
+            // Department heads see stats for their department only
+            const deptLeaves = leaves.filter(leave => 
+                leave.department?._id?.toString() === currentUser.department?.toString() ||
+                leave.department === currentUser.department
+            );
+            stats = {
+                totalApplications: deptLeaves.length,
+                pendingApprovals: deptLeaves.filter(l => l.status === 'pending').length,
+                approvedThisMonth: deptLeaves.filter(l => 
+                    l.status === 'approved' && 
+                    new Date(l.lastModified).getMonth() === new Date().getMonth()
+                ).length,
+                rejectedThisMonth: deptLeaves.filter(l => 
+                    l.status === 'rejected' && 
+                    new Date(l.lastModified).getMonth() === new Date().getMonth()
+                ).length,
+                upcomingLeaves: deptLeaves.filter(l => 
+                    l.status === 'approved' && 
+                    new Date(l.startDate) > new Date()
+                ).length,
+                onLeaveToday: deptLeaves.filter(l => {
+                    const today = new Date();
+                    const start = new Date(l.startDate);
+                    const end = new Date(l.endDate);
+                    return l.status === 'approved' && start <= today && end >= today;
+                }).length
+            };
+        }
+        // Admin/Manager keep the original stats (all data)
+
+        // Get departments for filtering dropdown (only for admin/manager)
+        let departments = [];
+        if (currentUser?.role === 'admin' || currentUser?.role === 'manager') {
+            try {
+                departments = await Department.find({ isActive: true });
+            } catch (error) {
+                console.error("Error fetching departments:", error);
+            }
+        }
         
         console.log("=== LOADER SUCCESS ===");
         return json({ 
@@ -64,7 +140,13 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             total, 
             stats, 
             filters,
-            currentUser: { id: userId, role: currentUser?.role, department: currentUser?.department },
+            departments,
+            currentUser: { 
+                id: userId, 
+                role: currentUser?.role, 
+                department: currentUser?.department,
+                name: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Unknown'
+            },
             success: url.searchParams.get('success')
         });
     } catch (error: any) {
@@ -154,7 +236,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 const LeaveManagement = () => {
 
-    const { leaves, total, stats, filters, currentUser, success, error } =useLoaderData<{leaves: any, total: number, stats: any, filters: any, currentUser: any, success: any, error: any}>();
+    const { leaves, total, stats, filters, departments, currentUser, success, error } = useLoaderData<{leaves: any, total: number, stats: any, filters: any, departments: any, currentUser: any, success: any, error: any}>();
 
     const actionData = useActionData<typeof action>();
     const submit = useSubmit();
@@ -162,6 +244,13 @@ const LeaveManagement = () => {
     const [approvalAction, setApprovalAction] = useState<'approve' | 'reject' | null>(null);
     const [comments, setComments] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    // Filter states
+    const [searchName, setSearchName] = useState(filters.employeeName || '');
+    const [startDate, setStartDate] = useState(filters.startDate || '');
+    const [endDate, setEndDate] = useState(filters.endDate || '');
+    const [selectedStatus, setSelectedStatus] = useState(filters.status || 'all');
+    const [selectedDepartment, setSelectedDepartment] = useState(filters.department || 'all');
 
     // Handle successful actions
     useEffect(() => {
@@ -238,6 +327,42 @@ const LeaveManagement = () => {
         window.open(`/api/leaves/export?${params.toString()}`, '_blank');
     };
 
+    // Filter handling functions
+    const applyFilters = () => {
+        const searchParams = new URLSearchParams();
+        
+        if (selectedStatus !== 'all') searchParams.set('status', selectedStatus);
+        if (selectedDepartment !== 'all' && (currentUser?.role === 'admin' || currentUser?.role === 'manager')) {
+            searchParams.set('department', selectedDepartment);
+        }
+        if (searchName.trim()) searchParams.set('employeeName', searchName.trim());
+        if (startDate) searchParams.set('startDate', startDate);
+        if (endDate) searchParams.set('endDate', endDate);
+        
+        window.location.href = `/admin/leave-management?${searchParams.toString()}`;
+    };
+
+    const clearFilters = () => {
+        setSearchName('');
+        setStartDate('');
+        setEndDate('');
+        setSelectedStatus('all');
+        setSelectedDepartment('all');
+        window.location.href = '/admin/leave-management';
+    };
+
+    // Role-based access control
+    const canViewAllStats = currentUser?.role === 'admin' || currentUser?.role === 'manager';
+    const canViewDepartmentStats = currentUser?.role === 'department_head';
+    const isStaff = currentUser?.role === 'staff';
+
+    // Page title based on role
+    const getPageTitle = () => {
+        if (isStaff) return `My Leave Applications`;
+        if (canViewDepartmentStats) return `Department Leave Management`;
+        return `Leave Management Dashboard`;
+    };
+
     return (
         <AdminLayout>
               <div className="p-6 space-y-6">
@@ -270,12 +395,12 @@ const LeaveManagement = () => {
                 <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                            Leave Management Dashboard
+                            {getPageTitle()}
                         </h1>
                         <p className="text-gray-600 dark:text-gray-300 mt-2">
-                            {currentUser?.role === 'staff' && 'View and manage your leave applications'}
-                            {currentUser?.role === 'department_head' && 'Manage leave applications for your department'}
-                            {(currentUser?.role === 'admin' || currentUser?.role === 'manager') && 'Manage all employee leave applications and approvals'}
+                            {isStaff && 'View and manage your leave applications'}
+                            {canViewDepartmentStats && 'Manage leave applications for your department'}
+                            {canViewAllStats && 'Manage all employee leave applications and approvals'}
                         </p>
                         {currentUser && (
                             <p className="text-gray-600 mt-1">
@@ -389,8 +514,136 @@ const LeaveManagement = () => {
                     </div>
                 )} */}
 
-                {/* Filters */}
+                {/* Enhanced Filters */}
                 <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Filter size={18} />
+                            <h3 className="text-lg font-semibold">Search & Filter</h3>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                            {/* Employee Name Search */}
+                            <Input
+                                label="Employee Name"
+                                placeholder="Search by name..."
+                                value={searchName}
+                                onValueChange={setSearchName}
+                                startContent={<Search size={16} />}
+                                size="sm"
+                                clearable
+                            />
+
+                            {/* Status Filter */}
+                            <Select
+                                label="Status"
+                                size="sm"
+                                selectedKeys={[selectedStatus]}
+                                onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
+                            >
+                                <SelectItem key="all" value="all">All Status</SelectItem>
+                                <SelectItem key="pending" value="pending">Pending</SelectItem>
+                                <SelectItem key="approved" value="approved">Approved</SelectItem>
+                                <SelectItem key="rejected" value="rejected">Rejected</SelectItem>
+                            </Select>
+
+                            {/* Department Filter (Admin/Manager only) */}
+                            {canViewAllStats && (
+                                <Select
+                                    label="Department"
+                                    size="sm"
+                                    selectedKeys={[selectedDepartment]}
+                                    onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
+                                >
+                                    <SelectItem key="all" value="all">All Departments</SelectItem>
+                                    {departments?.map((dept: any) => (
+                                        <SelectItem key={dept._id} value={dept._id}>
+                                            {dept.name}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                            )}
+
+                            {/* Start Date Filter */}
+                            <Input
+                                type="date"
+                                label="Start Date"
+                                size="sm"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                startContent={<Calendar size={16} />}
+                            />
+
+                            {/* End Date Filter */}
+                            <Input
+                                type="date"
+                                label="End Date"
+                                size="sm"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                startContent={<Calendar size={16} />}
+                            />
+
+                            {/* Filter Actions */}
+                            <div className="flex gap-2 items-end">
+                                <Button
+                                    color="primary"
+                                    size="sm"
+                                    onClick={applyFilters}
+                                    className="flex-1"
+                                >
+                                    Apply
+                                </Button>
+                                <Button
+                                    variant="flat"
+                                    size="sm"
+                                    onClick={clearFilters}
+                                    className="flex-1"
+                                >
+                                    Clear
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Active Filters Display */}
+                        {(filters.employeeName || filters.startDate || filters.endDate || filters.status !== 'all' || (filters.department !== 'all' && canViewAllStats)) && (
+                            <div className="mt-4 pt-4 border-t">
+                                <div className="flex flex-wrap gap-2 items-center">
+                                    <span className="text-sm font-medium">Active Filters:</span>
+                                    {filters.employeeName && (
+                                        <Chip size="sm" color="primary" variant="flat">
+                                            Name: {filters.employeeName}
+                                        </Chip>
+                                    )}
+                                    {filters.status !== 'all' && (
+                                        <Chip size="sm" color="primary" variant="flat">
+                                            Status: {filters.status}
+                                        </Chip>
+                                    )}
+                                    {filters.department !== 'all' && canViewAllStats && (
+                                        <Chip size="sm" color="primary" variant="flat">
+                                            Department: {departments?.find((d: any) => d._id === filters.department)?.name || filters.department}
+                                        </Chip>
+                                    )}
+                                    {filters.startDate && (
+                                        <Chip size="sm" color="primary" variant="flat">
+                                            From: {new Date(filters.startDate).toLocaleDateString()}
+                                        </Chip>
+                                    )}
+                                    {filters.endDate && (
+                                        <Chip size="sm" color="primary" variant="flat">
+                                            To: {new Date(filters.endDate).toLocaleDateString()}
+                                        </Chip>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </CardBody>
+                </Card>
+
+                {/* Legacy filter - keeping for backward compatibility */}
+                <Card style={{ display: 'none' }}>
                     <CardBody>
                         <div className="flex flex-wrap gap-4 items-end">
                             <div className="flex items-center gap-2">

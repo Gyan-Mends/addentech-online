@@ -124,6 +124,7 @@ export class LeaveController {
         leaveType?: string;
         department?: string;
         employee?: string;
+        employeeName?: string;
         startDate?: string;
         endDate?: string;
         page?: number;
@@ -141,6 +142,7 @@ export class LeaveController {
                 leaveType = 'all',
                 department = 'all',
                 employee,
+                employeeName,
                 startDate,
                 endDate,
                 page = 1,
@@ -197,6 +199,13 @@ export class LeaveController {
             if (employee) {
                 query.employee = employee;
             }
+
+            // Employee name filtering - search by firstName or lastName
+            if (employeeName && employeeName.trim()) {
+                const nameQuery = employeeName.trim();
+                // We'll need to do a populate-based search, which we'll handle in the aggregation
+                console.log("Employee name filter applied:", nameQuery);
+            }
             
             if (startDate || endDate) {
                 query.startDate = {};
@@ -217,13 +226,61 @@ export class LeaveController {
             console.log("Querying leaves with pagination...");
             console.log("Query parameters:", { query, limit, skip: (page - 1) * limit });
             
-            const leaves = await Leave.find(query)
-                .populate('employee', 'firstName lastName email image position department')
-                .populate('department', 'name')
-                .sort({ submissionDate: -1 })
-                .limit(limit)
-                .skip((page - 1) * limit)
-                .lean();
+            let leaves;
+            
+            // Use aggregation if employee name filtering is needed
+            if (employeeName && employeeName.trim()) {
+                const nameQuery = employeeName.trim();
+                leaves = await Leave.aggregate([
+                    { $match: query },
+                    {
+                        $lookup: {
+                            from: 'registrations',
+                            localField: 'employee',
+                            foreignField: '_id',
+                            as: 'employee'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'departments',
+                            localField: 'department',
+                            foreignField: '_id',
+                            as: 'department'
+                        }
+                    },
+                    { $unwind: '$employee' },
+                    { $unwind: { path: '$department', preserveNullAndEmptyArrays: true } },
+                    {
+                        $match: {
+                            $or: [
+                                { 'employee.firstName': { $regex: nameQuery, $options: 'i' } },
+                                { 'employee.lastName': { $regex: nameQuery, $options: 'i' } },
+                                { 
+                                    $expr: {
+                                        $regexMatch: {
+                                            input: { $concat: ['$employee.firstName', ' ', '$employee.lastName'] },
+                                            regex: nameQuery,
+                                            options: 'i'
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    { $sort: { submissionDate: -1 } },
+                    { $skip: (page - 1) * limit },
+                    { $limit: limit }
+                ]);
+            } else {
+                leaves = await Leave.find(query)
+                    .populate('employee', 'firstName lastName email image position department')
+                    .populate('department', 'name')
+                    .sort({ submissionDate: -1 })
+                    .limit(limit)
+                    .skip((page - 1) * limit)
+                    .lean();
+            }
                 
             console.log("Leaves found:", leaves?.length || 0);
             if (leaves && leaves.length > 0) {
