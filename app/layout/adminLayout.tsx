@@ -17,6 +17,7 @@ import {
     BarChart,
     Bell,
     BookOpen,
+    Calendar,
     CalendarDays,
     CheckSquare,
     ChevronDown,
@@ -109,13 +110,7 @@ const navItems: NavItem[] = [
         roles: ["admin"],
         permission: "view_messages"
     },
-    {
-        to: "/admin/leave-management",
-        icon: <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />,
-        label: "Leave Management",
-        roles: ["admin","manager","department_head","staff"],
-        permission: "view_messages"
-    },
+
     {
         to: "/admin/permissions",
         icon: <Shield className="h-4 w-4 hover:text-white text-pink-500" />,
@@ -248,6 +243,61 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                 </Link>
                             ))
                         }
+                        
+                        {/* Leave Management Dropdown */}
+                        {["admin", "manager", "department_head", "staff"].includes(userRole) && (
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer">
+                                        <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />
+                                        Leave Management
+                                        <ChevronDown className="h-3 w-3 ml-auto" />
+                                    </li>
+                                </DropdownTrigger>
+                                <DropdownMenu aria-label="Leave Management Options">
+                                    <DropdownItem key="leave-dashboard" href="/admin/leave-management">
+                                        <div className="flex items-center gap-2">
+                                            <LayoutDashboard className="h-4 w-4" />
+                                            Leave Dashboard
+                                        </div>
+                                    </DropdownItem>
+                                    <DropdownItem key="apply-leave" href="/employee-leave-application">
+                                        <div className="flex items-center gap-2">
+                                            <FileText className="h-4 w-4" />
+                                            Apply for Leave
+                                        </div>
+                                    </DropdownItem>
+                                    <DropdownItem key="team-calendar" href="/admin/team-calendar">
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="h-4 w-4" />
+                                            Team Calendar
+                                        </div>
+                                    </DropdownItem>
+                                    <DropdownItem key="leave-balance" href="/employee-leave-balance">
+                                        <div className="flex items-center gap-2">
+                                            <CheckSquare className="h-4 w-4" />
+                                            Leave Balance
+                                        </div>
+                                    </DropdownItem>
+                                    {["admin", "manager"].includes(userRole) ? (
+                                        <DropdownItem key="leave-policies" href="/admin/leave-policies">
+                                            <div className="flex items-center gap-2">
+                                                <Settings className="h-4 w-4" />
+                                                Leave Policies
+                                            </div>
+                                        </DropdownItem>
+                                    ) : null}
+                                    {["admin", "manager"].includes(userRole) ? (
+                                        <DropdownItem key="leave-reminders" href="/admin/leave-reminders">
+                                            <div className="flex items-center gap-2">
+                                                <Bell className="h-4 w-4" />
+                                                Leave Reminders
+                                            </div>
+                                        </DropdownItem>
+                                    ) : null}
+                                </DropdownMenu>
+                            </Dropdown>
+                        )}
                     </ul>
                     <Divider className="" />
                     <div className="mt-6">

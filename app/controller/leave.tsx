@@ -47,7 +47,24 @@ const leaveSchema = new mongoose.Schema<LeaveInterface>({
     isActive: { type: Boolean, default: true },
     // Email reminder fields
     reminderSent: { type: Boolean, default: false },
-    reminderSentAt: { type: Date }
+    reminderSentAt: { type: Date },
+    // Document support
+    documents: [{
+        filename: { type: String },
+        originalName: { type: String },
+        mimetype: { type: String },
+        size: { type: Number },
+        uploadDate: { type: Date, default: Date.now }
+    }],
+    // Balance tracking
+    balanceUsed: { type: Number, default: 0 },
+    // Enhanced workflow
+    currentApprovalLevel: { type: Number, default: 1 },
+    needsEscalation: { type: Boolean, default: false },
+    escalationReason: { type: String },
+    // Conflict detection
+    hasConflicts: { type: Boolean, default: false },
+    conflictDetails: [{ type: String }]
 }, { timestamps: true });
 
 // Ensure the model is only compiled once and connects to the correct collection
