@@ -1,16 +1,18 @@
-import { Card, CardHeader, CardBody, Button, Input, Select, SelectItem, Textarea, DatePicker } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Button, Input, Select, SelectItem, Textarea, DatePicker, Chip, Alert } from "@nextui-org/react";
 import { Form, useActionData, useLoaderData, useNavigation, redirect } from "@remix-run/react";
-import { CalendarDays, Clock, FileText, Send, ArrowLeft } from "lucide-react";
+import { CalendarDays, Clock, FileText, Send, ArrowLeft, AlertTriangle, Info, CheckCircle } from "lucide-react";
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "~/session";
 import { LeaveController } from "~/controller/leave";
+import { LeaveBalanceController } from "~/controller/leaveBalance";
 import Registration from "~/modal/registration";
+import LeavePolicy from "~/modal/leavePolicy";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { errorToast, successToast } from "~/components/toast";
 import AdminLayout from "~/layout/adminLayout";
 
-// Loader to get user data and departments
+// Loader to get user data, policies, and balances
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
@@ -20,27 +22,52 @@ export async function loader({ request }: LoaderFunctionArgs) {
             return redirect("/addentech-login");
         }
 
-        // Here you would fetch user and departments data
-        // For now, returning mock data structure
+        // Get user data
+        const user = await Registration.findOne({ email: userId });
+        if (!user) {
+            return redirect("/addentech-login");
+        }
+
+        // Get active leave policies
+        const policies = await LeavePolicy.find({ isActive: true }).sort({ leaveType: 1 });
+        
+        // Get user's leave balances
+        const balances = await LeaveBalanceController.getEmployeeBalances(user._id);
+        
+        // Format leave types from policies
+        const leaveTypes = policies.map(policy => ({
+            key: policy.leaveType,
+            label: policy.leaveType.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+            policy: {
+                description: policy.description,
+                defaultAllocation: policy.defaultAllocation,
+                maxConsecutiveDays: policy.maxConsecutiveDays,
+                minAdvanceNotice: policy.minAdvanceNotice,
+                maxAdvanceBooking: policy.maxAdvanceBooking,
+                documentRequired: policy.documentRequired,
+                approvalLevels: policy.approvalLevels
+            }
+        }));
+
+        const priorities = [
+            { key: 'low', label: 'Low' },
+            { key: 'normal', label: 'Normal' },
+            { key: 'high', label: 'High' },
+            { key: 'urgent', label: 'Urgent' }
+        ];
+
         return json({
-            user: { id: userId },
-            departments: [], // Fetch from DepartmentController
-            leaveTypes: [
-                { key: 'annual', label: 'Annual Leave' },
-                { key: 'sick', label: 'Sick Leave' },
-                { key: 'maternity', label: 'Maternity Leave' },
-                { key: 'paternity', label: 'Paternity Leave' },
-                { key: 'emergency', label: 'Emergency Leave' },
-                { key: 'bereavement', label: 'Bereavement Leave' },
-                { key: 'personal', label: 'Personal Leave' },
-                { key: 'study', label: 'Study Leave' }
-            ],
-            priorities: [
-                { key: 'low', label: 'Low' },
-                { key: 'normal', label: 'Normal' },
-                { key: 'high', label: 'High' },
-                { key: 'urgent', label: 'Urgent' }
-            ]
+            user: {
+                id: user._id,
+                email: user.email,
+                name: `${user.firstName} ${user.lastName}`,
+                department: user.department,
+                role: user.role
+            },
+            leaveTypes,
+            policies,
+            balances,
+            priorities
         });
     } catch (error) {
         console.error('Error in loader:', error);
@@ -82,13 +109,75 @@ export async function action({ request }: ActionFunctionArgs) {
                     });
                 }
 
-                console.log("User found:", user.firstName, user.lastName, "Department:", user.department);
+                // Get leave policy for validation
+                const policy = await LeavePolicy.findOne({ leaveType, isActive: true });
+                if (!policy) {
+                    return json({
+                        message: `Leave policy not found for ${leaveType}`,
+                        success: false,
+                        status: 400
+                    });
+                }
 
                 // Calculate total days
                 const start = new Date(startDate);
                 const end = new Date(endDate);
                 const timeDiff = end.getTime() - start.getTime();
                 const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+
+                // Policy validations
+                const today = new Date();
+                const daysFromNow = Math.ceil((start.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                
+                // Check advance notice requirement
+                if (daysFromNow < policy.minAdvanceNotice) {
+                    return json({
+                        message: `This leave type requires at least ${policy.minAdvanceNotice} days advance notice`,
+                        success: false,
+                        status: 400
+                    });
+                }
+
+                // Check maximum advance booking
+                if (daysFromNow > policy.maxAdvanceBooking) {
+                    return json({
+                        message: `Leave can only be booked up to ${policy.maxAdvanceBooking} days in advance`,
+                        success: false,
+                        status: 400
+                    });
+                }
+
+                // Check maximum consecutive days
+                if (totalDays > policy.maxConsecutiveDays) {
+                    return json({
+                        message: `Maximum consecutive days for ${leaveType} is ${policy.maxConsecutiveDays} days`,
+                        success: false,
+                        status: 400
+                    });
+                }
+
+                // Check leave balance
+                const balanceCheck = await LeaveBalanceController.checkBalance(
+                    user._id, 
+                    leaveType, 
+                    totalDays
+                );
+
+                if (!balanceCheck.hasBalance) {
+                    return json({
+                        message: balanceCheck.message,
+                        success: false,
+                        status: 400
+                    });
+                }
+
+                // Build approval workflow based on policy
+                const approvalWorkflow = policy.approvalLevels.map((level: any, index: number) => ({
+                    approver: null, // Will be set by system based on org structure
+                    approverRole: level.role,
+                    status: 'pending' as const,
+                    order: level.level
+                }));
 
                 const leaveData = {
                     employee: user._id,
@@ -100,25 +189,34 @@ export async function action({ request }: ActionFunctionArgs) {
                     priority,
                     department: user.department,
                     status: 'pending',
-                    approvalWorkflow: [{
-                        approver: user.department, // Temporary - should be set to actual manager
-                        approverRole: 'manager',
-                        status: 'pending' as const,
-                        order: 1
-                    }],
+                    approvalWorkflow,
                     submissionDate: new Date(),
                     lastModified: new Date(),
-                    isActive: true
+                    isActive: true,
+                    // Policy-related fields
+                    currentApprovalLevel: 1,
+                    needsEscalation: totalDays > (policy.approvalLevels[0]?.maxDays || 5)
                 };
 
                 console.log("Leave data to be created:", leaveData);
 
+                // Create the leave application
                 const newLeave = await LeaveController.createLeave(leaveData);
+                
+                // Reserve balance for pending request
+                if (newLeave && newLeave._id) {
+                    await LeaveBalanceController.reserveBalance(
+                        user._id,
+                        leaveType,
+                        totalDays,
+                        newLeave._id.toString()
+                    );
+                }
                 
                 console.log("Leave created successfully:", newLeave);
                 
                 return json({
-                    message: "Leave application submitted successfully",
+                    message: "Leave application submitted successfully and balance reserved",
                     success: true,
                     status: 200
                 });
@@ -141,7 +239,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 const EmployeeLeaveApplication = () => {
-    const { user, leaveTypes, priorities } = useLoaderData<typeof loader>();
+    const { user, leaveTypes, balances, priorities } = useLoaderData<typeof loader>();
     const actionData = useActionData<typeof action>();
     const navigation = useNavigation();
     const isSubmitting = navigation.state === "submitting";
@@ -149,6 +247,8 @@ const EmployeeLeaveApplication = () => {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [totalDays, setTotalDays] = useState<number>(0);
+    const [selectedLeaveType, setSelectedLeaveType] = useState<string>('');
+    const [validationMessages, setValidationMessages] = useState<string[]>([]);
 
     // Calculate total days when dates change
     useEffect(() => {
@@ -160,6 +260,47 @@ const EmployeeLeaveApplication = () => {
             setTotalDays(0);
         }
     }, [startDate, endDate]);
+
+    // Validate against policy when inputs change
+    useEffect(() => {
+        const messages: string[] = [];
+        
+        if (selectedLeaveType && totalDays > 0 && startDate) {
+            const selectedPolicy = leaveTypes.find(lt => lt.key === selectedLeaveType)?.policy;
+            
+            if (selectedPolicy) {
+                const today = new Date();
+                const daysFromNow = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                
+                // Check advance notice
+                if (daysFromNow < selectedPolicy.minAdvanceNotice) {
+                    messages.push(`Requires ${selectedPolicy.minAdvanceNotice} days advance notice`);
+                }
+                
+                // Check max advance booking
+                if (daysFromNow > selectedPolicy.maxAdvanceBooking) {
+                    messages.push(`Can only book up to ${selectedPolicy.maxAdvanceBooking} days in advance`);
+                }
+                
+                // Check consecutive days
+                if (totalDays > selectedPolicy.maxConsecutiveDays) {
+                    messages.push(`Maximum ${selectedPolicy.maxConsecutiveDays} consecutive days allowed`);
+                }
+                
+                // Check balance
+                const balance = balances.find((b: any) => b.leaveType === selectedLeaveType);
+                if (balance && balance.remaining < totalDays) {
+                    messages.push(`Insufficient balance. Available: ${balance.remaining} days, Required: ${totalDays} days`);
+                }
+            }
+        }
+        
+        setValidationMessages(messages);
+    }, [selectedLeaveType, totalDays, startDate, leaveTypes, balances]);
+
+    // Get selected leave type policy and balance
+    const selectedPolicy = leaveTypes.find(lt => lt.key === selectedLeaveType)?.policy;
+    const selectedBalance = balances.find((b: any) => b.leaveType === selectedLeaveType);
 
     // Handle success/error response with toast
     useEffect(() => {
@@ -237,6 +378,7 @@ const EmployeeLeaveApplication = () => {
                                     placeholder="Select leave type"
                                     isRequired
                                     variant="bordered"
+                                    onSelectionChange={(keys) => setSelectedLeaveType(Array.from(keys)[0] as string)}
                                 >
                                     {leaveTypes.map((type) => (
                                         <SelectItem key={type.key} value={type.key}>
@@ -290,6 +432,89 @@ const EmployeeLeaveApplication = () => {
                                     />
                                 </div>
                             </div>
+
+                            {/* Policy Information & Balance */}
+                            {selectedLeaveType && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Leave Policy Info */}
+                                    {selectedPolicy && (
+                                        <Card className="border-blue-200 bg-blue-50">
+                                            <CardHeader className="pb-2">
+                                                <h3 className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                                                    <Info size={18} />
+                                                    Policy Information
+                                                </h3>
+                                            </CardHeader>
+                                            <CardBody className="pt-0">
+                                                <div className="space-y-2 text-sm">
+                                                    <p><strong>Description:</strong> {selectedPolicy.description}</p>
+                                                    <p><strong>Max Consecutive Days:</strong> {selectedPolicy.maxConsecutiveDays}</p>
+                                                    <p><strong>Advance Notice:</strong> {selectedPolicy.minAdvanceNotice} days</p>
+                                                    <p><strong>Max Advance Booking:</strong> {selectedPolicy.maxAdvanceBooking} days</p>
+                                                    {selectedPolicy.documentRequired && (
+                                                        <Chip color="warning" size="sm" variant="flat">
+                                                            Documentation Required
+                                                        </Chip>
+                                                    )}
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    )}
+
+                                    {/* Balance Information */}
+                                    {selectedBalance ? (
+                                        <Card className="border-green-200 bg-green-50">
+                                            <CardHeader className="pb-2">
+                                                <h3 className="text-lg font-semibold text-green-800 flex items-center gap-2">
+                                                    <CheckCircle size={18} />
+                                                    Your Balance
+                                                </h3>
+                                            </CardHeader>
+                                            <CardBody className="pt-0">
+                                                <div className="space-y-2 text-sm">
+                                                    <p><strong>Total Allocated:</strong> {selectedBalance.totalAllocated} days</p>
+                                                    <p><strong>Used:</strong> {selectedBalance.used} days</p>
+                                                    <p><strong>Pending:</strong> {selectedBalance.pending} days</p>
+                                                    <p className="text-lg font-semibold text-green-700">
+                                                        <strong>Available:</strong> {selectedBalance.remaining} days
+                                                    </p>
+                                                    {selectedBalance.carriedForward > 0 && (
+                                                        <Chip color="primary" size="sm" variant="flat">
+                                                            +{selectedBalance.carriedForward} carried forward
+                                                        </Chip>
+                                                    )}
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    ) : selectedLeaveType && (
+                                        <Card className="border-orange-200 bg-orange-50">
+                                            <CardBody>
+                                                <div className="text-center text-orange-700">
+                                                    <AlertTriangle size={24} className="mx-auto mb-2" />
+                                                    <p>No balance found for this leave type</p>
+                                                    <p className="text-sm">Contact HR for balance setup</p>
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Validation Messages */}
+                            {validationMessages.length > 0 && (
+                                <Alert 
+                                    color="warning" 
+                                    variant="faded"
+                                    startContent={<AlertTriangle size={18} />}
+                                    title="Policy Validation Warnings"
+                                >
+                                    <ul className="list-disc list-inside space-y-1">
+                                        {validationMessages.map((message, index) => (
+                                            <li key={index}>{message}</li>
+                                        ))}
+                                    </ul>
+                                </Alert>
+                            )}
 
                             {/* Total Days Display */}
                             {totalDays > 0 && (

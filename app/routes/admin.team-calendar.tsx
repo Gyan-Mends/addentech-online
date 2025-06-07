@@ -4,7 +4,9 @@ import { useState, useMemo } from "react";
 import { getSession } from "~/session";
 import Registration from "~/modal/registration";
 import Department from "~/modal/department";
+import LeavePolicy from "~/modal/leavePolicy";
 import { LeaveController } from "~/controller/leave";
+import { LeaveBalanceController } from "~/controller/leaveBalance";
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
@@ -139,9 +141,93 @@ export const loader: LoaderFunction = async ({ request }) => {
       leave.status === 'pending'
     ).length;
 
+    // Get leave policies for policy information
+    const policies = await LeavePolicy.find({ isActive: true });
+
+    // Get team balances for capacity planning (admin/manager only)
+    let teamBalances: any[] = [];
+    if (isAdmin || isDepartmentHead) {
+      try {
+        if (isAdmin) {
+          // Get all employees' balances
+          const allEmployees = await Registration.find({ status: 'active' });
+          for (const employee of allEmployees) {
+            const balances = await LeaveBalanceController.getEmployeeBalances(employee._id, year);
+            if (balances.length > 0) {
+              teamBalances.push({
+                employee: {
+                  id: employee._id,
+                  name: `${employee.firstName} ${employee.lastName}`,
+                  department: employee.department
+                },
+                balances
+              });
+            }
+          }
+        } else if (isDepartmentHead) {
+          // Get department employees' balances
+          const deptEmployees = await Registration.find({ 
+            department: currentUser.department, 
+            status: 'active' 
+          });
+          for (const employee of deptEmployees) {
+            const balances = await LeaveBalanceController.getEmployeeBalances(employee._id, year);
+            if (balances.length > 0) {
+              teamBalances.push({
+                employee: {
+                  id: employee._id,
+                  name: `${employee.firstName} ${employee.lastName}`,
+                  department: employee.department
+                },
+                balances
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching team balances:", error);
+      }
+    }
+
+    // Detect policy violations in current leaves
+    const policyViolations: any[] = [];
+    for (const leave of leaves) {
+      const policy = policies.find(p => p.leaveType === leave.leaveType);
+      if (policy) {
+        const submissionDate = new Date(leave.submissionDate);
+        const startDate = new Date(leave.startDate);
+        const advanceNotice = Math.ceil((startDate.getTime() - submissionDate.getTime()) / (1000 * 3600 * 24));
+        
+        if (advanceNotice < policy.minAdvanceNotice) {
+          policyViolations.push({
+            leaveId: leave._id,
+            employeeName: `${leave.employee.firstName} ${leave.employee.lastName}`,
+            leaveType: leave.leaveType,
+            violation: 'Insufficient advance notice',
+            required: policy.minAdvanceNotice,
+            actual: advanceNotice
+          });
+        }
+        
+        if (leave.totalDays > policy.maxConsecutiveDays) {
+          policyViolations.push({
+            leaveId: leave._id,
+            employeeName: `${leave.employee.firstName} ${leave.employee.lastName}`,
+            leaveType: leave.leaveType,
+            violation: 'Exceeds maximum consecutive days',
+            required: policy.maxConsecutiveDays,
+            actual: leave.totalDays
+          });
+        }
+      }
+    }
+
     return json({
       leaves,
       departments,
+      policies,
+      teamBalances,
+      policyViolations,
       teamStats,
       currentYear: year,
       currentMonth: month,
@@ -164,10 +250,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function LeaveCalendar() {
-  const { leaves, departments, teamStats, currentYear, currentMonth, currentUser, isAdmin, isDepartmentHead } = useLoaderData<typeof loader>();
+  const { leaves, departments, policies, teamBalances, policyViolations, teamStats, currentYear, currentMonth, currentUser, isAdmin, isDepartmentHead } = useLoaderData<typeof loader>();
   
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
+  const [showPolicyViolations, setShowPolicyViolations] = useState(false);
 
   // Calendar utilities
   const monthNames = [
@@ -533,6 +620,84 @@ export default function LeaveCalendar() {
           </div>
         </CardBody>
       </Card>
+
+      {/* Policy Violations Alert */}
+      {(isAdmin || isDepartmentHead) && policyViolations.length > 0 && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-orange-800 flex items-center gap-2">
+                <AlertTriangle size={18} />
+                Policy Violations ({policyViolations.length})
+              </h3>
+              <Button
+                size="sm"
+                variant="light"
+                color="warning"
+                onPress={() => setShowPolicyViolations(!showPolicyViolations)}
+              >
+                {showPolicyViolations ? 'Hide' : 'Show'} Details
+              </Button>
+            </div>
+          </CardHeader>
+          {showPolicyViolations && (
+            <CardBody className="pt-0">
+              <div className="space-y-3">
+                {policyViolations.map((violation, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border border-orange-200 rounded-lg bg-white">
+                    <div>
+                      <p className="font-medium text-orange-800">{violation.employeeName}</p>
+                      <p className="text-sm text-orange-600">{violation.leaveType} - {violation.violation}</p>
+                    </div>
+                    <div className="text-right text-sm">
+                      <p className="text-orange-700">
+                        Required: {violation.required} | Actual: {violation.actual}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardBody>
+          )}
+        </Card>
+      )}
+
+      {/* Team Balance Overview */}
+      {(isAdmin || isDepartmentHead) && teamBalances.length > 0 && (
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Users size={18} />
+              Team Leave Balance Overview
+            </h3>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {teamBalances.slice(0, 10).map((member, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{member.employee.name}</p>
+                    <p className="text-sm text-gray-600">{member.employee.department}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    {member.balances.slice(0, 3).map((balance: any, idx: number) => (
+                      <div key={idx} className="text-center">
+                        <p className="text-xs text-gray-500 capitalize">{balance.leaveType}</p>
+                        <p className="text-sm font-medium">{balance.remaining}/{balance.totalAllocated}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {teamBalances.length > 10 && (
+              <p className="text-sm text-gray-500 text-center mt-3">
+                +{teamBalances.length - 10} more team members
+              </p>
+            )}
+          </CardBody>
+        </Card>
+      )}
 
       {/* Upcoming Leaves List */}
       <Card>
