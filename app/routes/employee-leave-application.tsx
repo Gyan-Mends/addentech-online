@@ -4,7 +4,10 @@ import { CalendarDays, Clock, FileText, Send, ArrowLeft } from "lucide-react";
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "~/session";
 import { LeaveController } from "~/controller/leave";
+import Registration from "~/modal/registration";
 import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
+import { errorToast, successToast } from "~/components/toast";
 import AdminLayout from "~/layout/adminLayout";
 
 // Loader to get user data and departments
@@ -48,27 +51,92 @@ export async function loader({ request }: LoaderFunctionArgs) {
 // Action to handle form submission
 export async function action({ request }: ActionFunctionArgs) {
     try {
+        const session = await getSession(request.headers.get("Cookie"));
+        const userId = session.get("email");
+        
+        if (!userId) {
+            return redirect("/addentech-login");
+        }
+
         const formData = await request.formData();
-        formData.set('_method', 'POST');
+        const leaveType = formData.get("leaveType") as string;
+        const startDate = formData.get("startDate") as string;
+        const endDate = formData.get("endDate") as string;
+        const reason = formData.get("reason") as string;
+        const priority = formData.get("priority") as string || 'normal';
+        const intent = formData.get("intent") as string;
 
-        const response = await fetch(`${request.url.origin}/api/leaves`, {
-            method: 'POST',
-            headers: {
-                'Cookie': request.headers.get('Cookie') || ''
-            },
-            body: formData
-        });
+        switch (intent) {
+            case "create":
+                console.log("Creating leave application for user:", userId);
+                console.log("Form data received:", { leaveType, startDate, endDate, reason, priority });
+                
+                // Find the user first to get their department
+                const user = await Registration.findOne({ email: userId });
+                if (!user) {
+                    console.log("User not found:", userId);
+                    return json({
+                        message: "User not found",
+                        success: false,
+                        status: 404
+                    });
+                }
 
-        const result = await response.json();
+                console.log("User found:", user.firstName, user.lastName, "Department:", user.department);
 
-        if (result.success) {
-            return redirect("/admin/leave-management?success=Application submitted successfully");
-        } else {
-            return json({ error: result.error || "Failed to submit application" });
+                // Calculate total days
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const timeDiff = end.getTime() - start.getTime();
+                const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+
+                const leaveData = {
+                    employee: user._id,
+                    leaveType,
+                    startDate: start,
+                    endDate: end,
+                    totalDays,
+                    reason,
+                    priority,
+                    department: user.department,
+                    status: 'pending',
+                    approvalWorkflow: [{
+                        approver: user.department, // Temporary - should be set to actual manager
+                        approverRole: 'manager',
+                        status: 'pending' as const,
+                        order: 1
+                    }],
+                    submissionDate: new Date(),
+                    lastModified: new Date(),
+                    isActive: true
+                };
+
+                console.log("Leave data to be created:", leaveData);
+
+                const newLeave = await LeaveController.createLeave(leaveData);
+                
+                console.log("Leave created successfully:", newLeave);
+                
+                return json({
+                    message: "Leave application submitted successfully",
+                    success: true,
+                    status: 200
+                });
+
+            default:
+                return json({
+                    message: "Bad request",
+                    success: false,
+                    status: 400
+                });
         }
     } catch (error) {
         console.error('Error submitting leave application:', error);
-        return json({ error: "Failed to submit application" });
+        return json({
+            message: "Failed to submit application",
+            success: false,
+            status: 500
+        });
     }
 }
 
@@ -93,8 +161,26 @@ const EmployeeLeaveApplication = () => {
         }
     }, [startDate, endDate]);
 
+    // Handle success/error response with toast
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                successToast(actionData.message);
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = "/admin/leave-management";
+                }, 1500);
+            } else {
+                errorToast(actionData.message);
+            }
+        }
+    }, [actionData]);
+
     return (
         <AdminLayout>
+            <div className="relative">
+                <Toaster position="top-right" />
+            </div>
             <div className="p-6 max-w-4xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
@@ -116,10 +202,19 @@ const EmployeeLeaveApplication = () => {
                 </div>
 
                 {/* Error Display */}
-                {actionData?.error && (
+                {actionData && !actionData.success && (
                     <Card className="border-danger-200 bg-danger-50">
                         <CardBody>
-                            <p className="text-danger-700">{actionData.error}</p>
+                            <p className="text-danger-700">{actionData.message}</p>
+                        </CardBody>
+                    </Card>
+                )}
+
+                {/* Success Display */}
+                {actionData?.success && (
+                    <Card className="border-success-200 bg-success-50">
+                        <CardBody>
+                            <p className="text-success-700">{actionData.message}</p>
                         </CardBody>
                     </Card>
                 )}
@@ -241,6 +336,9 @@ const EmployeeLeaveApplication = () => {
                                     </ul>
                                 </CardBody>
                             </Card>
+
+                            {/* Hidden Fields */}
+                            <input name="intent" value="create" type="hidden" />
 
                             {/* Submit Button */}
                             <div className="flex justify-end gap-4">

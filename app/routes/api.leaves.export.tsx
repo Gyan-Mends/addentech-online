@@ -5,7 +5,7 @@ import { getSession } from "~/session";
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
-        const userId = session.get("userId");
+        const userId = session.get("email");
         
         if (!userId) {
             return new Response("Unauthorized", { status: 401 });

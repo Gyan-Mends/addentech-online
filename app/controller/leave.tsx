@@ -1,10 +1,11 @@
 import { json } from "@remix-run/node";
 import mongoose from 'mongoose';
 import { LeaveInterface, RegistrationInterface, DepartmentInterface } from '~/interface/interface';
+import Registration from '~/modal/registration';
 
 // MongoDB Schemas
 const leaveSchema = new mongoose.Schema<LeaveInterface>({
-    employee: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    employee: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
     leaveType: { 
         type: String, 
         required: true,
@@ -53,6 +54,22 @@ export class LeaveController {
     // Create a new leave application
     static async createLeave(leaveData: Partial<LeaveInterface>): Promise<LeaveInterface> {
         try {
+            // If employee is provided as email, find the user first
+            let employeeId = leaveData.employee;
+            if (typeof leaveData.employee === 'string' && leaveData.employee.includes('@')) {
+                // Find user by email using the Registration model
+                const user = await Registration.findOne({ email: leaveData.employee });
+                if (user) {
+                    employeeId = user._id;
+                    // Use user's department if not provided
+                    if (!leaveData.department) {
+                        leaveData.department = user.department;
+                    }
+                } else {
+                    throw new Error('User not found');
+                }
+            }
+
             // Calculate total days
             const startDate = new Date(leaveData.startDate!);
             const endDate = new Date(leaveData.endDate!);
@@ -61,6 +78,7 @@ export class LeaveController {
 
             const newLeave = new Leave({
                 ...leaveData,
+                employee: employeeId,
                 totalDays,
                 submissionDate: new Date(),
                 lastModified: new Date()
@@ -134,7 +152,6 @@ export class LeaveController {
             const leaves = await Leave.find(query)
                 .populate('employee', 'firstName lastName email image position')
                 .populate('department', 'name')
-                .populate('approvalWorkflow.approver', 'firstName lastName')
                 .sort({ submissionDate: -1 })
                 .limit(limit)
                 .skip((page - 1) * limit)
@@ -166,46 +183,81 @@ export class LeaveController {
         }
     }
 
-    // Update leave status (approve/reject)
-    static async updateLeaveStatus(
-        leaveId: string, 
-        status: 'approved' | 'rejected', 
-        approverId: string,
-        comments?: string
-    ): Promise<LeaveInterface> {
+    // Update leave status (approve/reject) - following admin.users.tsx pattern
+    static async updateLeaveStatus({
+        leaveId,
+        status,
+        comments,
+        approverEmail
+    }: {
+        leaveId: string;
+        status: 'approved' | 'rejected';
+        comments?: string;
+        approverEmail: string;
+    }) {
         try {
+            console.log('Updating leave status:', { leaveId, status, comments, approverEmail });
+            
+            // Find the approver by email
+            const approver = await Registration.findOne({ email: approverEmail });
+            if (!approver) {
+                return {
+                    success: false,
+                    message: "Approver not found",
+                    status: 404
+                };
+            }
+
             const leave = await Leave.findById(leaveId);
             if (!leave) {
-                throw new Error('Leave application not found');
+                return {
+                    success: false,
+                    message: "Leave application not found",
+                    status: 404
+                };
             }
 
             // Update leave status
             leave.status = status;
             leave.lastModified = new Date();
-            leave.modifiedBy = new mongoose.Types.ObjectId(approverId);
+            leave.modifiedBy = approver._id;
 
             // Update approval workflow
             const currentApproval = leave.approvalWorkflow.find(
-                approval => approval.status === 'pending'
+                (approval: any) => approval.status === 'pending'
             );
             
             if (currentApproval) {
                 currentApproval.status = status === 'approved' ? 'approved' : 'rejected';
                 currentApproval.comments = comments || '';
                 currentApproval.actionDate = new Date();
-                currentApproval.approver = new mongoose.Types.ObjectId(approverId);
+                currentApproval.approver = approver._id;
+            } else {
+                // Add new approval workflow entry
+                leave.approvalWorkflow.push({
+                    approver: approver._id,
+                    approverRole: approver.role,
+                    status: status === 'approved' ? 'approved' : 'rejected',
+                    comments: comments || '',
+                    actionDate: new Date(),
+                    order: 1
+                } as any);
             }
 
             await leave.save();
             
-            // Populate and return
-            await leave.populate('employee', 'firstName lastName email');
-            await leave.populate('department', 'name');
-            
-            return leave.toObject();
+            return {
+                success: true,
+                message: `Leave application ${status} successfully`,
+                status: 200
+            };
         } catch (error) {
             console.error('Error updating leave status:', error);
-            throw new Error('Failed to update leave status');
+            return {
+                success: false,
+                message: "Failed to update leave status",
+                status: 500
+            };
         }
     }
 

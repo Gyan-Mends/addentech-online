@@ -9,7 +9,7 @@ import AdminLayout from "~/layout/adminLayout";
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
-        const userId = session.get("userId");
+        const userId = session.get("email");
         
         if (!userId) {
             return redirect("/addentech-login");

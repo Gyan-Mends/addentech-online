@@ -26,7 +26,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
             limit: parseInt(url.searchParams.get('limit') || '10')
         };
 
-        const { leaves, total, stats } = await LeaveController.getLeaves(filters);
+        const result = await LeaveController.getLeaves(filters);
+        const leaves = result.leaves || [];
+        const total = result.total || 0;
+        const stats = result.stats || {};
         
         return json({ 
             leaves, 
@@ -52,6 +55,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 // Action function to handle approvals/rejections
 export async function action({ request }: ActionFunctionArgs) {
     try {
+        const session = await getSession(request.headers.get("Cookie"));
+        const userId = session.get("email");
+        
+        if (!userId) {
+            return redirect("/addentech-login");
+        }
+
         const formData = await request.formData();
         const action = formData.get('_action') as string;
         const leaveId = formData.get('leaveId') as string;
@@ -59,23 +69,15 @@ export async function action({ request }: ActionFunctionArgs) {
         const comments = formData.get('comments') as string;
 
         if (action === 'updateStatus') {
-            formData.set('_method', 'PUT');
-            
-            const response = await fetch(`${request.url.origin}/api/leaves`, {
-                method: 'POST',
-                headers: {
-                    'Cookie': request.headers.get('Cookie') || ''
-                },
-                body: formData
+            // Direct controller call following admin.users.tsx pattern
+            const result = await LeaveController.updateLeaveStatus({
+                leaveId,
+                status,
+                comments,
+                approverEmail: userId
             });
-
-            const result = await response.json();
             
-            if (result.success) {
-                return json({ success: true, message: result.message });
-            } else {
-                return json({ success: false, error: result.error });
-            }
+            return json(result);
         }
 
         return json({ success: false, error: "Invalid action" });
@@ -86,7 +88,9 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 const LeaveManagement = () => {
-    const { leaves, total, stats, filters, currentUser, success, error } = useLoaderData<typeof loader>();
+
+    const { leaves, total, stats, filters, currentUser, success, error } =useLoaderData<{leaves: any, total: number, stats: any, filters: any, currentUser: any, success: any, error: any}>();
+
     const actionData = useActionData<typeof action>();
     const submit = useSubmit();
     const [selectedLeave, setSelectedLeave] = useState<any>(null);
@@ -164,10 +168,10 @@ const LeaveManagement = () => {
                     </Card>
                 )}
                 
-                {(error || actionData?.error) && (
+                {(error || (actionData && 'error' in actionData && actionData.error)) && (
                     <Card className="border-danger-200 bg-danger-50">
                         <CardBody>
-                            <p className="text-danger-700">{error || actionData?.error}</p>
+                            <p className="text-danger-700">{error || (actionData && 'error' in actionData ? actionData.error : '')}</p>
                         </CardBody>
                     </Card>
                 )}
@@ -175,7 +179,7 @@ const LeaveManagement = () => {
                 {actionData?.success && (
                     <Card className="border-success-200 bg-success-50">
                         <CardBody>
-                            <p className="text-success-700">{actionData.message}</p>
+                            <p className="text-success-700">{actionData && 'message' in actionData ? actionData.message : 'Action completed successfully'}</p>
                         </CardBody>
                     </Card>
                 )}
@@ -218,13 +222,13 @@ const LeaveManagement = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                     <Card className="bg-gradient-to-r from-blue-500 to-blue-600">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between text-white">
-                                <div>
-                                    <p className="text-sm opacity-90">Total Applications</p>
-                                    <p className="text-2xl font-bold">{stats.totalApplications || 0}</p>
-                                </div>
-                                <CalendarDays size={24} />
+                                                    <div className="flex items-center justify-between text-white">
+                            <div>
+                                <p className="text-sm opacity-90">Total Applications</p>
+                                <p className="text-2xl font-bold">{(stats as any)?.totalApplications || 0}</p>
                             </div>
+                            <CalendarDays size={24} />
+                        </div>
                         </CardBody>
                     </Card>
 
@@ -233,7 +237,7 @@ const LeaveManagement = () => {
                             <div className="flex items-center justify-between text-white">
                                 <div>
                                     <p className="text-sm opacity-90">Pending Approvals</p>
-                                    <p className="text-2xl font-bold">{stats.pendingApprovals || 0}</p>
+                                    <p className="text-2xl font-bold">{(stats as any)?.pendingApprovals || 0}</p>
                                 </div>
                                 <Clock size={24} />
                             </div>
@@ -245,7 +249,7 @@ const LeaveManagement = () => {
                             <div className="flex items-center justify-between text-white">
                                 <div>
                                     <p className="text-sm opacity-90">Approved This Month</p>
-                                    <p className="text-2xl font-bold">{stats.approvedThisMonth || 0}</p>
+                                    <p className="text-2xl font-bold">{(stats as any)?.approvedThisMonth || 0}</p>
                                 </div>
                                 <CheckCircle size={24} />
                             </div>
@@ -257,7 +261,7 @@ const LeaveManagement = () => {
                             <div className="flex items-center justify-between text-white">
                                 <div>
                                     <p className="text-sm opacity-90">Rejected This Month</p>
-                                    <p className="text-2xl font-bold">{stats.rejectedThisMonth || 0}</p>
+                                    <p className="text-2xl font-bold">{(stats as any)?.rejectedThisMonth || 0}</p>
                                 </div>
                                 <XCircle size={24} />
                             </div>
@@ -269,7 +273,7 @@ const LeaveManagement = () => {
                             <div className="flex items-center justify-between text-white">
                                 <div>
                                     <p className="text-sm opacity-90">Upcoming Leaves</p>
-                                    <p className="text-2xl font-bold">{stats.upcomingLeaves || 0}</p>
+                                    <p className="text-2xl font-bold">{(stats as any)?.upcomingLeaves || 0}</p>
                                 </div>
                                 <TrendingUp size={24} />
                             </div>
@@ -281,7 +285,7 @@ const LeaveManagement = () => {
                             <div className="flex items-center justify-between text-white">
                                 <div>
                                     <p className="text-sm opacity-90">On Leave Today</p>
-                                    <p className="text-2xl font-bold">{stats.onLeaveToday || 0}</p>
+                                    <p className="text-2xl font-bold">{(stats as any)?.onLeaveToday || 0}</p>
                                 </div>
                                 <Users size={24} />
                             </div>

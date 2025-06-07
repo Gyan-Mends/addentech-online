@@ -5,7 +5,7 @@ import { getSession } from "~/session";
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
-        const userId = session.get("userId");
+        const userId = session.get("email");
         
         if (!userId) {
             return json({ error: "Unauthorized" }, { status: 401 });
@@ -41,7 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
-        const userId = session.get("userId");
+        const userId = session.get("email");
         
         if (!userId) {
             return json({ error: "Unauthorized" }, { status: 401 });
@@ -129,7 +129,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export async function exportCSV({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
-        const userId = session.get("userId");
+        const userId = session.get("email");
         
         if (!userId) {
             return json({ error: "Unauthorized" }, { status: 401 });
