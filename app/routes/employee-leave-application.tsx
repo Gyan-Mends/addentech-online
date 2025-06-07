@@ -1,616 +1,299 @@
-import { json, LoaderFunction, ActionFunction, redirect } from "@remix-run/node";
-import { useLoaderData, Form, useActionData, useNavigation } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { Card, CardHeader, CardBody, Button, Input, Select, SelectItem, Textarea, DatePicker } from "@nextui-org/react";
+import { Form, useActionData, useLoaderData, useNavigation, redirect } from "@remix-run/react";
+import { CalendarDays, Clock, FileText, Send, ArrowLeft } from "lucide-react";
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "~/session";
-import Registration from "~/modal/registration";
-import Leave, { LeaveTypes, LeavePriority } from "~/modal/leave";
-import { Card, CardBody, CardHeader } from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/react";
-import { DatePicker } from "@nextui-org/react";
-import { CalendarDate, parseDate } from "@internationalized/date";
-import { 
-  Calendar, 
-  Clock, 
-  AlertTriangle, 
-  Users, 
-  FileText,
-  CheckCircle,
-  Info
-} from "lucide-react";
+import { LeaveController } from "~/controller/leave";
+import { useEffect, useState } from "react";
+import AdminLayout from "~/layout/adminLayout";
 
-interface LeaveBalance {
-  totalEntitlement: number;
-  totalUsed: number;
-  remaining: number;
+// Loader to get user data and departments
+export async function loader({ request }: LoaderFunctionArgs) {
+    try {
+        const session = await getSession(request.headers.get("Cookie"));
+        const userId = session.get("email");
+        
+        if (!userId) {
+            return redirect("/addentech-login");
+        }
+
+        // Here you would fetch user and departments data
+        // For now, returning mock data structure
+        return json({
+            user: { id: userId },
+            departments: [], // Fetch from DepartmentController
+            leaveTypes: [
+                { key: 'annual', label: 'Annual Leave' },
+                { key: 'sick', label: 'Sick Leave' },
+                { key: 'maternity', label: 'Maternity Leave' },
+                { key: 'paternity', label: 'Paternity Leave' },
+                { key: 'emergency', label: 'Emergency Leave' },
+                { key: 'bereavement', label: 'Bereavement Leave' },
+                { key: 'personal', label: 'Personal Leave' },
+                { key: 'study', label: 'Study Leave' }
+            ],
+            priorities: [
+                { key: 'low', label: 'Low' },
+                { key: 'normal', label: 'Normal' },
+                { key: 'high', label: 'High' },
+                { key: 'urgent', label: 'Urgent' }
+            ]
+        });
+    } catch (error) {
+        console.error('Error in loader:', error);
+        return redirect("/addentech-login");
+    }
 }
 
-interface ActionData {
-  success?: string;
-  error?: string;
-  errors?: {
-    leaveType?: string;
-    startDate?: string;
-    endDate?: string;
-    reason?: string;
-    priority?: string;
-  };
+// Action to handle form submission
+export async function action({ request }: ActionFunctionArgs) {
+    try {
+        const formData = await request.formData();
+        formData.set('_method', 'POST');
+
+        const response = await fetch(`${request.url.origin}/api/leaves`, {
+            method: 'POST',
+            headers: {
+                'Cookie': request.headers.get('Cookie') || ''
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            return redirect("/admin/leave-management?success=Application submitted successfully");
+        } else {
+            return json({ error: result.error || "Failed to submit application" });
+        }
+    } catch (error) {
+        console.error('Error submitting leave application:', error);
+        return json({ error: "Failed to submit application" });
+    }
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  try {
-    const session = await getSession(request.headers.get("Cookie"));
-    const email = session.get("email");
+const EmployeeLeaveApplication = () => {
+    const { user, leaveTypes, priorities } = useLoaderData<typeof loader>();
+    const actionData = useActionData<typeof action>();
+    const navigation = useNavigation();
+    const isSubmitting = navigation.state === "submitting";
 
-    if (!email) {
-      throw new Response("Unauthorized", { status: 401 });
-    }
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [totalDays, setTotalDays] = useState<number>(0);
 
-    const user = await Registration.findOne({ email }).populate('department');
-    if (!user) {
-      throw new Response("User not found", { status: 404 });
-    }
+    // Calculate total days when dates change
+    useEffect(() => {
+        if (startDate && endDate) {
+            const timeDiff = endDate.getTime() - startDate.getTime();
+            const days = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+            setTotalDays(days > 0 ? days : 0);
+        } else {
+            setTotalDays(0);
+        }
+    }, [startDate, endDate]);
 
-    // Get leave balance for current user
-    const leaveBalance = await (Leave as any).getLeaveBalance(user._id.toString());
-    
-    // Get team members for handover (same department)
-    const teamMembers = await Registration.find({
-      department: user.department,
-      _id: { $ne: user._id },
-      status: 'active'
-    }).select('firstName lastName email position');
-
-    // Get upcoming leaves to show conflicts
-    const upcomingLeaves = await (Leave as any).getUpcomingLeaves(user.department._id.toString(), 60);
-
-    return json({
-      user: {
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        department: user.department,
-        position: user.position
-      },
-      leaveBalance,
-      teamMembers,
-      upcomingLeaves
-    });
-
-  } catch (error) {
-    console.error("Error loading leave application:", error);
-    throw new Response("Internal Server Error", { status: 500 });
-  }
-};
-
-export const action: ActionFunction = async ({ request }) => {
-  try {
-    const session = await getSession(request.headers.get("Cookie"));
-    const email = session.get("email");
-
-    if (!email) {
-      return json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await Registration.findOne({ email });
-    if (!user) {
-      return json({ error: "User not found" }, { status: 404 });
-    }
-
-    const formData = await request.formData();
-    const leaveType = formData.get("leaveType") as string;
-    const startDate = formData.get("startDate") as string;
-    const endDate = formData.get("endDate") as string;
-    const reason = formData.get("reason") as string;
-    const priority = formData.get("priority") as string;
-    const handoverTo = formData.get("handoverTo") as string;
-    const handoverNotes = formData.get("handoverNotes") as string;
-    const emergencyContactName = formData.get("emergencyContactName") as string;
-    const emergencyContactPhone = formData.get("emergencyContactPhone") as string;
-    const emergencyContactRelationship = formData.get("emergencyContactRelationship") as string;
-
-    // Validation
-    const errors: ActionData["errors"] = {};
-
-    if (!leaveType) {
-      errors.leaveType = "Leave type is required";
-    }
-
-    if (!startDate) {
-      errors.startDate = "Start date is required";
-    }
-
-    if (!endDate) {
-      errors.endDate = "End date is required";
-    }
-
-    if (!reason || reason.trim().length < 10) {
-      errors.reason = "Reason must be at least 10 characters long";
-    }
-
-    if (!priority) {
-      errors.priority = "Priority is required";
-    }
-
-    // Validate dates
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (start < today) {
-        errors.startDate = "Start date cannot be in the past";
-      }
-
-      if (end < start) {
-        errors.endDate = "End date cannot be before start date";
-      }
-
-      // Check for overlapping leaves
-      const overlappingLeave = await Leave.findOne({
-        employee: user._id,
-        status: { $in: ['pending', 'approved'] },
-        $or: [
-          { startDate: { $lte: start }, endDate: { $gte: start } },
-          { startDate: { $lte: end }, endDate: { $gte: end } },
-          { startDate: { $gte: start }, endDate: { $lte: end } }
-        ]
-      });
-
-      if (overlappingLeave) {
-        errors.startDate = "You already have a leave application for overlapping dates";
-      }
-    }
-
-    if (Object.keys(errors).length > 0) {
-      return json({ errors }, { status: 400 });
-    }
-
-    // Create leave application
-    const leaveData = {
-      employee: user._id,
-      leaveType,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      reason: reason.trim(),
-      priority,
-      department: user.department,
-      handoverTo: handoverTo || undefined,
-      handoverNotes: handoverNotes || undefined
-    };
-
-    // Add emergency contact for emergency leaves
-    if (leaveType === LeaveTypes.EMERGENCY && emergencyContactName && emergencyContactPhone) {
-      (leaveData as any).emergencyContact = {
-        name: emergencyContactName,
-        phone: emergencyContactPhone,
-        relationship: emergencyContactRelationship || 'Not specified'
-      };
-    }
-
-    const leave = new Leave(leaveData);
-    await leave.save();
-
-    return redirect(`/employee/leave-status?success=Application submitted successfully`);
-
-  } catch (error) {
-    console.error("Error creating leave application:", error);
-    return json({ error: "Failed to submit leave application" }, { status: 500 });
-  }
-};
-
-export default function LeaveApplication() {
-  const { user, leaveBalance, teamMembers, upcomingLeaves } = useLoaderData<typeof loader>();
-  const actionData = useActionData<ActionData>();
-  const navigation = useNavigation();
-  
-  const [selectedLeaveType, setSelectedLeaveType] = useState<string>("");
-  const [startDate, setStartDate] = useState<CalendarDate | null>(null);
-  const [endDate, setEndDate] = useState<CalendarDate | null>(null);
-  const [calculatedDays, setCalculatedDays] = useState<number>(0);
-  const [showEmergencyContact, setShowEmergencyContact] = useState(false);
-
-  const isSubmitting = navigation.state === "submitting";
-
-  // Calculate leave days when dates change
-  useEffect(() => {
-    if (startDate && endDate) {
-      const start = new Date(startDate.toString());
-      const end = new Date(endDate.toString());
-      const timeDiff = end.getTime() - start.getTime();
-      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-      setCalculatedDays(daysDiff > 0 ? daysDiff : 0);
-    } else {
-      setCalculatedDays(0);
-    }
-  }, [startDate, endDate]);
-
-  // Show emergency contact form for emergency leaves
-  useEffect(() => {
-    setShowEmergencyContact(selectedLeaveType === LeaveTypes.EMERGENCY);
-  }, [selectedLeaveType]);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const getLeaveTypeDescription = (type: string) => {
-    const descriptions = {
-      [LeaveTypes.ANNUAL]: "Regular annual leave for vacation or personal time",
-      [LeaveTypes.SICK]: "Medical leave for illness or health appointments",
-      [LeaveTypes.MATERNITY]: "Maternity leave for new mothers",
-      [LeaveTypes.PATERNITY]: "Paternity leave for new fathers",
-      [LeaveTypes.EMERGENCY]: "Emergency leave for urgent personal matters",
-      [LeaveTypes.STUDY]: "Educational leave for training or studies",
-      [LeaveTypes.COMPASSIONATE]: "Compassionate leave for bereavement",
-      [LeaveTypes.UNPAID]: "Unpaid leave without salary",
-      [LeaveTypes.OTHER]: "Other types of leave not listed above"
-    };
-    return descriptions[type as keyof typeof descriptions] || "";
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Leave Application
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 mt-2">
-          Submit your leave request for approval
-        </p>
-      </div>
-
-      {/* Success/Error Messages */}
-      {actionData?.success && (
-        <Card className="border-green-200 bg-green-50">
-          <CardBody className="p-4">
-            <div className="flex items-center gap-2 text-green-800">
-              <CheckCircle size={20} />
-              <span>{actionData.success}</span>
-            </div>
-          </CardBody>
-        </Card>
-      )}
-
-      {actionData?.error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardBody className="p-4">
-            <div className="flex items-center gap-2 text-red-800">
-              <AlertTriangle size={20} />
-              <span>{actionData.error}</span>
-            </div>
-          </CardBody>
-        </Card>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Leave Application Form */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <FileText size={20} />
-                Leave Application Form
-              </h2>
-            </CardHeader>
-            <CardBody>
-              <Form method="post" className="space-y-6">
-                {/* Leave Type */}
-                <div>
-                  <Select
-                    name="leaveType"
-                    label="Leave Type"
-                    placeholder="Select leave type"
-                    isRequired
-                    errorMessage={actionData?.errors?.leaveType}
-                    isInvalid={!!actionData?.errors?.leaveType}
-                    selectedKeys={selectedLeaveType ? [selectedLeaveType] : []}
-                    onSelectionChange={(keys) => setSelectedLeaveType(Array.from(keys)[0] as string)}
-                  >
-                    {Object.values(LeaveTypes).map(type => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)} Leave
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  
-                  {selectedLeaveType && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {getLeaveTypeDescription(selectedLeaveType)}
-                    </p>
-                  )}
-                </div>
-
-                {/* Date Range */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <DatePicker
-                      name="startDate"
-                      label="Start Date"
-                      isRequired
-                      minValue={parseDate(new Date().toISOString().split('T')[0])}
-                      errorMessage={actionData?.errors?.startDate}
-                      isInvalid={!!actionData?.errors?.startDate}
-                      value={startDate}
-                      onChange={setStartDate}
-                    />
-                  </div>
-                  
-                  <div>
-                    <DatePicker
-                      name="endDate"
-                      label="End Date"
-                      isRequired
-                      minValue={startDate || parseDate(new Date().toISOString().split('T')[0])}
-                      errorMessage={actionData?.errors?.endDate}
-                      isInvalid={!!actionData?.errors?.endDate}
-                      value={endDate}
-                      onChange={setEndDate}
-                    />
-                  </div>
-                </div>
-
-                {/* Calculated Days */}
-                {calculatedDays > 0 && (
-                  <Card className="bg-blue-50 border-blue-200">
-                    <CardBody className="p-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-blue-800 font-medium">
-                          Total Leave Days: {calculatedDays}
-                        </span>
-                        <Calendar className="text-blue-600" size={20} />
-                      </div>
-                      {leaveBalance.remaining < calculatedDays && (
-                        <p className="text-red-600 text-sm mt-2">
-                          ⚠️ This exceeds your remaining leave balance ({leaveBalance.remaining} days)
+    return (
+        <AdminLayout>
+            <div className="p-6 max-w-4xl mx-auto space-y-6">
+                {/* Header */}
+                <div className="flex items-center gap-4 mb-6">
+                    <Button
+                        variant="light"
+                        startContent={<ArrowLeft size={16} />}
+                        onClick={() => window.history.back()}
+                    >
+                        Back
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                            New Leave Application
+                        </h1>
+                        <p className="text-gray-600 dark:text-gray-300 mt-2">
+                            Submit a new leave application for approval
                         </p>
-                      )}
-                    </CardBody>
-                  </Card>
+                    </div>
+                </div>
+
+                {/* Error Display */}
+                {actionData?.error && (
+                    <Card className="border-danger-200 bg-danger-50">
+                        <CardBody>
+                            <p className="text-danger-700">{actionData.error}</p>
+                        </CardBody>
+                    </Card>
                 )}
 
-                {/* Priority */}
-                <Select
-                  name="priority"
-                  label="Priority"
-                  placeholder="Select priority level"
-                  isRequired
-                  errorMessage={actionData?.errors?.priority}
-                  isInvalid={!!actionData?.errors?.priority}
-                >
-                  <SelectItem key={LeavePriority.LOW} value={LeavePriority.LOW}>
-                    Low Priority
-                  </SelectItem>
-                  <SelectItem key={LeavePriority.MEDIUM} value={LeavePriority.MEDIUM}>
-                    Medium Priority
-                  </SelectItem>
-                  <SelectItem key={LeavePriority.HIGH} value={LeavePriority.HIGH}>
-                    High Priority
-                  </SelectItem>
-                  <SelectItem key={LeavePriority.URGENT} value={LeavePriority.URGENT}>
-                    Urgent Priority
-                  </SelectItem>
-                </Select>
+                {/* Application Form */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <FileText size={20} />
+                            <h2 className="text-xl font-semibold">Leave Application Details</h2>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <Form method="post" className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Leave Type */}
+                                <Select
+                                    name="leaveType"
+                                    label="Leave Type"
+                                    placeholder="Select leave type"
+                                    isRequired
+                                    variant="bordered"
+                                >
+                                    {leaveTypes.map((type) => (
+                                        <SelectItem key={type.key} value={type.key}>
+                                            {type.label}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
 
-                {/* Reason */}
-                <Textarea
-                  name="reason"
-                  label="Reason for Leave"
-                  placeholder="Please provide a detailed reason for your leave application..."
-                  minRows={4}
-                  isRequired
-                  errorMessage={actionData?.errors?.reason}
-                  isInvalid={!!actionData?.errors?.reason}
-                />
+                                {/* Priority */}
+                                <Select
+                                    name="priority"
+                                    label="Priority"
+                                    placeholder="Select priority"
+                                    defaultSelectedKeys={["normal"]}
+                                    variant="bordered"
+                                >
+                                    {priorities.map((priority) => (
+                                        <SelectItem key={priority.key} value={priority.key}>
+                                            {priority.label}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
 
-                {/* Handover Section */}
-                <Card className="bg-gray-50">
-                  <CardBody className="p-4">
-                    <h3 className="font-semibold mb-4 flex items-center gap-2">
-                      <Users size={18} />
-                      Work Handover Details
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      <Select
-                        name="handoverTo"
-                        label="Handover Work To"
-                        placeholder="Select team member (optional)"
-                      >
-                        {teamMembers.map((member: any) => (
-                          <SelectItem key={member._id} value={member._id}>
-                            {member.firstName} {member.lastName} - {member.position}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                      
-                      <Textarea
-                        name="handoverNotes"
-                        label="Handover Instructions"
-                        placeholder="Provide details about tasks, deadlines, and important information..."
-                        minRows={3}
-                      />
-                    </div>
-                  </CardBody>
+                                {/* Start Date */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Start Date *
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        name="startDate"
+                                        variant="bordered"
+                                        isRequired
+                                        min={new Date().toISOString().split('T')[0]}
+                                        onChange={(e) => setStartDate(new Date(e.target.value))}
+                                    />
+                                </div>
+
+                                {/* End Date */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        End Date *
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        name="endDate"
+                                        variant="bordered"
+                                        isRequired
+                                        min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                                        onChange={(e) => setEndDate(new Date(e.target.value))}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Total Days Display */}
+                            {totalDays > 0 && (
+                                <Card className="bg-blue-50 border-blue-200">
+                                    <CardBody className="py-4">
+                                        <div className="flex items-center gap-2">
+                                            <CalendarDays size={16} className="text-blue-600" />
+                                            <span className="text-blue-800 font-medium">
+                                                Total Leave Days: {totalDays} day{totalDays !== 1 ? 's' : ''}
+                                            </span>
+                                        </div>
+                                    </CardBody>
+                                </Card>
+                            )}
+
+                            {/* Reason */}
+                            <Textarea
+                                name="reason"
+                                label="Reason for Leave"
+                                placeholder="Please provide a detailed reason for your leave application..."
+                                variant="bordered"
+                                isRequired
+                                minRows={4}
+                                maxRows={8}
+                            />
+
+                            {/* Additional Information */}
+                            <Card className="bg-gray-50 border-gray-200">
+                                <CardBody>
+                                    <h3 className="font-semibold text-gray-800 mb-3">Important Information</h3>
+                                    <ul className="space-y-2 text-sm text-gray-600">
+                                        <li className="flex items-start gap-2">
+                                            <Clock size={14} className="mt-0.5 text-gray-400" />
+                                            <span>Leave applications should be submitted at least 3 days in advance</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <Clock size={14} className="mt-0.5 text-gray-400" />
+                                            <span>Emergency leaves can be submitted with immediate effect</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <Clock size={14} className="mt-0.5 text-gray-400" />
+                                            <span>You will receive email notifications about approval status</span>
+                                        </li>
+                                    </ul>
+                                </CardBody>
+                            </Card>
+
+                            {/* Submit Button */}
+                            <div className="flex justify-end gap-4">
+                                <Button
+                                    type="button"
+                                    variant="light"
+                                    onClick={() => window.history.back()}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    color="primary"
+                                    startContent={<Send size={16} />}
+                                    isLoading={isSubmitting}
+                                    disabled={!startDate || !endDate || totalDays <= 0}
+                                >
+                                    {isSubmitting ? "Submitting..." : "Submit Application"}
+                                </Button>
+                            </div>
+                        </Form>
+                    </CardBody>
                 </Card>
 
-                {/* Emergency Contact (for emergency leaves) */}
-                {showEmergencyContact && (
-                  <Card className="bg-red-50 border-red-200">
-                    <CardBody className="p-4">
-                      <h3 className="font-semibold mb-4 flex items-center gap-2 text-red-800">
-                        <AlertTriangle size={18} />
-                        Emergency Contact Information
-                      </h3>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Input
-                          name="emergencyContactName"
-                          label="Contact Name"
-                          placeholder="Full name"
-                          isRequired
-                        />
-                        
-                        <Input
-                          name="emergencyContactPhone"
-                          label="Contact Phone"
-                          placeholder="Phone number"
-                          type="tel"
-                          isRequired
-                        />
-                        
-                        <Input
-                          name="emergencyContactRelationship"
-                          label="Relationship"
-                          placeholder="e.g., Spouse, Parent, etc."
-                          className="sm:col-span-2"
-                        />
-                      </div>
+                {/* Leave Policy Information */}
+                <Card>
+                    <CardHeader>
+                        <h3 className="text-lg font-semibold">Leave Policy Summary</h3>
+                    </CardHeader>
+                    <CardBody>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-2">Annual Leave</h4>
+                                <p className="text-sm text-gray-600">21 working days per year</p>
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-2">Sick Leave</h4>
+                                <p className="text-sm text-gray-600">12 days per year (medical certificate required for 3+ consecutive days)</p>
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-2">Maternity Leave</h4>
+                                <p className="text-sm text-gray-600">126 days (as per local labor law)</p>
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-2">Emergency Leave</h4>
+                                <p className="text-sm text-gray-600">Up to 3 days (manager discretion)</p>
+                            </div>
+                        </div>
                     </CardBody>
-                  </Card>
-                )}
+                </Card>
+            </div>
+        </AdminLayout>
+    );
+};
 
-                {/* Submit Button */}
-                <div className="flex gap-4">
-                  <Button
-                    type="submit"
-                    color="primary"
-                    size="lg"
-                    className="flex-1"
-                    isLoading={isSubmitting}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Submitting..." : "Submit Leave Application"}
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="light"
-                    size="lg"
-                    onClick={() => window.history.back()}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </Form>
-            </CardBody>
-          </Card>
-        </div>
-
-        {/* Sidebar - Leave Balance & Info */}
-        <div className="space-y-6">
-          {/* Leave Balance */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Clock size={18} />
-                Leave Balance
-              </h3>
-            </CardHeader>
-            <CardBody>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600">
-                    {leaveBalance.remaining}
-                  </div>
-                  <div className="text-sm text-gray-600">Days Remaining</div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Total Entitlement:</span>
-                    <span className="font-medium">{leaveBalance.totalEntitlement} days</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Used This Year:</span>
-                    <span className="font-medium">{leaveBalance.totalUsed} days</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Remaining:</span>
-                    <span className="font-medium text-green-600">{leaveBalance.remaining} days</span>
-                  </div>
-                </div>
-                
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(leaveBalance.totalUsed / leaveBalance.totalEntitlement) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-
-          {/* Upcoming Team Leaves */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Users size={18} />
-                Upcoming Team Leaves
-              </h3>
-            </CardHeader>
-            <CardBody>
-              {upcomingLeaves.length > 0 ? (
-                <div className="space-y-3">
-                  {upcomingLeaves.slice(0, 5).map((leave: any) => (
-                    <div key={leave._id} className="flex justify-between items-center text-sm">
-                      <div>
-                        <p className="font-medium">
-                          {leave.employee.firstName} {leave.employee.lastName}
-                        </p>
-                        <p className="text-gray-600">
-                          {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
-                        </p>
-                      </div>
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        {leave.leaveType}
-                      </span>
-                    </div>
-                  ))}
-                  {upcomingLeaves.length > 5 && (
-                    <p className="text-sm text-gray-600 text-center">
-                      +{upcomingLeaves.length - 5} more...
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 text-center">
-                  No upcoming team leaves
-                </p>
-              )}
-            </CardBody>
-          </Card>
-
-          {/* Leave Policy Info */}
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader>
-              <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-800">
-                <Info size={18} />
-                Leave Policy
-              </h3>
-            </CardHeader>
-            <CardBody>
-              <div className="text-sm text-blue-800 space-y-2">
-                <p>• Submit applications at least 3 days in advance</p>
-                <p>• Emergency leaves require immediate notification</p>
-                <p>• Annual leave: 21 days per year</p>
-                <p>• Sick leave: Medical certificate required for 3+ days</p>
-                <p>• Approval depends on workload and team coverage</p>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-}
+export default EmployeeLeaveApplication; 
