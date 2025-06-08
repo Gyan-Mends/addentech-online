@@ -60,7 +60,9 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
             const reportResult = await ReportController.generateStaffReport(
                 selectedUserId,
                 period as 'weekly' | 'monthly' | 'quarterly',
-                year
+                year,
+                currentUser.role,
+                currentUser._id
             );
             report = reportResult.success ? reportResult.report : null;
         }

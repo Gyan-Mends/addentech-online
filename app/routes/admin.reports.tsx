@@ -21,7 +21,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
             return redirect("/addentech-login");
         }
 
-        // Get departments for filtering
+        // Get departments for filtering based on role
         let departments = [];
         if (currentUser.role === 'admin' || currentUser.role === 'manager') {
             departments = await Departments.find();
@@ -31,8 +31,9 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
                 departments = [userDept];
             }
         }
+        // Staff don't need department info for main reports page
 
-        // Get users for individual reports
+        // Get users for individual reports based on role
         let users = [];
         if (currentUser.role === 'admin' || currentUser.role === 'manager') {
             users = await Registration.find({ status: 'active' }, 'firstName lastName email role department');
@@ -41,6 +42,9 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
                 department: currentUser.department, 
                 status: 'active' 
             }, 'firstName lastName email role');
+        } else if (currentUser.role === 'staff') {
+            // Staff can only see their own info
+            users = [await Registration.findById(currentUser._id, 'firstName lastName email role department')];
         }
 
         return json({
@@ -98,7 +102,8 @@ const ReportsPage = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Department Reports */}
+                    {/* Department Reports - Not available for staff */}
+                    {currentUser?.role !== 'staff' && (
                     <Card className="p-6">
                         <CardHeader className="pb-4">
                             <div className="flex items-center gap-3">
@@ -159,6 +164,7 @@ const ReportsPage = () => {
                             </div>
                         </CardBody>
                     </Card>
+                    )}
 
                     {/* Individual Staff Reports */}
                     <Card className="p-6">

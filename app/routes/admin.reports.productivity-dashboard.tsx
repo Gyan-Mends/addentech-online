@@ -29,35 +29,63 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
         const startDate = url.searchParams.get('startDate');
         const endDate = url.searchParams.get('endDate');
 
-        // Get departments for selection
+        // Get departments for selection based on role
         let departments = [];
-        if (currentUser.role === 'admin' || currentUser.role === 'manager') {
+        if (currentUser.role === 'admin') {
+            // Admin can see all departments
+            departments = await Departments.find();
+        } else if (currentUser.role === 'manager') {
+            // Manager can see all departments
             departments = await Departments.find();
         } else if (currentUser.role === 'department_head') {
+            // HOD can only see their own department
             const userDept = await Departments.findById(currentUser.department);
             if (userDept) {
                 departments = [userDept];
             }
+        } else if (currentUser.role === 'staff') {
+            // Staff cannot filter by department (they only see their own tasks)
+            departments = [];
         }
 
-        // Get users for selection
+        // Get users for selection based on role
         let users = [];
-        if (currentUser.role === 'admin' || currentUser.role === 'manager') {
+        if (currentUser.role === 'admin') {
+            // Admin can see all users
+            users = await Registration.find({ status: 'active' }, 'firstName lastName email role department');
+        } else if (currentUser.role === 'manager') {
+            // Manager can see all users
             users = await Registration.find({ status: 'active' }, 'firstName lastName email role department');
         } else if (currentUser.role === 'department_head') {
+            // HOD can see their department users
             users = await Registration.find({ 
                 department: currentUser.department, 
                 status: 'active' 
             }, 'firstName lastName email role');
+        } else if (currentUser.role === 'staff') {
+            // Staff can only see themselves
+            users = [await Registration.findById(currentUser._id, 'firstName lastName email role department')];
         }
 
-        // Generate productivity dashboard
+        // Generate productivity dashboard with role-based filtering
         const filters = {
             department: departmentId || undefined,
             userId: userIdParam || undefined,
             startDate: startDate ? new Date(startDate) : undefined,
-            endDate: endDate ? new Date(endDate) : undefined
+            endDate: endDate ? new Date(endDate) : undefined,
+            requestingUserRole: currentUser.role,
+            requestingUserId: currentUser._id
         };
+
+        // Apply role-based restrictions
+        if (currentUser.role === 'department_head') {
+            // HOD can only see their department
+            filters.department = currentUser.department;
+        } else if (currentUser.role === 'staff') {
+            // Staff can only see their own activities
+            filters.userId = currentUser._id;
+            delete filters.department; // Remove department filter for staff
+        }
 
         const dashboardResult = await ReportController.getProductivityDashboard(filters);
         const dashboard = dashboardResult.success ? dashboardResult.data : [];

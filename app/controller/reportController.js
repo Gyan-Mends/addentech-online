@@ -183,12 +183,32 @@ export class ReportController {
             const yearStart = new Date(year, 0, 1);
             const yearEnd = new Date(year, 11, 31);
 
+            // Build match query with role-based filtering
+            let activityMatchQuery = {
+                userId: userId,
+                timestamp: { $gte: yearStart, $lte: yearEnd }
+            };
+
+            // If staff is requesting, only show activities for tasks assigned to them
+            if (requestingUserRole === 'staff' && requestingUserId) {
+                const staffUser = await Registration.findById(requestingUserId);
+                if (staffUser && staffUser._id.toString() !== userId) {
+                    // Staff can only see their own reports
+                    return { success: false, message: "Access denied: You can only view your own reports" };
+                }
+                
+                // Get only tasks assigned to this staff member
+                const assignedTasks = await Task.find({ 
+                    assignedTo: userId 
+                }).select('_id');
+                const taskIds = assignedTasks.map(task => task._id);
+                
+                activityMatchQuery.taskId = { $in: taskIds };
+            }
+
             const overallStats = await TaskActivity.aggregate([
                 {
-                    $match: {
-                        userId: userId,
-                        timestamp: { $gte: yearStart, $lte: yearEnd }
-                    }
+                    $match: activityMatchQuery
                 },
                 {
                     $group: {
@@ -223,12 +243,25 @@ export class ReportController {
 
             // Generate period-specific data
             for (const [periodName, dateRange] of Object.entries(dateRanges)) {
+                // Apply same filtering for period breakdown
+                let periodMatchQuery = {
+                    userId: userId,
+                    timestamp: { $gte: dateRange.start, $lte: dateRange.end }
+                };
+
+                if (requestingUserRole === 'staff' && requestingUserId) {
+                    // Get only tasks assigned to this staff member for this period
+                    const assignedTasks = await Task.find({ 
+                        assignedTo: userId 
+                    }).select('_id');
+                    const taskIds = assignedTasks.map(task => task._id);
+                    
+                    periodMatchQuery.taskId = { $in: taskIds };
+                }
+
                 const periodStats = await TaskActivity.aggregate([
                     {
-                        $match: {
-                            userId: userId,
-                            timestamp: { $gte: dateRange.start, $lte: dateRange.end }
-                        }
+                        $match: periodMatchQuery
                     },
                     {
                         $group: {
@@ -262,20 +295,31 @@ export class ReportController {
         }
     }
 
-    // Generate productivity dashboard data
+    // Generate productivity dashboard data with role-based filtering
     static async getProductivityDashboard(filters = {}) {
         try {
-            const { department, userId, startDate, endDate } = filters;
+            const { department, userId, startDate, endDate, requestingUserRole, requestingUserId } = filters;
             
             const defaultStartDate = startDate || new Date(new Date().getFullYear(), 0, 1);
             const defaultEndDate = endDate || new Date();
 
-            const matchQuery = {
+            let matchQuery = {
                 timestamp: { $gte: defaultStartDate, $lte: defaultEndDate }
             };
 
             if (department) matchQuery.department = department;
             if (userId) matchQuery.userId = userId;
+
+            // Apply staff-level filtering - only show activities for tasks assigned to them
+            if (requestingUserRole === 'staff' && requestingUserId) {
+                const assignedTasks = await Task.find({ 
+                    assignedTo: requestingUserId 
+                }).select('_id');
+                const taskIds = assignedTasks.map(task => task._id);
+                
+                matchQuery.taskId = { $in: taskIds };
+                matchQuery.userId = requestingUserId; // Force to show only their activities
+            }
 
             const productivityData = await TaskActivity.aggregate([
                 { $match: matchQuery },
