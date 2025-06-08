@@ -9,6 +9,9 @@ import { ArrowLeft, Download, Calendar, BarChart3, TrendingUp, User, Clock, Acti
 import AdminLayout from "~/layout/adminLayout";
 
 export const loader: LoaderFunction = async ({ request, params }: LoaderFunctionArgs) => {
+
+    console.log("checking..........");
+    
     try {
         const session = await getSession(request.headers.get("Cookie"));
         const userId = session.get("email");

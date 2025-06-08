@@ -182,11 +182,13 @@ export class ReportController {
         }
     }
 
-    // Generate individual staff report
+    // Generate individual staff report with role-based filtering
     static async generateStaffReport(
         userId: string,
-        period: 'weekly' | 'monthly' | 'quarterly',
-        year: number = new Date().getFullYear()
+        period: 'weekly' | 'monthly' | 'quarterly' = 'monthly',
+        year: number = new Date().getFullYear(),
+        requestingUserRole: string = 'admin',
+        requestingUserId: string | null = null
     ) {
         try {
             const user = await Registration.findById(userId).populate('department');
@@ -213,12 +215,32 @@ export class ReportController {
             const yearStart = new Date(year, 0, 1);
             const yearEnd = new Date(year, 11, 31);
 
+            // Build match query with role-based filtering
+            let activityMatchQuery: any = {
+                userId: userId,
+                timestamp: { $gte: yearStart, $lte: yearEnd }
+            };
+
+            // If staff is requesting, only show activities for tasks assigned to them
+            if (requestingUserRole === 'staff' && requestingUserId) {
+                const staffUser = await Registration.findById(requestingUserId);
+                if (staffUser && staffUser._id.toString() !== userId) {
+                    // Staff can only see their own reports
+                    return { success: false, message: "Access denied: You can only view your own reports" };
+                }
+                
+                // Get only tasks assigned to this staff member (assignedTo is an array)
+                const assignedTasks = await Task.find({ 
+                    assignedTo: { $in: [userId] }
+                }).select('_id');
+                const taskIds = assignedTasks.map(task => task._id);
+                
+                activityMatchQuery.taskId = { $in: taskIds };
+            }
+
             const overallStats = await TaskActivity.aggregate([
                 {
-                    $match: {
-                        userId: userId,
-                        timestamp: { $gte: yearStart, $lte: yearEnd }
-                    }
+                    $match: activityMatchQuery
                 },
                 {
                     $group: {
@@ -237,49 +259,65 @@ export class ReportController {
                 }
             ]);
 
-            // Get task completion metrics
-            const taskMetrics = await TaskActivity.aggregate([
-                {
-                    $match: {
-                        userId: userId,
-                        activityType: 'completed',
-                        timestamp: { $gte: yearStart, $lte: yearEnd }
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'tasks',
-                        localField: 'taskId',
-                        foreignField: '_id',
-                        as: 'task'
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        totalCompleted: { $sum: 1 },
-                        tasks: { $push: '$task' }
-                    }
-                }
-            ]);
+            // Get task completion metrics and assigned tasks info
+            const completedTasks = await TaskActivity.countDocuments({
+                userId: userId,
+                activityType: 'completed',
+                timestamp: { $gte: yearStart, $lte: yearEnd }
+            });
+
+            // Get all tasks assigned to this user for the year (assignedTo is an array)
+            let assignedTasksQuery: any = { assignedTo: { $in: [userId] } };
+            if (requestingUserRole === 'staff' && requestingUserId) {
+                // For staff, only show tasks they're assigned to
+                assignedTasksQuery = { assignedTo: { $in: [requestingUserId] } };
+            }
+
+            const assignedTasks = await Task.find(assignedTasksQuery)
+                .populate('createdBy', 'firstName lastName')
+                .populate('department', 'name')
+                .select('title status priority dueDate createdAt assignedTo')
+                .lean();
+
+            // Calculate task status breakdown
+            const taskStatusBreakdown = assignedTasks.reduce((breakdown: any, task: any) => {
+                breakdown[task.status] = (breakdown[task.status] || 0) + 1;
+                return breakdown;
+            }, {});
 
             report.summary = {
                 totalActivities: overallStats.reduce((sum, stat) => sum + stat.count, 0),
                 totalHours: overallStats.reduce((sum, stat) => sum + stat.totalHours, 0),
-                completedTasks: taskMetrics[0]?.totalCompleted || 0,
-                activityBreakdown: overallStats
+                completedTasks,
+                totalAssignedTasks: assignedTasks.length,
+                taskStatusBreakdown,
+                activityBreakdown: overallStats,
+                assignedTasksList: assignedTasks // Full task details
             };
 
             // Generate period-specific data
             for (const [periodName, dateRange] of Object.entries(dateRanges)) {
                 const range = dateRange as { start: Date; end: Date };
                 
+                // Apply same filtering for period breakdown
+                let periodMatchQuery: any = {
+                    userId: userId,
+                    timestamp: { $gte: range.start, $lte: range.end }
+                };
+
+                if (requestingUserRole === 'staff' && requestingUserId) {
+                    // Get only tasks assigned to this staff member for this period (assignedTo is an array)
+                    const assignedTasks = await Task.find({ 
+                        assignedTo: { $in: [userId] } 
+                    }).select('_id');
+                    const taskIds = assignedTasks.map(task => task._id);
+                    
+                    periodMatchQuery.taskId = { $in: taskIds };
+                }
+                
                 const periodStats = await TaskActivity.aggregate([
                     {
-                        $match: {
-                            userId: userId,
-                            timestamp: { $gte: range.start, $lte: range.end }
-                        }
+                        $match: periodMatchQuery
                     },
                     {
                         $group: {
@@ -306,11 +344,25 @@ export class ReportController {
                     }
                 ]);
 
+                // Get tasks for this specific period
+                const periodTasks = assignedTasks.filter((task: any) => {
+                    const taskDate = new Date(task.createdAt);
+                    return taskDate >= range.start && taskDate <= range.end;
+                });
+
+                const periodTaskStatusBreakdown = periodTasks.reduce((breakdown: any, task: any) => {
+                    breakdown[task.status] = (breakdown[task.status] || 0) + 1;
+                    return breakdown;
+                }, {});
+
                 report.periodBreakdown[periodName] = {
                     dateRange: range,
                     totalActivities: periodStats.reduce((sum, stat) => sum + stat.count, 0),
                     totalHours: periodStats.reduce((sum, stat) => sum + stat.totalHours, 0),
-                    activityStats: periodStats
+                    activityStats: periodStats,
+                    assignedTasks: periodTasks.length,
+                    taskStatusBreakdown: periodTaskStatusBreakdown,
+                    tasksList: periodTasks // List of tasks for this period
                 };
             }
 
