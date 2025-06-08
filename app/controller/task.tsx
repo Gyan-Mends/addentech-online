@@ -281,6 +281,8 @@ export class TaskController {
                 .populate('dependencies', 'title status')
                 .populate('comments.user', 'firstName lastName email')
                 .populate('timeEntries.user', 'firstName lastName email')
+                .populate('assignmentHistory.assignedBy', 'firstName lastName email role')
+                .populate('assignmentHistory.assignedTo', 'firstName lastName email role')
                 .lean();
 
             if (!task) return null;
@@ -718,11 +720,22 @@ export class TaskController {
         instructions: string = ''
     ): Promise<{ success: boolean; task?: TaskInterface; message: string }> {
         try {
+            console.log('🔄 Starting hierarchical assignment:');
+            console.log('- Task ID:', taskId);
+            console.log('- New Assignee ID:', newAssigneeId);
+            console.log('- Assigned By User ID (email):', assignedByUserId);
+            console.log('- Instructions:', instructions);
+
             const [task, assignedByUser, newAssignee] = await Promise.all([
                 Task.findById(taskId),
                 Registration.findOne({ email: assignedByUserId }),
                 Registration.findById(newAssigneeId)
             ]);
+
+            console.log('📋 Database lookup results:');
+            console.log('- Task found:', !!task, task ? task.title : 'N/A');
+            console.log('- Assigned by user found:', !!assignedByUser, assignedByUser ? `${assignedByUser.firstName} ${assignedByUser.lastName}` : 'N/A');
+            console.log('- New assignee found:', !!newAssignee, newAssignee ? `${newAssignee.firstName} ${newAssignee.lastName}` : 'N/A');
 
             if (!task) {
                 return { success: false, message: "Task not found" };

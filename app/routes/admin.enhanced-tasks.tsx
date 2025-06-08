@@ -68,6 +68,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
                 department: currentUser.department, 
                 status: 'active' 
             }, 'firstName lastName email role');
+            console.log('👥 Department users for HOD:', users.map(u => `${u.firstName} ${u.lastName} (${u.role})`));
         }
 
         return json({
@@ -334,6 +335,17 @@ const EnhancedTaskManagement = () => {
     };
 
     const submitAssignment = () => {
+        console.log('Submitting assignment:');
+        console.log('- Selected task:', selectedTask._id);
+        console.log('- Assigned member ID:', assignedMember);
+        console.log('- Instructions:', assignmentInstructions);
+        console.log('- Available users:', users);
+        
+        if (!assignedMember) {
+            console.error('No assigned member selected!');
+            return;
+        }
+        
         const formData = new FormData();
         formData.set('_action', 'assignToMember');
         formData.set('taskId', selectedTask._id);
@@ -478,7 +490,7 @@ const EnhancedTaskManagement = () => {
                                 value={searchQuery}
                                 onValueChange={setSearchQuery}
                                 startContent={<Search size={16} />}
-                                clearable
+                                isClearable
                             />
 
                             <Select
@@ -757,7 +769,13 @@ const EnhancedTaskManagement = () => {
                                         label="Select Member"
                                         placeholder="Choose a department member"
                                         selectedKeys={assignedMember ? [assignedMember] : []}
-                                        onSelectionChange={(keys) => setAssignedMember(Array.from(keys)[0] as string)}
+                                        onSelectionChange={(keys) => {
+                                            const selectedUserId = Array.from(keys)[0] as string;
+                                            console.log('🎯 User selected in modal:', selectedUserId);
+                                            const selectedUser = users.find(u => u._id === selectedUserId);
+                                            console.log('🎯 Selected user details:', selectedUser);
+                                            setAssignedMember(selectedUserId);
+                                        }}
                                     >
                                         {users.map((user: any) => (
                                             <SelectItem key={user._id} value={user._id}>
