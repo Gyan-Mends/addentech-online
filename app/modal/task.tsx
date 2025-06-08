@@ -48,6 +48,13 @@ export interface TaskInterface {
         message: string;
         timestamp: Date;
         mentions: mongoose.Types.ObjectId[];
+        parentComment?: mongoose.Types.ObjectId;
+        replies: {
+            user: mongoose.Types.ObjectId;
+            message: string;
+            timestamp: Date;
+            mentions: mongoose.Types.ObjectId[];
+        }[];
     }[];
     
     // File attachments
@@ -85,11 +92,20 @@ const timeEntrySchema = new mongoose.Schema({
     description: { type: String }
 });
 
-const commentSchema = new mongoose.Schema({
+const replySchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
     message: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
     mentions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'registration' }]
+});
+
+const commentSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
+    message: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    mentions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'registration' }],
+    parentComment: { type: mongoose.Schema.Types.ObjectId },
+    replies: [replySchema]
 });
 
 const attachmentSchema = new mongoose.Schema({

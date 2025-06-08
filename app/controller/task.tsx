@@ -96,10 +96,14 @@ export class TaskController {
                 const user = await Registration.findOne({ email: userEmail });
                 if (user) {
                     if (userRole === 'staff') {
-                        // Staff can only see tasks assigned to them or created by them
+                        // Staff can see:
+                        // 1. Tasks assigned to them
+                        // 2. Tasks created by them
+                        // 3. All tasks in their department (department-wide visibility)
                         query.$or = [
                             { assignedTo: user._id },
-                            { createdBy: user._id }
+                            { createdBy: user._id },
+                            { department: user.department }
                         ];
                     } else if (userRole === 'department_head') {
                         // Department heads can see tasks in their department
@@ -280,13 +284,25 @@ export class TaskController {
             // Role-based access check
             if (userEmail) {
                 const user = await Registration.findOne({ email: userEmail });
-                if (user && user.role === 'staff') {
-                    // Check if staff user has access to this task
-                    const hasAccess = task.assignedTo.some((assignee: any) => 
-                        assignee._id.toString() === user._id.toString()
-                    ) || task.createdBy._id.toString() === user._id.toString();
-                    
-                    if (!hasAccess) return null;
+                if (user) {
+                    if (user.role === 'staff') {
+                        // Staff can access tasks:
+                        // 1. Assigned to them
+                        // 2. Created by them
+                        // 3. In their department (department-wide visibility)
+                        const isAssigned = task.assignedTo.some((assignee: any) => 
+                            assignee._id.toString() === user._id.toString());
+                        const isCreator = task.createdBy._id.toString() === user._id.toString();
+                        const isDepartmentTask = task.department._id.toString() === user.department.toString();
+                        
+                        if (!isAssigned && !isCreator && !isDepartmentTask) return null;
+                    } else if (user.role === 'department_head') {
+                        // Department head can access all tasks in their department
+                        const isDepartmentTask = task.department._id.toString() === user.department.toString();
+                        
+                        if (!isDepartmentTask) return null;
+                    }
+                    // Admin and Manager can access all tasks (no restriction)
                 }
             }
 
@@ -346,12 +362,13 @@ export class TaskController {
         }
     }
 
-    // Add comment to task
+    // Add comment to task with threading support
     static async addComment(
         taskId: string, 
         message: string, 
         userEmail: string,
-        mentions: string[] = []
+        mentions: string[] = [],
+        parentCommentId?: string
     ): Promise<{ success: boolean; message: string }> {
         try {
             const user = await Registration.findOne({ email: userEmail });
@@ -364,6 +381,12 @@ export class TaskController {
                 return { success: false, message: "Task not found" };
             }
 
+            // Check if user has permission to comment
+            const canComment = await this.canUserComment(task, user);
+            if (!canComment) {
+                return { success: false, message: "You don't have permission to comment on this task" };
+            }
+
             // Process mentions
             const mentionedUsers = mentions.length > 0 
                 ? await Registration.find({ email: { $in: mentions } })
@@ -373,10 +396,25 @@ export class TaskController {
                 user: user._id,
                 message,
                 timestamp: new Date(),
-                mentions: mentionedUsers.map(u => u._id)
+                mentions: mentionedUsers.map(u => u._id),
+                parentComment: parentCommentId || null,
+                replies: []
             };
 
-            task.comments.push(comment as any);
+            // If it's a reply, add to parent comment's replies
+            if (parentCommentId) {
+                const parentComment = task.comments.id(parentCommentId);
+                if (parentComment) {
+                    parentComment.replies = parentComment.replies || [];
+                    parentComment.replies.push(comment as any);
+                } else {
+                    return { success: false, message: "Parent comment not found" };
+                }
+            } else {
+                // Add as top-level comment
+                task.comments.push(comment as any);
+            }
+
             await task.save();
 
             return { success: true, message: "Comment added successfully" };
@@ -384,6 +422,35 @@ export class TaskController {
             console.error('Error adding comment:', error);
             return { success: false, message: "Failed to add comment" };
         }
+    }
+
+    // Check if user can comment on task
+    private static async canUserComment(task: any, user: any): Promise<boolean> {
+        // Admin and Manager can comment on any task
+        if (user.role === 'admin' || user.role === 'manager') {
+            return true;
+        }
+        
+        // Department head can comment on tasks in their department
+        if (user.role === 'department_head' && 
+            task.department.toString() === user.department.toString()) {
+            return true;
+        }
+        
+        // Staff can comment on tasks:
+        // 1. Assigned to them
+        // 2. Created by them  
+        // 3. In their department (department-wide visibility)
+        if (user.role === 'staff') {
+            const isAssigned = task.assignedTo.some((assignee: any) => 
+                assignee.toString() === user._id.toString());
+            const isCreator = task.createdBy.toString() === user._id.toString();
+            const isDepartmentMember = task.department.toString() === user.department.toString();
+            
+            return isAssigned || isCreator || isDepartmentMember;
+        }
+        
+        return false;
     }
 
     // Add time entry
@@ -430,9 +497,11 @@ export class TaskController {
             return true;
         }
         
-        // Department head can update tasks in their department
+        // Department head can update certain aspects of department tasks
         if (user.role === 'department_head' && 
             task.department.toString() === user.department.toString()) {
+            // Department heads can always update status and assignment for their department tasks
+            // This method is used for general updates - specific permissions are handled elsewhere
             return true;
         }
         
@@ -443,6 +512,44 @@ export class TaskController {
             );
             const isCreator = task.createdBy.toString() === user._id.toString();
             return isAssigned || isCreator;
+        }
+        
+        return false;
+    }
+
+    // Check if user can change task status (more permissive than full edit)
+    static canUserChangeStatus(task: any, user: any): boolean {
+        // Admin and Manager can change any task status
+        if (user.role === 'admin' || user.role === 'manager') {
+            return true;
+        }
+        
+        // Department head can change status of tasks in their department
+        if (user.role === 'department_head' && 
+            task.department.toString() === user.department.toString()) {
+            return true;
+        }
+        
+        // Staff can change status only if task is assigned to them
+        if (user.role === 'staff') {
+            return task.assignedTo.some((assignee: any) => 
+                assignee.toString() === user._id.toString());
+        }
+        
+        return false;
+    }
+
+    // Check if user can assign tasks to department members
+    static canUserAssignTasks(task: any, user: any): boolean {
+        // Admin and Manager can assign any task
+        if (user.role === 'admin' || user.role === 'manager') {
+            return true;
+        }
+        
+        // Department head can assign tasks in their department
+        if (user.role === 'department_head' && 
+            task.department.toString() === user.department.toString()) {
+            return true;
         }
         
         return false;
