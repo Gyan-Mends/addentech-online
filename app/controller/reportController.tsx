@@ -12,26 +12,55 @@ export class ReportController {
         
         switch (period) {
             case 'weekly':
-                const now = new Date();
-                const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-                const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
-                ranges.current = { start: startOfWeek, end: endOfWeek };
+                // Generate all weeks for the year
+                const yearStart = new Date(year, 0, 1);
+                const yearEnd = new Date(year, 11, 31);
+                
+                let weekNumber = 1;
+                let currentWeekStart = new Date(yearStart);
+                
+                // Adjust to start from Monday of the first week
+                const dayOfWeek = currentWeekStart.getDay();
+                const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                currentWeekStart.setDate(currentWeekStart.getDate() - daysToMonday);
+                
+                while (currentWeekStart < yearEnd) {
+                    const weekStart = new Date(currentWeekStart);
+                    const weekEnd = new Date(currentWeekStart);
+                    weekEnd.setDate(weekEnd.getDate() + 6);
+                    
+                    // Only include weeks that fall within the year
+                    if (weekEnd >= yearStart) {
+                        const weekName = `Week ${weekNumber} (${weekStart.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${weekEnd.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})`;
+                        ranges[weekName] = { start: weekStart, end: weekEnd };
+                    }
+                    
+                    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                    weekNumber++;
+                    
+                    // Safety check to prevent infinite loop
+                    if (weekNumber > 60) break;
+                }
                 break;
                 
             case 'monthly':
+                const monthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
                 for (let month = 0; month < 12; month++) {
                     const start = new Date(year, month, 1);
                     const end = new Date(year, month + 1, 0);
-                    ranges[`month_${month + 1}`] = { start, end };
+                    ranges[monthNames[month]] = { start, end };
                 }
                 break;
                 
             case 'quarterly':
                 const quarters = [
-                    { name: 'Q1', months: [0, 1, 2] },
-                    { name: 'Q2', months: [3, 4, 5] },
-                    { name: 'Q3', months: [6, 7, 8] },
-                    { name: 'Q4', months: [9, 10, 11] }
+                    { name: 'Q1 (Jan-Mar)', months: [0, 1, 2] },
+                    { name: 'Q2 (Apr-Jun)', months: [3, 4, 5] },
+                    { name: 'Q3 (Jul-Sep)', months: [6, 7, 8] },
+                    { name: 'Q4 (Oct-Dec)', months: [9, 10, 11] }
                 ];
                 
                 quarters.forEach((quarter, index) => {
@@ -94,9 +123,56 @@ export class ReportController {
                 }
             ]);
 
+            // Get completed tasks count for the department
+            const completedTasks = await TaskActivity.countDocuments({
+                department: new mongoose.Types.ObjectId(departmentId),
+                activityType: 'completed',
+                timestamp: { $gte: yearStart, $lte: yearEnd }
+            });
+
+            // Get all users in this department
+            const departmentUsers = await Registration.find({ 
+                department: departmentId, 
+                status: 'active' 
+            }).select('_id');
+            const departmentUserIds = departmentUsers.map(user => new mongoose.Types.ObjectId(user._id));
+
+            // Get all tasks assigned to users in this department
+            const assignedTasks = await Task.find({
+                assignedTo: { $in: departmentUserIds }
+            })
+                .populate('createdBy', 'firstName lastName')
+                .populate('department', 'name')
+                .populate('assignedTo', 'firstName lastName email role')
+                .sort({ createdAt: -1 });
+
+            // Get task status breakdown
+            const taskStatusBreakdown = await Task.aggregate([
+                {
+                    $match: {
+                        assignedTo: { $in: departmentUserIds }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$status',
+                        count: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            const statusBreakdown = taskStatusBreakdown.reduce((acc: any, item: any) => {
+                acc[item._id] = item.count;
+                return acc;
+            }, {});
+
             report.summary = {
                 totalActivities: overallStats.reduce((sum, stat) => sum + stat.count, 0),
                 totalHours: overallStats.reduce((sum, stat) => sum + stat.totalHours, 0),
+                completedTasks,
+                totalAssignedTasks: assignedTasks.length,
+                assignedTasksList: assignedTasks,
+                taskStatusBreakdown: statusBreakdown,
                 activityBreakdown: overallStats
             };
 
@@ -168,12 +244,26 @@ export class ReportController {
                     }));
                 });
 
-                report.periodBreakdown[periodName] = {
-                    dateRange: range,
-                    totalActivities: periodStats.reduce((sum, stat) => sum + stat.totalCount, 0),
-                    totalHours: periodStats.reduce((sum, stat) => sum + stat.totalHours, 0),
-                    activityStats: periodStats
-                };
+                // Get tasks assigned to department users in this period
+                const periodTasks = assignedTasks.filter(task => {
+                    const taskDate = new Date(task.createdAt);
+                    return taskDate >= range.start && taskDate <= range.end;
+                });
+
+                const totalActivities = periodStats.reduce((sum, stat) => sum + stat.totalCount, 0);
+                const totalHours = periodStats.reduce((sum, stat) => sum + stat.totalHours, 0);
+                
+                // Only include periods that have activities or tasks
+                if (totalActivities > 0 || periodTasks.length > 0) {
+                    report.periodBreakdown[periodName] = {
+                        dateRange: range,
+                        totalActivities,
+                        totalHours,
+                        assignedTasks: periodTasks.length,
+                        tasksList: periodTasks,
+                        activityStats: periodStats
+                    };
+                }
             }
 
             return { success: true, report };
@@ -356,15 +446,21 @@ export class ReportController {
                     return breakdown;
                 }, {});
 
-                report.periodBreakdown[periodName] = {
-                    dateRange: range,
-                    totalActivities: periodStats.reduce((sum, stat) => sum + stat.count, 0),
-                    totalHours: periodStats.reduce((sum, stat) => sum + stat.totalHours, 0),
-                    activityStats: periodStats,
-                    assignedTasks: periodTasks.length,
-                    taskStatusBreakdown: periodTaskStatusBreakdown,
-                    tasksList: periodTasks // List of tasks for this period
-                };
+                const totalActivities = periodStats.reduce((sum, stat) => sum + stat.count, 0);
+                const totalHours = periodStats.reduce((sum, stat) => sum + stat.totalHours, 0);
+                
+                // Only include periods that have activities or tasks
+                if (totalActivities > 0 || periodTasks.length > 0) {
+                    report.periodBreakdown[periodName] = {
+                        dateRange: range,
+                        totalActivities,
+                        totalHours,
+                        activityStats: periodStats,
+                        assignedTasks: periodTasks.length,
+                        taskStatusBreakdown: periodTaskStatusBreakdown,
+                        tasksList: periodTasks // List of tasks for this period
+                    };
+                }
             }
 
             return { success: true, report };

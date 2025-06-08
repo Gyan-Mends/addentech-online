@@ -476,14 +476,13 @@ const StaffReportPage = () => {
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-6">
-                                    {Object.entries(report.periodBreakdown).map(([periodName, data]: [string, any]) => (
-                                        <div key={periodName} className="border rounded-lg p-4">
+                                    {report.periodBreakdown && Object.entries(report.periodBreakdown)
+                                        .filter(([periodName, data]) => periodName && data)
+                                        .map(([periodName, data]: [string, any]) => (
+                                        <div key={periodName || 'unknown'} className="border rounded-lg p-4">
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="text-lg font-semibold">
-                                                    {period === 'monthly' ? 
-                                                        `Month ${periodName.split('_')[1]}` : 
-                                                        periodName
-                                                    }
+                                                    {periodName || 'Unknown Period'}
                                                 </h3>
                                                 <div className="text-sm text-gray-600">
                                                     {new Date(data.dateRange.start).toLocaleDateString()} - {new Date(data.dateRange.end).toLocaleDateString()}

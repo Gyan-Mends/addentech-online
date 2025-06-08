@@ -5,7 +5,7 @@ import { getSession } from "~/session";
 import Registration from "~/modal/registration";
 import Departments from "~/modal/department";
 import { ReportController } from "~/controller/reportController";
-import { ArrowLeft, Download, Calendar, BarChart3, TrendingUp, Users, Clock, Activity } from "lucide-react";
+import { ArrowLeft, Download, Calendar, BarChart3, TrendingUp, Users, Clock, Activity, Award } from "lucide-react";
 import AdminLayout from "~/layout/adminLayout";
 import { useState, useEffect } from "react";
 
@@ -124,16 +124,16 @@ const DepartmentReportPage = () => {
         ).join(' ');
     };
 
-    const getActivityColor = (type: string) => {
+    const getActivityColor = (type: string): "default" | "primary" | "secondary" | "warning" | "success" | "danger" => {
         const colors = {
-            created: 'primary',
-            assigned: 'secondary',
-            delegated: 'warning',
-            status_changed: 'default',
-            completed: 'success',
-            commented: 'primary',
-            time_logged: 'warning',
-            updated: 'default'
+            created: 'primary' as const,
+            assigned: 'secondary' as const,
+            delegated: 'warning' as const,
+            status_changed: 'default' as const,
+            completed: 'success' as const,
+            commented: 'primary' as const,
+            time_logged: 'warning' as const,
+            updated: 'default' as const
         };
         return colors[type as keyof typeof colors] || 'default';
     };
@@ -243,7 +243,7 @@ const DepartmentReportPage = () => {
                 ) : (
                     <div className="space-y-6">
                         {/* Summary Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                             <Card>
                                 <CardBody className="text-center">
                                     <Activity className="w-12 h-12 text-blue-600 mx-auto mb-3" />
@@ -255,17 +255,58 @@ const DepartmentReportPage = () => {
                                 <CardBody className="text-center">
                                     <Clock className="w-12 h-12 text-green-600 mx-auto mb-3" />
                                     <h3 className="text-2xl font-bold text-green-600">{report.summary.totalHours.toFixed(1)}</h3>
-                                    <p className="text-gray-600">Total Hours Logged</p>
+                                    <p className="text-gray-600">Hours Logged</p>
                                 </CardBody>
                             </Card>
                             <Card>
                                 <CardBody className="text-center">
-                                    <BarChart3 className="w-12 h-12 text-purple-600 mx-auto mb-3" />
-                                    <h3 className="text-2xl font-bold text-purple-600">{Object.keys(report.periodBreakdown).length}</h3>
-                                    <p className="text-gray-600">Reporting Periods</p>
+                                    <Award className="w-12 h-12 text-purple-600 mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-purple-600">{report.summary.completedTasks || 0}</h3>
+                                    <p className="text-gray-600">Tasks Completed</p>
+                                </CardBody>
+                            </Card>
+                            <Card>
+                                <CardBody className="text-center">
+                                    <BarChart3 className="w-12 h-12 text-orange-600 mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-orange-600">{Object.keys(report.periodBreakdown).length}</h3>
+                                    <p className="text-gray-600">Periods Tracked</p>
+                                </CardBody>
+                            </Card>
+                            <Card>
+                                <CardBody className="text-center">
+                                    <Users className="w-12 h-12 text-indigo-600 mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-indigo-600">{report.summary.totalAssignedTasks || 0}</h3>
+                                    <p className="text-gray-600">Assigned Tasks</p>
+                                    <p className="text-sm text-gray-500">Department total</p>
                                 </CardBody>
                             </Card>
                         </div>
+
+                        {/* Task Status Breakdown */}
+                        {report.summary.taskStatusBreakdown && Object.keys(report.summary.taskStatusBreakdown).length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <h2 className="text-xl font-semibold">Task Status Overview</h2>
+                            </CardHeader>
+                            <CardBody>
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    {Object.entries(report.summary.taskStatusBreakdown).map(([status, count]: [string, any]) => (
+                                        <div key={status} className="text-center p-4 bg-gray-50 rounded-lg">
+                                            <Chip 
+                                                color={status === 'completed' ? 'success' : status === 'in_progress' ? 'primary' : status === 'under_review' ? 'warning' : 'default'} 
+                                                variant="flat"
+                                                className="mb-2"
+                                            >
+                                                {status.replace('_', ' ').toUpperCase()}
+                                            </Chip>
+                                            <p className="text-2xl font-bold">{count}</p>
+                                            <p className="text-sm text-gray-600">tasks</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardBody>
+                        </Card>
+                        )}
 
                         {/* Activity Breakdown */}
                         <Card>
@@ -293,6 +334,51 @@ const DepartmentReportPage = () => {
                             </CardBody>
                         </Card>
 
+                        {/* All Assigned Tasks */}
+                        {report.summary.assignedTasksList && report.summary.assignedTasksList.length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <h2 className="text-xl font-semibold">All Department Tasks ({year})</h2>
+                            </CardHeader>
+                            <CardBody>
+                                <div className="space-y-3">
+                                    {report.summary.assignedTasksList.map((task: any) => (
+                                        <div key={task._id} className="flex justify-between items-center p-4 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-colors">
+                                            <div className="flex-grow">
+                                                <h5 className="font-semibold text-gray-900">{task.title}</h5>
+                                                <div className="text-sm text-gray-600 mt-1">
+                                                    <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                                                    {task.createdBy && (
+                                                        <span className="ml-4">• Assigned by: {task.createdBy.firstName} {task.createdBy.lastName}</span>
+                                                    )}
+                                                    {task.assignedTo && task.assignedTo.length > 0 && (
+                                                        <span className="ml-4">• Assigned to: {task.assignedTo.map((user: any) => `${user.firstName} ${user.lastName}`).join(', ')}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Chip 
+                                                    color={task.status === 'completed' ? 'success' : task.status === 'in_progress' ? 'primary' : task.status === 'under_review' ? 'warning' : 'default'}
+                                                    variant="flat"
+                                                    size="sm"
+                                                >
+                                                    {task.status.replace('_', ' ').toUpperCase()}
+                                                </Chip>
+                                                <Chip 
+                                                    color={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'default'}
+                                                    variant="flat"
+                                                    size="sm"
+                                                >
+                                                    {task.priority.toUpperCase()}
+                                                </Chip>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardBody>
+                        </Card>
+                        )}
+
                         {/* Period Breakdown */}
                         <Card>
                             <CardHeader>
@@ -300,21 +386,20 @@ const DepartmentReportPage = () => {
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-6">
-                                    {Object.entries(report.periodBreakdown).map(([periodName, data]: [string, any]) => (
-                                        <div key={periodName} className="border rounded-lg p-4">
+                                    {report.periodBreakdown && Object.entries(report.periodBreakdown)
+                                        .filter(([periodName, data]) => periodName && data)
+                                        .map(([periodName, data]: [string, any]) => (
+                                        <div key={periodName || 'unknown'} className="border rounded-lg p-4">
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="text-lg font-semibold">
-                                                    {period === 'monthly' ? 
-                                                        `Month ${periodName.split('_')[1]}` : 
-                                                        periodName
-                                                    }
+                                                    {periodName || 'Unknown Period'}
                                                 </h3>
                                                 <div className="text-sm text-gray-600">
                                                     {new Date(data.dateRange.start).toLocaleDateString()} - {new Date(data.dateRange.end).toLocaleDateString()}
                                                 </div>
                                             </div>
                                             
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                                 <div className="text-center p-3 bg-blue-50 rounded">
                                                     <p className="text-xl font-bold text-blue-600">{data.totalActivities}</p>
                                                     <p className="text-sm text-blue-600">Activities</p>
@@ -325,12 +410,16 @@ const DepartmentReportPage = () => {
                                                 </div>
                                                 <div className="text-center p-3 bg-purple-50 rounded">
                                                     <p className="text-xl font-bold text-purple-600">{data.activityStats?.length || 0}</p>
-                                                    <p className="text-sm text-purple-600">Types</p>
+                                                    <p className="text-sm text-purple-600">Activity Types</p>
+                                                </div>
+                                                <div className="text-center p-3 bg-orange-50 rounded">
+                                                    <p className="text-xl font-bold text-orange-600">{data.assignedTasks || 0}</p>
+                                                    <p className="text-sm text-orange-600">Assigned Tasks</p>
                                                 </div>
                                             </div>
 
                                             {data.activityStats && data.activityStats.length > 0 && (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                                                     {data.activityStats.map((activity: any) => (
                                                         <div key={activity._id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
                                                             <span className="font-medium">{formatActivityType(activity._id)}</span>
@@ -342,6 +431,47 @@ const DepartmentReportPage = () => {
                                                             </div>
                                                         </div>
                                                     ))}
+                                                </div>
+                                            )}
+
+                                            {/* Assigned Tasks for this period */}
+                                            {data.tasksList && data.tasksList.length > 0 && (
+                                                <div className="mt-4">
+                                                    <h4 className="font-semibold mb-3">Tasks Assigned in this Period</h4>
+                                                    <div className="space-y-2">
+                                                        {data.tasksList.map((task: any) => (
+                                                            <div key={task._id} className="flex justify-between items-center p-3 bg-white border rounded-lg">
+                                                                <div className="flex-grow">
+                                                                    <h5 className="font-medium text-gray-900">{task.title}</h5>
+                                                                    <p className="text-sm text-gray-600">
+                                                                        Due: {new Date(task.dueDate).toLocaleDateString()}
+                                                                        {task.createdBy && (
+                                                                            <span className="ml-2">• Assigned by: {task.createdBy.firstName} {task.createdBy.lastName}</span>
+                                                                        )}
+                                                                        {task.assignedTo && task.assignedTo.length > 0 && (
+                                                                            <span className="ml-2">• To: {task.assignedTo.map((user: any) => `${user.firstName} ${user.lastName}`).join(', ')}</span>
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex gap-2">
+                                                                    <Chip 
+                                                                        color={task.status === 'completed' ? 'success' : task.status === 'in_progress' ? 'primary' : task.status === 'under_review' ? 'warning' : 'default'}
+                                                                        variant="flat"
+                                                                        size="sm"
+                                                                    >
+                                                                        {task.status.replace('_', ' ').toUpperCase()}
+                                                                    </Chip>
+                                                                    <Chip 
+                                                                        color={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'default'}
+                                                                        variant="flat"
+                                                                        size="sm"
+                                                                    >
+                                                                        {task.priority}
+                                                                    </Chip>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
