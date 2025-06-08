@@ -141,14 +141,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const assignedMemberId = formData.get('assignedMemberId') as string;
                 const assignmentInstructions = formData.get('instructions') as string;
                 
-                // Update task assignment
-                const assignResult = await TaskController.updateTask(
+                // Handle hierarchical assignment
+                const assignResult = await TaskController.assignTaskHierarchically(
                     taskId,
-                    { 
-                        assignedTo: [assignedMemberId],
-                        lastModifiedBy: userId
-                    },
-                    userId
+                    assignedMemberId,
+                    userId,
+                    assignmentInstructions || ''
                 );
                 
                 // Add assignment comment
@@ -667,12 +665,53 @@ const TaskDetails = () => {
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">Assigned To</p>
                                     {task.assignedTo && task.assignedTo.length > 0 ? (
-                                        <div className="space-y-1">
-                                            {task.assignedTo.map((assignee: any) => (
-                                                <p key={assignee._id} className="text-sm">
-                                                    {assignee.firstName} {assignee.lastName}
-                                                </p>
+                                        <div className="space-y-2">
+                                            {task.assignedTo.map((assignee: any, index: number) => (
+                                                <div key={assignee._id} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                                                    <p className="text-sm font-medium">
+                                                        {assignee.firstName} {assignee.lastName}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 capitalize">
+                                                        {assignee.role?.replace('_', ' ')}
+                                                        {index === 0 && task.assignedTo.length > 1 && ' (Primary)'}
+                                                        {index > 0 && ' (Delegated)'}
+                                                    </p>
+                                                </div>
                                             ))}
+                                            
+                                            {/* Assignment History */}
+                                            {task.assignmentHistory && task.assignmentHistory.length > 0 && (
+                                                <div className="border-t pt-2">
+                                                    <p className="text-xs font-medium text-gray-600 mb-1">Assignment History</p>
+                                                    <div className="space-y-1">
+                                                        {task.assignmentHistory.slice(-3).map((assignment: any, index: number) => (
+                                                            <div key={index} className="text-xs text-gray-500">
+                                                                <span className="font-medium">
+                                                                    {assignment.assignedBy.firstName} {assignment.assignedBy.lastName}
+                                                                </span>
+                                                                {' '}assigned to{' '}
+                                                                <span className="font-medium">
+                                                                    {assignment.assignedTo.firstName} {assignment.assignedTo.lastName}
+                                                                </span>
+                                                                <div className="text-xs text-gray-400">
+                                                                    {new Date(assignment.assignedAt).toLocaleDateString()} at {new Date(assignment.assignedAt).toLocaleTimeString()}
+                                                                    {assignment.assignmentLevel === 'delegation' && ' (Delegated)'}
+                                                                </div>
+                                                                {assignment.instructions && (
+                                                                    <div className="text-xs italic text-gray-400 mt-1">
+                                                                        "{assignment.instructions}"
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                        {task.assignmentHistory.length > 3 && (
+                                                            <p className="text-xs text-gray-400">
+                                                                ...and {task.assignmentHistory.length - 3} more assignments
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     ) : (
                                         <p className="text-sm text-gray-500">Not assigned</p>

@@ -141,15 +141,13 @@ export async function action({ request }: ActionFunctionArgs) {
                 const assignedMemberId = formData.get('assignedMemberId') as string;
                 const assignmentInstructions = formData.get('instructions') as string;
                 
-                // Update task assignment
+                // Handle hierarchical assignment
                 console.log('Assigning task:', assignTaskId, 'to member:', assignedMemberId);
-                const assignResult = await TaskController.updateTask(
+                const assignResult = await TaskController.assignTaskHierarchically(
                     assignTaskId,
-                    { 
-                        assignedTo: [assignedMemberId],
-                        lastModifiedBy: userId
-                    },
-                    userId
+                    assignedMemberId,
+                    userId,
+                    assignmentInstructions || ''
                 );
                 console.log('Assignment result:', assignResult);
                 
@@ -594,11 +592,23 @@ const EnhancedTaskManagement = () => {
                                             <TableCell>
                                                 {task.assignedTo && task.assignedTo.length > 0 ? (
                                                     <div className="space-y-1">
-                                                        {task.assignedTo.map((assignee: any) => (
-                                                            <p key={assignee._id} className="text-sm">
-                                                                {assignee.firstName} {assignee.lastName}
-                                                            </p>
+                                                        {task.assignedTo.map((assignee: any, index: number) => (
+                                                            <div key={assignee._id} className="text-sm">
+                                                                <p className="font-medium">
+                                                                    {assignee.firstName} {assignee.lastName}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500 capitalize">
+                                                                    {assignee.role?.replace('_', ' ')}
+                                                                    {index === 0 && task.assignedTo.length > 1 && ' (Primary)'}
+                                                                    {index > 0 && ' (Delegated)'}
+                                                                </p>
+                                                            </div>
                                                         ))}
+                                                        {task.assignmentHistory && task.assignmentHistory.length > 0 && (
+                                                            <div className="text-xs text-gray-400 mt-1 border-t pt-1">
+                                                                Last assigned: {new Date(task.assignmentHistory[task.assignmentHistory.length - 1].assignedAt).toLocaleDateString()}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <span className="text-gray-500 text-sm">Unassigned</span>

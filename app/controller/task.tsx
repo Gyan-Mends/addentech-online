@@ -169,9 +169,11 @@ export class TaskController {
             // Get tasks with pagination
             const tasks = await Task.find(query)
                 .populate('createdBy', 'firstName lastName email')
-                .populate('assignedTo', 'firstName lastName email')
+                .populate('assignedTo', 'firstName lastName email role')
                 .populate('department', 'name')
                 .populate('parentTask', 'title')
+                .populate('assignmentHistory.assignedBy', 'firstName lastName email role')
+                .populate('assignmentHistory.assignedTo', 'firstName lastName email role')
                 .sort(sortObj)
                 .limit(limit)
                 .skip((page - 1) * limit)
@@ -705,6 +707,102 @@ export class TaskController {
         } catch (error) {
             console.error('Error in DeleteTask:', error);
             return { success: false, message: "Failed to delete task" };
+        }
+    }
+
+    // Hierarchical task assignment - preserves assignment chain
+    static async assignTaskHierarchically(
+        taskId: string,
+        newAssigneeId: string,
+        assignedByUserId: string,
+        instructions: string = ''
+    ): Promise<{ success: boolean; task?: TaskInterface; message: string }> {
+        try {
+            const [task, assignedByUser, newAssignee] = await Promise.all([
+                Task.findById(taskId),
+                Registration.findOne({ email: assignedByUserId }),
+                Registration.findById(newAssigneeId)
+            ]);
+
+            if (!task) {
+                return { success: false, message: "Task not found" };
+            }
+
+            if (!assignedByUser) {
+                return { success: false, message: "Assigning user not found" };
+            }
+
+            if (!newAssignee) {
+                return { success: false, message: "Assignee not found" };
+            }
+
+            // Determine assignment level
+            const assignmentLevel = (assignedByUser.role === 'admin' || assignedByUser.role === 'manager') 
+                ? 'initial' 
+                : 'delegation';
+
+            // For hierarchical assignment:
+            // - If it's an initial assignment (admin/manager to HOD), replace assignedTo
+            // - If it's a delegation (HOD to member), add to assignedTo and keep the chain
+            let updatedAssignedTo;
+            
+            if (assignmentLevel === 'initial') {
+                // Admin/Manager assigning to HOD - replace the assignment
+                updatedAssignedTo = [newAssigneeId];
+            } else {
+                // HOD delegating to member - preserve the chain but ensure HOD is included
+                const currentAssignees = task.assignedTo || [];
+                const assignedByUserId_obj = assignedByUser._id.toString();
+                
+                // Add the assigning user (HOD) if not already in the list
+                if (!currentAssignees.some(id => id.toString() === assignedByUserId_obj)) {
+                    currentAssignees.push(assignedByUser._id);
+                }
+                
+                // Add the new assignee if not already in the list
+                if (!currentAssignees.some(id => id.toString() === newAssigneeId)) {
+                    currentAssignees.push(newAssigneeId);
+                }
+                
+                updatedAssignedTo = currentAssignees;
+            }
+
+            // Create assignment history entry
+            const assignmentHistoryEntry = {
+                assignedBy: assignedByUser._id,
+                assignedTo: newAssignee._id,
+                assignedAt: new Date(),
+                assignmentLevel,
+                instructions
+            };
+
+            // Update the task
+            const updatedTask = await Task.findByIdAndUpdate(
+                taskId,
+                {
+                    assignedTo: updatedAssignedTo,
+                    lastModifiedBy: assignedByUser._id,
+                    $push: { assignmentHistory: assignmentHistoryEntry },
+                    updatedAt: new Date()
+                },
+                { new: true }
+            ).populate([
+                { path: 'createdBy', select: 'firstName lastName email role' },
+                { path: 'assignedTo', select: 'firstName lastName email role' },
+                { path: 'department', select: 'name' },
+                { path: 'assignmentHistory.assignedBy', select: 'firstName lastName email role' },
+                { path: 'assignmentHistory.assignedTo', select: 'firstName lastName email role' }
+            ]);
+
+            return {
+                success: true,
+                task: updatedTask?.toObject(),
+                message: `Task successfully assigned to ${newAssignee.firstName} ${newAssignee.lastName}`
+            };
+
+        } catch (error) {
+            console.error('Error in hierarchical task assignment:', error);
+            return { success: false, message: "Failed to assign task" };
         }
     }
 

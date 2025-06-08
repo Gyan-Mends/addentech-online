@@ -14,6 +14,15 @@ export interface TaskInterface {
     assignedTo: mongoose.Types.ObjectId[];
     department: mongoose.Types.ObjectId;
     
+    // Assignment history tracking
+    assignmentHistory: {
+        assignedBy: mongoose.Types.ObjectId;
+        assignedTo: mongoose.Types.ObjectId;
+        assignedAt: Date;
+        assignmentLevel: 'initial' | 'delegation'; // initial = admin/manager to HOD, delegation = HOD to member
+        instructions?: string;
+    }[];
+    
     // Dates and deadlines
     startDate?: Date;
     dueDate: Date;
@@ -130,6 +139,14 @@ const recurringPatternSchema = new mongoose.Schema({
     endDate: { type: Date }
 });
 
+const assignmentHistorySchema = new mongoose.Schema({
+    assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
+    assignedAt: { type: Date, default: Date.now },
+    assignmentLevel: { type: String, enum: ['initial', 'delegation'], required: true },
+    instructions: { type: String }
+});
+
 const taskSchema = new mongoose.Schema<TaskInterface>({
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
@@ -152,6 +169,9 @@ const taskSchema = new mongoose.Schema<TaskInterface>({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'registration', required: true },
     assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'registration' }],
     department: { type: mongoose.Schema.Types.ObjectId, ref: 'departments', required: true },
+    
+    // Assignment history tracking
+    assignmentHistory: [assignmentHistorySchema],
     
     // Dates and deadlines
     startDate: { type: Date },
