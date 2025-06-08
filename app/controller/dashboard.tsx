@@ -231,14 +231,14 @@ class DashboardController {
                 
                 // Upcoming tasks (assignedTo is an array)
                 const upcomingTasks = await Task.find({
-                    assignedTo: { $in: [userId] },
+                    assignedTo: { $in: [new mongoose.Types.ObjectId(userId)] },
                     status: "pending",
                     dueDate: { $gte: new Date() }
                 }).sort({ dueDate: 1 }).limit(5);
                 
                 // Recent activities (assignedTo is an array)
                 const recentActivities = await Task.find({
-                    assignedTo: { $in: [userId] },
+                    assignedTo: { $in: [new mongoose.Types.ObjectId(userId)] },
                     updatedAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
                 }).sort({ updatedAt: -1 }).limit(5);
                 

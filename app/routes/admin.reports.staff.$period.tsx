@@ -58,12 +58,12 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
         let reportUserId = selectedUserId;
         if (currentUser.role === 'staff') {
             // Staff always see their own report
-            reportUserId = currentUser._id;
+            reportUserId = currentUser._id.toString();
         }
 
         // Generate report if user is selected or auto-selected for staff
         let report = null;
-        if (reportUserId && users.some(u => u._id.toString() === reportUserId)) {
+        if (reportUserId && users.some(u => u._id.toString() === reportUserId.toString())) {
             const reportResult = await ReportController.generateStaffReport(
                 reportUserId,
                 period as 'weekly' | 'monthly' | 'quarterly',

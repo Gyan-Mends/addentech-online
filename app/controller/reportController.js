@@ -2,6 +2,7 @@ import TaskActivity from '../modal/taskActivity.tsx';
 import Registration from '../modal/registration.tsx';
 import Departments from '../modal/department.tsx';
 import Task from '../modal/task.tsx';
+import mongoose from 'mongoose';
 
 export class ReportController {
 
@@ -185,7 +186,7 @@ export class ReportController {
 
             // Build match query with role-based filtering
             let activityMatchQuery = {
-                userId: userId,
+                userId: new mongoose.Types.ObjectId(userId),
                 timestamp: { $gte: yearStart, $lte: yearEnd }
             };
 
@@ -199,7 +200,7 @@ export class ReportController {
                 
                 // Get only tasks assigned to this staff member (assignedTo is an array)
                 const assignedTasks = await Task.find({ 
-                    assignedTo: { $in: [userId] }
+                    assignedTo: { $in: [new mongoose.Types.ObjectId(userId)] }
                 }).select('_id');
                 const taskIds = assignedTasks.map(task => task._id);
                 
@@ -229,16 +230,16 @@ export class ReportController {
 
             // Get task completion metrics and assigned tasks info
             const completedTasks = await TaskActivity.countDocuments({
-                userId: userId,
+                userId: new mongoose.Types.ObjectId(userId),
                 activityType: 'completed',
                 timestamp: { $gte: yearStart, $lte: yearEnd }
             });
 
             // Get all tasks assigned to this user for the year (assignedTo is an array)
-            let assignedTasksQuery = { assignedTo: { $in: [userId] } };
+            let assignedTasksQuery = { assignedTo: { $in: [new mongoose.Types.ObjectId(userId)] } };
             if (requestingUserRole === 'staff' && requestingUserId) {
                 // For staff, only show tasks they're assigned to
-                assignedTasksQuery = { assignedTo: { $in: [requestingUserId] } };
+                assignedTasksQuery = { assignedTo: { $in: [new mongoose.Types.ObjectId(requestingUserId)] } };
             }
 
             const assignedTasks = await Task.find(assignedTasksQuery)
@@ -267,14 +268,14 @@ export class ReportController {
             for (const [periodName, dateRange] of Object.entries(dateRanges)) {
                 // Apply same filtering for period breakdown
                 let periodMatchQuery = {
-                    userId: userId,
+                    userId: new mongoose.Types.ObjectId(userId),
                     timestamp: { $gte: dateRange.start, $lte: dateRange.end }
                 };
 
                 if (requestingUserRole === 'staff' && requestingUserId) {
                     // Get only tasks assigned to this staff member for this period (assignedTo is an array)
                     const assignedTasks = await Task.find({ 
-                        assignedTo: { $in: [userId] } 
+                        assignedTo: { $in: [new mongoose.Types.ObjectId(userId)] } 
                     }).select('_id');
                     const taskIds = assignedTasks.map(task => task._id);
                     
@@ -349,12 +350,12 @@ export class ReportController {
             // Apply staff-level filtering - only show activities for tasks assigned to them
             if (requestingUserRole === 'staff' && requestingUserId) {
                 const assignedTasks = await Task.find({ 
-                    assignedTo: { $in: [requestingUserId] }
+                    assignedTo: { $in: [new mongoose.Types.ObjectId(requestingUserId)] }
                 }).select('_id');
                 const taskIds = assignedTasks.map(task => task._id);
                 
                 matchQuery.taskId = { $in: taskIds };
-                matchQuery.userId = requestingUserId; // Force to show only their activities
+                matchQuery.userId = new mongoose.Types.ObjectId(requestingUserId); // Force to show only their activities
             }
 
             const productivityData = await TaskActivity.aggregate([
