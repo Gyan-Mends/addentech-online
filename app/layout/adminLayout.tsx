@@ -90,6 +90,13 @@ const navItems: NavItem[] = [
         permission: "view_reports"
     },
     {
+        to: "/admin/reports",
+        icon: <FileText className="h-4 w-4 hover:text-white text-pink-500" />,
+        label: "Activity Reports",
+        roles: ["admin", "department_head", "manager", "staff"],
+        permission: "view_reports"
+    },
+    {
         to: "/admin/blog",
         icon: <BookOpen className="h-4 w-4 hover:text-white text-pink-500" />,
         label: "Blog",

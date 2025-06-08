@@ -2,6 +2,7 @@ import { json } from "@remix-run/node";
 import mongoose from 'mongoose';
 import Task, { TaskInterface } from '~/modal/task';
 import Registration from '~/modal/registration';
+import TaskActivity from '~/modal/taskActivity';
 import Departments from '~/modal/department';
 
 export class TaskController {
@@ -37,6 +38,25 @@ export class TaskController {
                 { path: 'assignedTo', select: 'firstName lastName email' },
                 { path: 'department', select: 'name' }
             ]);
+
+            // Log task creation activity
+            await this.logActivity(
+                newTask._id.toString(),
+                creatorEmail,
+                'created',
+                `Task "${taskData.title}" created`,
+                undefined,
+                JSON.stringify({
+                    title: taskData.title,
+                    priority: taskData.priority,
+                    dueDate: taskData.dueDate,
+                    category: taskData.category
+                }),
+                {
+                    priority: taskData.priority,
+                    estimatedHours: taskData.estimatedHours
+                }
+            );
 
             return { 
                 success: true, 
@@ -357,6 +377,29 @@ export class TaskController {
                 { path: 'department', select: 'name' }
             ]);
 
+            // Log task update activity
+            const changeDescriptions = [];
+            if (updateData.title) changeDescriptions.push(`title updated`);
+            if (updateData.description) changeDescriptions.push(`description updated`);
+            if (updateData.priority) changeDescriptions.push(`priority changed to ${updateData.priority}`);
+            if (updateData.dueDate) changeDescriptions.push(`due date updated`);
+            if (updateData.status) changeDescriptions.push(`status changed to ${updateData.status}`);
+
+            if (changeDescriptions.length > 0) {
+                await this.logActivity(
+                    id,
+                    userEmail,
+                    updateData.status ? 'status_changed' : 'updated',
+                    `Task updated: ${changeDescriptions.join(', ')}`,
+                    undefined,
+                    JSON.stringify(updateData),
+                    {
+                        priority: updateData.priority,
+                        estimatedHours: updateData.estimatedHours
+                    }
+                );
+            }
+
             return { 
                 success: true, 
                 task: updatedTask?.toObject(),
@@ -423,6 +466,16 @@ export class TaskController {
 
             await task.save();
 
+            // Log comment activity
+            await this.logActivity(
+                taskId,
+                userEmail,
+                'commented',
+                `${parentCommentId ? 'Replied to comment' : 'Added comment'}: "${message.substring(0, 100)}${message.length > 100 ? '...' : ''}"`,
+                undefined,
+                message
+            );
+
             return { success: true, message: "Comment added successfully" };
         } catch (error) {
             console.error('Error adding comment:', error);
@@ -488,6 +541,19 @@ export class TaskController {
             task.timeEntries.push(timeEntry as any);
             task.actualHours = (task.actualHours || 0) + hours;
             await task.save();
+
+            // Log time entry activity
+            await this.logActivity(
+                taskId,
+                userEmail,
+                'time_logged',
+                `Logged ${hours} hours${description ? ` - ${description}` : ''}`,
+                undefined,
+                hours.toString(),
+                {
+                    timeLogged: hours
+                }
+            );
 
             return { success: true, message: "Time entry added successfully" };
         } catch (error) {
@@ -807,6 +873,22 @@ export class TaskController {
                 { path: 'assignmentHistory.assignedTo', select: 'firstName lastName email role' }
             ]);
 
+            // Log assignment activity
+            await this.logActivity(
+                taskId,
+                assignedByUserId,
+                assignmentLevel === 'initial' ? 'assigned' : 'delegated',
+                `Task ${assignmentLevel === 'initial' ? 'assigned' : 'delegated'} to ${newAssignee.firstName} ${newAssignee.lastName}`,
+                undefined,
+                `${newAssignee.firstName} ${newAssignee.lastName}`,
+                {
+                    assignedTo: [newAssignee._id],
+                    assignedBy: assignedByUser._id,
+                    assignmentLevel,
+                    instructions
+                }
+            );
+
             return {
                 success: true,
                 task: updatedTask?.toObject(),
@@ -832,6 +914,42 @@ export class TaskController {
         } catch (error) {
             console.error('Error in AssignTaskToMember:', error);
             return { success: false, message: "Failed to assign task" };
+        }
+    }
+
+    // Activity logging helper method
+    static async logActivity(
+        taskId: string,
+        userEmail: string,
+        activityType: string,
+        description: string,
+        previousValue?: string,
+        newValue?: string,
+        metadata?: any
+    ): Promise<void> {
+        try {
+            const [user, task] = await Promise.all([
+                Registration.findOne({ email: userEmail }),
+                Task.findById(taskId)
+            ]);
+
+            if (!user || !task) return;
+
+            await TaskActivity.create({
+                taskId,
+                userId: user._id,
+                department: task.department,
+                activityType,
+                activityDescription: description,
+                previousValue,
+                newValue,
+                metadata,
+                timestamp: new Date()
+            });
+
+            console.log(`📊 Activity logged: ${description} by ${user.firstName} ${user.lastName}`);
+        } catch (error) {
+            console.error('Error logging activity:', error);
         }
     }
 }
