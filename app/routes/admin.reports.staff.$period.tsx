@@ -54,11 +54,18 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
                 .select('firstName lastName email role department')];
         }
 
-        // Generate report if user is selected
+        // Auto-select current user for staff, or use selected user for others
+        let reportUserId = selectedUserId;
+        if (currentUser.role === 'staff') {
+            // Staff always see their own report
+            reportUserId = currentUser._id;
+        }
+
+        // Generate report if user is selected or auto-selected for staff
         let report = null;
-        if (selectedUserId && users.some(u => u._id.toString() === selectedUserId)) {
+        if (reportUserId && users.some(u => u._id.toString() === reportUserId)) {
             const reportResult = await ReportController.generateStaffReport(
-                selectedUserId,
+                reportUserId,
                 period as 'weekly' | 'monthly' | 'quarterly',
                 year,
                 currentUser.role,
@@ -71,7 +78,7 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
             users,
             report,
             period,
-            selectedUser: selectedUserId,
+            selectedUser: reportUserId,
             year,
             currentUser: {
                 id: currentUser._id,
@@ -157,6 +164,17 @@ const StaffReportPage = () => {
         return colors[role as keyof typeof colors] || 'default';
     };
 
+    const getStatusColor = (status: string) => {
+        const colors = {
+            completed: 'success',
+            in_progress: 'primary',
+            under_review: 'warning',
+            on_hold: 'default',
+            not_started: 'default'
+        };
+        return colors[status as keyof typeof colors] || 'default';
+    };
+
     if (error) {
         return (
             <AdminLayout>
@@ -209,6 +227,7 @@ const StaffReportPage = () => {
                 <Card>
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {currentUser?.role !== 'staff' && (
                             <Select 
                                 label="Select Staff Member"
                                 placeholder="Choose an employee"
@@ -233,6 +252,7 @@ const StaffReportPage = () => {
                                     </SelectItem>
                                 ))}
                             </Select>
+                            )}
                             
                             <Select 
                                 label="Year"
@@ -260,8 +280,15 @@ const StaffReportPage = () => {
                     <Card>
                         <CardBody className="text-center py-12">
                             <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-600 mb-2">Select a Staff Member</h3>
-                            <p className="text-gray-500">Choose an employee from the dropdown above to generate the report</p>
+                            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                                {currentUser?.role === 'staff' ? 'Loading Your Report...' : 'Select a Staff Member'}
+                            </h3>
+                            <p className="text-gray-500">
+                                {currentUser?.role === 'staff' 
+                                    ? 'Please wait while we load your personal activity report'
+                                    : 'Choose an employee from the dropdown above to generate the report'
+                                }
+                            </p>
                         </CardBody>
                     </Card>
                 ) : !report ? (
@@ -303,7 +330,7 @@ const StaffReportPage = () => {
                         </Card>
 
                         {/* Summary Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                             <Card>
                                 <CardBody className="text-center">
                                     <Activity className="w-12 h-12 text-blue-600 mx-auto mb-3" />
@@ -332,7 +359,41 @@ const StaffReportPage = () => {
                                     <p className="text-gray-600">Periods Tracked</p>
                                 </CardBody>
                             </Card>
+                            <Card>
+                                <CardBody className="text-center">
+                                    <User className="w-12 h-12 text-indigo-600 mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-indigo-600">{report.summary.totalAssignedTasks || 0}</h3>
+                                    <p className="text-gray-600">Assigned Tasks</p>
+                                    <p className="text-sm text-gray-500">Total assigned</p>
+                                </CardBody>
+                            </Card>
                         </div>
+
+                        {/* Task Status Breakdown */}
+                        {report.summary.taskStatusBreakdown && Object.keys(report.summary.taskStatusBreakdown).length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <h2 className="text-xl font-semibold">Task Status Overview</h2>
+                            </CardHeader>
+                            <CardBody>
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    {Object.entries(report.summary.taskStatusBreakdown).map(([status, count]: [string, any]) => (
+                                        <div key={status} className="text-center p-4 bg-gray-50 rounded-lg">
+                                            <Chip 
+                                                color={getStatusColor(status)} 
+                                                variant="flat"
+                                                className="mb-2"
+                                            >
+                                                {status.replace('_', ' ').toUpperCase()}
+                                            </Chip>
+                                            <p className="text-2xl font-bold">{count}</p>
+                                            <p className="text-sm text-gray-600">tasks</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardBody>
+                        </Card>
+                        )}
 
                         {/* Activity Breakdown */}
                         <Card>
@@ -360,6 +421,51 @@ const StaffReportPage = () => {
                             </CardBody>
                         </Card>
 
+                        {/* All Assigned Tasks */}
+                        {report.summary.assignedTasksList && report.summary.assignedTasksList.length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <h2 className="text-xl font-semibold">All Assigned Tasks ({year})</h2>
+                            </CardHeader>
+                            <CardBody>
+                                <div className="space-y-3">
+                                    {report.summary.assignedTasksList.map((task: any) => (
+                                        <div key={task._id} className="flex justify-between items-center p-4 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-colors">
+                                            <div className="flex-grow">
+                                                <h5 className="font-semibold text-gray-900">{task.title}</h5>
+                                                <div className="text-sm text-gray-600 mt-1">
+                                                    <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                                                    {task.createdBy && (
+                                                        <span className="ml-4">• Assigned by: {task.createdBy.firstName} {task.createdBy.lastName}</span>
+                                                    )}
+                                                    {task.department && (
+                                                        <span className="ml-4">• Dept: {task.department.name}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Chip 
+                                                    color={getStatusColor(task.status)}
+                                                    variant="flat"
+                                                    size="sm"
+                                                >
+                                                    {task.status.replace('_', ' ').toUpperCase()}
+                                                </Chip>
+                                                <Chip 
+                                                    color={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'default'}
+                                                    variant="flat"
+                                                    size="sm"
+                                                >
+                                                    {task.priority.toUpperCase()}
+                                                </Chip>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardBody>
+                        </Card>
+                        )}
+
                         {/* Period Breakdown */}
                         <Card>
                             <CardHeader>
@@ -381,7 +487,7 @@ const StaffReportPage = () => {
                                                 </div>
                                             </div>
                                             
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                                 <div className="text-center p-3 bg-blue-50 rounded">
                                                     <p className="text-xl font-bold text-blue-600">{data.totalActivities}</p>
                                                     <p className="text-sm text-blue-600">Activities</p>
@@ -394,10 +500,14 @@ const StaffReportPage = () => {
                                                     <p className="text-xl font-bold text-purple-600">{data.activityStats?.length || 0}</p>
                                                     <p className="text-sm text-purple-600">Activity Types</p>
                                                 </div>
+                                                <div className="text-center p-3 bg-orange-50 rounded">
+                                                    <p className="text-xl font-bold text-orange-600">{data.assignedTasks || 0}</p>
+                                                    <p className="text-sm text-orange-600">Assigned Tasks</p>
+                                                </div>
                                             </div>
 
                                             {data.activityStats && data.activityStats.length > 0 && (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                                                     {data.activityStats.map((activity: any) => (
                                                         <div key={activity._id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
                                                             <span className="font-medium">{formatActivityType(activity._id)}</span>
@@ -409,6 +519,44 @@ const StaffReportPage = () => {
                                                             </div>
                                                         </div>
                                                     ))}
+                                                </div>
+                                            )}
+
+                                            {/* Assigned Tasks for this period */}
+                                            {data.tasksList && data.tasksList.length > 0 && (
+                                                <div className="mt-4">
+                                                    <h4 className="font-semibold mb-3">Assigned Tasks in this Period</h4>
+                                                    <div className="space-y-2">
+                                                        {data.tasksList.map((task: any) => (
+                                                            <div key={task._id} className="flex justify-between items-center p-3 bg-white border rounded-lg">
+                                                                <div className="flex-grow">
+                                                                    <h5 className="font-medium text-gray-900">{task.title}</h5>
+                                                                    <p className="text-sm text-gray-600">
+                                                                        Due: {new Date(task.dueDate).toLocaleDateString()}
+                                                                        {task.createdBy && (
+                                                                            <span className="ml-2">• Assigned by: {task.createdBy.firstName} {task.createdBy.lastName}</span>
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex gap-2">
+                                                                    <Chip 
+                                                                        color={getStatusColor(task.status)}
+                                                                        variant="flat"
+                                                                        size="sm"
+                                                                    >
+                                                                        {task.status.replace('_', ' ').toUpperCase()}
+                                                                    </Chip>
+                                                                    <Chip 
+                                                                        color={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'default'}
+                                                                        variant="flat"
+                                                                        size="sm"
+                                                                    >
+                                                                        {task.priority}
+                                                                    </Chip>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

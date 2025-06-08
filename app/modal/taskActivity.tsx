@@ -110,6 +110,7 @@ taskActivitySchema.index({
     activityType: 1 
 });
 
-const TaskActivity = mongoose.model<TaskActivityInterface>('TaskActivity', taskActivitySchema);
+// Fix for hot reload model overwrite error
+const TaskActivity = mongoose.models.TaskActivity || mongoose.model<TaskActivityInterface>('TaskActivity', taskActivitySchema);
 
 export default TaskActivity; 

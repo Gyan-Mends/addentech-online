@@ -117,11 +117,11 @@ export class TaskController {
                 if (user) {
                     if (userRole === 'staff') {
                         // Staff can see:
-                        // 1. Tasks assigned to them
+                        // 1. Tasks assigned to them (assignedTo is an array)
                         // 2. Tasks created by them
                         // 3. All tasks in their department (department-wide visibility)
                         query.$or = [
-                            { assignedTo: user._id },
+                            { assignedTo: { $in: [user._id] } },
                             { createdBy: user._id },
                             { department: user.department }
                         ];
@@ -151,7 +151,8 @@ export class TaskController {
             }
 
             if (assignedTo) {
-                query.assignedTo = assignedTo;
+                // assignedTo is an array field, so use $in for proper querying
+                query.assignedTo = { $in: [assignedTo] };
             }
 
             if (createdBy) {
@@ -232,7 +233,7 @@ export class TaskController {
                     if (userRole === 'staff') {
                         // Staff stats should include all department tasks (matching the getTasks logic)
                         matchQuery.$or = [
-                            { assignedTo: user._id },
+                            { assignedTo: { $in: [user._id] } },
                             { createdBy: user._id },
                             { department: user.department }
                         ];
@@ -642,7 +643,7 @@ export class TaskController {
             
             if (user.role === 'staff') {
                 recentTasksQuery.$or = [
-                    { assignedTo: user._id },
+                    { assignedTo: { $in: [user._id] } },
                     { createdBy: user._id }
                 ];
             } else if (user.role === 'department_head') {
