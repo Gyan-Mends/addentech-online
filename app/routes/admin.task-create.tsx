@@ -171,6 +171,11 @@ const TaskCreate = () => {
         }
     }, [currentUser, departments]);
 
+    // Clear assigned users when department changes
+    useEffect(() => {
+        setAssignedTo([]);
+    }, [selectedDepartment]);
+
     // Handle tag addition
     const addTag = () => {
         if (currentTag.trim() && !tags.includes(currentTag.trim())) {
@@ -184,10 +189,33 @@ const TaskCreate = () => {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
 
-    // Get filtered users for assignment based on selected department
+    // Get only department heads for the selected department
     const getFilteredUsers = () => {
-        if (!selectedDepartment) return users;
-        return users.filter((user: any) => user.department === selectedDepartment);
+        if (!selectedDepartment) return [];
+        
+        // Debug logging
+        console.log('Selected Department:', selectedDepartment);
+        console.log('All Users:', users);
+        
+        // Return only department heads for the selected department
+        const filteredUsers = users.filter((user: any) => {
+            const isDepartmentMatch = user.department === selectedDepartment || 
+                                    (user.department && user.department._id === selectedDepartment) ||
+                                    (user.department && user.department.toString() === selectedDepartment);
+            const isDepartmentHead = user.role === 'department_head';
+            
+            console.log(`User: ${user.firstName} ${user.lastName}, Dept: ${user.department}, Role: ${user.role}, Match: ${isDepartmentMatch && isDepartmentHead}`);
+            
+            return isDepartmentMatch && isDepartmentHead;
+        });
+        
+        console.log('Filtered Department Heads:', filteredUsers);
+        return filteredUsers;
+    };
+
+    // Get department heads count for description
+    const getDepartmentHeads = () => {
+        return getFilteredUsers();
     };
 
     // Get users who can approve (managers and above)
@@ -200,37 +228,13 @@ const TaskCreate = () => {
     };
 
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        // Validate required fields
+        // Validate required fields - only prevent submission if validation fails
         if (!title || !description || !dueDate || !selectedDepartment) {
+            e.preventDefault();
+            alert('Please fill in all required fields: Title, Description, Due Date, and Department');
             return;
         }
-
-        const formData = new FormData();
-        formData.set('title', title);
-        formData.set('description', description);
-        formData.set('priority', priority);
-        formData.set('category', category);
-        formData.set('department', selectedDepartment);
-        formData.set('dueDate', dueDate);
-        if (startDate) formData.set('startDate', startDate);
-        if (estimatedHours) formData.set('estimatedHours', estimatedHours);
-        formData.set('assignedTo', JSON.stringify(assignedTo));
-        formData.set('tags', JSON.stringify(tags));
-        formData.set('approvalRequired', approvalRequired.toString());
-        formData.set('approvers', JSON.stringify(approvers));
-        formData.set('isRecurring', isRecurring.toString());
-        if (isRecurring) {
-            formData.set('recurringFrequency', recurringFrequency);
-            formData.set('recurringInterval', recurringInterval);
-            if (recurringEndDate) formData.set('recurringEndDate', recurringEndDate);
-        }
-
-        // Submit form programmatically
-        const form = e.target as HTMLFormElement;
-        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-        form.dispatchEvent(submitEvent);
+        // Let Remix handle the form submission naturally - don't prevent default
     };
 
     return (
@@ -274,6 +278,22 @@ const TaskCreate = () => {
 
                 {/* Task Creation Form */}
                 <Form method="post" onSubmit={handleSubmit}>
+                    {/* Hidden inputs for complex data */}
+                    <input type="hidden" name="assignedTo" value={JSON.stringify(assignedTo)} />
+                    <input type="hidden" name="tags" value={JSON.stringify(tags)} />
+                    <input type="hidden" name="approvalRequired" value={approvalRequired.toString()} />
+                    <input type="hidden" name="approvers" value={JSON.stringify(approvers)} />
+                    <input type="hidden" name="isRecurring" value={isRecurring.toString()} />
+                    {startDate && <input type="hidden" name="startDate" value={startDate} />}
+                    {estimatedHours && <input type="hidden" name="estimatedHours" value={estimatedHours} />}
+                    {isRecurring && (
+                        <>
+                            <input type="hidden" name="recurringFrequency" value={recurringFrequency} />
+                            <input type="hidden" name="recurringInterval" value={recurringInterval} />
+                            {recurringEndDate && <input type="hidden" name="recurringEndDate" value={recurringEndDate} />}
+                        </>
+                    )}
+                    
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Task Information */}
                         <div className="lg:col-span-2 space-y-6">
@@ -283,6 +303,7 @@ const TaskCreate = () => {
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <Input
+                                        name="title"
                                         label="Task Title"
                                         placeholder="Enter task title"
                                         value={title}
@@ -293,6 +314,7 @@ const TaskCreate = () => {
                                     />
                                     
                                     <Textarea
+                                        name="description"
                                         label="Description"
                                         placeholder="Describe the task in detail"
                                         value={description}
@@ -305,6 +327,7 @@ const TaskCreate = () => {
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <Select
+                                            name="priority"
                                             label="Priority"
                                             selectedKeys={[priority]}
                                             onSelectionChange={(keys) => setPriority(Array.from(keys)[0] as string)}
@@ -316,6 +339,7 @@ const TaskCreate = () => {
                                         </Select>
                                         
                                         <Input
+                                            name="category"
                                             label="Category"
                                             placeholder="e.g., Development, Marketing"
                                             value={category}
@@ -333,6 +357,7 @@ const TaskCreate = () => {
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <Select
+                                        name="department"
                                         label="Department"
                                         selectedKeys={selectedDepartment ? [selectedDepartment] : []}
                                         onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
@@ -349,15 +374,20 @@ const TaskCreate = () => {
                                     </Select>
 
                                     <Select
-                                        label="Assign To"
+                                        label="Assign To Department Heads"
                                         selectionMode="multiple"
                                         selectedKeys={assignedTo}
                                         onSelectionChange={(keys) => setAssignedTo(Array.from(keys) as string[])}
-                                        placeholder="Select team members"
+                                        placeholder={selectedDepartment ? "Select department heads" : "Select department first"}
+                                        isDisabled={!selectedDepartment}
+                                        description={selectedDepartment ? 
+                                            `Department heads available: ${getDepartmentHeads().length}` : 
+                                            "Select a department to see available department heads"
+                                        }
                                     >
                                         {getFilteredUsers().map((user: any) => (
                                             <SelectItem key={user._id} value={user._id}>
-                                                {user.firstName} {user.lastName} ({user.role})
+                                                {user.firstName} {user.lastName} (Department Head)
                                             </SelectItem>
                                         ))}
                                     </Select>
@@ -380,6 +410,7 @@ const TaskCreate = () => {
                                         />
                                         
                                         <Input
+                                            name="dueDate"
                                             type="date"
                                             label="Due Date"
                                             value={dueDate}
