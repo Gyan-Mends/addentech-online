@@ -143,37 +143,37 @@ const StaffReportPage = () => {
         ).join(' ');
     };
 
-    const getActivityColor = (type: string) => {
+    const getActivityColor = (type: string): "default" | "primary" | "secondary" | "warning" | "success" | "danger" => {
         const colors = {
-            created: 'primary',
-            assigned: 'secondary',
-            delegated: 'warning',
-            status_changed: 'default',
-            completed: 'success',
-            commented: 'primary',
-            time_logged: 'warning',
-            updated: 'default'
+            created: 'primary' as const,
+            assigned: 'secondary' as const,
+            delegated: 'warning' as const,
+            status_changed: 'default' as const,
+            completed: 'success' as const,
+            commented: 'primary' as const,
+            time_logged: 'warning' as const,
+            updated: 'default' as const
         };
         return colors[type as keyof typeof colors] || 'default';
     };
 
-    const getRoleColor = (role: string) => {
+    const getRoleColor = (role: string): "default" | "primary" | "secondary" | "warning" | "success" | "danger" => {
         const colors = {
-            admin: 'danger',
-            manager: 'warning',
-            department_head: 'secondary',
-            staff: 'primary'
+            admin: 'danger' as const,
+            manager: 'warning' as const,
+            department_head: 'secondary' as const,
+            staff: 'primary' as const
         };
         return colors[role as keyof typeof colors] || 'default';
     };
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: string): "default" | "primary" | "secondary" | "warning" | "success" | "danger" => {
         const colors = {
-            completed: 'success',
-            in_progress: 'primary',
-            under_review: 'warning',
-            on_hold: 'default',
-            not_started: 'default'
+            completed: 'success' as const,
+            in_progress: 'primary' as const,
+            under_review: 'warning' as const,
+            on_hold: 'default' as const,
+            not_started: 'default' as const
         };
         return colors[status as keyof typeof colors] || 'default';
     };

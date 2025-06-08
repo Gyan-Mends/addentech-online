@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import TaskActivity from '~/modal/taskActivity';
 import Registration from '~/modal/registration';
 import Departments from '~/modal/department';
@@ -72,7 +73,7 @@ export class ReportController {
             const overallStats = await TaskActivity.aggregate([
                 {
                     $match: {
-                        department: departmentId,
+                        department: new mongoose.Types.ObjectId(departmentId),
                         timestamp: { $gte: yearStart, $lte: yearEnd }
                     }
                 },
@@ -106,7 +107,7 @@ export class ReportController {
                 const periodStats = await TaskActivity.aggregate([
                     {
                         $match: {
-                            department: departmentId,
+                            department: new mongoose.Types.ObjectId(departmentId),
                             timestamp: { $gte: range.start, $lte: range.end }
                         }
                     },
