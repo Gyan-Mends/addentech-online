@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardBody, Button, Input, Select, SelectItem, Textarea, Chip, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Badge, Divider, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tabs, Tab } from "@nextui-org/react";
-import { Form, Link, useLoaderData, useActionData, useSubmit, useNavigate } from "@remix-run/react";
+import { Form, Link, useLoaderData, useActionData, useSubmit, useNavigate, useRevalidator } from "@remix-run/react";
 import { json, LoaderFunction, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useState, useEffect } from "react";
 import { Calendar, Clock, Users, MessageCircle, Edit, CheckCircle, ArrowLeft, Plus, Reply, MoreVertical, UserPlus, AlertTriangle, FileText, Eye, Filter, Search, Star, Flag } from "lucide-react";
@@ -41,6 +41,16 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
 
         // Get tasks with role-based access
         const { tasks, total, stats } = await TaskController.getTasks(filters);
+        
+        // Debug: Log first task's assignee data to see what's being returned
+        if (tasks.length > 0 && tasks[0].assignedTo && tasks[0].assignedTo.length > 0) {
+            console.log('Sample task assignee data:', JSON.stringify(tasks[0].assignedTo, null, 2));
+        }
+        
+        // Debug: Log first task's assignee data
+        if (tasks.length > 0) {
+            console.log('Sample task assignee data:', tasks[0].assignedTo);
+        }
 
         // Get departments and users based on role
         let departments = [];
@@ -132,6 +142,7 @@ export async function action({ request }: ActionFunctionArgs) {
                 const assignmentInstructions = formData.get('instructions') as string;
                 
                 // Update task assignment
+                console.log('Assigning task:', assignTaskId, 'to member:', assignedMemberId);
                 const assignResult = await TaskController.updateTask(
                     assignTaskId,
                     { 
@@ -140,6 +151,7 @@ export async function action({ request }: ActionFunctionArgs) {
                     },
                     userId
                 );
+                console.log('Assignment result:', assignResult);
                 
                 // Add assignment comment
                 if (assignResult.success && assignmentInstructions) {
@@ -184,6 +196,7 @@ const EnhancedTaskManagement = () => {
     const actionData = useActionData<typeof action>();
     const submit = useSubmit();
     const navigate = useNavigate();
+    const revalidator = useRevalidator();
 
     // Modal states
     const [showStatusModal, setShowStatusModal] = useState(false);
@@ -198,6 +211,17 @@ const EnhancedTaskManagement = () => {
     const [assignmentInstructions, setAssignmentInstructions] = useState('');
     const [comment, setComment] = useState('');
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
+
+    // Debug: Log task data to see assignee information
+    useEffect(() => {
+        if (tasks && tasks.length > 0) {
+            console.log('Client-side tasks data:', tasks.map(task => ({
+                id: task._id,
+                title: task.title,
+                assignedTo: task.assignedTo
+            })));
+        }
+    }, [tasks]);
 
     // Filter states
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
@@ -214,11 +238,16 @@ const EnhancedTaskManagement = () => {
             setSelectedTask(null);
             setComment('');
             setReplyingTo(null);
+            setAssignedMember('');
+            setAssignmentInstructions('');
+            setStatusReason('');
             
-            // Refresh the page to show updated data
+            // Give a small delay for database to be fully updated, then refresh
             setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+                navigate(`/admin/enhanced-tasks?${new URLSearchParams(window.location.search)}`, {
+                    replace: true
+                });
+            }, 200);
         }
     }, [actionData]);
 

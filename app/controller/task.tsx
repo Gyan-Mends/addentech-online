@@ -208,9 +208,11 @@ export class TaskController {
                 const user = await Registration.findOne({ email: userEmail });
                 if (user) {
                     if (userRole === 'staff') {
+                        // Staff stats should include all department tasks (matching the getTasks logic)
                         matchQuery.$or = [
                             { assignedTo: user._id },
-                            { createdBy: user._id }
+                            { createdBy: user._id },
+                            { department: user.department }
                         ];
                     } else if (userRole === 'department_head') {
                         matchQuery.department = user.department;
