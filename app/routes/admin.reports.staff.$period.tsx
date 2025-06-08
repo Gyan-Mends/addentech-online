@@ -1,12 +1,13 @@
-import { Card, CardHeader, CardBody, Button, Select, SelectItem, Spinner, Chip, Avatar } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Button, Select, SelectItem, Spinner, Chip, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Form, Link, useLoaderData, useParams, useSearchParams } from "@remix-run/react";
 import { json, LoaderFunction, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "~/session";
 import Registration from "~/modal/registration";
 import Departments from "~/modal/department";
 import { ReportController } from "~/controller/reportController";
-import { ArrowLeft, Download, Calendar, BarChart3, TrendingUp, User, Clock, Activity, Award } from "lucide-react";
+import { ArrowLeft, Download, Calendar, BarChart3, TrendingUp, User, Clock, Activity, Award, ChevronDown, FileText, Printer } from "lucide-react";
 import AdminLayout from "~/layout/adminLayout";
+import { ReportExporter } from "~/utils/reportExport";
 
 export const loader: LoaderFunction = async ({ request, params }: LoaderFunctionArgs) => {
 
@@ -220,9 +221,36 @@ const StaffReportPage = () => {
                         </div>
                     </div>
                     {report && (
-                        <Button color="success" startContent={<Download className="w-4 h-4" />}>
-                            Export Report
-                        </Button>
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <Button color="success" startContent={<Download className="w-4 h-4" />} endContent={<ChevronDown className="w-4 h-4" />}>
+                                    Export Report
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Export options">
+                                <DropdownItem 
+                                    key="csv" 
+                                    startContent={<FileText className="w-4 h-4" />}
+                                    onClick={() => ReportExporter.exportStaffReportToCSV(report, period, year)}
+                                >
+                                    Export as CSV
+                                </DropdownItem>
+                                <DropdownItem 
+                                    key="json" 
+                                    startContent={<FileText className="w-4 h-4" />}
+                                    onClick={() => ReportExporter.exportReportToJSON(report, period, year, 'staff')}
+                                >
+                                    Export as JSON
+                                </DropdownItem>
+                                <DropdownItem 
+                                    key="print" 
+                                    startContent={<Printer className="w-4 h-4" />}
+                                    onClick={() => ReportExporter.openPrintableReport(report, period, year, 'staff')}
+                                >
+                                    Print Report
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                     )}
                 </div>
 
