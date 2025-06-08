@@ -53,7 +53,7 @@ import Registration from "~/modal/registration";
 import Task from "~/modal/task";
 import { DepartmentInterface, RegistrationInterface, TaskInterface } from "~/interface/interface";
 import department from "~/controller/departments";
-import TaskController from "~/controller/task";
+import { TaskController } from "~/controller/task";
 
 // Types for the loader data
 interface TaskLoaderData {

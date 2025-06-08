@@ -76,9 +76,9 @@ const navItems: NavItem[] = [
         permission: "view_attendance"
     },
     {
-        to: "/admin/tasks",
+        to: "/admin/task-management",
         icon: <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />,
-        label: "Tasks",
+        label: "Task Management",
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_tasks"
     },
