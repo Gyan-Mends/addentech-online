@@ -82,13 +82,13 @@ const navItems: NavItem[] = [
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_tasks"
     },
-    {
-        to: "/admin/monthly-reports",
-        icon: <BarChart className="h-4 w-4 hover:text-white text-pink-500" />,
-        label: "Monthly Reports",
-        roles: ["admin", "head", "manager", "staff", "department_head", "user", "*"],
-        permission: "view_reports"
-    },
+    // {
+    //     to: "/admin/monthly-reports",
+    //     icon: <BarChart className="h-4 w-4 hover:text-white text-pink-500" />,
+    //     label: "Monthly Reports",
+    //     roles: ["admin", "head", "manager", "staff", "department_head", "user", "*"],
+    //     permission: "view_reports"
+    // },
     {
         to: "/admin/reports",
         icon: <FileText className="h-4 w-4 hover:text-white text-pink-500" />,
@@ -197,7 +197,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
 
     return (
-        <div className="flex font-nunito">
+        <div className="flex font-nunito h-screen overflow-hidden">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div 
@@ -208,7 +208,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             
             {/* Sidebar */}
             <div
-                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0`}
+                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}  w-64 bg-white transition-transform duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0`}
             >
                 <div className="flex items-center justify-between p-4 border-b border-b-white/20">
                     <div className="flex items-center">
@@ -226,8 +226,14 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </Button>
                 </div>
 
-                <div className="flex flex-col flex-1 px-2 py-4 space-y-6">
-                    <ul className="flex flex-col">
+                <div 
+                    className="flex flex-col  flex-1 px-2 py-4 space-y-6"
+                   
+                >
+                    <ul className="flex flex-col overflow-y-auto"  style={{
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: '#f8b4cb #f1f5f9'
+                    }}>
                         {navItems
                             .filter(item => {
                                 // Include if user's role is in the allowed roles list
@@ -336,7 +342,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden px-10">
+            <div className="flex-1 flex flex-col overflow-hidden h-full">
                 <header className="h-16 bg-white shadow-b-md flex items-center justify-between px-4 sm:px-6">
                     <div className="flex items-center space-x-2">
                         <Button
@@ -386,7 +392,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                 </header>
 
-                <main className=" flex-1 overflow-auto p-4 sm:p-6 rounded-lg bg-gray-50 rounded-tl-xl">
+                <main className="flex-1 overflow-auto p-4 sm:p-6 px-10 rounded-lg bg-gray-50 rounded-tl-xl">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full">
                             <Spinner className="!text-pink-500" size="lg" />
