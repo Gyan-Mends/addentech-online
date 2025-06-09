@@ -265,8 +265,9 @@ export default function ServicesPage() {
 
     return (
         <PublicLayout>
-            {/* Hero Section */}
-            <section
+           <div className="overflow-x-hidden">
+             {/* Hero Section */}
+             <section
                 id="hero-section"
                 className="relative overflow-hidden  lg:py-24 py-16 md:py-32 "
             >
@@ -583,6 +584,7 @@ export default function ServicesPage() {
                     </motion.div>
                 </div>
             </section>
+           </div>
         </PublicLayout>
     )
 }

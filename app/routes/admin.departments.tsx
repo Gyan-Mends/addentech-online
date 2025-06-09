@@ -20,7 +20,7 @@ import { errorToast, successToast } from "~/components/toast";
 
 
 const Category = () => {
-    const { departments, user, totalPages } = useLoaderData<{ departments: DepartmentInterface[], user: { user: string }, totalPages: number | any }>()
+    const { departments, user, totalPages, currentPage } = useLoaderData<{ departments: DepartmentInterface[], user: { user: string }, totalPages: number | any, currentPage: number }>()
     const submit = useSubmit()
     const [editDrawerOpened, setEditDrawerOpened] = useState(false)
     const [dataValue, setDataValue] = useState<DepartmentInterface>();
@@ -74,7 +74,7 @@ const Category = () => {
                     columns={CategoryColumns}
                     loadingState={navigation.state === "loading" ? "loading" : "idle"}
                     totalPages={totalPages}
-                    page={1}
+                    page={currentPage}
                     setPage={(page) => (
                         navigate(`?page=${page}`)
                     )}>
@@ -179,7 +179,7 @@ const Category = () => {
                         type="text"
                         labelPlacement="outside"
                     />
-                    <input hidden name="admin" value={user?.user} type="" />
+                    {/* <input hidden name="admin" value={user?.user} type="" /> */}
                     <input hidden name="intent" value="create" type="" />
 
                     <Textarea
@@ -221,7 +221,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     const { departments, totalPages } = await department.getDepartments({ request, page, search_term })
     const { user } = await usersController.FetchUsers({ request, page, search_term })
-    return { departments, user, totalPages }
+    return { departments, user, totalPages, currentPage: page }
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -237,7 +237,7 @@ export const action: ActionFunction = async ({ request }) => {
 
         switch (intent) {
             case 'create':
-                const categories = await department.CategoryAdd(request, name, description, admin, intent, id);
+                const categories = await department.CategoryAdd(request, name, description,  intent, id);
                 return categories;
 
             case "delete":

@@ -44,12 +44,12 @@ class DepartmentController {
         }
     }
 
-    async CategoryAdd(request: Request, name: string, description: string, admin: string, intent: string, id: string) {
+    async CategoryAdd(request: Request, name: string, description: string, intent: string, id: string) {
         try {
 
             if (intent === "create") {
                 // Checking if category already exists
-                const categoryExistCheck = await Departments.findOne({ admin, name });
+                const categoryExistCheck = await Departments.findOne({  name });
                 if (categoryExistCheck) {
                     return json({ message: "Department already exists", success: false }, { status: 400 });
                 }
@@ -57,8 +57,7 @@ class DepartmentController {
                 // Saving data if category does not exist
                 const category = new Departments({
                     name,
-                    description,
-                    admin
+                    description
                 });
 
                 const response = await category.save();

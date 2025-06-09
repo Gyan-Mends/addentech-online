@@ -43,7 +43,7 @@ const About = () => {
         <PublicLayout>
             <main className="flex-1">
                 {/* Hero Section */}
-                <section className="relative overflow-hidden py-10 md:py-28  lg:px-[125px]">
+                <section className="relative overflow-hidden py-10 md:py-28 mt-10 lg:mt-0 px-4 lg:px-[125px]">
                     <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                     <div className="container relative">
                         <div className="max-w-3xl mx-auto text-center mb-12">
@@ -66,7 +66,7 @@ const About = () => {
                 </section>
 
                 {/* Stats Section */}
-                <section className="py-16 bg-gray-100 lg:px-[125px]">
+                <section className="py-16 bg-gray-100 px-4 lg:px-[125px]">
                     <div className="container ">
                         <ScrollAnimation>
                             <div className="max-w-3xl mx-auto text-center mb-12">
@@ -87,7 +87,7 @@ const About = () => {
                 </section>
 
                 {/* Vision Section */}
-                <section className="py-16  lg:px-[125px]">
+                <section className="py-16 px-4 lg:px-[125px]">
                     <div className="container">
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div className="space-y-6">
@@ -145,7 +145,7 @@ const About = () => {
                 </section>
 
                 {/* Mission Section */}
-                <section className="py-16 bg-gray-100">
+                <section className="py-16 px-4 bg-gray-100">
                     <div className="container">
                         <div className="max-w-3xl mx-auto text-center">
                             <ScrollAnimation>
@@ -160,7 +160,7 @@ const About = () => {
                 </section>
 
                 {/* Team Section */}
-                <section className="py-20 relative overflow-hidden lg:px-[125px] px-4">
+                <section className="py-20 px-4 relative overflow-hidden lg:px-[125px] px-4">
                     {/* Animated background elements */}
                     <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                     <div className="absolute inset-0 opacity-30">
@@ -280,7 +280,7 @@ const About = () => {
                 </section>
 
                 {/* About Us Section */}
-                <section className="py-16 bg-gray-100 lg:px-[125px]">
+                <section className="py-16 px-4 bg-gray-100 lg:px-[125px]">
                     <div className="container">
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div className="space-y-6 font-nunito">

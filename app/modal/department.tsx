@@ -11,11 +11,7 @@ const DepartmentSchema = new mongoose.Schema({
         required: true,
         type: String,
     },
-    admin: {
-        ref: "registration",
-        type: Schema.Types.ObjectId,
-        required: false,
-    },
+   
 })
 
 let Departments: mongoose.Model<DepartmentInterface>

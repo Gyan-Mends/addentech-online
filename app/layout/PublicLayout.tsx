@@ -98,7 +98,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             aria-label="Toggle menu"
                             className={`transition-colors duration-300 ${isScrolled
                                     ? 'text-foreground hover:bg-default-100'
-                                    : 'text-white hover:bg-white/10'
+                                    : ' hover:bg-white/10'
                                 }`}
                         >
                             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -125,12 +125,12 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
                 {/* Mobile Navigation */}
                 {isMobileMenuOpen && (
-                    <nav className="flex flex-col mt-4 space-y-2 md:hidden bg-black/90 backdrop-blur rounded-lg p-4">
+                    <nav className="flex flex-col mt-4 space-y-2 md:hidden  backdrop-blur rounded-lg p-4">
                         {Object.entries(navigationLinks).map(([name, path]) => (
                             <Link
                                 key={name}
                                 to={path}
-                                className="px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
+                                className="px-4 py-2 text-sm font-medium  transition-colors hover:text-white"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {name}

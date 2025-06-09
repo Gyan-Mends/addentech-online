@@ -28,7 +28,7 @@ const Team = () => {
 
     return (
         <PublicLayout>
-            <section className="py-20 m-10 relative overflow-hidden lg:px-[125px] px-4">
+            <section className="py-20 m-10 relative overflow-hidden mt-10 lg:mt-0 lg:px-[125px] px-4">
                 {/* Animated background elements */}
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                 <div className="absolute inset-0 opacity-30">
