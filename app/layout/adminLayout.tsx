@@ -479,7 +479,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                 </header>
 
-                <main className="flex-1 lg:ml-8 overflow-auto p-4 sm:p-6 px-10 rounded-lg bg-gray-50 rounded-tl-xl">
+                <main className="flex-1 lg:ml-8 overflow-auto p-4  lg:px-10 rounded-lg bg-gray-50 rounded-tl-xl">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full">
                             <Spinner className="!text-pink-500" size="lg" />

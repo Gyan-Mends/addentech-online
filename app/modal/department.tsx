@@ -14,6 +14,7 @@ const DepartmentSchema = new mongoose.Schema({
     admin: {
         ref: "registration",
         type: Schema.Types.ObjectId,
+        required: false,
     },
 })
 

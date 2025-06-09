@@ -514,9 +514,9 @@ export default function AttendancePage() {
 
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md border lg:border-black/10 border-black/30">
         <Toaster position="top-right" />
-        <div className="flex justify-between items-center mb-6">
+        <div className="lg:flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">
               Attendance Management
@@ -530,7 +530,7 @@ export default function AttendancePage() {
           </div>
 
           {/* Check In Form */}
-          <Form method="post" className="flex flex-col space-y-4 w-full max-w-lg p-4 border rounded-lg shadow">
+          <Form method="post" className="flex mt-10 lg:mt-0 flex-col space-y-4 w-full max-w-lg p-4 border rounded-lg border-black/10 shadow">
             <h2 className="text-lg font-semibold text-gray-700">Check In</h2>
             <input type="hidden" name="_action" value="checkIn" />
             <input type="hidden" name="latitude" id="latitude" />
@@ -543,6 +543,9 @@ export default function AttendancePage() {
                 name="notes"
                 label="Notes"
                 placeholder="Any notes for today?"
+                classNames={{
+                  inputWrapper: "bg-white border border-black/20 shadow-sm"
+                }}
               />
             </div>
 
@@ -727,6 +730,7 @@ export default function AttendancePage() {
         )}
         
         <Tabs
+        className="flex flex-wrap"
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
         >
@@ -750,7 +754,7 @@ export default function AttendancePage() {
                         Department
                       </label>
                       <select
-                        className="border rounded px-3 py-2 w-full max-w-[250px]"
+                        className="border rounded px-3 py-2 w-[70vw] lg:max-w-[250px]"
                         name="department"
                         value={selectedDepartment}
                         onChange={(e) => setSelectedDepartment(e.target.value)}
@@ -768,7 +772,7 @@ export default function AttendancePage() {
                         User
                       </label>
                       <select
-                        className="border rounded px-3 py-2 w-full max-w-[250px]"
+                        className="border rounded px-3 py-2 w-[70vw] lg:max-w-[250px]"
                         name="userId"
                       >
                         <option value="">All Users</option>

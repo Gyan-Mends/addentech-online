@@ -22,6 +22,36 @@ export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
 
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Addentechnology Limited" },
+        {
+            name: "description",
+            content: ".",
+        },
+        {
+            name: "author",
+            content: "Mends Gyan",
+        },
+        { name: "og:title", content: "Addentechnology" },
+        {
+            name: "og:description",
+            content: "",
+        },
+        {
+            name: "og:image",
+            content:
+                "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
+        },
+        { name: "og:url", content: "https://addentech-online.vercel.app" },
+        {
+            name: "keywords",
+            content:
+                "Adentechnology Ghana, Dennis Law Ghana, Dennis Law, Addentech",
+        },
+    ];
+};
+
 const Users = () => {
     const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
     const [base64Image, setBase64Image] = useState<any>()
@@ -164,8 +194,13 @@ const Users = () => {
                                 <button className="text-primary " onClick={() => {
                                     setIsEditDrawerOpened(true)
                                     setDataValue(user)
+                                    console.log('=== EDIT DEBUG INFO ===');
+                                    console.log('Current page:', currentPage);
                                     console.log('User data for edit:', user);
                                     console.log('Department structure:', user.department);
+                                    console.log('Department type:', typeof user.department);
+                                    console.log('Available departments:', departments);
+                                    console.log('========================');
 
                                 }}>
 
@@ -315,15 +350,34 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select Department"
                                 name="department"
-                                defaultSelectedKeys={(() => {
+                                selectedKeys={(() => {
+                                    let selectedKey = '';
+                                    
+                                    // Debug the department selection
+                                    console.log('Department selection debug:');
+                                    console.log('dataValue.department:', dataValue.department);
+                                    console.log('type:', typeof dataValue.department);
+                                    
                                     // Handle both cases: department as object or as string ID
                                     if (typeof dataValue.department === 'string') {
-                                        return [dataValue.department];
+                                        selectedKey = dataValue.department;
+                                        console.log('Using string department ID:', selectedKey);
                                     } else if (dataValue.department?._id) {
-                                        return [dataValue.department._id];
+                                        selectedKey = dataValue.department._id;
+                                        console.log('Using department._id:', selectedKey);
+                                    } else {
+                                        console.log('No valid department found');
                                     }
-                                    return [];
+                                    
+                                    // Verify the department exists in available departments
+                                    const departmentExists = departments.some(dept => dept._id === selectedKey);
+                                    console.log('Department exists in list:', departmentExists);
+                                    
+                                    return selectedKey ? new Set([selectedKey]) : new Set([]);
                                 })()}
+                                onSelectionChange={(keys) => {
+                                    console.log('Department selection changed:', keys);
+                                }}
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent:
@@ -877,32 +931,3 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ user, users, totalPages, departments, currentPage: page });
 }
 
-export const meta: MetaFunction = () => {
-    return [
-        { title: "Addentechnology Limited" },
-        {
-            name: "description",
-            content: ".",
-        },
-        {
-            name: "author",
-            content: "Mends Gyan",
-        },
-        { name: "og:title", content: "Addentechnology" },
-        {
-            name: "og:description",
-            content: "",
-        },
-        {
-            name: "og:image",
-            content:
-                "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
-        },
-        { name: "og:url", content: "https://addentech-online.vercel.app" },
-        {
-            name: "keywords",
-            content:
-                "Adentechnology Ghana, Dennis Law Ghana, Dennis Law, Addentech",
-        },
-    ];
-};

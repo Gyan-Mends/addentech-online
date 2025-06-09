@@ -23,7 +23,7 @@ const Category = () => {
     const { departments, user, totalPages } = useLoaderData<{ departments: DepartmentInterface[], user: { user: string }, totalPages: number | any }>()
     const submit = useSubmit()
     const [editDrawerOpened, setEditDrawerOpened] = useState(false)
-    const [dataValue, setDataValue] = useState<CategoryInterface>();
+    const [dataValue, setDataValue] = useState<DepartmentInterface>();
     const [createModalOpened, setCreateModalOpened] = useState(false)
     const [confirmModalOpened, setConfirmModalOpened] = useState(false)
     const navigate = useNavigate()
@@ -140,7 +140,7 @@ const Category = () => {
                                 inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-black/30 focus:bg-[#333]",
                             }}
                         />
-                        <input name="seller" value={user?._id} type="hidden" />
+                        <input name="seller" value={user?.user} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="id" value={dataValue?._id} type="hidden" />
 
@@ -179,7 +179,7 @@ const Category = () => {
                         type="text"
                         labelPlacement="outside"
                     />
-                    <input hidden name="admin" value={user?._id} type="" />
+                    <input hidden name="admin" value={user?.user} type="" />
                     <input hidden name="intent" value="create" type="" />
 
                     <Textarea
