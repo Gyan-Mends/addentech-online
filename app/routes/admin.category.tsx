@@ -117,19 +117,19 @@ const Category = () => {
                             <TableCell>{categories.name}</TableCell>
                             <TableCell>{categories.description}</TableCell>
                             <TableCell className="relative flex items-center gap-4">
-                                <Button size="sm" color="success" variant="flat" onClick={() => {
+                                <button  onClick={() => {
                                     setEditModalOpened(true)
                                     setDataValue(categories)
 
                                 }}>
-                                    <EditIcon /> Edit
-                                </Button >
-                                <Button size="sm" color="danger" variant="flat" onClick={() => {
+                                    <EditIcon className="w-4 h-4 text-primary" />
+                                </button >
+                                <button onClick={() => {
                                     setDataValue(categories)
                                     setConfirmModalOpened(true)
                                 }}>
-                                    <DeleteIcon /> Delete
-                                </Button>
+                                    <DeleteIcon className="w-4 h-4 text-danger" />
+                                </button>
 
                             </TableCell>
                         </TableRow>

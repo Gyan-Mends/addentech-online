@@ -498,7 +498,7 @@ export default function AttendancePage() {
             {/* Check-out button for records without checkout time */}
             {row.checkInTime && !row.checkOutTime && (
               <Form method="post" className="inline">
-                <input type="hidden" name="_action" value="checkOut" />
+                <input  type="hidden" name="_action" value="checkOut" />
                 <input type="hidden" name="attendanceId" value={row._id} />
                 <Button
                   type="submit"
@@ -506,6 +506,7 @@ export default function AttendancePage() {
                   color="success"
                   isLoading={isLoading}
                   startContent={<CheckCircle className="h-4 w-4" />}
+                  className="text-white"
                 >
                   Check Out
                 </Button>

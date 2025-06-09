@@ -257,7 +257,7 @@ const Users = () => {
 
 
 
-                        <div className=" ">
+                        <div className="lg:mt-10  ">
                             <input name="base64Image" value={base64Image} type="hidden" />
                             <label className="font-nunito block text-sm !text-black" htmlFor="image">
                                 Image
@@ -298,7 +298,7 @@ const Users = () => {
                         <input hidden name="admin" value={user?._id} type="" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="base64Image" value={base64Image} type="hidden" />
-                        <input name="id" value={dataValue?._id} type="text" />
+                        <input hidden name="id" value={dataValue?._id} type="text" />
 
 
                         <div className="flex gap-6 mt-6">
@@ -311,8 +311,8 @@ const Users = () => {
             {/* Create Modal */}
 
 
-            <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Blog">
-                <Form method="post" className="flex flex-col gap-4 p-4">
+            <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Blog" fullscreen={true}>
+                <Form method="post" className="flex flex-col gap-4 p-4 lg:px-80">
                     <CustomInput
                         label="Title"
                         isRequired
@@ -355,7 +355,7 @@ const Users = () => {
                             onChange={setContent}
 
                             modules={modules}
-                            className='md:!h-[30vh] mt-2 font-nunito  w-full mb-12 !font-nunito !rounded'
+                            className='md:!h-[40vh] mt-2 font-nunito  w-full mb-12 !font-nunito !rounded'
                         />
                     </div>
 
