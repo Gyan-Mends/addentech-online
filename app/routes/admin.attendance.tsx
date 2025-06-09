@@ -1,15 +1,16 @@
 import { Button, Input, Spinner, Tab, Tabs } from "@nextui-org/react";
-import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation, useNavigate } from "@remix-run/react";
 import { DataTable } from "../components/DataTable";
 import AdminLayout from "~/layout/adminLayout";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import attendanceController from "~/controller/attendance";
 import { ActionFunctionArgs } from "@remix-run/node";
-import { BarChart2, Calendar, CheckCircle, Clock, Users } from "lucide-react";
+import { BarChart2, Calendar, CheckCircle, Clock, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getSession } from "~/session";
 import Registration from "~/modal/registration";
+import Attendance from "~/modal/attendance";
 import { redirect } from "@remix-run/node";
 import { errorToast, successToast } from "~/components/toast";
 import { Toaster } from "react-hot-toast";
@@ -313,16 +314,46 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function AttendancePage() {
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const loaderData = useLoaderData<typeof loader>();
+  
+  // Get URL parameters for state initialization
+  const [searchParams, setSearchParams] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search);
+    }
+    return new URLSearchParams();
+  });
+  
   // Initial states
   const [activeTab, setActiveTab] = useState("today");
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
+    startDate: searchParams.get('startDate') || new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split("T")[0],
+    endDate: searchParams.get('endDate') || new Date().toISOString().split("T")[0],
   });
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState(searchParams.get('department') || "");
+  const [selectedUser, setSelectedUser] = useState(searchParams.get('userId') || "");
   const actionData = useActionData<typeof action>();
   const isLoading = navigation.state === "loading";
+  
+  // Function to handle report generation
+  const handleGenerateReport = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (dateRange.startDate) params.set('startDate', dateRange.startDate);
+    if (dateRange.endDate) params.set('endDate', dateRange.endDate);
+    if (selectedDepartment) params.set('department', selectedDepartment);
+    navigate(`?${params.toString()}`);
+  };
+  
+  // Function to handle filter submission
+  const handleFilter = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (selectedDepartment) params.set('department', selectedDepartment);
+    if (selectedUser) params.set('userId', selectedUser);
+    navigate(`?${params.toString()}`);
+  };
   
   // Helper function to calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -365,7 +396,7 @@ export default function AttendancePage() {
       render: (row: any) => {
         const user = row.user || {};
         // Highlight the current user's records
-        const isCurrentUser = user._id === loaderData.currentUser.id;
+        const isCurrentUser = user._id === loaderData.currentUser?.id;
         return (
           <span className={isCurrentUser ? "font-bold text-blue-600" : ""}>
             {user.firstName || ""} {user.lastName || ""}
@@ -407,39 +438,44 @@ export default function AttendancePage() {
     },
     {
       key: "location",
-      label: "LOCATION",
+      label: "WORK MODE",
       render: (row: any) => {
-        if (row.location && row.location.locationName) {
-          return (
-            <div className="max-w-xs truncate" title={row.location.locationName}>
-              <span className="text-xs">{row.location.locationName}</span>
-              {row.workMode === "in-house" && (
-                <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1 rounded">
-                  In-House
-                </span>
-              )}
-              {row.workMode === "remote" && (
-                <span className="ml-1 text-xs bg-purple-100 text-purple-800 px-1 rounded">
-                  Remote
-                </span>
-              )}
-            </div>
-          );
-        } else if (row.workMode) {
+       
           return (
             <span className={`text-xs ${row.workMode === "in-house" ? "text-blue-600" : "text-purple-600"}`}>
               {row.workMode === "in-house" ? "In-House" : "Remote"}
             </span>
           );
-        }
-        return "Unknown";
+      
       },
     },
     {
       key: "workHours",
       label: "WORK HOURS",
       render: (row: any) => {
-        return row.workHours ? `${row.workHours} hrs` : "In progress";
+        // Check if both check-in and check-out times exist
+        if (!row.checkInTime || !row.checkOutTime) {
+          return "0 hrs 0 mins";
+        }
+        
+        // Calculate work hours
+        const checkInTime = new Date(row.checkInTime);
+        const checkOutTime = new Date(row.checkOutTime);
+        
+        // Validate that the dates are valid
+        if (isNaN(checkInTime.getTime()) || isNaN(checkOutTime.getTime())) {
+          return "0 hrs 0 mins";
+        }
+        
+        const workHours = checkOutTime.getTime() - checkInTime.getTime();
+        const hours = Math.floor(workHours / (1000 * 60 * 60));
+        const minutes = Math.floor((workHours % (1000 * 60 * 60)) / (1000 * 60));
+        
+        // Ensure hours and minutes are valid numbers
+        const validHours = isNaN(hours) ? 0 : Math.max(0, hours);
+        const validMinutes = isNaN(minutes) ? 0 : Math.max(0, minutes);
+        
+        return `${validHours} hrs ${validMinutes} mins`;
       },
     },
     {
@@ -447,19 +483,8 @@ export default function AttendancePage() {
       label: "STATUS",
       render: (row: any) => {
         return (
-          <span
-            className={`px-2 py-1 rounded text-xs font-semibold ${
-              row.status === "present"
-                ? "bg-green-100 text-green-800"
-                : row.status === "late"
-                ? "bg-yellow-100 text-yellow-800"
-                : row.status === "absent"
-                ? "bg-red-100 text-red-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {row.status.toUpperCase()}
-          </span>
+          // if checkout show out of office else show present
+          row.checkOutTime ? "Out of Office" : "In Office"
         );
       },
     },
@@ -581,8 +606,10 @@ export default function AttendancePage() {
                             const { latitude, longitude } = position.coords;
 
                             // Set hidden inputs with location data
-                            document.getElementById("latitude").value = latitude.toString();
-                            document.getElementById("longitude").value = longitude.toString();
+                            const latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+                            const longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+                            if (latitudeInput) latitudeInput.value = latitude.toString();
+                            if (longitudeInput) longitudeInput.value = longitude.toString();
 
                             // Calculate distance from office (assuming office coordinates are 5.660881, -0.156627)
                             const officeLatitude = 5.660881;
@@ -605,7 +632,8 @@ export default function AttendancePage() {
                               if (data.status === "OK" && data.results && data.results.length > 0) {
                                 locationName = data.results[0].formatted_address;
                                 // Set the location name in the hidden input
-                                document.getElementById("locationName").value = locationName;
+                                const locationNameInput = document.getElementById("locationName") as HTMLInputElement;
+                                if (locationNameInput) locationNameInput.value = locationName;
                               } else {
                                 console.error("Geocoding failed:", data);
                               }
@@ -748,7 +776,7 @@ export default function AttendancePage() {
               {loaderData.isAdmin && (
                 <div className="bg-white rounded-lg p-4 mb-6">
                   <h3 className="text-lg font-semibold mb-2">Filter Attendance</h3>
-                  <Form className="flex flex-wrap items-end gap-4">
+                  <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
                     <div>
                       <label className="block text-sm text-gray-700 mb-1">
                         Department
@@ -774,6 +802,8 @@ export default function AttendancePage() {
                       <select
                         className="border rounded px-3 py-2 w-[70vw] lg:max-w-[250px]"
                         name="userId"
+                        value={selectedUser}
+                        onChange={(e) => setSelectedUser(e.target.value)}
                       >
                         <option value="">All Users</option>
                         {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
@@ -783,14 +813,29 @@ export default function AttendancePage() {
                         ))}
                       </select>
                     </div>
-                    <Button
-                      type="submit"
-                      color="primary"
-                      className="bg-pink-500"
-                    >
-                      Filter
-                    </Button>
-                  </Form>
+                    <div className="flex gap-2">
+                      <Button
+                        type="submit"
+                        color="primary"
+                        className="bg-pink-500"
+                      >
+                        Filter
+                      </Button>
+                      <Button
+                        type="button"
+                        color="default"
+                        variant="bordered"
+                        startContent={<X className="h-4 w-4" />}
+                        onClick={() => {
+                          setSelectedDepartment("");
+                          setSelectedUser("");
+                          navigate(window.location.pathname);
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  </form>
                 </div>
               )}
             </div>
@@ -807,7 +852,7 @@ export default function AttendancePage() {
             <div className="mt-6">
               <div className="bg-white rounded-lg p-4 mb-6">
                 <h3 className="text-lg font-semibold mb-2">Generate Report</h3>
-                <Form className="flex flex-wrap gap-4">
+                <form onSubmit={handleGenerateReport} className="flex flex-wrap gap-4 items-end">
                   {/* Department filter (admin only) */}
                   {loaderData.isAdmin && (
                     <div>
@@ -841,6 +886,7 @@ export default function AttendancePage() {
                       onChange={(e) =>
                         setDateRange({ ...dateRange, startDate: e.target.value })
                       }
+                      required
                     />
                   </div>
                   <div>
@@ -855,9 +901,10 @@ export default function AttendancePage() {
                       onChange={(e) =>
                         setDateRange({ ...dateRange, endDate: e.target.value })
                       }
+                      required
                     />
                   </div>
-                  <div className="flex items-end">
+                  <div className="flex gap-2">
                     <Button
                       type="submit"
                       color="primary"
@@ -865,16 +912,32 @@ export default function AttendancePage() {
                     >
                       Generate Report
                     </Button>
+                    <Button
+                      type="button"
+                      color="default"
+                      variant="bordered"
+                      startContent={<X className="h-4 w-4" />}
+                      onClick={() => {
+                        setDateRange({
+                          startDate: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split("T")[0],
+                          endDate: new Date().toISOString().split("T")[0],
+                        });
+                        setSelectedDepartment("");
+                        navigate(window.location.pathname);
+                      }}
+                    >
+                      Clear
+                    </Button>
                   </div>
-                </Form>
+                </form>
               </div>
-
+{/* 
               <DataTable
                 columns={columns}
                 data={loaderData.data}
                 isLoading={isLoading}
                 emptyContent={"No attendance records found"}
-              />
+              /> */}
             </div>
           </Tab>
           <Tab
@@ -897,7 +960,10 @@ export default function AttendancePage() {
             {loaderData && 'data' in loaderData && loaderData.data && loaderData.data.length > 0 ? (
               <DataTable
                 columns={columns}
-                data={loaderData.data}
+                data={loaderData.data.map((record: any) => ({
+                  ...record,
+                  searchableText: `${record.user?.firstName || ''} ${record.user?.lastName || ''} ${record.department?.name || ''} ${record.status || ''}`.toLowerCase()
+                }))}
                 pagination
                 search
               />
