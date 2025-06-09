@@ -75,13 +75,7 @@ const navItems: NavItem[] = [
         roles: ["admin", "department_head", "manager", "staff"],
         permission: "view_attendance"
     },
-    {
-        to: "/admin/task-management",
-        icon: <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />,
-        label: "Task Management",
-        roles: ["admin", "department_head", "manager", "staff"],
-        permission: "view_tasks"
-    },
+
     // {
     //     to: "/admin/monthly-reports",
     //     icon: <BarChart className="h-4 w-4 hover:text-white text-pink-500" />,
@@ -140,9 +134,46 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [userRole, setUserRole] = useState<string>("staff");
     const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
     const [isLeaveDropdownOpen, setIsLeaveDropdownOpen] = useState(false);
+    const [isTaskDropdownOpen, setIsTaskDropdownOpen] = useState(false);
     const navigation = useNavigation();
     const navigate = useNavigate(); 
     const isLoading = navigation.state === "loading";
+
+    // Function to handle accordion toggle with scroll
+    const handleLeaveAccordionToggle = () => {
+        setIsLeaveDropdownOpen(!isLeaveDropdownOpen);
+        
+        // If opening, scroll to make content visible after animation
+        if (!isLeaveDropdownOpen) {
+            setTimeout(() => {
+                const leaveMenuItem = document.querySelector('[data-leave-accordion]');
+                if (leaveMenuItem) {
+                    leaveMenuItem.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                }
+            }, 150); // Half of animation duration
+        }
+    };
+
+    // Function to handle task accordion toggle with scroll
+    const handleTaskAccordionToggle = () => {
+        setIsTaskDropdownOpen(!isTaskDropdownOpen);
+        
+        // If opening, scroll to make content visible after animation
+        if (!isTaskDropdownOpen) {
+            setTimeout(() => {
+                const taskMenuItem = document.querySelector('[data-task-accordion]');
+                if (taskMenuItem) {
+                    taskMenuItem.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                }
+            }, 150); // Half of animation duration
+        }
+    };
   
     // Auto-open sidebar on desktop
     // Auto-open sidebar on desktop
@@ -227,11 +258,14 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </Button>
                 </div>
 
-                <div 
-                    className="flex flex-col  flex-1 px-2 py-4 space-y-6"
-                   
+                                <div 
+                    className="flex flex-col flex-1 px-2 py-4 space-y-6 overflow-y-auto"
+                    style={{
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: '#f8b4cb #f1f5f9'
+                    }}
                 >
-                    <ul className="flex flex-col overflow-y-auto"  >
+                    <ul className="flex flex-col space-y-1">
                         {navItems
                             .filter(item => {
                                 // Include if user's role is in the allowed roles list
@@ -256,12 +290,59 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             ))
                         }
                         
-                        {/* Leave Management Accordion */}
-                        {["admin", "manager", "department_head", "staff"].includes(userRole) && (
-                            <div>
+                        {/* Task Management Accordion */}
+                        {["admin", "department_head", "manager", "staff"].includes(userRole) && (
+                            <div data-task-accordion>
                                 <li 
                                     className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer"
-                                    onClick={() => setIsLeaveDropdownOpen(!isLeaveDropdownOpen)}
+                                    onClick={handleTaskAccordionToggle}
+                                >
+                                    <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />
+                                    Task Management
+                                    <ChevronDown className={`h-3 w-3 ml-auto transition-transform duration-200 ${isTaskDropdownOpen ? 'rotate-180' : ''}`} />
+                                </li>
+                                
+                                {/* Submenu */}
+                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isTaskDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                    <div className="ml-6 mt-2 space-y-1">
+                                        <Link to="/admin/task-management">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <LayoutDashboard className="h-3 w-3" />
+                                                Task Dashboard
+                                            </div>
+                                        </Link>
+                                        
+                                        <Link to="/admin/task-create">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <FileText className="h-3 w-3" />
+                                                Create Task
+                                            </div>
+                                        </Link>
+                                        
+                                        <Link to="/admin/enhanced-tasks">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <CheckSquare className="h-3 w-3" />
+                                                Enhanced Tasks
+                                            </div>
+                                        </Link>
+                                        
+                                        <Link to="/admin/task-details">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <FileText className="h-3 w-3" />
+                                                Task Details
+                                            </div>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Leave Management Accordion */}
+                        {["admin", "manager", "department_head", "staff"].includes(userRole) && (
+                            <div data-leave-accordion>
+                                <li 
+                                    className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer"
+                                    onClick={handleLeaveAccordionToggle}
                                 >
                                     <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />
                                     Leave Management
@@ -269,7 +350,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                 </li>
                                 
                                 {/* Submenu */}
-                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isLeaveDropdownOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isLeaveDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="ml-6 mt-2 space-y-1">
                                         <Link to="/admin/leave-management">
                                             <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
