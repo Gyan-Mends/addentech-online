@@ -140,8 +140,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [userRole, setUserRole] = useState<string>("staff");
     const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
     const navigation = useNavigation();
-    const navigate = useNavigate();
-    
+    const navigate = useNavigate(); 
+    const isLoading = navigation.state === "loading";
+  
+    // Auto-open sidebar on desktop
     // Auto-open sidebar on desktop
     useEffect(() => {
         const handleResize = () => {
@@ -159,7 +161,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
+    // Fetch user role and permissions from session
     // Fetch user role and permissions from session
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -193,10 +195,9 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
         fetchUserProfile();
     }, []);
 
-    const isLoading = navigation.state === "loading";
 
     return (
-        <div className="flex h-screen font-nunito">
+        <div className="flex font-nunito">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div 

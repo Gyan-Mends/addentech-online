@@ -330,7 +330,7 @@ const Home = () => {
                       <CardFooter className="pt-0">
                         <Link to="/services/#services-section" className="w-full">
                           <Button
-                            className={`w-fulltext-white font-semibold hover:shadow-xl $ transition-all duration-300 group-hover:scale-105`}
+                            className={` !text-sm font-semibold hover:shadow-xl $ transition-all duration-300 group-hover:scale-105`}
                           >
                             <span className="flex items-center justify-center gap-2">
                               Learn More
@@ -350,7 +350,7 @@ const Home = () => {
                 <Link to="/services#services-section">
                   <Button
                     size="lg"
-                    className="bg-pink-500 hover:to-purple-700 text-white font-semibold px-8 py-6 text-lg shadow-xl hover:shadow-2xl hover:shadow-pink-500/25 transform hover:scale-105 transition-all duration-300"
+                    className="bg-pink-500 hover:to-purple-700 text-white font-semibold px-8 py-6 text-lg shadow-xl hover:shadow-2xl text-sm hover:shadow-pink-500/25 transform hover:scale-105 transition-all duration-300"
                   >
                     <span className="flex items-center gap-2">
                       View All Services
@@ -371,7 +371,7 @@ const Home = () => {
             <ScrollAnimation>
               <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center mb-12">
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-bold font-montserrat">Blog, News & Articles</h2>
+                  <h2 className="text-3xl md:text-3xl font-bold font-montserrat">Blog, News & Articles</h2>
                 </div>
                 <Link to="/blog">
                   <Button variant="bordered" className="font-montserrat border border-2">
@@ -561,7 +561,7 @@ const Home = () => {
             <Button
               isIconOnly
               variant="bordered"
-              className="absolute lg:ml-[22vw] lg:mt-[100px] top-1/2 left-4 -translate-y-1/2  hover:bg-black/70 bg-gray-600 hover:border-pink-500/50 hidden md:flex text-white"
+              className="absolute lg:ml-[22vw] lg:mt-[100px] top-1/2 left-4 -translate-y-1/2 border-2 border-black/30 bg-gray-200 hidden md:flex "
               onClick={goToPrevious}
               aria-label="Previous testimonial"
             >
@@ -571,7 +571,7 @@ const Home = () => {
             <Button
               isIconOnly
               variant="bordered"
-              className="absolute lg:mr-[22vw] lg:mt-[100px] top-1/2 right-4 -translate-y-1/2 bg-gray-600 hover:bg-black/70 hover:border-pink-500/50 hidden md:flex text-white"
+              className="absolute  lg:mr-[22vw] lg:mt-[100px] top-1/2 right-4 -translate-y-1/2 bg-gray-200  border-2 border-black/30 hidden md:flex"
               onClick={goToNext}
               aria-label="Next testimonial"
             >

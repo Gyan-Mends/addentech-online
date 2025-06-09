@@ -269,10 +269,10 @@ const About = () => {
                             }}
                         >
                             <Link
-                                to="/careers"
+                                to="/team"
                                 className="inline-flex items-center gap-2 text-pink-400 hover:text-pink-300 font-medium transition-colors duration-300"
                             >
-                                <span>Join Our Team</span>
+                                <span>View All Team Members</span>
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </motion.div>

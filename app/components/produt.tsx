@@ -42,7 +42,7 @@ export function ProductCard({ id, className }: { id?: string, className: string 
                             className: "h-20 mb-20 mt-20  flex items-center justify-center w-80 transition-transform group-hover:scale-105", 
                         },
                         {
-                            link: "",
+                            link: "/404",
                             title: "Justice Locator",
                             description: "Legal advice on the go",
                             image: jl,

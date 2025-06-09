@@ -63,7 +63,6 @@ const Login = () => {
                             labelPlacement="outside"
                             placeholder="Enter your email "
                             type="email"
-
                             endContent={<EmailIcon className="text-xl text-default-400 " />}
                             className="placeholder:text-gray-300"
                         />

@@ -78,8 +78,8 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             <Link
                                 key={name}
                                 to={path}
-                                className={`text-sm font-medium transition-colors duration-300 ${isScrolled && path === "/"
-                                        ? 'text-default-500 hover:text-foreground'
+                                className={`text-sm font-medium transition-colors duration-300 !text-black  ${!isScrolled 
+                                        ? '!text-white hover:text-foreground'
                                         : ' '
                                     }`}
                             >
