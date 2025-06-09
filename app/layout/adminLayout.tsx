@@ -139,6 +139,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Start closed on mobile
     const [userRole, setUserRole] = useState<string>("staff");
     const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
+    const [isLeaveDropdownOpen, setIsLeaveDropdownOpen] = useState(false);
     const navigation = useNavigation();
     const navigate = useNavigate(); 
     const isLoading = navigation.state === "loading";
@@ -230,10 +231,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     className="flex flex-col  flex-1 px-2 py-4 space-y-6"
                    
                 >
-                    <ul className="flex flex-col overflow-y-auto"  style={{
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: '#f8b4cb #f1f5f9'
-                    }}>
+                    <ul className="flex flex-col overflow-y-auto"  >
                         {navItems
                             .filter(item => {
                                 // Include if user's role is in the allowed roles list
@@ -258,59 +256,69 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             ))
                         }
                         
-                        {/* Leave Management Dropdown */}
+                        {/* Leave Management Accordion */}
                         {["admin", "manager", "department_head", "staff"].includes(userRole) && (
-                            <Dropdown>
-                                <DropdownTrigger>
-                                    <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer">
-                                        <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />
-                                        Leave Management
-                                        <ChevronDown className="h-3 w-3 ml-auto" />
-                                    </li>
-                                </DropdownTrigger>
-                                <DropdownMenu aria-label="Leave Management Options">
-                                    <DropdownItem key="leave-dashboard" href="/admin/leave-management">
-                                        <div className="flex items-center gap-2">
-                                            <LayoutDashboard className="h-4 w-4" />
-                                            Leave Dashboard
-                                        </div>
-                                    </DropdownItem>
-                                    <DropdownItem key="apply-leave" href="/employee-leave-application">
-                                        <div className="flex items-center gap-2">
-                                            <FileText className="h-4 w-4" />
-                                            Apply for Leave
-                                        </div>
-                                    </DropdownItem>
-                                    <DropdownItem key="team-calendar" href="/admin/team-calendar">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4" />
-                                            Team Calendar
-                                        </div>
-                                    </DropdownItem>
-                                    <DropdownItem key="leave-balance" href="/employee-leave-balance">
-                                        <div className="flex items-center gap-2">
-                                            <CheckSquare className="h-4 w-4" />
-                                            Leave Balance
-                                        </div>
-                                    </DropdownItem>
-                                    {["admin", "manager"].includes(userRole) ? (
-                                        <DropdownItem key="leave-policies" href="/admin/leave-policies">
-                                            <div className="flex items-center gap-2">
-                                                <Settings className="h-4 w-4" />
-                                                Leave Policies
+                            <div>
+                                <li 
+                                    className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer"
+                                    onClick={() => setIsLeaveDropdownOpen(!isLeaveDropdownOpen)}
+                                >
+                                    <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />
+                                    Leave Management
+                                    <ChevronDown className={`h-3 w-3 ml-auto transition-transform duration-200 ${isLeaveDropdownOpen ? 'rotate-180' : ''}`} />
+                                </li>
+                                
+                                {/* Submenu */}
+                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isLeaveDropdownOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                    <div className="ml-6 mt-2 space-y-1">
+                                        <Link to="/admin/leave-management">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <LayoutDashboard className="h-3 w-3" />
+                                                Leave Dashboard
                                             </div>
-                                        </DropdownItem>
-                                    ) : null}
-                                    {["admin", "manager"].includes(userRole) ? (
-                                        <DropdownItem key="leave-reminders" href="/admin/leave-reminders">
-                                            <div className="flex items-center gap-2">
-                                                <Bell className="h-4 w-4" />
-                                                Leave Reminders
+                                        </Link>
+                                        
+                                        <Link to="/employee-leave-application">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <FileText className="h-3 w-3" />
+                                                Apply for Leave
                                             </div>
-                                        </DropdownItem>
-                                    ) : null}
-                                </DropdownMenu>
-                            </Dropdown>
+                                        </Link>
+                                        
+                                        <Link to="/admin/team-calendar">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <Calendar className="h-3 w-3" />
+                                                Team Calendar
+                                            </div>
+                                        </Link>
+                                        
+                                        <Link to="/employee-leave-balance">
+                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                <CheckSquare className="h-3 w-3" />
+                                                Leave Balance
+                                            </div>
+                                        </Link>
+                                        
+                                        {["admin", "manager"].includes(userRole) && (
+                                            <Link to="/admin/leave-policies">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <Settings className="h-3 w-3" />
+                                                    Leave Policies
+                                                </div>
+                                            </Link>
+                                        )}
+                                        
+                                        {["admin", "manager"].includes(userRole) && (
+                                            <Link to="/admin/leave-reminders">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <Bell className="h-3 w-3" />
+                                                    Leave Reminders
+                                                </div>
+                                            </Link>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </ul>
                     <Divider className="" />
