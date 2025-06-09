@@ -42,12 +42,14 @@ const Users = () => {
         user,
         users,
         totalPages,
-        departments
+        departments,
+        currentPage
     } = useLoaderData<{
         user: { _id: string },
         users: RegistrationInterface[],
         totalPages: number,
-        departments: DepartmentInterface[]
+        departments: DepartmentInterface[],
+        currentPage: number
     }>()
     const [content, setContent] = useState("");
     const [department, setDepartment] = useState()
@@ -136,7 +138,7 @@ const Users = () => {
                     columns={UserColumns}
                     loadingState={navigation.state === "loading" ? "loading" : "idle"}
                     totalPages={totalPages}
-                    page={1}
+                    page={currentPage}
                     setPage={(page) => (
                         navigate(`?page=${page}`)
                     )}>
@@ -162,7 +164,8 @@ const Users = () => {
                                 <button className="text-primary " onClick={() => {
                                     setIsEditDrawerOpened(true)
                                     setDataValue(user)
-                                    console.log(dataValue);
+                                    console.log('User data for edit:', user);
+                                    console.log('Department structure:', user.department);
 
                                 }}>
 
@@ -312,7 +315,15 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select Department"
                                 name="department"
-                                defaultSelectedKeys={[dataValue.department]}
+                                defaultSelectedKeys={(() => {
+                                    // Handle both cases: department as object or as string ID
+                                    if (typeof dataValue.department === 'string') {
+                                        return [dataValue.department];
+                                    } else if (dataValue.department?._id) {
+                                        return [dataValue.department._id];
+                                    }
+                                    return [];
+                                })()}
                                 classNames={{
                                     label: "font-nunito text-sm text-default-100",
                                     popoverContent:
@@ -480,6 +491,7 @@ const Users = () => {
                         <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
                         <input name="id" value={dataValue?._id} type="hidden" />
+                        <input name="currentPage" value={currentPage} type="hidden" />
 
 
                         <Button size="sm" type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4" onClick={() => {
@@ -736,6 +748,7 @@ const Users = () => {
                     <input name="admin" value={user?._id} type="hidden" />
                     <input name="intent" value="create" type="hidden" />
                     <input name="base64Image" value={base64Image} type="hidden" />
+                    <input name="currentPage" value={currentPage} type="hidden" />
 
                     <button type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4">
                         Submit
@@ -770,6 +783,7 @@ export const action: ActionFunction = async ({ request }) => {
     const institutionName = formData.get("institution_name") as string;
     const program = formData.get("program") as string;
     const dateCompletedProgram = formData.get("date_c") as string;
+    const currentPage = formData.get("currentPage") as string;
 
 
 
@@ -860,7 +874,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         search_term
     });
 
-    return json({ user, users, totalPages, departments });
+    return json({ user, users, totalPages, departments, currentPage: page });
 }
 
 export const meta: MetaFunction = () => {
