@@ -416,13 +416,6 @@ const EmployeeLeaveApplication = () => {
             <div className="p-6 max-w-4xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
-                    <Button
-                        variant="light"
-                        startContent={<ArrowLeft size={16} />}
-                        onClick={() => window.history.back()}
-                    >
-                        Back
-                    </Button>
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             New Leave Application
@@ -467,6 +460,10 @@ const EmployeeLeaveApplication = () => {
                                     name="leaveType"
                                     label="Leave Type"
                                     placeholder="Select leave type"
+                                    labelPlacement="outside"
+                                    classNames={{
+                                        label: "font-nunito",
+                                    }}
                                     isRequired
                                     variant="bordered"
                                     selectedKeys={selectedLeaveType ? [selectedLeaveType] : []}
@@ -489,6 +486,7 @@ const EmployeeLeaveApplication = () => {
                                     placeholder="Select priority"
                                     defaultSelectedKeys={["normal"]}
                                     variant="bordered"
+                                    labelPlacement="outside"
                                 >
                                     {priorities.map((priority) => (
                                         <SelectItem key={priority.key} value={priority.key}>
@@ -634,6 +632,7 @@ const EmployeeLeaveApplication = () => {
                                 isRequired
                                 minRows={4}
                                 maxRows={8}
+                                labelPlacement="outside"
                                 value={reason}
                                 onValueChange={setReason}
                             />

@@ -10,28 +10,28 @@ import { useState, useEffect } from "react";
 import AdminLayout from "~/layout/adminLayout";
 
 // Loader function to fetch leave data
-export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
+export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
     try {
         console.log("=== LOADER START ===");
         const session = await getSession(request.headers.get("Cookie"));
         const userId = session.get("email");
         console.log("User ID from session:", userId);
-        
+
         if (!userId) {
             return redirect("/addentech-login");
         }
 
         // Test database connection first
         console.log("Testing database connection...");
-        
+
         // Get current user information for role-based access
         console.log("Finding user by email:", userId);
         const currentUser = await Registration.findOne({ email: userId });
         console.log("Current user found:", currentUser ? `${currentUser.firstName} ${currentUser.lastName} (${currentUser.role})` : 'Not found');
-        
+
         // Ensure Department model is loaded
         console.log("Department model available:", Department);
-        
+
         const url = new URL(request.url);
         const filters = {
             status: url.searchParams.get('status') || 'all',
@@ -49,7 +49,7 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             userRole: currentUser?.role,
             userDepartment: currentUser?.department
         };
-        
+
         console.log("Filters being passed:", filters);
 
         console.log("Calling LeaveController.getLeaves...");
@@ -59,7 +59,7 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             total: result.total,
             statsKeys: Object.keys(result.stats || {})
         });
-        
+
         const leaves = result.leaves || [];
         const total = result.total || 0;
         let stats = result.stats || {};
@@ -67,23 +67,23 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
         // Role-based stats filtering
         if (currentUser?.role === 'staff') {
             // Staff can only see their own statistics
-            const userLeaves = leaves.filter(leave => 
-                leave.employee?.email === userId || 
+            const userLeaves = leaves.filter(leave =>
+                leave.employee?.email === userId ||
                 leave.employee?._id?.toString() === currentUser.id
             );
             stats = {
                 totalApplications: userLeaves.length,
                 pendingApprovals: userLeaves.filter(l => l.status === 'pending').length,
-                approvedThisMonth: userLeaves.filter(l => 
-                    l.status === 'approved' && 
+                approvedThisMonth: userLeaves.filter(l =>
+                    l.status === 'approved' &&
                     new Date(l.lastModified).getMonth() === new Date().getMonth()
                 ).length,
-                rejectedThisMonth: userLeaves.filter(l => 
-                    l.status === 'rejected' && 
+                rejectedThisMonth: userLeaves.filter(l =>
+                    l.status === 'rejected' &&
                     new Date(l.lastModified).getMonth() === new Date().getMonth()
                 ).length,
-                upcomingLeaves: userLeaves.filter(l => 
-                    l.status === 'approved' && 
+                upcomingLeaves: userLeaves.filter(l =>
+                    l.status === 'approved' &&
                     new Date(l.startDate) > new Date()
                 ).length,
                 onLeaveToday: userLeaves.filter(l => {
@@ -95,23 +95,23 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
             };
         } else if (currentUser?.role === 'department_head') {
             // Department heads see stats for their department only
-            const deptLeaves = leaves.filter(leave => 
+            const deptLeaves = leaves.filter(leave =>
                 leave.department?._id?.toString() === currentUser.department?.toString() ||
                 leave.department === currentUser.department
             );
             stats = {
                 totalApplications: deptLeaves.length,
                 pendingApprovals: deptLeaves.filter(l => l.status === 'pending').length,
-                approvedThisMonth: deptLeaves.filter(l => 
-                    l.status === 'approved' && 
+                approvedThisMonth: deptLeaves.filter(l =>
+                    l.status === 'approved' &&
                     new Date(l.lastModified).getMonth() === new Date().getMonth()
                 ).length,
-                rejectedThisMonth: deptLeaves.filter(l => 
-                    l.status === 'rejected' && 
+                rejectedThisMonth: deptLeaves.filter(l =>
+                    l.status === 'rejected' &&
                     new Date(l.lastModified).getMonth() === new Date().getMonth()
                 ).length,
-                upcomingLeaves: deptLeaves.filter(l => 
-                    l.status === 'approved' && 
+                upcomingLeaves: deptLeaves.filter(l =>
+                    l.status === 'approved' &&
                     new Date(l.startDate) > new Date()
                 ).length,
                 onLeaveToday: deptLeaves.filter(l => {
@@ -133,17 +133,17 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
                 console.error("Error fetching departments:", error);
             }
         }
-        
+
         console.log("=== LOADER SUCCESS ===");
-        return json({ 
-            leaves, 
-            total, 
-            stats, 
+        return json({
+            leaves,
+            total,
+            stats,
             filters,
             departments,
-            currentUser: { 
-                id: userId, 
-                role: currentUser?.role, 
+            currentUser: {
+                id: userId,
+                role: currentUser?.role,
                 department: currentUser?.department,
                 name: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Unknown'
             },
@@ -153,9 +153,9 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
         console.error('=== LOADER ERROR ===');
         console.error('Error loading leave data:', error);
         console.error('Stack trace:', error?.stack);
-        return json({ 
-            leaves: [], 
-            total: 0, 
+        return json({
+            leaves: [],
+            total: 0,
             stats: {
                 totalApplications: 0,
                 pendingApprovals: 0,
@@ -163,7 +163,7 @@ export const loader:LoaderFunction = async ({ request }: LoaderFunctionArgs) => 
                 rejectedThisMonth: 0,
                 upcomingLeaves: 0,
                 onLeaveToday: 0
-            }, 
+            },
             filters: { status: 'all', leaveType: 'all', department: 'all' },
             currentUser: null,
             error: `Failed to load leave data: ${error?.message || error}`
@@ -176,7 +176,7 @@ export async function action({ request }: ActionFunctionArgs) {
     try {
         const session = await getSession(request.headers.get("Cookie"));
         const userId = session.get("email");
-        
+
         if (!userId) {
             return redirect("/addentech-login");
         }
@@ -197,17 +197,17 @@ export async function action({ request }: ActionFunctionArgs) {
                 comments,
                 approverEmail: userId
             });
-            
+
             // Send email notification to employee about approval/rejection
             if (result.success) {
                 try {
                     // Get the updated leave details for email notification
                     const updatedLeave = await LeaveController.getLeaveById(leaveId);
-                    
+
                     if (updatedLeave && updatedLeave.employee) {
                         const { EmailService } = await import('~/services/emailService');
                         const employee = updatedLeave.employee as any;
-                        
+
                         if (employee && employee.email) {
                             await EmailService.sendLeaveApprovalNotification(
                                 employee.email,
@@ -223,7 +223,7 @@ export async function action({ request }: ActionFunctionArgs) {
                     // Don't fail the entire operation if email fails
                 }
             }
-            
+
             return json(result);
         }
 
@@ -236,7 +236,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 const LeaveManagement = () => {
 
-    const { leaves, total, stats, filters, departments, currentUser, success, error } = useLoaderData<{leaves: any, total: number, stats: any, filters: any, departments: any, currentUser: any, success: any, error: any}>();
+    const { leaves, total, stats, filters, departments, currentUser, success, error } = useLoaderData<{ leaves: any, total: number, stats: any, filters: any, departments: any, currentUser: any, success: any, error: any }>();
 
     const actionData = useActionData<typeof action>();
     const submit = useSubmit();
@@ -323,14 +323,14 @@ const LeaveManagement = () => {
             leaveType: filters.leaveType,
             department: filters.department
         });
-        
+
         window.open(`/api/leaves/export?${params.toString()}`, '_blank');
     };
 
     // Filter handling functions
     const applyFilters = () => {
         const searchParams = new URLSearchParams();
-        
+
         if (selectedStatus !== 'all') searchParams.set('status', selectedStatus);
         if (selectedDepartment !== 'all' && (currentUser?.role === 'admin' || currentUser?.role === 'manager')) {
             searchParams.set('department', selectedDepartment);
@@ -338,7 +338,7 @@ const LeaveManagement = () => {
         if (searchName.trim()) searchParams.set('employeeName', searchName.trim());
         if (startDate) searchParams.set('startDate', startDate);
         if (endDate) searchParams.set('endDate', endDate);
-        
+
         window.location.href = `/admin/leave-management?${searchParams.toString()}`;
     };
 
@@ -365,7 +365,7 @@ const LeaveManagement = () => {
 
     return (
         <AdminLayout>
-              <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6">
                 {/* Success/Error Messages */}
                 {success && (
                     <Card className="border-success-200 bg-success-50">
@@ -374,7 +374,7 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
                 )}
-                
+
                 {(error || (actionData && 'error' in actionData && actionData.error)) && (
                     <Card className="border-danger-200 bg-danger-50">
                         <CardBody>
@@ -397,22 +397,14 @@ const LeaveManagement = () => {
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             {getPageTitle()}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">
-                            {isStaff && 'View and manage your leave applications'}
-                            {canViewDepartmentStats && 'Manage leave applications for your department'}
-                            {canViewAllStats && 'Manage all employee leave applications and approvals'}
-                        </p>
-                        {currentUser && (
-                            <p className="text-gray-600 mt-1">
-                                Total Applications: {total} | Role: {currentUser.role} | Active Filters Applied
-                            </p>
-                        )}
                     </div>
                     <div className="flex gap-3">
                         <Button
-                            color="primary"
+                            variant="bordered"
                             startContent={<Download size={16} />}
                             onClick={exportToCSV}
+                            className="shadow-sm"
+
                         >
                             Export CSV
                         </Button>
@@ -420,8 +412,9 @@ const LeaveManagement = () => {
                         {(currentUser?.role === 'staff' || currentUser?.role === 'admin' || currentUser?.role === 'manager') && (
                             <Link to="/employee-leave-application">
                                 <Button
-                                    color="success"
+
                                     startContent={<Plus size={16} />}
+                                    className="text-white bg-pink-500 shadow-sm"
                                 >
                                     New Leave Application
                                 </Button>
@@ -432,74 +425,74 @@ const LeaveManagement = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600">
-                        <CardBody className="p-4">
-                                                    <div className="flex items-center justify-between text-white">
-                            <div>
-                                <p className="text-sm opacity-90">Total Applications</p>
-                                <p className="text-2xl font-bold">{(stats as any)?.totalApplications || 0}</p>
+                    <Card className="white border border-black/20 shadow-sm">
+                        <CardBody className="px-4">
+                            <div className="flex items-center justify-between ">
+                                <div>
+                                    <p className="text-sm opacity-90 font-nunito">Total Applications</p>
+                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.totalApplications || 0}</p>
+                                </div>
+                                <CalendarDays className="font-nunito" size={24} />
                             </div>
-                            <CalendarDays size={24} />
-                        </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600">
+                    <Card className="border border-black/20 bg-white shadow-sm">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between text-white">
+                            <div className="flex items-center justify-between font-nunito">
                                 <div>
                                     <p className="text-sm opacity-90">Pending Approvals</p>
-                                    <p className="text-2xl font-bold">{(stats as any)?.pendingApprovals || 0}</p>
+                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.pendingApprovals || 0}</p>
                                 </div>
-                                <Clock size={24} />
+                                <Clock className="font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-green-500 to-green-600">
+                    <Card className="border border-black/20 bg-white shadow-sm">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between text-white">
+                            <div className="flex items-center justify-between font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90">Approved This Month</p>
-                                    <p className="text-2xl font-bold">{(stats as any)?.approvedThisMonth || 0}</p>
+                                    <p className="text-sm opacity-90 font-nunito">Approved This Month</p>
+                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.approvedThisMonth || 0}</p>
                                 </div>
-                                <CheckCircle size={24} />
+                                <CheckCircle className="font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-red-500 to-red-600">
+                    <Card className="border border-black/20 bg-white shadow-sm">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between text-white">
+                            <div className="flex items-center justify-between font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90">Rejected This Month</p>
-                                    <p className="text-2xl font-bold">{(stats as any)?.rejectedThisMonth || 0}</p>
+                                    <p className="text-sm opacity-90 font-nunito">Rejected This Month</p>
+                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.rejectedThisMonth || 0}</p>
                                 </div>
-                                <XCircle size={24} />
+                                <XCircle className="font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600">
+                    <Card className="border border-black/20 bg-white shadow-sm">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between text-white">
+                            <div className="flex items-center justify-between font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90">Upcoming Leaves</p>
-                                    <p className="text-2xl font-bold">{(stats as any)?.upcomingLeaves || 0}</p>
+                                    <p className="text-sm opacity-90 font-nunito">Upcoming Leaves</p>
+                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.upcomingLeaves || 0}</p>
                                 </div>
-                                <TrendingUp size={24} />
+                                <TrendingUp className="font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600">
+                    <Card className="border border-black/20 bg-white shadow-sm">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between text-white">
+                            <div className="flex items-center justify-between font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90">On Leave Today</p>
-                                    <p className="text-2xl font-bold">{(stats as any)?.onLeaveToday || 0}</p>
+                                    <p className="text-sm opacity-90 font-nunito">On Leave Today</p>
+                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.onLeaveToday || 0}</p>
                                 </div>
-                                <Users size={24} />
+                                <Users className="font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
@@ -531,6 +524,12 @@ const LeaveManagement = () => {
                                 value={searchName}
                                 onValueChange={setSearchName}
                                 startContent={<Search size={16} />}
+                                labelPlacement="outside"
+                                classNames={{
+                                    label: "font-nunito",
+                                    inputWrapper: "font-nunito bg-white border border-black/20",
+                                    
+                                }}
                                 size="sm"
                                 clearable
                             />
@@ -540,7 +539,12 @@ const LeaveManagement = () => {
                                 label="Status"
                                 size="sm"
                                 selectedKeys={[selectedStatus]}
+                                labelPlacement="outside"
                                 onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
+                                classNames={{
+                                    label: "font-nunito",
+                                    trigger: "font-nunito bg-white border border-black/20",
+                                }}
                             >
                                 <SelectItem key="all" value="all">All Status</SelectItem>
                                 <SelectItem key="pending" value="pending">Pending</SelectItem>
@@ -555,6 +559,11 @@ const LeaveManagement = () => {
                                     size="sm"
                                     selectedKeys={[selectedDepartment]}
                                     onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
+                                    labelPlacement="outside"
+                                    classNames={{
+                                        label: "font-nunito",
+                                        trigger: "font-nunito bg-white border border-black/20",
+                                    }}
                                 >
                                     <SelectItem key="all" value="all">All Departments</SelectItem>
                                     {departments?.map((dept: any) => (
@@ -570,6 +579,11 @@ const LeaveManagement = () => {
                                 type="date"
                                 label="Start Date"
                                 size="sm"
+                                labelPlacement="outside"
+                                classNames={{
+                                    label: "font-nunito",
+                                    inputWrapper: "font-nunito bg-white border border-black/20",
+                                }}
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 startContent={<Calendar size={16} />}
@@ -580,6 +594,11 @@ const LeaveManagement = () => {
                                 type="date"
                                 label="End Date"
                                 size="sm"
+                                labelPlacement="outside"
+                                classNames={{
+                                    label: "font-nunito",
+                                    inputWrapper: "font-nunito bg-white border border-black/20",
+                                }}
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 startContent={<Calendar size={16} />}
@@ -588,15 +607,15 @@ const LeaveManagement = () => {
                             {/* Filter Actions */}
                             <div className="flex gap-2 items-end">
                                 <Button
-                                    color="primary"
+                                    className="bg-pink-500 text-white shadow-sm"
                                     size="sm"
                                     onClick={applyFilters}
-                                    className="flex-1"
+                                   
                                 >
                                     Apply
                                 </Button>
                                 <Button
-                                    variant="flat"
+                                    variant="bordered"
                                     size="sm"
                                     onClick={clearFilters}
                                     className="flex-1"
@@ -764,31 +783,31 @@ const LeaveManagement = () => {
 
                                                     {/* Show approve/reject buttons based on role and permissions */}
                                                     {leave.status === 'pending' && (
-                                                        currentUser?.role === 'admin' || 
-                                                        currentUser?.role === 'manager' || 
+                                                        currentUser?.role === 'admin' ||
+                                                        currentUser?.role === 'manager' ||
                                                         (currentUser?.role === 'department_head' && leave.department?._id === currentUser?.department)
                                                     ) && (
-                                                        <>
-                                                            <Button
-                                                                size="sm"
-                                                                color="success"
-                                                                variant="light"
-                                                                startContent={<CheckCircle size={14} />}
-                                                                onClick={() => handleApprovalAction(leave, 'approve')}
-                                                            >
-                                                                Approve
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                color="danger"
-                                                                variant="light"
-                                                                startContent={<XCircle size={14} />}
-                                                                onClick={() => handleApprovalAction(leave, 'reject')}
-                                                            >
-                                                                Reject
-                                                            </Button>
-                                                        </>
-                                                    )}
+                                                            <>
+                                                                <Button
+                                                                    size="sm"
+                                                                    color="success"
+                                                                    variant="light"
+                                                                    startContent={<CheckCircle size={14} />}
+                                                                    onClick={() => handleApprovalAction(leave, 'approve')}
+                                                                >
+                                                                    Approve
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    color="danger"
+                                                                    variant="light"
+                                                                    startContent={<XCircle size={14} />}
+                                                                    onClick={() => handleApprovalAction(leave, 'reject')}
+                                                                >
+                                                                    Reject
+                                                                </Button>
+                                                            </>
+                                                        )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -888,7 +907,7 @@ const LeaveManagement = () => {
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
-                
+
             </div>
         </AdminLayout>
     )

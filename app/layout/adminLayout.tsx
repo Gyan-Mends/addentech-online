@@ -371,12 +371,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                             </div>
                                         </Link>
                                         
-                                        <Link to="/employee-leave-balance">
+                                        {/* <Link to="/employee-leave-balance">
                                             <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
                                                 <CheckSquare className="h-3 w-3" />
                                                 Leave Balance
                                             </div>
-                                        </Link>
+                                        </Link> */}
                                         
                                         {["admin", "manager"].includes(userRole) && (
                                             <Link to="/admin/leave-policies">
@@ -387,14 +387,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                             </Link>
                                         )}
                                         
-                                        {["admin", "manager"].includes(userRole) && (
-                                            <Link to="/admin/leave-reminders">
-                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                    <Bell className="h-3 w-3" />
-                                                    Leave Reminders
-                                                </div>
-                                            </Link>
-                                        )}
+                                      
                                     </div>
                                 </div>
                             </div>

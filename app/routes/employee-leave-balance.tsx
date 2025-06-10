@@ -138,17 +138,10 @@ export default function EmployeeLeaveBalance() {
                 <div className="flex justify-between items-start">
                     <div>
                         <h1 className="text-3xl font-bold">My Leave Balance</h1>
-                        <p className="text-gray-600 mt-2">
-                            Track your leave allowances and usage for {selectedYear}
-                        </p>
-                        {user && (
-                            <p className="text-sm text-gray-500 mt-1">
-                                {user.name} • {user.position}
-                            </p>
-                        )}
+                       
                     </div>
                     <div className="flex gap-3">
-                        <Select
+                        {/* <Select
                             size="sm"
                             selectedKeys={[selectedYear]}
                             onSelectionChange={(keys) => setSelectedYear(Array.from(keys)[0] as string)}
@@ -159,11 +152,12 @@ export default function EmployeeLeaveBalance() {
                                     {year}
                                 </SelectItem>
                             ))}
-                        </Select>
+                        </Select> */}
                         <Link to="/employee-leave-application">
                             <Button
-                                color="primary"
+                                className="bg-pink-500 text-white shadow-sm"
                                 startContent={<Plus size={16} />}
+
                             >
                                 Apply for Leave
                             </Button>

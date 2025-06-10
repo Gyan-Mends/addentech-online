@@ -39,6 +39,35 @@ export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
 
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Memorandum | Addentech" },
+        {
+            name: "description",
+            content: "Manage organizational memorandums.",
+        },
+        {
+            name: "author",
+            content: "MendsGyan",
+        },
+        { name: "og:title", content: "Addentech" },
+        {
+            name: "og:description",
+            content: "",
+        },
+        {
+            name: "og:image",
+            content:
+                "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
+        },
+        { name: "og:url", content: "https://marry-right.vercel.app" },
+        {
+            name: "keywords",
+            content: "Addentech, Addentech Ghana, Addentech Ghana Limited, memorandum, memo management, document management"
+        },
+    ];
+};
+
 const Users = () => {
     const [isCreateModalOpened, setIsCreateModalOpened] = useState(false);
     const [base64Image, setBase64Image] = useState<any>();
@@ -577,7 +606,7 @@ const Users = () => {
                         <input name="emailCheck" type="hidden" value="on" />
 
                         <div className="flex gap-6 mt-6">
-                            <button color="primary" className="font-montserrat w-40">Send Memo</button>
+                            <button  className="font-montserrat w-40 !bg-pink-500 text-white py-2 rounded-md">Send Memo</button>
                         </div>
 
                         <input name="intent" value="create" type="hidden" />
@@ -889,7 +918,7 @@ const Users = () => {
                         <input name="emailCheck" type="hidden" value="on" />
 
                         <div className="flex gap-6 mt-6">
-                            <button color="primary" className="font-montserrat w-40">Update Memo</button>
+                            <button color="primary" className="font-montserrat w-40 !bg-pink-500 text-white py-2 rounded-md">Update Memo</button>
                         </div>
 
                         <input name="intent" value="update" type="hidden" />
@@ -1058,32 +1087,3 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ departments, memos, totalPages, users, currentUser, currentPage: page });
 };
 
-export const meta: MetaFunction = () => {
-    return [
-        { title: "Memorandum | Point of Sale" },
-        {
-            name: "description",
-            content: "Manage organizational memorandums.",
-        },
-        {
-            name: "author",
-            content: "MendsGyan",
-        },
-        { name: "og:title", content: "Point of Sale" },
-        {
-            name: "og:description",
-            content: "",
-        },
-        {
-            name: "og:image",
-            content:
-                "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
-        },
-        { name: "og:url", content: "https://marry-right.vercel.app" },
-        {
-            name: "keywords",
-            content:
-                "point of sales in Ghana, online shops, sales, e-commerce",
-        },
-    ];
-};

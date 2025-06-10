@@ -363,19 +363,7 @@ export default function LeaveCalendar() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Leave Calendar
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
-            {isAdmin 
-              ? "View team leave schedule and availability" 
-              : isDepartmentHead 
-                ? "View department leave schedule and availability"
-                : "View your leave schedule"
-            }
-          </p>
-          {currentUser && (
-            <p className="text-gray-600 mt-1">
-              Welcome, {currentUser.firstName} {currentUser.lastName} | Role: {currentUser.role}
-            </p>
-          )}
+         
         </div>
       </div>
 
@@ -388,56 +376,7 @@ export default function LeaveCalendar() {
         </div>
       )}
 
-      {/* Team Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600">
-          <CardBody className="p-4">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <p className="text-sm opacity-90">Total Team</p>
-                <p className="text-2xl font-bold">{teamStats.totalEmployees}</p>
-              </div>
-              <Users size={24} />
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-red-500 to-red-600">
-          <CardBody className="p-4">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <p className="text-sm opacity-90">On Leave Today</p>
-                <p className="text-2xl font-bold">{teamStats.onLeaveToday}</p>
-              </div>
-              <AlertTriangle size={24} />
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-green-500 to-green-600">
-          <CardBody className="p-4">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <p className="text-sm opacity-90">Upcoming Leaves</p>
-                <p className="text-2xl font-bold">{teamStats.upcomingLeaves}</p>
-              </div>
-              <Calendar size={24} />
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600">
-          <CardBody className="p-4">
-            <div className="flex items-center justify-between text-white">
-              <div>
-                <p className="text-sm opacity-90">Pending Approvals</p>
-                <p className="text-2xl font-bold">{teamStats.pendingApprovals}</p>
-              </div>
-              <Clock size={24} />
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+      
 
       {/* Calendar Controls */}
       <Card>

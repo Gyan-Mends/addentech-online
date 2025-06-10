@@ -117,11 +117,8 @@ export default function LeavePolicies() {
                 )}
 
                 <Card>
-                    <CardHeader>
-                        <h3 className="text-lg font-semibold">Leave Policies</h3>
-                    </CardHeader>
                     <CardBody>
-                        <Table aria-label="Leave policies table">
+                        <Table aria-label="Leave policies table" className="shadow-none border-none">
                             <TableHeader>
                                 <TableColumn>Leave Type</TableColumn>
                                 <TableColumn>Allocation</TableColumn>
@@ -165,17 +162,27 @@ export default function LeavePolicies() {
                                 <h3 className="text-lg font-bold">Create New Policy</h3>
                             </ModalHeader>
                             <ModalBody>
-                                <div className="space-y-4">
+                                <div className="space-y-8">
                                     <input type="hidden" name="_action" value="create" />
                                     
                                     <div className="grid grid-cols-2 gap-4">
                                         <Input
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                             label="Leave Type"
                                             name="leaveType"
                                             isRequired
                                         />
                                         <Input
-                                            label="Default Allocation (days)"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
+                                            label="Default Allocation "
                                             name="defaultAllocation"
                                             type="number"
                                             isRequired
@@ -183,6 +190,11 @@ export default function LeavePolicies() {
                                     </div>
 
                                     <Input
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                         label="Description"
                                         name="description"
                                         isRequired
@@ -190,19 +202,34 @@ export default function LeavePolicies() {
 
                                     <div className="grid grid-cols-3 gap-4">
                                         <Input
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                             label="Max Consecutive Days"
                                             name="maxConsecutiveDays"
                                             type="number"
                                             isRequired
                                         />
                                         <Input
-                                            label="Min Advance Notice (days)"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
+                                            label="Min Advance Notice "
                                             name="minAdvanceNotice"
                                             type="number"
                                             isRequired
                                         />
                                         <Input
-                                            label="Max Advance Booking (days)"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
+                                            label="Max Advance Booking "
                                             name="maxAdvanceBooking"
                                             type="number"
                                             defaultValue="365"
@@ -215,6 +242,11 @@ export default function LeavePolicies() {
                                             Allow Carry Forward
                                         </Switch>
                                         <Input
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                             label="Carry Forward Limit"
                                             name="carryForwardLimit"
                                             type="number"
@@ -231,12 +263,22 @@ export default function LeavePolicies() {
                                         <h4 className="font-medium mb-3">Approval Workflow Limits</h4>
                                         <div className="grid grid-cols-2 gap-4">
                                             <Input
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                            }}
                                                 label="Manager Max Days"
                                                 name="managerMaxDays"
                                                 type="number"
                                                 defaultValue="30"
                                             />
                                             <Input
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                            }}
                                                 label="Dept Head Max Days"
                                                 name="deptHeadMaxDays"
                                                 type="number"
