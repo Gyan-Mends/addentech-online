@@ -21,6 +21,8 @@ import {
     CalendarDays,
     CheckSquare,
     ChevronDown,
+    ChevronLeft,
+    ChevronRight,
     Clock,
     FileText,
     Folder,
@@ -130,7 +132,8 @@ const navItems: NavItem[] = [
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Start closed on mobile
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile overlay toggle
+    const [isCollapsed, setIsCollapsed] = useState(false); // Desktop sidebar collapse toggle
     const [userRole, setUserRole] = useState<string>("staff");
     const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
     const [isLeaveDropdownOpen, setIsLeaveDropdownOpen] = useState(false);
@@ -141,6 +144,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
     // Function to handle accordion toggle with scroll
     const handleLeaveAccordionToggle = () => {
+        if (isCollapsed) return; // Don't open dropdowns in collapsed mode
         setIsLeaveDropdownOpen(!isLeaveDropdownOpen);
         
         // If opening, scroll to make content visible after animation
@@ -159,6 +163,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
     // Function to handle task accordion toggle with scroll
     const handleTaskAccordionToggle = () => {
+        if (isCollapsed) return; // Don't open dropdowns in collapsed mode
         setIsTaskDropdownOpen(!isTaskDropdownOpen);
         
         // If opening, scroll to make content visible after animation
@@ -176,7 +181,6 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     };
   
     // Auto-open sidebar on desktop
-    // Auto-open sidebar on desktop
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 768) {
@@ -193,7 +197,15 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    // Fetch user role and permissions from session
+
+    // Close dropdowns when sidebar is collapsed
+    useEffect(() => {
+        if (isCollapsed) {
+            setIsLeaveDropdownOpen(false);
+            setIsTaskDropdownOpen(false);
+        }
+    }, [isCollapsed]);
+
     // Fetch user role and permissions from session
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -240,15 +252,33 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             
             {/* Sidebar */}
             <div
-                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}  w-64 bg-white transition-transform duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0`}
+                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} ${isCollapsed ? "w-16" : "w-64"} bg-white transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0`}
             >
                 <div className="flex items-center justify-between p-4 border-b border-b-white/20">
                     <div className="flex items-center">
-
-                        <span className="ml-2 text-xl font-bold ">
-                            Addentech
-                        </span>
+                        {!isCollapsed && (
+                            <span className="ml-2 text-xl font-bold ">
+                                Addentech
+                            </span>
+                        )}
+                        {isCollapsed && (
+                            <span className="text-xl font-bold text-pink-500">
+                                A
+                            </span>
+                        )}
                     </div>
+                    
+                    {/* Desktop collapse toggle */}
+                    <Button
+                        variant="ghost"
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="hidden md:flex"
+                        size="sm"
+                    >
+                        {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                    </Button>
+                    
+                    {/* Mobile close button */}
                     <Button
                         variant="ghost"
                         onClick={() => setIsSidebarOpen(false)}
@@ -257,7 +287,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
-                                <div 
+                
+                <div 
                     className="flex flex-col flex-1 px-2 py-4 space-y-6 overflow-y-auto"
                     style={{
                         scrollbarWidth: 'thin',
@@ -280,9 +311,10 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             })
                             .map((item, index) => (
                                 <Link key={index} to={item.to}>
-                                    <li className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm">
+                                    <li className={`hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm ${isCollapsed ? 'justify-center' : ''}`}
+                                        title={isCollapsed ? item.label : ''}>
                                         {item.icon}
-                                        {item.label}
+                                        {!isCollapsed && item.label}
                                     </li>
                                 </Link>
                             ))
@@ -292,46 +324,53 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         {["admin", "department_head", "manager", "staff"].includes(userRole) && (
                             <div data-task-accordion>
                                 <li 
-                                    className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer"
+                                    className={`hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}
                                     onClick={handleTaskAccordionToggle}
+                                    title={isCollapsed ? 'Task Management' : ''}
                                 >
                                     <CheckSquare className="h-4 w-4 hover:text-white text-pink-500" />
-                                    Task Management
-                                    <ChevronDown className={`h-3 w-3 ml-auto transition-transform duration-200 ${isTaskDropdownOpen ? 'rotate-180' : ''}`} />
+                                    {!isCollapsed && (
+                                        <>
+                                            Task Management
+                                            <ChevronDown className={`h-3 w-3 ml-auto transition-transform duration-200 ${isTaskDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </>
+                                    )}
                                 </li>
                                 
-                                {/* Submenu */}
-                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isTaskDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                    <div className="ml-6 mt-2 space-y-1">
-                                        <Link to="/admin/task-management">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <LayoutDashboard className="h-3 w-3" />
-                                                Task Dashboard
-                                            </div>
-                                        </Link>
-                                        
-                                        <Link to="/admin/task-create">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <FileText className="h-3 w-3" />
-                                                Create Task
-                                            </div>
-                                        </Link>
-                                        
-                                        <Link to="/admin/enhanced-tasks">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <CheckSquare className="h-3 w-3" />
-                                                Enhanced Tasks
-                                            </div>
-                                        </Link>
-                                        
-                                        <Link to="/admin/task-details">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <FileText className="h-3 w-3" />
-                                                Task Details
-                                            </div>
-                                        </Link>
+                                {/* Submenu - only show when not collapsed */}
+                                {!isCollapsed && (
+                                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isTaskDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                        <div className="ml-6 mt-2 space-y-1">
+                                            <Link to="/admin/task-management">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <LayoutDashboard className="h-3 w-3" />
+                                                    Task Dashboard
+                                                </div>
+                                            </Link>
+                                            
+                                            <Link to="/admin/task-create">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <FileText className="h-3 w-3" />
+                                                    Create Task
+                                                </div>
+                                            </Link>
+                                            
+                                            <Link to="/admin/enhanced-tasks">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <CheckSquare className="h-3 w-3" />
+                                                    Enhanced Tasks
+                                                </div>
+                                            </Link>
+                                            
+                                            <Link to="/admin/task-details">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <FileText className="h-3 w-3" />
+                                                    Task Details
+                                                </div>
+                                            </Link>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         )}
                         
@@ -339,72 +378,79 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         {["admin", "manager", "department_head", "staff"].includes(userRole) && (
                             <div data-leave-accordion>
                                 <li 
-                                    className="hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer"
+                                    className={`hover:bg-pink-100 py-3 hover:border-r-4 hover:border-r-pink-500 hover:bg-opacity-50 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-sm cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}
                                     onClick={handleLeaveAccordionToggle}
+                                    title={isCollapsed ? 'Leave Management' : ''}
                                 >
                                     <CalendarDays className="h-4 w-4 hover:text-white text-pink-500" />
-                                    Leave Management
-                                    <ChevronDown className={`h-3 w-3 ml-auto transition-transform duration-200 ${isLeaveDropdownOpen ? 'rotate-180' : ''}`} />
+                                    {!isCollapsed && (
+                                        <>
+                                            Leave Management
+                                            <ChevronDown className={`h-3 w-3 ml-auto transition-transform duration-200 ${isLeaveDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </>
+                                    )}
                                 </li>
                                 
-                                {/* Submenu */}
-                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isLeaveDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                    <div className="ml-6 mt-2 space-y-1">
-                                        <Link to="/admin/leave-management">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <LayoutDashboard className="h-3 w-3" />
-                                                Leave Dashboard
-                                            </div>
-                                        </Link>
-                                        
-                                        <Link to="/employee-leave-application">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <FileText className="h-3 w-3" />
-                                                Apply for Leave
-                                            </div>
-                                        </Link>
-                                        
-                                        <Link to="/admin/team-calendar">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <Calendar className="h-3 w-3" />
-                                                Team Calendar
-                                            </div>
-                                        </Link>
-                                        
-                                        {/* <Link to="/employee-leave-balance">
-                                            <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                <CheckSquare className="h-3 w-3" />
-                                                Leave Balance
-                                            </div>
-                                        </Link> */}
-                                        
-                                        {["admin", "manager"].includes(userRole) && (
-                                            <Link to="/admin/leave-policies">
+                                {/* Submenu - only show when not collapsed */}
+                                {!isCollapsed && (
+                                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isLeaveDropdownOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                        <div className="ml-6 mt-2 space-y-1">
+                                            <Link to="/admin/leave-management">
                                                 <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
-                                                    <Settings className="h-3 w-3" />
-                                                    Leave Policies
+                                                    <LayoutDashboard className="h-3 w-3" />
+                                                    Leave Dashboard
                                                 </div>
                                             </Link>
-                                        )}
-                                        
-                                      
+                                            
+                                            <Link to="/employee-leave-application">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <FileText className="h-3 w-3" />
+                                                    Apply for Leave
+                                                </div>
+                                            </Link>
+                                            
+                                            <Link to="/admin/team-calendar">
+                                                <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                    <Calendar className="h-3 w-3" />
+                                                    Team Calendar
+                                                </div>
+                                            </Link>
+                                            
+                                            {["admin", "manager"].includes(userRole) && (
+                                                <Link to="/admin/leave-policies">
+                                                    <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-pink-50 hover:text-pink-600 transition-colors duration-200">
+                                                        <Settings className="h-3 w-3" />
+                                                        Leave Policies
+                                                    </div>
+                                                </Link>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         )}
                     </ul>
+                    
                     <Divider className="" />
+                    
                     <div className="mt-6">
-                        <h3 className="text-xs font-semibold text-muted-foreground mb-2">
-                            ACCOUNT
-                        </h3>
-                        <Button variant="ghost" className="w-full justify-start mb-2">
-                            <Settings className="mr-2 h-4 w-4" />
-                            Settings
+                        {!isCollapsed && (
+                            <h3 className="text-xs font-semibold text-muted-foreground mb-2">
+                                ACCOUNT
+                            </h3>
+                        )}
+                        <Button 
+                            variant="ghost" 
+                            className={`w-full mb-2 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}
+                            title={isCollapsed ? 'Settings' : ''}
+                        >
+                            <Settings className="h-4 w-4" />
+                            {!isCollapsed && <span className="ml-2">Settings</span>}
                         </Button>
                         <Button 
                             variant="ghost" 
-                            className="w-full justify-start text-red-500 hover:text-red-700"
+                            className={`w-full text-red-500 hover:text-red-700 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}
+                            title={isCollapsed ? 'Logout' : ''}
                             onClick={() => {
                                 // Logout functionality
                                 fetch("/api/logout", { method: "POST" })
@@ -412,19 +458,18 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                     .catch(err => console.error("Logout failed:", err));
                             }}
                         >
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Logout
+                            <LogOut className="h-4 w-4" />
+                            {!isCollapsed && <span className="ml-2">Logout</span>}
                         </Button>
                     </div>
                 </div>
-
-               
             </div>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden h-full">
                 <header className="h-16 bg-white shadow-b-md flex items-center justify-between px-4 sm:px-6">
                     <div className="flex items-center space-x-2">
+                        {/* Mobile menu toggle */}
                         <Button
                             variant="ghost"
                             onClick={() => setIsSidebarOpen(true)}
