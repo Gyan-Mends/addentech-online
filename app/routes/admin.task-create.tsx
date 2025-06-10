@@ -259,13 +259,7 @@ const TaskCreate = () => {
 
                 {/* Header */}
                 <div className="flex items-center gap-4">
-                    <Button
-                        variant="light"
-                        startContent={<ArrowLeft size={16} />}
-                        onClick={() => navigate('/admin/task-management')}
-                    >
-                        Back to Tasks
-                    </Button>
+                  
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             Create New Task
@@ -304,6 +298,11 @@ const TaskCreate = () => {
                                 <CardBody className="space-y-4">
                                     <Input
                                         name="title"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                         label="Task Title"
                                         placeholder="Enter task title"
                                         value={title}
@@ -315,6 +314,11 @@ const TaskCreate = () => {
                                     
                                     <Textarea
                                         name="description"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                         label="Description"
                                         placeholder="Describe the task in detail"
                                         value={description}
@@ -328,6 +332,11 @@ const TaskCreate = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <Select
                                             name="priority"
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                trigger: "font-nunito bg-white border border-black/20",
+                                            }}
                                             label="Priority"
                                             selectedKeys={[priority]}
                                             onSelectionChange={(keys) => setPriority(Array.from(keys)[0] as string)}
@@ -340,6 +349,11 @@ const TaskCreate = () => {
                                         
                                         <Input
                                             name="category"
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                            }}
                                             label="Category"
                                             placeholder="e.g., Development, Marketing"
                                             value={category}
@@ -355,9 +369,14 @@ const TaskCreate = () => {
                                 <CardHeader>
                                     <h3 className="text-lg font-semibold">Assignment & Department</h3>
                                 </CardHeader>
-                                <CardBody className="space-y-4">
+                                <CardBody className="space-y-10">
                                     <Select
                                         name="department"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            trigger: "font-nunito bg-white border border-black/20",
+                                        }}
                                         label="Department"
                                         selectedKeys={selectedDepartment ? [selectedDepartment] : []}
                                         onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
@@ -374,6 +393,11 @@ const TaskCreate = () => {
                                     </Select>
 
                                     <Select
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            trigger: "font-nunito bg-white border border-black/20",
+                                        }}
                                         label="Assign To Department Heads"
                                         selectionMode="multiple"
                                         selectedKeys={assignedTo}
@@ -399,10 +423,15 @@ const TaskCreate = () => {
                                 <CardHeader>
                                     <h3 className="text-lg font-semibold">Timeline</h3>
                                 </CardHeader>
-                                <CardBody className="space-y-4">
+                                <CardBody className="space-y-10">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <Input
                                             type="date"
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                            }}
                                             label="Start Date (Optional)"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
@@ -412,6 +441,11 @@ const TaskCreate = () => {
                                         <Input
                                             name="dueDate"
                                             type="date"
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                            }}
                                             label="Due Date"
                                             value={dueDate}
                                             onChange={(e) => setDueDate(e.target.value)}
@@ -424,6 +458,11 @@ const TaskCreate = () => {
                                     
                                     <Input
                                         type="number"
+                                        labelPlacement="outside"
+                                        classNames={{
+                                            label: "font-nunito text-black",
+                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                        }}
                                         label="Estimated Hours (Optional)"
                                         placeholder="0"
                                         value={estimatedHours}
@@ -443,6 +482,11 @@ const TaskCreate = () => {
                                 <CardBody className="space-y-4">
                                     <div className="flex gap-2">
                                         <Input
+                                            labelPlacement="outside"
+                                            classNames={{
+                                                label: "font-nunito text-black",
+                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                            }}
                                             placeholder="Add a tag"
                                             value={currentTag}
                                             onValueChange={setCurrentTag}
