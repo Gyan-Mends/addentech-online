@@ -87,14 +87,18 @@ const Users = () => {
         memos,
         totalPages,
         users,
-        currentUser
+        currentUser,
+        currentPage
     } = useLoaderData<{
         departments: DepartmentInterface[]
         users: RegistrationInterface[]
         memos: MemoInterface[]
         totalPages: number
         currentUser: RegistrationInterface
+        currentPage: number
     }>()
+
+
 
     useEffect(() => {
         if (actionData) {
@@ -115,8 +119,28 @@ const Users = () => {
 
     // Filter users by department when to department changes
     useEffect(() => {
-        if (toDepartmentValue) {
-            const filteredUsers = users.filter(user => user.department === toDepartmentValue);
+        console.log('=== TO DEPARTMENT FILTERING DEBUG ===');
+        console.log('toDepartmentValue:', toDepartmentValue);
+        console.log('users array length:', users?.length || 0);
+        console.log('users sample:', users?.slice(0, 2));
+        
+        if (toDepartmentValue && users) {
+            const filteredUsers = users.filter(user => {
+                // Handle both cases: department as object or as string ID
+                const userDeptId = typeof user.department === 'object' 
+                    ? (user.department as DepartmentInterface)?._id 
+                    : user.department;
+                
+                console.log(`User: ${user.firstName} ${user.lastName}`);
+                console.log('  - user.department:', user.department);
+                console.log('  - typeof user.department:', typeof user.department);
+                console.log('  - userDeptId extracted:', userDeptId);
+                console.log('  - toDepartmentValue:', toDepartmentValue);
+                console.log('  - Match?', userDeptId === toDepartmentValue);
+                
+                return userDeptId === toDepartmentValue;
+            });
+            console.log('Filtered users result:', filteredUsers);
             setToUsers(filteredUsers);
         } else {
             setToUsers([]);
@@ -126,8 +150,15 @@ const Users = () => {
 
     // Filter users by department when cc department changes
     useEffect(() => {
-        if (ccDepartmentValue) {
-            const filteredUsers = users.filter(user => user.department === ccDepartmentValue);
+        if (ccDepartmentValue && users) {
+            const filteredUsers = users.filter(user => {
+                // Handle both cases: department as object or as string ID
+                const userDeptId = typeof user.department === 'object' 
+                    ? (user.department as DepartmentInterface)?._id 
+                    : user.department;
+                
+                return userDeptId === ccDepartmentValue;
+            });
             setCcUsers(filteredUsers);
         } else {
             setCcUsers([]);
@@ -241,7 +272,7 @@ const Users = () => {
                     columns={MemoColumns}
                     loadingState={navigation.state === "loading" ? "loading" : "idle"}
                     totalPages={totalPages}
-                    page={1}
+                    page={currentPage}
                     setPage={(page) => (
                         navigate(`?page=${page}`)
                     )}>
@@ -1024,7 +1055,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         search_term,
     });
 
-    return json({ departments, memos, totalPages, users, currentUser });
+    return json({ departments, memos, totalPages, users, currentUser, currentPage: page });
 };
 
 export const meta: MetaFunction = () => {
