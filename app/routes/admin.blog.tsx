@@ -313,7 +313,8 @@ const Users = () => {
 
             <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Blog" fullscreen={true}>
                 <Form method="post" className="flex flex-col gap-4 p-4 lg:px-80">
-                    <CustomInput
+                   <div className="grid grid-cols-2 gap-4 w-full">
+                   <CustomInput
                         label="Title"
                         isRequired
                         isClearable
@@ -346,6 +347,7 @@ const Users = () => {
                         </Select>
 
                     </div>
+                   </div>
 
                     <div>
                         <label htmlFor="" className="font-nunito">Subject</label>
