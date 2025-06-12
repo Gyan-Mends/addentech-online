@@ -269,14 +269,14 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     </div>
                     
                     {/* Desktop collapse toggle */}
-                    <Button
+                    {/* <Button
                         variant="ghost"
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         className="hidden md:flex"
                         size="sm"
                     >
                         {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-                    </Button>
+                    </Button> */}
                     
                     {/* Mobile close button */}
                     <Button
@@ -439,14 +439,16 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                 ACCOUNT
                             </h3>
                         )}
-                        <Button 
-                            variant="ghost" 
-                            className={`w-full mb-2 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}
-                            title={isCollapsed ? 'Settings' : ''}
-                        >
-                            <Settings className="h-4 w-4" />
-                            {!isCollapsed && <span className="ml-2">Settings</span>}
-                        </Button>
+                        <Link to="/admin/settings">
+                            <Button 
+                                variant="ghost" 
+                                className={`w-full mb-2 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}
+                                title={isCollapsed ? 'Settings' : ''}
+                            >
+                                <Settings className="h-4 w-4" />
+                                {!isCollapsed && <span className="ml-2">Settings</span>}
+                            </Button>
+                        </Link>
                         <Button 
                             variant="ghost" 
                             className={`w-full text-red-500 hover:text-red-700 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}
@@ -480,6 +482,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         <Button
                             size="sm"
                             className="hidden sm:flex rounded-md text-md h-[35px] shadow-sm hover:bg-pink-300 text-pink-500 bg-pink-200"
+                            onClick={() => navigate(-1)}
                         >
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back
