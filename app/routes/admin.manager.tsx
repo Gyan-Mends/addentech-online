@@ -42,15 +42,15 @@ const ManagerDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 text-white"
+          className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md"
         >
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">{getWelcomeMessage()}</h1>
-              <p className="text-purple-100 mt-1">Manager Dashboard - System Overview</p>
+              <p className="text-pink-100 mt-1">Manager Dashboard - System Overview</p>
             </div>
             <div className="text-right">
-              <p className="text-purple-100 text-sm">Today's Date</p>
+              <p className="text-pink-100 text-sm">Today's Date</p>
               <p className="font-semibold">{new Date().toLocaleDateString()}</p>
             </div>
           </div>
@@ -72,9 +72,8 @@ const ManagerDashboard = () => {
                 as={Link}
                 to="/admin/task-create"
                 variant="flat"
-                color="primary"
                 startContent={<Plus className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Create Task</span>
               </Button>
@@ -82,9 +81,8 @@ const ManagerDashboard = () => {
                 as={Link}
                 to="/admin/users"
                 variant="flat"
-                color="primary"
                 startContent={<Users className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Manage Team</span>
               </Button>
@@ -92,9 +90,8 @@ const ManagerDashboard = () => {
                 as={Link}
                 to="/admin/reports"
                 variant="flat"
-                color="primary"
                 startContent={<FileText className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">View Reports</span>
               </Button>
@@ -102,9 +99,8 @@ const ManagerDashboard = () => {
                 as={Link}
                 to="/admin/attendance"
                 variant="flat"
-                color="primary"
                 startContent={<Clock className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Attendance</span>
               </Button>

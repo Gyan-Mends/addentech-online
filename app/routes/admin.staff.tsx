@@ -42,15 +42,15 @@ const StaffDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white"
+          className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md"
         >
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">{getWelcomeMessage()}</h1>
-              <p className="text-indigo-100 mt-1">Staff Member Dashboard</p>
+              <p className="text-pink-100 mt-1">Staff Member Dashboard</p>
             </div>
             <div className="text-right">
-              <p className="text-indigo-100 text-sm">Today's Date</p>
+              <p className="text-pink-100 text-sm">Today's Date</p>
               <p className="font-semibold">{new Date().toLocaleDateString()}</p>
             </div>
           </div>
@@ -72,9 +72,8 @@ const StaffDashboard = () => {
                 as={Link}
                 to="/admin/task-management"
                 variant="flat"
-                color="primary"
                 startContent={<CheckSquare className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">My Tasks</span>
               </Button>
@@ -82,9 +81,8 @@ const StaffDashboard = () => {
                 as={Link}
                 to="/employee-leave-application"
                 variant="flat"
-                color="primary"
                 startContent={<Calendar className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Apply Leave</span>
               </Button>
@@ -92,9 +90,8 @@ const StaffDashboard = () => {
                 as={Link}
                 to="/admin/attendance"
                 variant="flat"
-                color="primary"
                 startContent={<Clock className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">My Attendance</span>
               </Button>
@@ -102,9 +99,8 @@ const StaffDashboard = () => {
                 as={Link}
                 to="/team"
                 variant="flat"
-                color="primary"
                 startContent={<Activity className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Team</span>
               </Button>

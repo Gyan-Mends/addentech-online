@@ -44,15 +44,15 @@ const DepartmentHeadDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl p-6 text-white"
+          className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md"
         >
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">{getWelcomeMessage()}</h1>
-              <p className="text-green-100 mt-1">Department Head - {departmentName}</p>
+              <p className="text-pink-100 mt-1">Department Head - {departmentName}</p>
             </div>
             <div className="text-right">
-              <p className="text-green-100 text-sm">Today's Date</p>
+              <p className="text-pink-100 text-sm">Today's Date</p>
               <p className="font-semibold">{new Date().toLocaleDateString()}</p>
             </div>
           </div>
@@ -74,9 +74,8 @@ const DepartmentHeadDashboard = () => {
                 as={Link}
                 to="/admin/task-management"
                 variant="flat"
-                color="primary"
                 startContent={<CheckSquare className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Department Tasks</span>
               </Button>
@@ -84,9 +83,8 @@ const DepartmentHeadDashboard = () => {
                 as={Link}
                 to="/admin/team-calendar"
                 variant="flat"
-                color="primary"
                 startContent={<Calendar className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Team Calendar</span>
               </Button>
@@ -94,9 +92,8 @@ const DepartmentHeadDashboard = () => {
                 as={Link}
                 to="/admin/reports"
                 variant="flat"
-                color="primary"
                 startContent={<BarChart2 className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Department Reports</span>
               </Button>
@@ -104,9 +101,8 @@ const DepartmentHeadDashboard = () => {
                 as={Link}
                 to="/admin/leave-management"
                 variant="flat"
-                color="primary"
                 startContent={<FileText className="h-4 w-4" />}
-                className="justify-start h-auto p-3"
+                className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
               >
                 <span className="text-xs">Leave Management</span>
               </Button>
