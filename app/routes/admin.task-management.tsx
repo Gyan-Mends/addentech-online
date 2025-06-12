@@ -345,39 +345,41 @@ const TaskManagement = () => {
                 )}
 
                 {/* Header */}
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                            {getPageTitle()}
-                        </h1>
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">
-                            {isStaff && 'View and manage your assigned tasks'}
-                            {canViewDepartmentStats && 'Manage tasks for your department'}
-                            {canViewAllStats && 'Manage all tasks across the organization'}
-                        </p>
-                        {currentUser && (
-                            <p className="text-gray-600 mt-1">
-                                Total Tasks: {total} | Role: {currentUser.role}
+                <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold">
+                                {getPageTitle()}
+                            </h1>
+                            <p className="text-pink-100 mt-2">
+                                {isStaff && 'View and manage your assigned tasks'}
+                                {canViewDepartmentStats && 'Manage tasks for your department'}
+                                {canViewAllStats && 'Manage all tasks across the organization'}
                             </p>
-                        )}
-                    </div>
-                    <div className="flex gap-3">
-                        {canCreateTasks && (
-                            <Link to="/admin/task-create">
-                                <Button
-                                    color="primary"
-                                    startContent={<Plus size={16} />}
-                                >
-                                    New Task
-                                </Button>
-                            </Link>
-                        )}
+                            {currentUser && (
+                                <p className="text-pink-100 mt-1">
+                                    Total Tasks: {total} | Role: {currentUser.role}
+                                </p>
+                            )}
+                        </div>
+                        <div className="flex gap-3">
+                            {canCreateTasks && (
+                                <Link to="/admin/task-create">
+                                    <Button
+                                        startContent={<Plus size={16} />}
+                                        className="bg-white text-pink-600 hover:bg-pink-50 shadow-sm font-semibold"
+                                    >
+                                        New Task
+                                    </Button>
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600">
+                    <Card className="bg-gradient-to-r from-pink-500 to-pink-600 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
@@ -389,7 +391,7 @@ const TaskManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-green-500 to-green-600">
+                    <Card className="bg-gradient-to-r from-green-500 to-green-600 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
@@ -401,7 +403,7 @@ const TaskManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600">
+                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
@@ -413,7 +415,7 @@ const TaskManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-red-500 to-red-600">
+                    <Card className="bg-gradient-to-r from-red-500 to-red-600 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
@@ -425,7 +427,7 @@ const TaskManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-orange-500 to-orange-600">
+                    <Card className="bg-gradient-to-r from-amber-500 to-amber-600 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
@@ -437,7 +439,7 @@ const TaskManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600">
+                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>

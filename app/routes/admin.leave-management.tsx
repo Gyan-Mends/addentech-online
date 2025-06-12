@@ -392,42 +392,43 @@ const LeaveManagement = () => {
                 )}
 
                 {/* Header */}
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                            {getPageTitle()}
-                        </h1>
-                    </div>
-                    <div className="flex gap-3">
-                        <Button
-                            variant="bordered"
-                            startContent={<Download size={16} />}
-                            onClick={exportToCSV}
-                            className="shadow-sm"
-
-                        >
-                            Export CSV
-                        </Button>
-                        {/* Only show New Leave Application for staff, admin, and manager */}
-                        {(currentUser?.role === 'staff' || currentUser?.role === 'admin' || currentUser?.role === 'manager') && (
-                            <Link to="/employee-leave-application">
-                                <Button
-
-                                    startContent={<Plus size={16} />}
-                                    className="text-white bg-pink-500 shadow-sm"
-                                >
-                                    New Leave Application
-                                </Button>
-                            </Link>
-                        )}
+                <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold">
+                                {getPageTitle()}
+                            </h1>
+                            <p className="text-pink-100 mt-1">Manage leave applications and approvals</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <Button
+                                variant="bordered"
+                                startContent={<Download size={16} />}
+                                onClick={exportToCSV}
+                                className="bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
+                            >
+                                Export CSV
+                            </Button>
+                            {/* Only show New Leave Application for staff, admin, and manager */}
+                            {(currentUser?.role === 'staff' || currentUser?.role === 'admin' || currentUser?.role === 'manager') && (
+                                <Link to="/employee-leave-application">
+                                    <Button
+                                        startContent={<Plus size={16} />}
+                                        className="bg-white text-pink-600 hover:bg-pink-50 shadow-sm font-semibold"
+                                    >
+                                        New Leave Application
+                                    </Button>
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <Card className="white border border-black/20 shadow-sm">
+                    <Card className="bg-gradient-to-r from-pink-500 to-pink-600 shadow-md">
                         <CardBody className="px-4">
-                            <div className="flex items-center justify-between ">
+                            <div className="flex items-center justify-between text-white">
                                 <div>
                                     <p className="text-sm opacity-90 font-nunito">Total Applications</p>
                                     <p className="text-2xl font-bold font-nunito">{(stats as any)?.totalApplications || 0}</p>
@@ -437,9 +438,9 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="border border-black/20 bg-white shadow-sm">
+                    <Card className="bg-gradient-to-r from-amber-500 to-amber-600 shadow-md">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between font-nunito">
+                            <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
                                     <p className="text-sm opacity-90">Pending Approvals</p>
                                     <p className="text-2xl font-bold font-nunito">{(stats as any)?.pendingApprovals || 0}</p>
@@ -449,9 +450,9 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="border border-black/20 bg-white shadow-sm">
+                    <Card className="bg-gradient-to-r from-green-500 to-green-600 shadow-md">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between font-nunito">
+                            <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
                                     <p className="text-sm opacity-90 font-nunito">Approved This Month</p>
                                     <p className="text-2xl font-bold font-nunito">{(stats as any)?.approvedThisMonth || 0}</p>
@@ -461,9 +462,9 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="border border-black/20 bg-white shadow-sm">
+                    <Card className="bg-gradient-to-r from-red-500 to-red-600 shadow-md">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between font-nunito">
+                            <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
                                     <p className="text-sm opacity-90 font-nunito">Rejected This Month</p>
                                     <p className="text-2xl font-bold font-nunito">{(stats as any)?.rejectedThisMonth || 0}</p>
@@ -473,9 +474,9 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="border border-black/20 bg-white shadow-sm">
+                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600 shadow-md">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between font-nunito">
+                            <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
                                     <p className="text-sm opacity-90 font-nunito">Upcoming Leaves</p>
                                     <p className="text-2xl font-bold font-nunito">{(stats as any)?.upcomingLeaves || 0}</p>
@@ -485,9 +486,9 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
 
-                    <Card className="border border-black/20 bg-white shadow-sm">
+                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600 shadow-md">
                         <CardBody className="p-4">
-                            <div className="flex items-center justify-between font-nunito">
+                            <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
                                     <p className="text-sm opacity-90 font-nunito">On Leave Today</p>
                                     <p className="text-2xl font-bold font-nunito">{(stats as any)?.onLeaveToday || 0}</p>
