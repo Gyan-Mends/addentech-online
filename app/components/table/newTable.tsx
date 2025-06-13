@@ -32,9 +32,9 @@ export default function NewCustomTable(
                 classNames={{
                     base: "h-[68vh] overflow-y-auto w-full overflow-x-auto shadow-none",
                     wrapper:
-                        "dark:bg-default-50 !bg-white vertical-scrollbar horizontal-scrollbar !border min-w-full",
-                    th: "dark: ",
-                    td: "font-nunito text-xs text-slate-500 dark:text-slate-200 whitespace-nowrap",
+                        "bg-dashboard-secondary vertical-scrollbar horizontal-scrollbar !border border-white/10 min-w-full",
+                    th: "bg-dashboard-primary",
+                    td: "font-nunito text-xs text-dashboard-secondary whitespace-nowrap",
                 }}
             >
                 <TableHeader className="" >

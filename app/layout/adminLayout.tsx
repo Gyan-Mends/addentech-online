@@ -251,7 +251,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
             {/* Sidebar */}
             <div
-                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} ${isCollapsed ? "w-16" : "w-64"} transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0 bg-sidebar`}
+                className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} ${isCollapsed ? "w-16" : "w-64"} transition-all duration-300 ease-in-out flex flex-col z-30 fixed h-full md:relative md:translate-x-0 bg-color-dark-2`}
             >
                 <div className="flex items-center justify-between p-4 border-b border-dashboard">
                     <div className="flex items-center">
@@ -276,6 +276,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     className="flex flex-col flex-1 px-2 py-4 space-y-6 overflow-y-auto"
                     style={{
                         scrollbarWidth: 'thin',
+                        msOverflowStyle: 'none',
+                        scrollbarColor: 'transparent transparent'
                     }}
                 >
                     <ul className="flex flex-col space-y-1">
@@ -295,7 +297,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             })
                             .map((item, index) => (
                                 <Link key={index} to={item.to}>
-                                    <li className={`bg-sidebar-item hover:bg-sidebar-item-active py-3 hover:border-r-4 hover:border-r-blue-500 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-dashboard-secondary hover:text-dashboard-primary text-sm ${isCollapsed ? 'justify-center' : ''}`}
+                                    <li className={`bg-sidebar-item hover:bg-sidebar-item-active py-2 hover:border-r-4 hover:border-r-blue-500 font-nunito p-1 rounded-lg hover:rounded-r-lg flex items-center gap-2 transition-all duration-300 ease-in-out  hover:text-dashboard-primary dark-text text-sm ${isCollapsed ? 'justify-center' : ''}`}
                                         title={isCollapsed ? item.label : ''}>
                                         {item.icon}
                                         {!isCollapsed && item.label}
@@ -394,13 +396,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
                 {/* Collapse Toggle Button */}
                 <div className="p-4 border-t border-dashboard">
-                    <Button
-                        variant="ghost"
+                    <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="w-full justify-center text-dashboard-secondary hover:text-dashboard-primary"
+                        className="w-full justify-center text-dashboard-secondary hover:text-dashboard-primary bg-transparent border-none"
                     >
                         {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-                    </Button>
+                    </button>
                 </div>
             </div>
 
@@ -442,7 +443,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             className="w-full"
                             classNames={{
                                 inputWrapper:
-                                    "border hover:bg-gray-50 shadow-sm focus:bg-gray-50 focus:ring-1 focus:ring-pink-500 rounded-md border-black/20 bg-white",
+                                    "border  shadow-sm focus:bg-gray-50 focus:ring-1 focus:ring-pink-500 rounded-md hover:bg-color-dark-2 focus:bg-color-dark-2 ring-0  bg-color-dark-2 border-white/40",
                             }}
                         />
                     </div>
@@ -450,14 +451,14 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     <div className="flex items-center space-x-3">
                         <div className="relative h-10 w-10 rounded-full flex items-center justify-center border border-white/20">
                             <div>
-                                <Bell className="h-5 w-5" />
+                                <Bell className="h-5 w-5 dark-text" />
                                 <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary-400"></span>
                             </div>
                         </div>
                     </div>
                 </header>
 
-                <main className="flex-1 lg:ml-8 overflow-auto p-4  lg:px-10 rounded-lg bg-gray-50 rounded-tl-xl">
+                <main className="flex-1 lg:ml-8 overflow-auto p-4  lg:px-10 rounded-lg  rounded-tl-xl">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-full">
                             <Spinner className="!text-pink-500" size="lg" />

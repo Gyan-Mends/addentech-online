@@ -23,7 +23,7 @@ const Drawer = ({
                 />
             )}
             
-            <div className={`overflow-scroll fixed top-0 ${fullscreen ? 'left-0' : 'right-0'} z-50 h-full bg-white shadow-lg transition-transform transform ${isDrawerOpened ? "translate-x-0" : "translate-x-full"
+            <div className={`overflow-scroll fixed top-0 ${fullscreen ? 'left-0' : 'right-0'} z-50 h-full bg-dashboard-secondary shadow-lg transition-transform transform ${isDrawerOpened ? "translate-x-0" : "translate-x-full"
                 } ${fullscreen ? 'w-full' : 'w-full sm:w-[80vw] md:w-[60vw] lg:w-[40vw] xl:w-[30vw]'} border-l border-l-black/10`}>
                <div className="flex justify-between p-4">
                         <p className="font-montserrat text-lg font-semibold">{title}</p>

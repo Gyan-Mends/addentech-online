@@ -189,7 +189,7 @@ const Admin = () => {
           action={{ label: "Manage Users", href: "/admin/users" }}
         >
           {dashboardData.usersByRole ? (
-            <div className="space-y-3">
+            <div className="space-y-3 !text-white">
               {dashboardData.usersByRole.labels.map((role: string, index: number) => (
                 <div key={role} className="flex items-center justify-between">
                   <span className="text-sm font-medium capitalize">{role}</span>
@@ -629,12 +629,12 @@ const Admin = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 !text-white">
         {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md"
+          className=" rounded-xl bg-color-dark-2 border border-white/10 p-6 text-white shadow-md"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -669,7 +669,7 @@ const Admin = () => {
                   to={action.href}
                   variant="flat"
                   startContent={action.icon}
-                  className="justify-start h-auto p-3 bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
+                  className="justify-start h-auto p-3 text-white  bg-dashboard-secondary border border-white/10  "
                 >
                   <span className="text-xs">{action.label}</span>
                 </Button>

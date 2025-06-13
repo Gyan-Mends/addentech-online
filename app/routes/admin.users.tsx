@@ -163,7 +163,6 @@ const Users = () => {
                     </Button>
                 </div>
                 {/* table  */}
-                <div className="bg-dashboard-secondary rounded-lg border border-dashboard">
                     <NewCustomTable
                         columns={UserColumns}
                         loadingState={navigation.state === "loading" ? "loading" : "idle"}
@@ -227,7 +226,6 @@ const Users = () => {
                         ))}
                     </NewCustomTable>
                 </div>
-            </div>
 
             {/* confirm modal */}
             {/* confirm modal */}
