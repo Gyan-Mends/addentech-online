@@ -91,11 +91,11 @@ const ReportsPage = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 !text-white">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Task Activity Reports</h1>
-                        <p className="text-gray-600 mt-2">
+                        <h1 className="text-3xl font-bold text-white">Task Activity Reports</h1>
+                        <p className="text-gray-300 mt-2">
                             Generate comprehensive reports for departments and individual staff members
                         </p>
                     </div>
@@ -112,7 +112,7 @@ const ReportsPage = () => {
                                 </div>
                                 <div>
                                     <h2 className="text-xl text-white font-semibold">Department Reports</h2>
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-300 text-sm">
                                         View activity and productivity reports by department
                                     </p>
                                 </div>
@@ -127,7 +127,7 @@ const ReportsPage = () => {
                                             <CardBody className="p-4 text-center">
                                                 <Calendar className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                                                 <h3 className="font-semibold text-white">Weekly Reports</h3>
-                                                <p className="text-sm text-gray-600">Current week activity</p>
+                                                <p className="text-sm text-gray-300">Current week activity</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
@@ -136,7 +136,7 @@ const ReportsPage = () => {
                                             <CardBody className="p-4 text-center">
                                                 <BarChart3 className="w-8 h-8 text-green-600 mx-auto mb-2" />
                                                 <h3 className="font-semibold text-white">Monthly Reports</h3>
-                                                <p className="text-sm text-gray-600">Month-by-month breakdown</p>
+                                                <p className="text-sm text-gray-300">Month-by-month breakdown</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
@@ -147,7 +147,7 @@ const ReportsPage = () => {
                                             <CardBody className="p-4 text-center">
                                                 <TrendingUp className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                                                 <h3 className="font-semibold text-white">Quarterly Reports</h3>
-                                                <p className="text-sm text-gray-600">Q1, Q2, Q3, Q4 analysis</p>
+                                                <p className="text-sm text-gray-300">Q1, Q2, Q3, Q4 analysis</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
@@ -156,7 +156,7 @@ const ReportsPage = () => {
                                             <CardBody className="p-4 text-center">
                                                 <Clock className="w-8 h-8 text-orange-600 mx-auto mb-2" />
                                                 <h3 className="font-semibold text-white">Productivity Dashboard</h3>
-                                                <p className="text-sm text-gray-600">Real-time metrics</p>
+                                                <p className="text-sm text-gray-300">Real-time metrics</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
@@ -174,8 +174,8 @@ const ReportsPage = () => {
                                     <FileText className="w-6 h-6 text-green-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-semibold">Individual Staff Reports</h2>
-                                    <p className="text-gray-600 text-sm">
+                                    <h2 className="text-xl font-semibold text-white">Individual Staff Reports</h2>
+                                    <p className="text-gray-300 text-sm">
                                         Track individual performance and activity
                                     </p>
                                 </div>
@@ -186,31 +186,31 @@ const ReportsPage = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <Link to="/admin/reports/staff/weekly">
-                                        <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 border-transparent hover:border-green-200">
+                                        <Card className="cursor-pointer hover:shadow-md bg-dashboard-secondary transition-shadow border border-white/20 hover:border-green-200">
                                             <CardBody className="p-4 text-center">
                                                 <Calendar className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                                                <h3 className="font-semibold">Weekly Reports</h3>
-                                                <p className="text-sm text-gray-600">Individual weekly activity</p>
+                                                <h3 className="font-semibold text-white">Weekly Reports</h3>
+                                                <p className="text-sm text-gray-300">Individual weekly activity</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
                                     <Link to="/admin/reports/staff/monthly">
-                                        <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 border-transparent hover:border-green-200">
+                                        <Card className="cursor-pointer hover:shadow-md bg-dashboard-secondary transition-shadow border border-white/20 hover:border-green-200">
                                             <CardBody className="p-4 text-center">
                                                 <BarChart3 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                                                <h3 className="font-semibold">Monthly Reports</h3>
-                                                <p className="text-sm text-gray-600">Monthly performance tracking</p>
+                                                <h3 className="font-semibold text-white">Monthly Reports</h3>
+                                                <p className="text-sm text-gray-300">Monthly performance tracking</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
                                 </div>
                                 <div className="w-full">
                                     <Link to="/admin/reports/staff/quarterly">
-                                        <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 border-transparent hover:border-green-200">
+                                        <Card className="cursor-pointer hover:shadow-md bg-dashboard-secondary transition-shadow border border-white/20 hover:border-green-200">
                                             <CardBody className="p-4 text-center">
                                                 <TrendingUp className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                                                <h3 className="font-semibold">Quarterly Reports</h3>
-                                                <p className="text-sm text-gray-600">Quarterly performance analysis</p>
+                                                <h3 className="font-semibold text-white">Quarterly Reports</h3>
+                                                <p className="text-sm text-gray-300">Quarterly performance analysis</p>
                                             </CardBody>
                                         </Card>
                                     </Link>
@@ -223,24 +223,24 @@ const ReportsPage = () => {
                 {/* Quick Stats */}
                 <Card className="p-6 bg-dashboard-secondary border border-white/20">
                     <CardHeader>
-                        <h2 className="text-xl font-semibold">Quick Access</h2>
+                        <h2 className="text-xl font-semibold text-white">Quick Access</h2>
                     </CardHeader>
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-blue-50 p-4 rounded-lg">
-                                <h3 className="font-semibold text-blue-800">Available Departments</h3>
-                                <p className="text-2xl font-bold text-blue-600">{departments?.length || 0}</p>
-                                <p className="text-sm text-blue-600">departments to report on</p>
+                            <div className="bg-blue-900/20 border border-blue-700 p-4 rounded-lg">
+                                <h3 className="font-semibold text-blue-300">Available Departments</h3>
+                                <p className="text-2xl font-bold text-blue-400">{departments?.length || 0}</p>
+                                <p className="text-sm text-blue-300">departments to report on</p>
                             </div>
-                            <div className="bg-green-50 p-4 rounded-lg">
-                                <h3 className="font-semibold text-green-800">Staff Members</h3>
-                                <p className="text-2xl font-bold text-green-600">{users?.length || 0}</p>
-                                <p className="text-sm text-green-600">individual reports available</p>
+                            <div className="bg-green-900/20 border border-green-700 p-4 rounded-lg">
+                                <h3 className="font-semibold text-green-300">Staff Members</h3>
+                                <p className="text-2xl font-bold text-green-400">{users?.length || 0}</p>
+                                <p className="text-sm text-green-300">individual reports available</p>
                             </div>
-                            <div className="bg-purple-50 p-4 rounded-lg">
-                                <h3 className="font-semibold text-purple-800">Current Year</h3>
-                                <p className="text-2xl font-bold text-purple-600">{currentYear}</p>
-                                <p className="text-sm text-purple-600">reporting year</p>
+                            <div className="bg-purple-900/20 border border-purple-700 p-4 rounded-lg">
+                                <h3 className="font-semibold text-purple-300">Current Year</h3>
+                                <p className="text-2xl font-bold text-purple-400">{currentYear}</p>
+                                <p className="text-sm text-purple-300">reporting year</p>
                             </div>
                         </div>
                     </CardBody>
