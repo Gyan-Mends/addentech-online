@@ -707,10 +707,10 @@ export default function AttendancePage() {
           </Form>
         </div>
         
-        {/* Work Mode Management (Admins and Managers only) */}
-        {loaderData.isAdmin && (
-          <div className="mb-8 p-4 border border-white/10 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-white mb-4">Manage Work Modes</h2>
+                 {/* Work Mode Management (Admins and Managers only) */}
+         {loaderData.isAdmin && (
+           <div className="mb-8 p-4 bg-dashboard-secondary border border-white/20 rounded-lg shadow">
+             <h2 className="text-lg font-semibold text-white mb-4">Manage Work Modes</h2>
             <Form method="post" className="flex flex-col space-y-4">
               <input type="hidden" name="_action" value="updateWorkMode" />
               
@@ -750,20 +750,25 @@ export default function AttendancePage() {
           </div>
         )}
 
-        {/* Role-based access message */}
-        {!loaderData.isAdmin && (
-          <div className="bg-blue-50 p-4 rounded-lg mb-4">
-            <p className="text-blue-700">
-              <span className="font-bold">Note:</span> You are viewing your personal attendance records.
-            </p>
-          </div>
-        )}
+                 {/* Role-based access message */}
+         {!loaderData.isAdmin && (
+           <div className="bg-dashboard-secondary border border-white/20 p-4 rounded-lg mb-4">
+             <p className="text-blue-700">
+               <span className="font-bold">Note:</span> You are viewing your personal attendance records.
+             </p>
+           </div>
+         )}
         
-        <Tabs
-        className="flex flex-wrap"
-          selectedKey={activeTab}
-          onSelectionChange={(key) => setActiveTab(key as string)}
-        
+                 <Tabs
+         className="flex flex-wrap"
+           selectedKey={activeTab}
+           onSelectionChange={(key) => setActiveTab(key as string)}
+           classNames={{
+             tabList: "bg-dashboard-secondary border border-white/20",
+             tab: "text-gray-300 data-[selected=true]:text-white",
+             tabContent: "text-gray-300 data-[selected=true]:text-white",
+             panel: "pt-6"
+           }}        
         >
           <Tab
             key="today"
@@ -774,47 +779,47 @@ export default function AttendancePage() {
               </div>
             }
           >
-            <div className="mt-6">
-              {/* Admin-only filters */}
-              {loaderData.isAdmin && (
-                <div className="bg-white rounded-lg p-4 mb-6">
-                  <h3 className="text-lg font-semibold mb-2">Filter Attendance</h3>
-                  <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
-                    <div>
-                      <label className="block text-sm text-white mb-1">
-                        Department
-                      </label>
-                      <select
-                        className="border rounded px-3 py-2 w-[70vw] lg:max-w-[250px]"
-                        name="department"
-                        value={selectedDepartment}
-                        onChange={(e) => setSelectedDepartment(e.target.value)}
-                      >
-                        <option value="">All Departments</option>
-                        {loaderData.departments.map((dept: any) => (
-                          <option key={dept._id} value={dept._id}>
-                            {dept.name}
-                          </option>
-                        ))}
-                      </select>
+            <div className="mt-6 !text-white">
+                             {/* Admin-only filters */}
+               {loaderData.isAdmin && (
+                 <div className="bg-dashboard-secondary border border-white/20 rounded-lg p-4 mb-6">
+                   <h3 className="text-lg text-white font-semibold mb-2">Filter Attendance</h3>
+                                       <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
+                       <div>
+                         <label className="block text-sm text-white mb-1">
+                           Department
+                         </label>
+                                             <select
+                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-[70vw] lg:max-w-[250px] text-white"
+                         name="department"
+                         value={selectedDepartment}
+                         onChange={(e) => setSelectedDepartment(e.target.value)}
+                       >
+                         <option value="">All Departments</option>
+                         {loaderData.departments.map((dept: any) => (
+                           <option key={dept._id} value={dept._id}>
+                             {dept.name}
+                           </option>
+                         ))}
+                       </select>
                     </div>
                     <div>
                       <label className="block text-sm text-white mb-1">
                         User
                       </label>
-                      <select
-                        className="border rounded px-3 py-2 w-[70vw] lg:max-w-[250px]"
-                        name="userId"
-                        value={selectedUser}
-                        onChange={(e) => setSelectedUser(e.target.value)}
-                      >
-                        <option value="">All Users</option>
-                        {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
-                          <option key={user._id} value={user._id}>
-                            {user.firstName} {user.lastName}
-                          </option>
-                        ))}
-                      </select>
+                                             <select
+                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-[70vw] lg:max-w-[250px] text-white"
+                         name="userId"
+                         value={selectedUser}
+                         onChange={(e) => setSelectedUser(e.target.value)}
+                       >
+                         <option value="">All Users</option>
+                         {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
+                           <option key={user._id} value={user._id}>
+                             {user.firstName} {user.lastName}
+                           </option>
+                         ))}
+                       </select>
                     </div>
                     <div className="flex gap-2">
                       <Button
@@ -852,9 +857,9 @@ export default function AttendancePage() {
               </div>
             }
           >
-            <div className="mt-6">
-              <div className="bg-white rounded-lg p-4 mb-6">
-                <h3 className="text-lg font-semibold mb-2">Generate Report</h3>
+                         <div className="mt-6">
+               <div className="bg-dashboard-secondary border border-white/20 rounded-lg p-4 mb-6">
+                 <h3 className="text-lg text-white font-semibold mb-2">Generate Report</h3>
                 <form onSubmit={handleGenerateReport} className="flex flex-wrap gap-4 items-end">
                   {/* Department filter (admin only) */}
                   {loaderData.isAdmin && (
@@ -862,50 +867,50 @@ export default function AttendancePage() {
                       <label className="block text-sm text-white mb-1">
                         Department
                       </label>
-                      <select
-                        className="border rounded px-3 py-2 w-full max-w-[250px]"
-                        name="department"
-                        value={selectedDepartment}
-                        onChange={(e) => setSelectedDepartment(e.target.value)}
-                      >
-                        <option value="">All Departments</option>
-                        {loaderData.departments.map((dept: any) => (
-                          <option key={dept._id} value={dept._id}>
-                            {dept.name}
-                          </option>
-                        ))}
-                      </select>
+                                             <select
+                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-full max-w-[250px] text-white"
+                         name="department"
+                         value={selectedDepartment}
+                         onChange={(e) => setSelectedDepartment(e.target.value)}
+                       >
+                         <option value="">All Departments</option>
+                         {loaderData.departments.map((dept: any) => (
+                           <option key={dept._id} value={dept._id}>
+                             {dept.name}
+                           </option>
+                         ))}
+                       </select>
                     </div>
                   )}
                   <div>
                     <label className="block text-sm text-white mb-1">
                       Start Date
                     </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      className="border rounded px-3 py-2"
-                      value={dateRange.startDate}
-                      onChange={(e) =>
-                        setDateRange({ ...dateRange, startDate: e.target.value })
-                      }
-                      required
-                    />
+                                         <input
+                       type="date"
+                       name="startDate"
+                       className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 text-white"
+                       value={dateRange.startDate}
+                       onChange={(e) =>
+                         setDateRange({ ...dateRange, startDate: e.target.value })
+                       }
+                       required
+                     />
                   </div>
                   <div>
                     <label className="block text-sm text-white mb-1">
                       End Date
                     </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      className="border rounded px-3 py-2"
-                      value={dateRange.endDate}
-                      onChange={(e) =>
-                        setDateRange({ ...dateRange, endDate: e.target.value })
-                      }
-                      required
-                    />
+                                         <input
+                       type="date"
+                       name="endDate"
+                       className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 text-white"
+                       value={dateRange.endDate}
+                       onChange={(e) =>
+                         setDateRange({ ...dateRange, endDate: e.target.value })
+                       }
+                       required
+                     />
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -919,6 +924,7 @@ export default function AttendancePage() {
                       type="button"
                       color="default"
                       variant="bordered"
+                      className="!text-white"
                       startContent={<X className="h-4 w-4" />}
                       onClick={() => {
                         setDateRange({

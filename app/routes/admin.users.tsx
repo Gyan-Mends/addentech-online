@@ -231,7 +231,7 @@ const Users = () => {
             {/* confirm modal */}
             <ConfirmModal header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
-                    <Button color="success" variant="flat" className="font-montserrat font-semibold" size="sm" onPress={handleConfirmModalClosed}>
+                    <Button color="success" variant="flat" className="font-montserrat font-semibold !text-white" size="sm" onPress={handleConfirmModalClosed}>
                         No
                     </Button>
                     <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onPress={() => {
@@ -255,7 +255,7 @@ const Users = () => {
             {dataValue && (
                 console.log(dataValue),
                 <Drawer isDrawerOpened={isEditDrawerOpened} handleDrawerClosed={handleEditDrawerClosed} title="Edit User">
-                    <Form method="post" className="flex flex-col gap-4 p-4">
+                    <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
                         <CustomInput
                             label="First name"
                             isRequired
@@ -330,11 +330,11 @@ const Users = () => {
                                 defaultSelectedKeys={[dataValue.role]} // Ensure dataValue.role matches a valid key
                                 name="role"
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
+                                    label: "font-nunito text-sm !text-white",
                                     popoverContent:
-                                        "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                        "z-[10000] bg-dashboard-secondary shadow-sm border border-white/20 font-nunito",
                                     trigger:
-                                        "shadow-sm border border-black/5 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white",
+                                        "shadow-sm border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white",
                                 }}
                             >
                                 {[
@@ -388,11 +388,11 @@ const Users = () => {
                                     console.log('Department selection changed:', keys);
                                 }}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
+                                    label: "font-nunito text-sm !text-white",
                                     popoverContent:
-                                        "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
+                                        "z-[10000] bg-dashboard-secondary shadow-sm border border-white/20 font-nunito",
                                     trigger:
-                                        "shadow-sm border border-black/5 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white",
+                                        "shadow-sm border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white",
                                 }}
                             >
                                 {departments.map((department) => (
@@ -416,7 +416,7 @@ const Users = () => {
                         </div>
                             <div className=" ">
                                 <input name="base64Image" value={base64Image} type="hidden" />
-                                <label className="font-nunito block text-sm !text-black" htmlFor="image">
+                                <label className="font-nunito block text-sm text-white" htmlFor="image">
                                     Image
                                 </label>
                                 <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
@@ -457,7 +457,7 @@ const Users = () => {
                             <Divider />
 
                             <div className="mt-6">
-                                <label htmlFor="" className="font-nunito">Bio</label>
+                                <label htmlFor="" className="font-nunito text-white">Bio</label>
                                 <input type="hidden" name="bio" value={content} />
                                 <ReactQuill
                                     value={content} // Bind editor content to state
@@ -470,7 +470,7 @@ const Users = () => {
                             <Divider className="mt-28" />
 
                             <div className="flex flex-col gap-6">
-                                <p>Professional Experience </p>
+                                <p className="text-white">Professional Experience </p>
                                 <CustomInput
                                     defaultValue={dataValue.institution}
                                     label=" Institution"
@@ -510,7 +510,7 @@ const Users = () => {
                             </div>
                             <Divider className="mt-6" />
                             <div className="flex flex-col gap-6 mt-4">
-                                <p>Education Background</p>
+                                <p className="text-white">Education Background</p>
                                 <CustomInput
                                     defaultValue={dataValue.institutionName}
                                     label="Intution Name"
@@ -569,7 +569,7 @@ const Users = () => {
             {/* Create Modal */}
             {/* Create Modal */}
             <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create User">
-                <Form method="post" className="flex flex-col gap-4 p-4">
+                <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
                     <CustomInput
                         label="First name"
                         isClearable
@@ -637,9 +637,9 @@ const Users = () => {
                             isRequired
                             name="role"
                             classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                label: "font-nunito text-sm text-white",
+                                popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm border border-white/20 font-nunito ",
+                                trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white  "
                             }}
                         >
                             {[
@@ -661,9 +661,9 @@ const Users = () => {
                             isRequired
                             name="department"
                             classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                popoverContent: "z-[10000]  !bg-white shadow-sm  border border-black/5 font-nunito ",
-                                trigger: "   shadow-sm   border border-black/30  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white "
+                                label: "font-nunito text-sm text-white",
+                                popoverContent: "z-[10000]  bg-dashboard-secondary shadow-sm  border border-white/20 font-nunito ",
+                                trigger: "   shadow-sm   border border-white/20  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white "
                             }}
                         >
                             {departments.map((department: DepartmentInterface, index: number) => (
@@ -684,7 +684,7 @@ const Users = () => {
                     </div>
                 
                     <div className=" ">
-                        <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                        <label className="font-nunito block text-sm text-white" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
                                 name="image"
@@ -721,7 +721,7 @@ const Users = () => {
                         <Divider />
 
                         <div className="mt-6">
-                            <label htmlFor="" className="font-nunito">Bio</label>
+                            <label htmlFor="" className="font-nunito text-white">Bio</label>
                             <input type="hidden" name="bio" value={content} />
                             <ReactQuill
                                 value={content} // Bind editor content to state
@@ -734,7 +734,7 @@ const Users = () => {
                         <Divider className="mt-28" />
 
                         <div className="flex flex-col gap-6">
-                            <p>Professional Experience </p>
+                            <p className="text-white">Professional Experience </p>
                             <CustomInput
                                 label=" Institution"
                                 isRequired
@@ -771,7 +771,7 @@ const Users = () => {
                         </div>
                         <Divider className="mt-6" />
                         <div className="flex flex-col gap-6 mt-4">
-                            <p>Education Background</p>
+                            <p className="text-white">Education Background</p>
                             <CustomInput
                                 label="Intution Name"
                                 isRequired

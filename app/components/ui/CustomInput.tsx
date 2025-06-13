@@ -42,8 +42,8 @@ const CustomInput = ({
                 labelPlacement={labelPlacement}
                 className={className}
                 classNames={{
-                    label: "font-nunito text-sm text-default-100",
-                    inputWrapper: "border border-black/30  hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white  !bg-white shadow-sm"
+                    label: "font-nunito text-sm !text-white",
+                    inputWrapper: "border border-white/20  hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out  bg-dashboard-secondary shadow-sm"
                 }}
             />
         </div>
