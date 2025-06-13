@@ -6,6 +6,7 @@ import dashboard from "~/controller/dashboard";
 import AdminLayout from "~/layout/adminLayout";
 import DashboardMetricCard from "~/components/ui/DashboardMetricCard";
 import DashboardWidget, { QuickStat, TeamMemberItem } from "~/components/ui/DashboardWidget";
+import LineChart from "~/components/ui/LineChart";
 import { 
   Users, 
   ClipboardList, 
@@ -180,6 +181,31 @@ const Admin = () => {
         />
       </div>
 
+      {/* Statistics Line Chart */}
+      <LineChart
+        title="Dashboard Statistics Overview"
+        data={{
+          labels: ['Users', 'Departments', 'Blog Posts', 'Messages'],
+          datasets: [
+            {
+              label: 'Current Stats',
+              data: [
+                dashboardData.totalUsers || 0,
+                dashboardData.totalDepartments || 0,
+                dashboardData.totalBlogs || 0,
+                dashboardData.totalMessages || 0
+              ],
+              borderColor: '#3B82F6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              fill: true,
+              tension: 0.4,
+            },
+          ],
+        }}
+        height={350}
+        className="mb-6"
+      />
+
       {/* Charts and Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DashboardWidget
@@ -293,6 +319,31 @@ const Admin = () => {
         />
       </div>
 
+      {/* Manager Statistics Line Chart */}
+      <LineChart
+        title="Management Statistics Overview"
+        data={{
+          labels: ['Total Users', 'Departments', 'Work Modes', 'Active Tasks'],
+          datasets: [
+            {
+              label: 'Management Stats',
+              data: [
+                dashboardData.totalUsers || 0,
+                dashboardData.totalDepartments || 0,
+                dashboardData.workModeDistribution?.labels?.length || 0,
+                dashboardData.tasksByStatus?.values?.reduce((a: number, b: number) => a + b, 0) || 0
+              ],
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              fill: true,
+              tension: 0.4,
+            },
+          ],
+        }}
+        height={350}
+        className="mb-6"
+      />
+
       {/* Manager specific widgets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DashboardWidget
@@ -405,6 +456,31 @@ const Admin = () => {
         />
       </div>
 
+      {/* Department Head Statistics Line Chart */}
+      <LineChart
+        title="Department Statistics Overview"
+        data={{
+          labels: ['Department Staff', 'Department Tasks', 'Work Modes', 'Monthly Attendance'],
+          datasets: [
+            {
+              label: 'Department Stats',
+              data: [
+                dashboardData.departmentStaff || 0,
+                dashboardData.departmentTasks?.values?.reduce((a: number, b: number) => a + b, 0) || 0,
+                dashboardData.workModeBreakdown?.labels?.length || 0,
+                dashboardData.departmentAttendance?.values?.reduce((a: number, b: number) => a + b, 0) || 0
+              ],
+              borderColor: '#F59E0B',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              fill: true,
+              tension: 0.4,
+            },
+          ],
+        }}
+        height={350}
+        className="mb-6"
+      />
+
       {/* Department specific widgets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DashboardWidget
@@ -516,6 +592,31 @@ const Admin = () => {
           color="secondary"
         />
       </div>
+
+      {/* Staff Statistics Line Chart */}
+      <LineChart
+        title="Personal Statistics Overview"
+        data={{
+          labels: ['My Tasks', 'Completed', 'Pending', 'In Progress'],
+          datasets: [
+            {
+              label: 'My Stats',
+              data: [
+                dashboardData.userTasks?.values?.reduce((a: number, b: number) => a + b, 0) || 0,
+                dashboardData.userTasks?.values?.[dashboardData.userTasks?.labels?.indexOf('completed')] || 0,
+                dashboardData.userTasks?.values?.[dashboardData.userTasks?.labels?.indexOf('pending')] || 0,
+                dashboardData.userTasks?.values?.[dashboardData.userTasks?.labels?.indexOf('in_progress')] || 0
+              ],
+              borderColor: '#8B5CF6',
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              fill: true,
+              tension: 0.4,
+            },
+          ],
+        }}
+        height={350}
+        className="mb-6"
+      />
 
       {/* Staff specific widgets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

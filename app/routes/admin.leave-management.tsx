@@ -8,6 +8,7 @@ import Registration from "~/modal/registration";
 import Department from "~/modal/department";
 import { useState, useEffect } from "react";
 import AdminLayout from "~/layout/adminLayout";
+import LineChart from "~/components/ui/LineChart";
 
 // Loader function to fetch leave data
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
@@ -498,6 +499,33 @@ const LeaveManagement = () => {
                         </CardBody>
                     </Card>
                 </div>
+
+                {/* Leave Statistics Line Chart */}
+                <LineChart
+                    title="Leave Management Statistics Overview"
+                    data={{
+                        labels: ['Total Applications', 'Pending Approvals', 'Approved This Month', 'Rejected This Month', 'Upcoming Leaves', 'On Leave Today'],
+                        datasets: [
+                            {
+                                label: 'Leave Stats',
+                                data: [
+                                    (stats as any)?.totalApplications || 0,
+                                    (stats as any)?.pendingApprovals || 0,
+                                    (stats as any)?.approvedThisMonth || 0,
+                                    (stats as any)?.rejectedThisMonth || 0,
+                                    (stats as any)?.upcomingLeaves || 0,
+                                    (stats as any)?.onLeaveToday || 0
+                                ],
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ],
+                    }}
+                    height={350}
+                    className="mb-6"
+                />
 
                 {/* Role-based access message */}
                 {/* {!isAdmin && !isDepartmentHead && (

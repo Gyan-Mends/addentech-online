@@ -6,6 +6,7 @@ import Registration from "~/modal/registration";
 import Departments from "~/modal/department";
 import { BarChart3, Users, TrendingUp, Calendar, FileText, Clock } from "lucide-react";
 import AdminLayout from "~/layout/adminLayout";
+import LineChart from "~/components/ui/LineChart";
 
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
     try {
@@ -100,6 +101,82 @@ const ReportsPage = () => {
                         </p>
                     </div>
                 </div>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                        <CardBody className="p-4">
+                            <div className="flex items-center justify-between text-white">
+                                <div>
+                                    <p className="text-sm text-gray-300">Total Departments</p>
+                                    <p className="text-2xl font-bold text-white">{departments?.length || 0}</p>
+                                </div>
+                                <Users className="text-blue-400" size={24} />
+                            </div>
+                        </CardBody>
+                    </Card>
+
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                        <CardBody className="p-4">
+                            <div className="flex items-center justify-between text-white">
+                                <div>
+                                    <p className="text-sm text-gray-300">Total Users</p>
+                                    <p className="text-2xl font-bold text-white">{users?.length || 0}</p>
+                                </div>
+                                <FileText className="text-green-400" size={24} />
+                            </div>
+                        </CardBody>
+                    </Card>
+
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                        <CardBody className="p-4">
+                            <div className="flex items-center justify-between text-white">
+                                <div>
+                                    <p className="text-sm text-gray-300">Report Types</p>
+                                    <p className="text-2xl font-bold text-white">6</p>
+                                </div>
+                                <BarChart3 className="text-purple-400" size={24} />
+                            </div>
+                        </CardBody>
+                    </Card>
+
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                        <CardBody className="p-4">
+                            <div className="flex items-center justify-between text-white">
+                                <div>
+                                    <p className="text-sm text-gray-300">Current Year</p>
+                                    <p className="text-2xl font-bold text-white">{new Date().getFullYear()}</p>
+                                </div>
+                                <Calendar className="text-amber-400" size={24} />
+                            </div>
+                        </CardBody>
+                    </Card>
+                </div>
+
+                {/* Reports Statistics Line Chart */}
+                <LineChart
+                    title="Reports Dashboard Overview"
+                    data={{
+                        labels: ['Total Departments', 'Total Users', 'Report Types', 'Current Year'],
+                        datasets: [
+                            {
+                                label: 'Reports Stats',
+                                data: [
+                                    departments?.length || 0,
+                                    users?.length || 0,
+                                    6, // Number of report types
+                                    new Date().getFullYear()
+                                ],
+                                borderColor: '#8B5CF6',
+                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ],
+                    }}
+                    height={350}
+                    className="mb-6"
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Department Reports - Not available for staff */}

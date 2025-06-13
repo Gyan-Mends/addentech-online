@@ -8,6 +8,7 @@ import Registration from "~/modal/registration";
 import Departments from "~/modal/department";
 import { useState, useEffect } from "react";
 import AdminLayout from "~/layout/adminLayout";
+import LineChart from "~/components/ui/LineChart";
 
 // Loader function to fetch task data
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
@@ -451,6 +452,33 @@ const TaskManagement = () => {
                         </CardBody>
                     </Card>
                 </div>
+
+                {/* Task Statistics Line Chart */}
+                <LineChart
+                    title="Task Management Statistics Overview"
+                    data={{
+                        labels: ['Total Tasks', 'Active Tasks', 'Completed', 'Overdue', 'High Priority', 'This Week'],
+                        datasets: [
+                            {
+                                label: 'Task Stats',
+                                data: [
+                                    stats?.totalTasks || 0,
+                                    stats?.activeTasks || 0,
+                                    stats?.completedTasks || 0,
+                                    stats?.overdueTasks || 0,
+                                    stats?.highPriorityTasks || 0,
+                                    stats?.tasksThisWeek || 0
+                                ],
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ],
+                    }}
+                    height={350}
+                    className="mb-6"
+                />
 
                 {/* Enhanced Filters */}
                 <Card className="bg-dashboard-secondary border border-white/20">
