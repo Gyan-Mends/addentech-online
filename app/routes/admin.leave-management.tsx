@@ -365,47 +365,47 @@ const LeaveManagement = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 !text-white">
                 {/* Success/Error Messages */}
                 {success && (
-                    <Card className="border-success-200 bg-success-50">
+                    <Card className="bg-dashboard-secondary border border-green-700">
                         <CardBody>
-                            <p className="text-success-700">{success}</p>
+                            <p className="text-green-300">{success}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {(error || (actionData && 'error' in actionData && actionData.error)) && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="bg-dashboard-secondary border border-red-700">
                         <CardBody>
-                            <p className="text-danger-700">{error || (actionData && 'error' in actionData ? actionData.error : '')}</p>
+                            <p className="text-red-300">{error || (actionData && 'error' in actionData ? actionData.error : '')}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {actionData?.success && (
-                    <Card className="border-success-200 bg-success-50">
+                    <Card className="bg-dashboard-secondary border border-green-700">
                         <CardBody>
-                            <p className="text-success-700">{actionData && 'message' in actionData ? actionData.message : 'Action completed successfully'}</p>
+                            <p className="text-green-300">{actionData && 'message' in actionData ? actionData.message : 'Action completed successfully'}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md">
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 text-white shadow-md">
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold">
                                 {getPageTitle()}
                             </h1>
-                            <p className="text-pink-100 mt-1">Manage leave applications and approvals</p>
+                            <p className="text-gray-300 mt-1">Manage leave applications and approvals</p>
                         </div>
                         <div className="flex gap-3">
                             <Button
                                 variant="bordered"
                                 startContent={<Download size={16} />}
                                 onClick={exportToCSV}
-                                className="bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200"
+                                className="bg-dashboard-tertiary hover:bg-dashboard-secondary text-white border-white/20"
                             >
                                 Export CSV
                             </Button>
@@ -414,7 +414,7 @@ const LeaveManagement = () => {
                                 <Link to="/employee-leave-application">
                                     <Button
                                         startContent={<Plus size={16} />}
-                                        className="bg-white text-pink-600 hover:bg-pink-50 shadow-sm font-semibold"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm font-semibold"
                                     >
                                         New Leave Application
                                     </Button>
@@ -426,74 +426,74 @@ const LeaveManagement = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <Card className="bg-gradient-to-r from-pink-500 to-pink-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="px-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90 font-nunito">Total Applications</p>
-                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.totalApplications || 0}</p>
+                                    <p className="text-sm text-gray-300 font-nunito">Total Applications</p>
+                                    <p className="text-2xl font-bold text-white font-nunito">{(stats as any)?.totalApplications || 0}</p>
                                 </div>
-                                <CalendarDays className="font-nunito" size={24} />
+                                <CalendarDays className="text-blue-400 font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-amber-500 to-amber-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90">Pending Approvals</p>
-                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.pendingApprovals || 0}</p>
+                                    <p className="text-sm text-gray-300">Pending Approvals</p>
+                                    <p className="text-2xl font-bold text-white font-nunito">{(stats as any)?.pendingApprovals || 0}</p>
                                 </div>
-                                <Clock className="font-nunito" size={24} />
+                                <Clock className="text-amber-400 font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-green-500 to-green-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90 font-nunito">Approved This Month</p>
-                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.approvedThisMonth || 0}</p>
+                                    <p className="text-sm text-gray-300 font-nunito">Approved This Month</p>
+                                    <p className="text-2xl font-bold text-white font-nunito">{(stats as any)?.approvedThisMonth || 0}</p>
                                 </div>
-                                <CheckCircle className="font-nunito" size={24} />
+                                <CheckCircle className="text-green-400 font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-red-500 to-red-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90 font-nunito">Rejected This Month</p>
-                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.rejectedThisMonth || 0}</p>
+                                    <p className="text-sm text-gray-300 font-nunito">Rejected This Month</p>
+                                    <p className="text-2xl font-bold text-white font-nunito">{(stats as any)?.rejectedThisMonth || 0}</p>
                                 </div>
-                                <XCircle className="font-nunito" size={24} />
+                                <XCircle className="text-red-400 font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90 font-nunito">Upcoming Leaves</p>
-                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.upcomingLeaves || 0}</p>
+                                    <p className="text-sm text-gray-300 font-nunito">Upcoming Leaves</p>
+                                    <p className="text-2xl font-bold text-white font-nunito">{(stats as any)?.upcomingLeaves || 0}</p>
                                 </div>
-                                <TrendingUp className="font-nunito" size={24} />
+                                <TrendingUp className="text-blue-400 font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white font-nunito">
                                 <div>
-                                    <p className="text-sm opacity-90 font-nunito">On Leave Today</p>
-                                    <p className="text-2xl font-bold font-nunito">{(stats as any)?.onLeaveToday || 0}</p>
+                                    <p className="text-sm text-gray-300 font-nunito">On Leave Today</p>
+                                    <p className="text-2xl font-bold text-white font-nunito">{(stats as any)?.onLeaveToday || 0}</p>
                                 </div>
-                                <Users className="font-nunito" size={24} />
+                                <Users className="text-purple-400 font-nunito" size={24} />
                             </div>
                         </CardBody>
                     </Card>
@@ -509,11 +509,11 @@ const LeaveManagement = () => {
                 )} */}
 
                 {/* Enhanced Filters */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
                         <div className="flex items-center gap-2">
-                            <Filter size={18} />
-                            <h3 className="text-lg font-semibold">Search & Filter</h3>
+                            <Filter size={18} className="text-white" />
+                            <h3 className="text-lg font-semibold text-white">Search & Filter</h3>
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -527,12 +527,12 @@ const LeaveManagement = () => {
                                 startContent={<Search size={16} />}
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito",
-                                    inputWrapper: "font-nunito bg-white border border-black/20",
+                                    label: "font-nunito text-white",
+                                    inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20",
                                     
                                 }}
                                 size="sm"
-                                clearable
+                                isClearable
                             />
 
                             {/* Status Filter */}
@@ -543,8 +543,8 @@ const LeaveManagement = () => {
                                 labelPlacement="outside"
                                 onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
                                 classNames={{
-                                    label: "font-nunito",
-                                    trigger: "font-nunito bg-white border border-black/20",
+                                    label: "font-nunito text-white",
+                                    trigger: "font-nunito bg-dashboard-tertiary border border-white/20",
                                 }}
                             >
                                 <SelectItem key="all" value="all">All Status</SelectItem>
@@ -562,8 +562,8 @@ const LeaveManagement = () => {
                                     onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
                                     labelPlacement="outside"
                                     classNames={{
-                                        label: "font-nunito",
-                                        trigger: "font-nunito bg-white border border-black/20",
+                                        label: "font-nunito text-white",
+                                        trigger: "font-nunito bg-dashboard-tertiary border border-white/20",
                                     }}
                                 >
                                     <SelectItem key="all" value="all">All Departments</SelectItem>
@@ -582,8 +582,8 @@ const LeaveManagement = () => {
                                 size="sm"
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito",
-                                    inputWrapper: "font-nunito bg-white border border-black/20",
+                                    label: "font-nunito text-white",
+                                    inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20",
                                 }}
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
@@ -597,8 +597,8 @@ const LeaveManagement = () => {
                                 size="sm"
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito",
-                                    inputWrapper: "font-nunito bg-white border border-black/20",
+                                    label: "font-nunito text-white",
+                                    inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20",
                                 }}
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
@@ -608,7 +608,7 @@ const LeaveManagement = () => {
                             {/* Filter Actions */}
                             <div className="flex gap-2 items-end">
                                 <Button
-                                    className="bg-pink-500 text-white shadow-sm"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                                     size="sm"
                                     onClick={applyFilters}
                                    
@@ -619,7 +619,7 @@ const LeaveManagement = () => {
                                     variant="bordered"
                                     size="sm"
                                     onClick={clearFilters}
-                                    className="flex-1"
+                                    className="flex-1 border-white/20 text-white hover:bg-dashboard-tertiary"
                                 >
                                     Clear
                                 </Button>
@@ -628,9 +628,9 @@ const LeaveManagement = () => {
 
                         {/* Active Filters Display */}
                         {(filters.employeeName || filters.startDate || filters.endDate || filters.status !== 'all' || (filters.department !== 'all' && canViewAllStats)) && (
-                            <div className="mt-4 pt-4 border-t">
+                            <div className="mt-4 pt-4 border-t border-white/20">
                                 <div className="flex flex-wrap gap-2 items-center">
-                                    <span className="text-sm font-medium">Active Filters:</span>
+                                    <span className="text-sm font-medium text-white">Active Filters:</span>
                                     {filters.employeeName && (
                                         <Chip size="sm" color="primary" variant="flat">
                                             Name: {filters.employeeName}
@@ -712,46 +712,46 @@ const LeaveManagement = () => {
                 </Card>
 
                 {/* Leave Applications Table */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardBody>
                         <div className="overflow-x-auto">
                             <table className="w-full table-auto">
                                 <thead>
-                                    <tr className="border-b">
-                                        <th className="text-left p-3">Employee</th>
-                                        <th className="text-left p-3">Leave Type</th>
-                                        <th className="text-left p-3">Duration</th>
-                                        <th className="text-left p-3">Days</th>
-                                        <th className="text-left p-3">Status</th>
-                                        <th className="text-left p-3">Priority</th>
-                                        <th className="text-left p-3">Submitted</th>
-                                        <th className="text-left p-3">Actions</th>
+                                    <tr className="border-b border-white/20">
+                                        <th className="text-left p-3 text-white">Employee</th>
+                                        <th className="text-left p-3 text-white">Leave Type</th>
+                                        <th className="text-left p-3 text-white">Duration</th>
+                                        <th className="text-left p-3 text-white">Days</th>
+                                        <th className="text-left p-3 text-white">Status</th>
+                                        <th className="text-left p-3 text-white">Priority</th>
+                                        <th className="text-left p-3 text-white">Submitted</th>
+                                        <th className="text-left p-3 text-white">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {leaves.map((leave: any) => (
-                                        <tr key={leave._id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        <tr key={leave._id} className="border-b border-white/20 hover:bg-dashboard-tertiary">
                                             <td className="p-3">
                                                 <div>
-                                                    <p className="font-medium">
+                                                    <p className="font-medium text-white">
                                                         {leave.employee?.firstName} {leave.employee?.lastName}
                                                     </p>
-                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    <p className="text-sm text-gray-300">
                                                         {leave.department?.name}
                                                     </p>
                                                 </div>
                                             </td>
                                             <td className="p-3">
-                                                <span className="capitalize">{leave.leaveType}</span>
+                                                <span className="capitalize text-white">{leave.leaveType}</span>
                                             </td>
                                             <td className="p-3">
                                                 <div>
-                                                    <p className="text-sm">{formatDate(leave.startDate)}</p>
-                                                    <p className="text-sm text-gray-600">to {formatDate(leave.endDate)}</p>
+                                                    <p className="text-sm text-white">{formatDate(leave.startDate)}</p>
+                                                    <p className="text-sm text-gray-300">to {formatDate(leave.endDate)}</p>
                                                 </div>
                                             </td>
                                             <td className="p-3">
-                                                <span className="font-medium">{leave.totalDays} days</span>
+                                                <span className="font-medium text-white">{leave.totalDays} days</span>
                                             </td>
                                             <td className="p-3">
                                                 <Chip
@@ -820,8 +820,8 @@ const LeaveManagement = () => {
                         {leaves.length === 0 && (
                             <div className="text-center py-8">
                                 <AlertCircle size={48} className="mx-auto text-gray-400 mb-4" />
-                                <p className="text-gray-600 dark:text-gray-400">No leave applications found</p>
-                                <p className="text-sm text-gray-500 mt-2">
+                                <p className="text-gray-300">No leave applications found</p>
+                                <p className="text-sm text-gray-400 mt-2">
                                     Try adjusting your filters or check back later
                                 </p>
                             </div>

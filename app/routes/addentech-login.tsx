@@ -57,7 +57,7 @@ const Login = () => {
 
                 <Form method="post" className=" flex flex-col gap-6">
                     <div>
-                        <CustomInput
+                        <Input
                             name="email"
                             label="Email"
                             labelPlacement="outside"
@@ -74,7 +74,7 @@ const Login = () => {
                     </div>
 
                     <div>
-                        <CustomInput
+                        <Input
                             name="password"
                             label="Password"
                             labelPlacement="outside"
@@ -111,7 +111,7 @@ const Login = () => {
                         </Link>
                     </div>
                     <button
-                        className="font-nunito bg-pink-500 hover:bg-pink-600  text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl"
+                        className="font-nunito bg-primary-500 hover:bg-primary-600  text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Loggin in..." : "Login"}

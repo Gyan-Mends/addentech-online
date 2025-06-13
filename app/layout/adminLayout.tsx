@@ -455,6 +455,75 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                 <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary-400"></span>
                             </div>
                         </div>
+
+                        {/* User Profile Dropdown */}
+                        <Dropdown placement="bottom-end">
+                            <DropdownTrigger>
+                                <div className="flex items-center space-x-2 cursor-pointer hover:bg-dashboard-tertiary p-2 rounded-lg transition-colors">
+                                    <Avatar
+                                        size="sm"
+                                        className="bg-avatar-purple"
+                                        fallback={
+                                            <User className="h-4 w-4 text-white" />
+                                        }
+                                    />
+                                    <ChevronDown className="h-4 w-4 text-dashboard-secondary" />
+                                </div>
+                            </DropdownTrigger>
+                            <DropdownMenu 
+                                aria-label="User menu"
+                                className="bg-dashboard-secondary border border-white/20"
+                            >
+                                <DropdownItem 
+                                    key="profile" 
+                                    className="text-white hover:bg-dashboard-tertiary"
+                                    startContent={<User className="h-4 w-4" />}
+                                >
+                                    Profile
+                                </DropdownItem>
+                                <DropdownItem 
+                                    key="settings" 
+                                    className="text-white hover:bg-dashboard-tertiary"
+                                    startContent={<Settings className="h-4 w-4" />}
+                                >
+                                    Settings
+                                </DropdownItem>
+                                <DropdownItem 
+                                    key="logout" 
+                                    className="text-red-400 hover:bg-red-900/20"
+                                    startContent={<LogOut className="h-4 w-4" />}
+                                    onClick={async () => {
+                                        try {
+                                            const response = await fetch('/api/auth/logout', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                            });
+                                            
+                                            if (response.ok) {
+                                                // Clear any local storage or session data if needed
+                                                localStorage.clear();
+                                                sessionStorage.clear();
+                                                
+                                                // Redirect to login page
+                                                window.location.href = '/addentech-login';
+                                            } else {
+                                                console.error('Logout failed');
+                                                // Fallback: redirect anyway
+                                                window.location.href = '/addentech-login';
+                                            }
+                                        } catch (error) {
+                                            console.error('Logout error:', error);
+                                            // Fallback: redirect anyway
+                                            window.location.href = '/addentech-login';
+                                        }
+                                    }}
+                                >
+                                    Logout
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                     </div>
                 </header>
 

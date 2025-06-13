@@ -167,7 +167,7 @@ export const QuickStat: React.FC<{
   };
 
   return (
-    <div className="flex items-center justify-between p-3 bg-dashboard-tertiary rounded-lg">
+    <div className="flex items-center text-white justify-between p-3 bg-dashboard-secondary border border-white/20 rounded-lg">
       <span className="text-sm font-medium text-dashboard-secondary">{label}</span>
       <div className="text-right">
         <div className={`text-lg font-bold ${getColorClasses()}`}>{value}</div>

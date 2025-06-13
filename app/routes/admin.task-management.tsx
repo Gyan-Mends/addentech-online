@@ -318,46 +318,46 @@ const TaskManagement = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 !text-white">
                 {/* Error/Success Messages */}
                 {error && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="bg-dashboard-secondary border border-red-700">
                         <CardBody>
-                            <p className="text-danger-700">{error}</p>
+                            <p className="text-red-300">{error}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {actionData?.success && (
-                    <Card className="border-success-200 bg-success-50">
+                    <Card className="bg-dashboard-secondary border border-green-700">
                         <CardBody>
-                            <p className="text-success-700">{actionData.message}</p>
+                            <p className="text-green-300">{actionData.message}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {actionData && !actionData.success && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="bg-dashboard-secondary border border-red-700">
                         <CardBody>
-                            <p className="text-danger-700">{actionData.message}</p>
+                            <p className="text-red-300">{actionData.message}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-md">
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 text-white shadow-md">
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold">
                                 {getPageTitle()}
                             </h1>
-                            <p className="text-pink-100 mt-2">
+                            <p className="text-gray-300 mt-2">
                                 {isStaff && 'View and manage your assigned tasks'}
                                 {canViewDepartmentStats && 'Manage tasks for your department'}
                                 {canViewAllStats && 'Manage all tasks across the organization'}
                             </p>
                             {currentUser && (
-                                <p className="text-pink-100 mt-1">
+                                <p className="text-gray-300 mt-1">
                                     Total Tasks: {total} | Role: {currentUser.role}
                                 </p>
                             )}
@@ -367,7 +367,7 @@ const TaskManagement = () => {
                                 <Link to="/admin/task-create">
                                     <Button
                                         startContent={<Plus size={16} />}
-                                        className="bg-white text-pink-600 hover:bg-pink-50 shadow-sm font-semibold"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm font-semibold"
                                     >
                                         New Task
                                     </Button>
@@ -379,85 +379,85 @@ const TaskManagement = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <Card className="bg-gradient-to-r from-pink-500 to-pink-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90">Total Tasks</p>
-                                    <p className="text-2xl font-bold">{stats?.totalTasks || 0}</p>
+                                    <p className="text-sm text-gray-300">Total Tasks</p>
+                                    <p className="text-2xl font-bold text-white">{stats?.totalTasks || 0}</p>
                                 </div>
-                                <CalendarDays size={24} />
+                                <CalendarDays size={24} className="text-blue-400" />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-green-500 to-green-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90">Active Tasks</p>
-                                    <p className="text-2xl font-bold">{stats?.activeTasks || 0}</p>
+                                    <p className="text-sm text-gray-300">Active Tasks</p>
+                                    <p className="text-2xl font-bold text-white">{stats?.activeTasks || 0}</p>
                                 </div>
-                                <Clock size={24} />
+                                <Clock size={24} className="text-green-400" />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90">Completed</p>
-                                    <p className="text-2xl font-bold">{stats?.completedTasks || 0}</p>
+                                    <p className="text-sm text-gray-300">Completed</p>
+                                    <p className="text-2xl font-bold text-white">{stats?.completedTasks || 0}</p>
                                 </div>
-                                <CheckCircle size={24} />
+                                <CheckCircle size={24} className="text-purple-400" />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-red-500 to-red-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90">Overdue</p>
-                                    <p className="text-2xl font-bold">{stats?.overdueTasks || 0}</p>
+                                    <p className="text-sm text-gray-300">Overdue</p>
+                                    <p className="text-2xl font-bold text-white">{stats?.overdueTasks || 0}</p>
                                 </div>
-                                <AlertTriangle size={24} />
+                                <AlertTriangle size={24} className="text-red-400" />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-amber-500 to-amber-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90">High Priority</p>
-                                    <p className="text-2xl font-bold">{stats?.highPriorityTasks || 0}</p>
+                                    <p className="text-sm text-gray-300">High Priority</p>
+                                    <p className="text-2xl font-bold text-white">{stats?.highPriorityTasks || 0}</p>
                                 </div>
-                                <TrendingUp size={24} />
+                                <TrendingUp size={24} className="text-amber-400" />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm opacity-90">This Week</p>
-                                    <p className="text-2xl font-bold">{stats?.tasksThisWeek || 0}</p>
+                                    <p className="text-sm text-gray-300">This Week</p>
+                                    <p className="text-2xl font-bold text-white">{stats?.tasksThisWeek || 0}</p>
                                 </div>
-                                <Users size={24} />
+                                <Users size={24} className="text-blue-400" />
                             </div>
                         </CardBody>
                     </Card>
                 </div>
 
                 {/* Enhanced Filters */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
                         <div className="flex items-center gap-2">
-                            <Filter size={18} />
-                            <h3 className="text-lg font-semibold">Search & Filter</h3>
+                            <Filter size={18} className="text-blue-400" />
+                            <h3 className="text-lg font-semibold text-white">Search & Filter</h3>
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -563,9 +563,9 @@ const TaskManagement = () => {
                 </Card>
 
                 {/* Tasks Table */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
-                        <h3 className="text-lg font-semibold">Tasks</h3>
+                        <h3 className="text-lg font-semibold text-white">Tasks</h3>
                     </CardHeader>
                     <CardBody>
                         <Table aria-label="Tasks table">
@@ -583,8 +583,8 @@ const TaskManagement = () => {
                                     <TableRow key={task._id}>
                                         <TableCell>
                                             <div>
-                                                <p className="font-medium">{task.title}</p>
-                                                <p className="text-sm text-gray-600">{task.category}</p>
+                                                <p className="font-medium text-white">{task.title}</p>
+                                                <p className="text-sm text-gray-300">{task.category}</p>
                                                 {task.tags && task.tags.length > 0 && (
                                                     <div className="flex gap-1 mt-1">
                                                         {task.tags.slice(0, 2).map((tag: string, index: number) => (
@@ -599,12 +599,12 @@ const TaskManagement = () => {
                                         <TableCell>
                                             <div className="flex flex-col">
                                                 {task.assignedTo?.slice(0, 2).map((assignee: any, index: number) => (
-                                                    <span key={index} className="text-sm">
+                                                    <span key={index} className="text-sm text-white">
                                                         {assignee.firstName} {assignee.lastName}
                                                     </span>
                                                 ))}
                                                 {task.assignedTo?.length > 2 && (
-                                                    <span className="text-xs text-gray-500">
+                                                    <span className="text-xs text-gray-300">
                                                         +{task.assignedTo.length - 2} more
                                                     </span>
                                                 )}
@@ -629,10 +629,10 @@ const TaskManagement = () => {
                                             </Chip>
                                         </TableCell>
                                         <TableCell>
-                                            <div className={`${isOverdue(task.dueDate, task.status) ? 'text-red-600' : ''}`}>
+                                            <div className={`${isOverdue(task.dueDate, task.status) ? 'text-red-400' : 'text-white'}`}>
                                                 {formatDate(task.dueDate)}
                                                 {isOverdue(task.dueDate, task.status) && (
-                                                    <span className="block text-xs">Overdue</span>
+                                                    <span className="block text-xs text-red-400">Overdue</span>
                                                 )}
                                             </div>
                                         </TableCell>
@@ -643,7 +643,7 @@ const TaskManagement = () => {
                                                     size="sm"
                                                     color={task.progress === 100 ? "success" : "primary"}
                                                 />
-                                                <span className="text-xs text-gray-600">
+                                                <span className="text-xs text-gray-300">
                                                     {task.progress || 0}%
                                                 </span>
                                             </div>
@@ -690,7 +690,7 @@ const TaskManagement = () => {
 
                         {tasks.length === 0 && (
                             <div className="text-center py-8">
-                                <p className="text-gray-600">No tasks found matching your criteria</p>
+                                <p className="text-gray-300">No tasks found matching your criteria</p>
                             </div>
                         )}
                     </CardBody>
