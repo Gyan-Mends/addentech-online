@@ -165,155 +165,208 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function UserPermissionsPage() {
-  const loaderData = useLoaderData<typeof loader>();
+  const { users } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
-  
-  const [users, setUsers] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
-  const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
-  
   const isSubmitting = navigation.state === "submitting";
   
-  useEffect(() => {
-    if (loaderData?.users) {
-      setUsers(loaderData.users);
-    }
-  }, [loaderData]);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
   
-  // Update permissions when user is selected
+  // Initialize permissions when user is selected
   useEffect(() => {
     if (selectedUser) {
-      const userPerms: Record<string, boolean> = {};
-      
-      // Initialize all permissions to false
-      Object.keys(availablePermissions).forEach(key => {
-        userPerms[key] = false;
-      });
-      
-      // Set user's actual permissions
-      if (selectedUser.permissions) {
-        Object.entries(selectedUser.permissions).forEach(([key, value]) => {
-          if (key in availablePermissions) {
-            userPerms[key] = Boolean(value);
-          }
-        });
-      }
-      
-      setUserPermissions(userPerms);
+      const permissions = selectedUser.permissions ? Object.fromEntries(selectedUser.permissions) : {};
+      setUserPermissions(permissions);
     }
   }, [selectedUser]);
   
-  // Handle permission toggle
-  const handlePermissionChange = (permission: string, checked: boolean) => {
+  const handlePermissionChange = (permissionKey: string, checked: boolean) => {
     setUserPermissions(prev => ({
       ...prev,
-      [permission]: checked
+      [permissionKey]: checked
     }));
   };
   
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Shield className="h-6 w-6 text-pink-500" />
-            User Permissions Management
-          </h1>
-          
-          {isSubmitting && <Spinner />}
+      <div className="space-y-6 !text-white">
+        {/* Header */}
+        <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Shield className="h-6 w-6 text-blue-400" />
+                User Permissions Management
+              </h1>
+              <p className="text-gray-300 mt-1">Manage user access and permissions across the system</p>
+            </div>
+            {isSubmitting && <Spinner />}
+          </div>
         </div>
         
+        {/* Action Data Messages */}
         {actionData && (
           <div
-            className={`mb-4 p-4 rounded-md ${
+            className={`p-4 rounded-md border ${
               actionData.success
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
+                ? "bg-green-900/20 text-green-300 border-green-700"
+                : "bg-red-900/20 text-red-300 border-red-700"
             }`}
           >
             {actionData.message}
           </div>
         )}
         
-        <div className="mb-6">
+        {/* User Selection */}
+        <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+          <h2 className="text-lg font-semibold text-white mb-4">Select User</h2>
           <Select
-            label="Select User"
-            placeholder="Choose a user to manage permissions"
+            label="Choose a user to manage permissions"
+            placeholder="Select a user..."
+            className="max-w-md"
+            classNames={{
+              trigger: "bg-dashboard-tertiary border-white/20 text-white",
+              value: "text-white",
+              listbox: "bg-dashboard-secondary",
+              popoverContent: "bg-dashboard-secondary border-white/20"
+            }}
             onChange={(e) => {
               const userId = e.target.value;
-              const user = users.find(u => u._id === userId);
-              setSelectedUser(user);
+              const user = users.find(u => u?._id === userId);
+              setSelectedUser(user || null);
             }}
           >
             {users.map((user) => (
-              <SelectItem key={user._id} value={user._id}>
+              <SelectItem key={user._id} value={user._id} className="text-white">
                 {user.firstName} {user.lastName} ({user.email}) - {user.role}
               </SelectItem>
             ))}
           </Select>
         </div>
         
+        {/* Permissions Management */}
         {selectedUser && (
-          <div>
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold">
-                Editing Permissions for {selectedUser.firstName} {selectedUser.lastName}
-              </h2>
-              <div className="flex gap-2 mt-2">
-                <Chip color="primary">{selectedUser.role}</Chip>
-                <Chip color="secondary">
-                  {selectedUser.department?.name || "No Department"}
-                </Chip>
+          <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-white">
+                  Permissions for {selectedUser.firstName} {selectedUser.lastName}
+                </h2>
+                                 <p className="text-gray-300 text-sm">
+                   Role: <span className="font-medium">{selectedUser?.role}</span> | 
+                   Department: <span className="font-medium">{selectedUser?.department?.name || "Not assigned"}</span>
+                 </p>
               </div>
             </div>
             
-            <Form method="post">
+            <Form method="post" className="space-y-6">
               <input type="hidden" name="_action" value="update_permissions" />
               <input type="hidden" name="userId" value={selectedUser._id} />
               
-              <Card className="mb-4">
-                <div className="p-4">
-                  {Object.entries(permissionCategories).map(([category, permissions]) => (
-                    <div key={category} className="mb-6">
-                      <h3 className="text-lg font-semibold mb-2">{category}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {permissions.map(perm => (
-                          <Checkbox
-                            key={perm}
-                            name={`perm_${perm}`}
-                            isSelected={userPermissions[perm]}
-                            onChange={(e) => handlePermissionChange(perm, e.target.checked)}
-                          >
-                            {availablePermissions[perm]}
-                          </Checkbox>
-                        ))}
+              {Object.entries(permissionCategories).map(([category, permissions]) => (
+                <div key={category} className="bg-dashboard-tertiary p-4 rounded-lg border border-white/10">
+                  <h3 className="text-md font-semibold text-white mb-3 flex items-center gap-2">
+                    <UserCheck className="h-4 w-4 text-blue-400" />
+                    {category}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {permissions.map((permissionKey) => (
+                      <div key={permissionKey} className="flex items-center space-x-2">
+                        <Checkbox
+                          name={`perm_${permissionKey}`}
+                          isSelected={userPermissions[permissionKey] || false}
+                          onValueChange={(checked) => handlePermissionChange(permissionKey, checked)}
+                          className="text-white"
+                          classNames={{
+                            wrapper: "before:border-white/30",
+                            label: "text-gray-300"
+                          }}
+                        >
+                                                     <span className="text-sm text-gray-300">
+                             {availablePermissions[permissionKey as keyof typeof availablePermissions] || permissionKey}
+                           </span>
+                        </Checkbox>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </Card>
+              ))}
               
-              <div className="flex justify-end">
+              <div className="flex justify-end pt-4 border-t border-white/10">
                 <Button
                   type="submit"
                   color="primary"
-                  startContent={<Save size={16} />}
                   isLoading={isSubmitting}
+                  startContent={<Save className="h-4 w-4" />}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  Save Permissions
+                  {isSubmitting ? "Updating..." : "Update Permissions"}
                 </Button>
               </div>
             </Form>
           </div>
         )}
         
-        {!selectedUser && (
-          <div className="text-center py-12 text-gray-500">
-            <UserCheck size={48} className="mx-auto mb-4 text-gray-400" />
-            <p>Select a user to manage their permissions</p>
+        {/* Current Users Overview */}
+        <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+          <h2 className="text-lg font-semibold text-white mb-4">Users Overview</h2>
+          <div className="overflow-x-auto">
+            <Table 
+              aria-label="Users table"
+              classNames={{
+                wrapper: "bg-dashboard-secondary border border-white/10",
+                th: "bg-dashboard-tertiary text-white border-b border-white/10",
+                td: "text-gray-300 border-b border-white/10"
+              }}
+            >
+              <TableHeader>
+                <TableColumn>NAME</TableColumn>
+                <TableColumn>EMAIL</TableColumn>
+                <TableColumn>ROLE</TableColumn>
+                <TableColumn>DEPARTMENT</TableColumn>
+                <TableColumn>PERMISSIONS</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user._id}>
+                    <TableCell className="font-medium">
+                      {user.firstName} {user.lastName}
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        size="sm" 
+                        className={`${
+                          user.role === 'admin' ? 'bg-red-600 text-white' :
+                          user.role === 'manager' ? 'bg-blue-600 text-white' :
+                          user.role === 'department_head' ? 'bg-purple-600 text-white' :
+                          'bg-green-600 text-white'
+                        }`}
+                      >
+                        {user.role}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>
+                      {user.department?.name || "Not assigned"}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        onClick={() => setSelectedUser(user)}
+                        className="bg-dashboard-tertiary text-white border border-white/20 hover:bg-dashboard-primary"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        )}
+        </div>
       </div>
     </AdminLayout>
   );

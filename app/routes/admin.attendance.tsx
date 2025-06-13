@@ -540,24 +540,24 @@ export default function AttendancePage() {
 
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md border lg:border-black/10 border-black/30">
+      <div className="bg-dashboard-secondary  p-6 rounded-lg shadow-md border lg:border-black/10 border-black/30">
         <Toaster position="top-right" />
         <div className="lg:flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
+          <div className="text-white">
+            <h1 className="text-2xl font-bold ">
               Attendance Management
             </h1>
             {loaderData.currentUser && (
               <p className="text-gray-600 mt-1">
                 Welcome, {loaderData.currentUser.firstName} {loaderData.currentUser.lastName} | 
-                Current Work Mode: <span className="font-semibold">{loaderData.currentUser.workMode === "in-house" ? "In-House" : "Remote"}</span>
+                Current Work Mode: <span className="font-semibold text-primary">{loaderData.currentUser.workMode === "in-house" ? "In-House" : "Remote"}</span>
               </p>
             )}
           </div>
 
           {/* Check In Form */}
-          <Form method="post" className="flex mt-10 lg:mt-0 flex-col space-y-4 w-full max-w-lg p-4 border rounded-lg border-black/10 shadow">
-            <h2 className="text-lg font-semibold text-gray-700">Check In</h2>
+          <Form method="post" className="flex mt-10 lg:mt-0 border border-white/10 flex-col space-y-4 w-full max-w-lg p-4 border rounded-lg border-black/10 shadow">
+            <h2 className="text-lg font-semibold text-white">Check In</h2>
             <input type="hidden" name="_action" value="checkIn" />
             <input type="hidden" name="latitude" id="latitude" />
             <input type="hidden" name="longitude" id="longitude" />
@@ -568,23 +568,24 @@ export default function AttendancePage() {
               <Input
                 name="notes"
                 label="Notes"
+                className="text-white"
                 placeholder="Any notes for today?"
                 classNames={{
-                  inputWrapper: "bg-white border border-black/20 shadow-sm"
+                  inputWrapper: "bg-dashboard-secondary border border-white/10 shadow-sm"
                 }}
               />
             </div>
 
             {/* Attendance Status and Rules */}
-            <div className="p-3 bg-blue-50 rounded-lg mb-4">
-              <p className="text-sm text-blue-700 mb-2">
+            <div className="p-3 bg-dashboard-secondary border border-white/10 !text-white rounded-lg mb-4">
+              <p className="text-sm text-white mb-2">
                 <span className="font-semibold">Work Mode:</span> {loaderData.currentUser?.workMode === "in-house" ? "In-House" : "Remote"}
               </p>
 
               {/* Attendance Rules Section */}
               <div className="border-t border-blue-200 pt-2 mt-2">
-                <p className="text-xs font-semibold text-blue-800 mb-1">Attendance Rules:</p>
-                <ul className="text-xs text-gray-700 list-disc pl-4 space-y-1">
+                <p className="text-xs font-semibold text-dark-text mb-1">Attendance Rules:</p>
+                <ul className="text-xs text-white list-disc pl-4 space-y-1">
                   <li>Attendance cannot be taken on weekends (Saturday/Sunday)</li>
                   <li>Check-in is only allowed between 7:00 AM and 5:00 PM</li>
                   <li>You can check out anytime after check-in</li>
@@ -594,8 +595,8 @@ export default function AttendancePage() {
 
               {loaderData.currentUser?.workMode === "in-house" && (
                 <div className="mt-3 border-t border-blue-200 pt-2">
-                  <p className="text-xs font-semibold text-blue-800 mb-1">Location Requirements:</p>
-                  <p className="text-xs text-gray-700 mb-2">In-house attendance requires you to be physically present at the office location.</p>
+                  <p className="text-xs font-semibold text-dark-text mb-1">Location Requirements:</p>
+                  <p className="text-xs  mb-2">In-house attendance requires you to be physically present at the office location.</p>
                   <button 
                     type="button" 
                     className="text-xs bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -708,15 +709,15 @@ export default function AttendancePage() {
         
         {/* Work Mode Management (Admins and Managers only) */}
         {loaderData.isAdmin && (
-          <div className="mb-8 p-4 border rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Manage Work Modes</h2>
+          <div className="mb-8 p-4 border border-white/10 rounded-lg shadow">
+            <h2 className="text-lg font-semibold text-white mb-4">Manage Work Modes</h2>
             <Form method="post" className="flex flex-col space-y-4">
               <input type="hidden" name="_action" value="updateWorkMode" />
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Select User</label>
-                  <select name="targetUserId" className="w-full px-3 py-2 border rounded-md" required>
+                  <label className="block text-sm font-medium text-white mb-1">Select User</label>
+                  <select name="targetUserId" className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
                     <option value="">Choose a user</option>
                     {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
                       <option key={user._id} value={user._id}>
@@ -727,8 +728,8 @@ export default function AttendancePage() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Work Mode</label>
-                  <select name="newWorkMode" className="w-full px-3 py-2 border rounded-md" required>
+                  <label className="block text-sm font-medium text-white mb-1">Work Mode</label>
+                  <select name="newWorkMode"  className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
                     <option value="">Select work mode</option>
                     <option value="in-house">In-House</option>
                     <option value="remote">Remote</option>
@@ -762,6 +763,7 @@ export default function AttendancePage() {
         className="flex flex-wrap"
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
+        
         >
           <Tab
             key="today"
@@ -779,7 +781,7 @@ export default function AttendancePage() {
                   <h3 className="text-lg font-semibold mb-2">Filter Attendance</h3>
                   <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
                     <div>
-                      <label className="block text-sm text-gray-700 mb-1">
+                      <label className="block text-sm text-white mb-1">
                         Department
                       </label>
                       <select
@@ -797,7 +799,7 @@ export default function AttendancePage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-700 mb-1">
+                      <label className="block text-sm text-white mb-1">
                         User
                       </label>
                       <select
@@ -857,7 +859,7 @@ export default function AttendancePage() {
                   {/* Department filter (admin only) */}
                   {loaderData.isAdmin && (
                     <div>
-                      <label className="block text-sm text-gray-700 mb-1">
+                      <label className="block text-sm text-white mb-1">
                         Department
                       </label>
                       <select
@@ -876,7 +878,7 @@ export default function AttendancePage() {
                     </div>
                   )}
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
+                    <label className="block text-sm text-white mb-1">
                       Start Date
                     </label>
                     <input
@@ -891,7 +893,7 @@ export default function AttendancePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
+                    <label className="block text-sm text-white mb-1">
                       End Date
                     </label>
                     <input

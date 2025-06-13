@@ -118,64 +118,74 @@ const Users = () => {
 
     return (
         <AdminLayout>
-            <Toaster position="top-right" />
-            <div className="relative">
-                <div className="flex justify-end">
-                    <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
-                        setIsCreateModalOpened(true)
-                    }}>
-                        <Plus />
-                        Create Blog
-                    </Button>
+            <div className="space-y-6 !text-white">
+                <Toaster position="top-right" />
+                
+                {/* Header */}
+                <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-2xl font-bold text-white">Blog Management</h1>
+                            <p className="text-gray-300 mt-1">Create and manage blog posts</p>
+                        </div>
+                        <Button className="border text-white border-white/20 px-4 py-1 bg-blue-600 hover:bg-blue-700" onClick={() => {
+                            setIsCreateModalOpened(true)
+                        }}>
+                            <Plus />
+                            Create Blog
+                        </Button>
+                    </div>
                 </div>
-                {/* table  */}
-                {/* table  */}
-                <NewCustomTable
-                    columns={BlogColumns}
-                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
-                    totalPages={totalPages}
-                    page={1}
-                    setPage={(page) => (
-                        navigate(`?page=${page}`)
-                    )}>
-                    {blogs?.map((blog: BlogInterface, index: number) => (
-                        <TableRow key={index}>
-                            <TableCell className="text-xs">
-                                <p className="!text-xs">
-                                    <User
-                                        avatarProps={{ radius: "sm", src: blog?.image }}
-                                        name={
-                                            <p className="font-nunito text-xs">
-                                                {truncateText(blog?.name, 10)}
-                                            </p>
-                                        }
-                                    />
-                                </p>
-                            </TableCell>
-                            <TableCell className="text-xs">{blog.category?.name}</TableCell>
-                            <TableCell className="text-xs">{blog._id}</TableCell>
-                            <TableCell>
-                                <div dangerouslySetInnerHTML={{ __html: truncateText(blog.description, 15) }} />
-                            </TableCell>
-                            <TableCell className="relative flex items-center gap-4 text-primary">
-                                <button onClick={() => {
+                
+                {/* Table */}
+                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
+                    <NewCustomTable
+                        columns={BlogColumns}
+                        loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                        totalPages={totalPages}
+                        page={1}
+                        setPage={(page) => (
+                            navigate(`?page=${page}`)
+                        )}>
+                        {blogs?.map((blog: BlogInterface, index: number) => (
+                            <TableRow key={index}>
+                                <TableCell className="text-xs">
+                                    <p className="!text-xs">
+                                        <User
+                                            avatarProps={{ radius: "sm", src: blog?.image }}
+                                            name={
+                                                <p className="font-nunito text-xs">
+                                                    {truncateText(blog?.name, 10)}
+                                                </p>
+                                            }
+                                        />
+                                    </p>
+                                </TableCell>
+                                <TableCell className="text-xs">{blog.category?.name}</TableCell>
+                                <TableCell className="text-xs">{blog._id}</TableCell>
+                                <TableCell>
+                                    <div dangerouslySetInnerHTML={{ __html: truncateText(blog.description, 15) }} />
+                                </TableCell>
+                                <TableCell className="relative flex items-center gap-4 text-primary">
+                                    <button onClick={() => {
 
-                                    setIsEditModalOpened(true)
-                                    setDataValue(blog)
-                                }}>
-                                    <EditIcon className="text-primary" />
-                                </button>
-                                <button onClick={() => {
-                                    setIsConfirmModalOpened(true)
-                                    setDataValue(blog)
-                                }}>
-                                    <DeleteIcon className="text-danger" />
-                                </button>
+                                        setIsEditModalOpened(true)
+                                        setDataValue(blog)
+                                    }}>
+                                        <EditIcon className="text-primary" />
+                                    </button>
+                                    <button onClick={() => {
+                                        setIsConfirmModalOpened(true)
+                                        setDataValue(blog)
+                                    }}>
+                                        <DeleteIcon className="text-danger" />
+                                    </button>
 
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </NewCustomTable>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </NewCustomTable>
+                </div>
             </div>
 
             {/* confirm modal */}

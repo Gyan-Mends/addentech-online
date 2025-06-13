@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Input, Textarea, TableRow, TableCell, Tooltip, Skeleton } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
+import { Toaster } from "react-hot-toast";
 
 import { CategoryColumns, ContactColumns } from "~/components/table/columns";
 
@@ -72,64 +73,78 @@ const Category = () => {
     }, [])
 
     return (
-        <AdminLayout handleOnClick={handleClick} pageName="Categories">
-
-            <div className="">
-                <NewCustomTable
-                    columns={ContactColumns}
-                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
-                    totalPages={totalPages}
-                    page={1}
-                    setPage={(page) => (
-                        navigate(`?page=${page}`)
-                    )}>
-                    {contacts.map((contact: ContactInterface, index: number) => (
-                        <TableRow key={index}>
-                            <TableCell>{contact.firstName}</TableCell>
-                            <TableCell>{contact.middleName}</TableCell>
-                            <TableCell>{contact.lastName}</TableCell>
-                            <TableCell>{contact.number}</TableCell>
-                            <TableCell>{contact.description}</TableCell>
-                            <TableCell className="relative flex items-center gap-4">
-
-                                <button onClick={() => {
-                                    setDataValue(contact)
-                                    setConfirmModalOpened(true)
-                                }}>
-                                    <DeleteIcon className="text-danger" />
-                                </button>
-
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </NewCustomTable>
-            </div>
-
-
-            <ConfirmModal className="dark:bg-[#333] !bg-[#020817] border border-white/20"
-                content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
-                <div className="flex gap-4">
-                    <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
-                        No
-                    </Button>
-                    <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
-                        if (dataValue) {
-                            submit({
-                                intent: "delete",
-                                id: dataValue?._id
-
-                            }, {
-                                method: "post"
-                            })
-                        }
-                    }} >
-                        Yes
-                    </Button>
+        <AdminLayout>
+            <div className="space-y-6 !text-white">
+                <Toaster position="top-right" />
+                
+                {/* Header */}
+                <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-2xl font-bold text-white">Contact Messages</h1>
+                            <p className="text-gray-300 mt-1">Manage customer inquiries and messages</p>
+                        </div>
+                    </div>
                 </div>
-            </ConfirmModal>
+                
+                {/* Table */}
+                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
+                    <NewCustomTable
+                        columns={ContactColumns}
+                        loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                        totalPages={totalPages}
+                        page={1}
+                        setPage={(page) => (
+                            navigate(`?page=${page}`)
+                        )}>
+                        {contacts.map((contact: ContactInterface, index: number) => (
+                            <TableRow key={index}>
+                                <TableCell>{contact.firstName}</TableCell>
+                                <TableCell>{contact.middleName}</TableCell>
+                                <TableCell>{contact.lastName}</TableCell>
+                                <TableCell>{contact.number}</TableCell>
+                                <TableCell>{contact.description}</TableCell>
+                                <TableCell className="relative flex items-center gap-4">
+
+                                    <button onClick={() => {
+                                        setDataValue(contact)
+                                        setConfirmModalOpened(true)
+                                    }}>
+                                        <DeleteIcon className="text-danger" />
+                                    </button>
+
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </NewCustomTable>
+                </div>
+
+
+                <ConfirmModal className="dark:bg-[#333] !bg-[#020817] border border-white/20"
+                    content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
+                    <div className="flex gap-4">
+                        <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
+                            No
+                        </Button>
+                        <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
+                            if (dataValue) {
+                                submit({
+                                    intent: "delete",
+                                    id: dataValue?._id
+
+                                }, {
+                                    method: "post"
+                                })
+                            }
+                        }} >
+                            Yes
+                        </Button>
+                    </div>
+                </ConfirmModal>
 
 
 
+            </div>
         </AdminLayout>
     );
 };

@@ -59,90 +59,139 @@ const Category = () => {
 
 
     return (
-        <AdminLayout >
-            <Toaster position="top-right" />
-            <div className="flex justify-end">
-                <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
-                    setCreateModalOpened(true)
-                }}>
-                    <Plus />
-                    Create Department
-                </Button>
-            </div>
-            <div className="">
-                <NewCustomTable
-                    columns={CategoryColumns}
-                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
-                    totalPages={totalPages}
-                    page={currentPage}
-                    setPage={(page) => (
-                        navigate(`?page=${page}`)
-                    )}>
-                    {departments.map((dept: DepartmentInterface, index: number) => (
-                        <TableRow key={index}>
-                            <TableCell>{dept.name}</TableCell>
-                            <TableCell>{dept.description}</TableCell>
-                            <TableCell className="relative flex items-center gap-4">
-                                <button onClick={() => {
-                                    setEditDrawerOpened(true)
-                                    setDataValue(dept)
-
-                                }}>
-                                    <EditIcon className="text-primary" />
-                                </button >
-                                <button onClick={() => {
-                                    setDataValue(dept)
-                                    setConfirmModalOpened(true)
-                                }}>
-                                    <DeleteIcon className="text-danger" />
-                                </button>
-
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </NewCustomTable>
-            </div>
-
-            <ConfirmModal
-                content="Are you sure to delete department" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
-                <div className="flex gap-4">
-                    <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
-                        No
-                    </Button>
-                    <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
-                        if (dataValue) {
-                            submit({
-                                intent: "delete",
-                                id: dataValue?._id
-
-                            }, {
-                                method: "post"
-                            })
-                        }
-                    }} >
-                        Yes
-                    </Button>
+        <AdminLayout>
+            <div className="space-y-6 !text-white">
+                <Toaster position="top-right" />
+                
+                {/* Header */}
+                <div className="bg-color-dark-2 border border-white/10 p-6 rounded-xl">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-2xl font-bold text-white">Department Management</h1>
+                            <p className="text-gray-300 mt-1">Manage organizational departments</p>
+                        </div>
+                        <Button className="border text-white border-white/20 px-4 py-1 bg-blue-600 hover:bg-blue-700" onClick={() => {
+                            setCreateModalOpened(true)
+                        }}>
+                            <Plus />
+                            Create Department
+                        </Button>
+                    </div>
                 </div>
-            </ConfirmModal>
+                
+                {/* Table */}
+                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
+                    <NewCustomTable
+                        columns={CategoryColumns}
+                        loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                        totalPages={totalPages}
+                        page={currentPage}
+                        setPage={(page) => (
+                            navigate(`?page=${page}`)
+                        )}>
+                        {departments.map((dept: DepartmentInterface, index: number) => (
+                            <TableRow key={index}>
+                                <TableCell>{dept.name}</TableCell>
+                                <TableCell>{dept.description}</TableCell>
+                                <TableCell className="relative flex items-center gap-4">
+                                    <button onClick={() => {
+                                        setEditDrawerOpened(true)
+                                        setDataValue(dept)
 
-            {dataValue && (
-                <Drawer isDrawerOpened={editDrawerOpened} handleDrawerClosed={handleEditDrawerModalClose} title="Edit Department">
+                                    }}>
+                                        <EditIcon className="text-primary" />
+                                    </button >
+                                    <button onClick={() => {
+                                        setDataValue(dept)
+                                        setConfirmModalOpened(true)
+                                    }}>
+                                        <DeleteIcon className="text-danger" />
+                                    </button>
+
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </NewCustomTable>
+                </div>
+
+                <ConfirmModal
+                    content="Are you sure to delete department" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
+                    <div className="flex gap-4">
+                        <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>
+                            No
+                        </Button>
+                        <Button size="sm" color="primary" className="font-montserrat font-semibold" onClick={() => {
+                            if (dataValue) {
+                                submit({
+                                    intent: "delete",
+                                    id: dataValue?._id
+
+                                }, {
+                                    method: "post"
+                                })
+                            }
+                        }} >
+                            Yes
+                        </Button>
+                    </div>
+                </ConfirmModal>
+
+                {dataValue && (
+                    <Drawer isDrawerOpened={editDrawerOpened} handleDrawerClosed={handleEditDrawerModalClose} title="Edit Department">
+                        <Form method="post" className="p-4">
+                            <Input
+                                label="Name"
+                                name="name"
+                                defaultValue={dataValue?.name}
+                                placeholder=" "
+                                type="text"
+                                labelPlacement="outside"
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-black/30 focus:bg-[#333]",
+                                }}
+                            />
+                            <input name="seller" value={user?.user} type="hidden" />
+                            <input name="intent" value="update" type="hidden" />
+                            <input name="id" value={dataValue?._id} type="hidden" />
+
+                            <Textarea
+                                autoFocus
+                                label="Department description"
+                                labelPlacement="outside"
+                                placeholder=" "
+                                name="description"
+                                className="mt-4 font-nunito text-sm"
+                                defaultValue={dataValue?.description}
+                                classNames={{
+                                    label: "font-nunito text-sm text-default-100",
+                                    inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                                }}
+                            />
+
+                            <button
+                                type="submit"
+                                className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4"
+                            >
+                                Update
+                            </button>
+                        </Form>
+                    </Drawer>
+                )}
+
+
+
+                <Drawer isDrawerOpened={createModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Department">
                     <Form method="post" className="p-4">
-                        <Input
+                        <CustomInput
                             label="Name"
                             name="name"
-                            defaultValue={dataValue?.name}
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
-                            classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-black/30 focus:bg-[#333]",
-                            }}
                         />
-                        <input name="seller" value={user?.user} type="hidden" />
-                        <input name="intent" value="update" type="hidden" />
-                        <input name="id" value={dataValue?._id} type="hidden" />
+                        {/* <input hidden name="admin" value={user?.user} type="" /> */}
+                        <input hidden name="intent" value="create" type="" />
 
                         <Textarea
                             autoFocus
@@ -151,57 +200,20 @@ const Category = () => {
                             placeholder=" "
                             name="description"
                             className="mt-4 font-nunito text-sm"
-                            defaultValue={dataValue?.description}
                             classNames={{
                                 label: "font-nunito text-sm text-default-100",
                                 inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                             }}
                         />
 
-                        <button
-                            type="submit"
-                            className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4"
-                        >
-                            Update
+                        <button onClick={() => {
+                        }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
+                            Submit
                         </button>
                     </Form>
                 </Drawer>
-            )}
 
-
-
-            <Drawer isDrawerOpened={createModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create New Department">
-                <Form method="post" className="p-4">
-                    <CustomInput
-                        label="Name"
-                        name="name"
-                        placeholder=" "
-                        type="text"
-                        labelPlacement="outside"
-                    />
-                    {/* <input hidden name="admin" value={user?.user} type="" /> */}
-                    <input hidden name="intent" value="create" type="" />
-
-                    <Textarea
-                        autoFocus
-                        label="Department description"
-                        labelPlacement="outside"
-                        placeholder=" "
-                        name="description"
-                        className="mt-4 font-nunito text-sm"
-                        classNames={{
-                            label: "font-nunito text-sm text-default-100",
-                            inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
-                        }}
-                    />
-
-                    <button onClick={() => {
-                    }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
-                        Submit
-                    </button>
-                </Form>
-            </Drawer>
-
+            </div>
         </AdminLayout>
     );
 };
