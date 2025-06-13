@@ -13,6 +13,7 @@ import { getSession } from "~/session"
 import Registration from "~/modal/registration"
 import dashboard from "~/controller/dashboard"
 import { motion } from "framer-motion"
+import LineChart from "~/components/ui/LineChart"
 
 const StaffDashboard = () => {
   const { userProfile, dashboardData, error } = useLoaderData<typeof loader>()
@@ -142,6 +143,37 @@ const StaffDashboard = () => {
             description="Current setting"
             icon={<Home className="h-5 w-5" />}
             color="secondary"
+          />
+        </motion.div>
+
+        {/* Staff Statistics Line Chart */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+        >
+          <LineChart
+            title="My Personal Statistics Overview"
+            data={{
+              labels: ['My Tasks', 'Completed', 'Pending', 'In Progress'],
+              datasets: [
+                {
+                  label: 'My Stats',
+                  data: [
+                    dashboardData?.userTasks?.values?.reduce((a: number, b: number) => a + b, 0) || 0,
+                    dashboardData?.userTasks?.values?.[dashboardData.userTasks?.labels?.indexOf('completed')] || 0,
+                    dashboardData?.userTasks?.values?.[dashboardData.userTasks?.labels?.indexOf('pending')] || 0,
+                    dashboardData?.userTasks?.values?.[dashboardData.userTasks?.labels?.indexOf('in_progress')] || 0
+                  ],
+                  borderColor: '#8B5CF6',
+                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
+            }}
+            height={350}
+            className="mb-6"
           />
         </motion.div>
 

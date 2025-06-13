@@ -15,6 +15,7 @@ import Registration from "~/modal/registration"
 import Department from "~/modal/department"
 import { getSession } from "~/session"
 import { motion } from "framer-motion"
+import LineChart from "~/components/ui/LineChart"
 
 const DepartmentHeadDashboard = () => {
   const { dashboardData, departmentName, error, userProfile } = useLoaderData<typeof loader>()
@@ -144,6 +145,37 @@ const DepartmentHeadDashboard = () => {
             description="This month"
             icon={<Clock className="h-5 w-5" />}
             color="warning"
+          />
+        </motion.div>
+
+        {/* Department Head Statistics Line Chart */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+        >
+          <LineChart
+            title="Department Statistics Overview"
+            data={{
+              labels: ['Department Staff', 'Department Tasks', 'Work Modes', 'Monthly Attendance'],
+              datasets: [
+                {
+                  label: 'Department Stats',
+                  data: [
+                    dashboardData?.departmentStaff || 0,
+                    dashboardData?.departmentTasks?.values?.reduce((a: number, b: number) => a + b, 0) || 0,
+                    dashboardData?.workModeBreakdown?.labels?.length || 0,
+                    dashboardData?.departmentAttendance?.values?.reduce((a: number, b: number) => a + b, 0) || 0
+                  ],
+                  borderColor: '#F59E0B',
+                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
+            }}
+            height={350}
+            className="mb-6"
           />
         </motion.div>
 

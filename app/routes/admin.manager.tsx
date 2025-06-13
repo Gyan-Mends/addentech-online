@@ -13,6 +13,7 @@ import { getSession } from "~/session"
 import Registration from "~/modal/registration"
 import dashboard from "~/controller/dashboard"
 import { motion } from "framer-motion"
+import LineChart from "~/components/ui/LineChart"
 
 const ManagerDashboard = () => {
   const { userProfile, dashboardData, error } = useLoaderData<typeof loader>()
@@ -142,6 +143,37 @@ const ManagerDashboard = () => {
             description="Currently managed"
             icon={<Target className="h-5 w-5" />}
             color="warning"
+          />
+        </motion.div>
+
+        {/* Manager Statistics Line Chart */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+        >
+          <LineChart
+            title="Management Statistics Overview"
+            data={{
+              labels: ['Total Users', 'Departments', 'Work Modes', 'Active Tasks'],
+              datasets: [
+                {
+                  label: 'Management Stats',
+                  data: [
+                    dashboardData?.totalUsers || 0,
+                    dashboardData?.totalDepartments || 0,
+                    dashboardData?.workModeDistribution?.labels?.length || 0,
+                    dashboardData?.tasksByStatus?.values?.reduce((a: number, b: number) => a + b, 0) || 0
+                  ],
+                  borderColor: '#10B981',
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
+            }}
+            height={350}
+            className="mb-6"
           />
         </motion.div>
 
