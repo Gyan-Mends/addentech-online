@@ -30,44 +30,44 @@ const DashboardMetricCard: React.FC<DashboardMetricCardProps> = ({
     switch (color) {
       case "primary":
         return {
-          bg: "bg-blue-500/10",
-          icon: "text-blue-500",
-          trend: "text-blue-600",
+          bg: "bg-avatar-blue",
+          icon: "text-dashboard-primary",
+          trend: "text-dashboard-primary",
           progress: "success"
         };
       case "secondary":
         return {
-          bg: "bg-purple-500/10",
-          icon: "text-purple-500",
-          trend: "text-purple-600",
+          bg: "bg-avatar-purple",
+          icon: "text-dashboard-primary",
+          trend: "text-dashboard-primary",
           progress: "secondary"
         };
       case "success":
         return {
-          bg: "bg-green-500/10",
-          icon: "text-green-500",
-          trend: "text-green-600",
+          bg: "bg-status-active",
+          icon: "text-dashboard-primary",
+          trend: "text-dashboard-primary",
           progress: "success"
         };
       case "warning":
         return {
-          bg: "bg-yellow-500/10",
-          icon: "text-yellow-500",
-          trend: "text-yellow-600",
+          bg: "bg-avatar-orange",
+          icon: "text-dashboard-primary",
+          trend: "text-dashboard-primary",
           progress: "warning"
         };
       case "danger":
         return {
-          bg: "bg-red-500/10",
-          icon: "text-red-500",
-          trend: "text-red-600",
+          bg: "bg-status-admin",
+          icon: "text-dashboard-primary",
+          trend: "text-dashboard-primary",
           progress: "danger"
         };
       default:
         return {
-          bg: "bg-gray-500/10",
-          icon: "text-gray-500",
-          trend: "text-gray-600",
+          bg: "bg-dashboard-tertiary",
+          icon: "text-dashboard-secondary",
+          trend: "text-dashboard-secondary",
           progress: "default"
         };
     }
@@ -89,11 +89,11 @@ const DashboardMetricCard: React.FC<DashboardMetricCardProps> = ({
   const getTrendColor = () => {
     switch (trend) {
       case "up":
-        return "text-green-600";
+        return "text-status-active";
       case "down":
-        return "text-red-600";
+        return "text-status-admin";
       default:
-        return "text-gray-600";
+        return "text-dashboard-muted";
     }
   };
 
@@ -104,7 +104,7 @@ const DashboardMetricCard: React.FC<DashboardMetricCardProps> = ({
       transition={{ duration: 0.3 }}
       whileHover={{ y: -2 }}
     >
-      <Card className="bg-white shadow-sm border border-gray-200/50 hover:shadow-md transition-all duration-300">
+      <Card className="bg-dashboard-secondary shadow-sm border border-dashboard hover:shadow-md transition-all duration-300">
         <CardHeader className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-lg ${colorClasses.bg} flex items-center justify-center`}>
@@ -113,7 +113,7 @@ const DashboardMetricCard: React.FC<DashboardMetricCardProps> = ({
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">{title}</p>
+              <p className="text-sm font-medium text-dashboard-secondary">{title}</p>
               {trendPercentage && (
                 <div className={`flex items-center gap-1 text-xs ${getTrendColor()}`}>
                   {getTrendIcon()}
@@ -127,12 +127,12 @@ const DashboardMetricCard: React.FC<DashboardMetricCardProps> = ({
           <div className="space-y-2">
             <div className={`text-2xl font-bold ${colorClasses.trend}`}>
               {isLoading ? (
-                <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                <div className="animate-pulse bg-dashboard-tertiary h-8 w-16 rounded"></div>
               ) : (
                 value
               )}
             </div>
-            <p className="text-xs text-gray-500">{description}</p>
+            <p className="text-xs text-dashboard-muted">{description}</p>
             {progressValue !== undefined && (
               <Progress
                 size="sm"

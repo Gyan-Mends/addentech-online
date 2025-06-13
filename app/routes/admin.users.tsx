@@ -152,10 +152,10 @@ const Users = () => {
 
     return (
         <AdminLayout>
-            <div className="relative">
+            <div className="relative bg-dashboard-primary min-h-screen">
                 <Toaster position="top-right" />
-                <div className="flex justify-end">
-                    <Button className="border text-white border-white/30 px-4 py-1 bg-pink-500" onClick={() => {
+                <div className="flex justify-end mb-6">
+                    <Button className="border text-dashboard-primary border-dashboard-light px-4 py-1 bg-action-primary hover:bg-action-primary:hover" onClick={() => {
                         setIsCreateModalOpened(true)
                     }}>
                         <Plus />
@@ -163,59 +163,70 @@ const Users = () => {
                     </Button>
                 </div>
                 {/* table  */}
-                {/* table  */}
-                <NewCustomTable
-                    columns={UserColumns}
-                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
-                    totalPages={totalPages}
-                    page={currentPage}
-                    setPage={(page) => (
-                        navigate(`?page=${page}`)
-                    )}>
-                    {users?.map((user, index: number) => (
-                        <TableRow key={index}>
-                            <TableCell className="text-xs">
-                                <p className="!text-xs">
-                                    <User
-                                        avatarProps={{ radius: "sm", src: user.image }}
-                                        name={
-                                            <p className="font-nunito text-xs">
-                                                {user.firstName + ' ' + user.middleName + ' ' + user.lastName}
-                                            </p>
-                                        }
-                                    />
-                                </p>
-                            </TableCell>
-                            <TableCell className="text-xs">{user.email}</TableCell>
-                            <TableCell>{user.phone}</TableCell>
-                            <TableCell>{user.department.name}</TableCell>
-                            <TableCell>{user.role}</TableCell>
-                            <TableCell className="relative flex items-center gap-4 mt-2">
-                                <button className="text-primary " onClick={() => {
-                                    setIsEditDrawerOpened(true)
-                                    setDataValue(user)
-                                    console.log('=== EDIT DEBUG INFO ===');
-                                    console.log('Current page:', currentPage);
-                                    console.log('User data for edit:', user);
-                                    console.log('Department structure:', user.department);
-                                    console.log('Department type:', typeof user.department);
-                                    console.log('Available departments:', departments);
-                                    console.log('========================');
+                <div className="bg-dashboard-secondary rounded-lg border border-dashboard">
+                    <NewCustomTable
+                        columns={UserColumns}
+                        loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                        totalPages={totalPages}
+                        page={currentPage}
+                        setPage={(page) => (
+                            navigate(`?page=${page}`)
+                        )}>
+                        {users?.map((user, index: number) => (
+                            <TableRow key={index} className="border-b border-dashboard hover:bg-dashboard-tertiary">
+                                <TableCell className="text-xs">
+                                    <p className="!text-xs">
+                                        <User
+                                            avatarProps={{ radius: "sm", src: user.image }}
+                                            name={
+                                                <p className="font-nunito text-xs text-dashboard-primary">
+                                                    {user.firstName + ' ' + user.middleName + ' ' + user.lastName}
+                                                </p>
+                                            }
+                                        />
+                                    </p>
+                                </TableCell>
+                                <TableCell className="text-xs text-dashboard-secondary">{user.email}</TableCell>
+                                <TableCell className="text-dashboard-secondary">{user.phone}</TableCell>
+                                <TableCell className="text-dashboard-secondary">{typeof user.department === 'object' && user.department ? (user.department as any).name : user.department}</TableCell>
+                                <TableCell>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        user.role === 'admin' ? 'bg-status-admin text-dashboard-primary' :
+                                        user.role === 'manager' ? 'bg-avatar-blue text-dashboard-primary' :
+                                        user.role === 'department_head' ? 'bg-avatar-purple text-dashboard-primary' :
+                                        'bg-status-active text-dashboard-primary'
+                                    }`}>
+                                        {user.role}
+                                    </span>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-2">
+                                        <button className="text-action-view hover:text-green-300" onClick={() => {
+                                            setIsEditDrawerOpened(true)
+                                            setDataValue(user as any)
+                                            console.log('=== EDIT DEBUG INFO ===');
+                                            console.log('Current page:', currentPage);
+                                            console.log('User data for edit:', user);
+                                            console.log('Department structure:', user.department);
+                                            console.log('Department type:', typeof user.department);
+                                            console.log('Available departments:', departments);
+                                            console.log('========================');
 
-                                }}>
-
-                                    <EditIcon className="" />
-                                </button>
-                                <button className="text-danger" onClick={() => {
-                                    setIsConfirmModalOpened(true)
-                                    setDataValue(user)
-                                }}>
-                                    <DeleteIcon className="" />
-                                </button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </NewCustomTable>
+                                        }}>
+                                            <EditIcon className="" />
+                                        </button>
+                                        <button className="text-action-delete hover:text-red-300" onClick={() => {
+                                            setIsConfirmModalOpened(true)
+                                            setDataValue(user as any)
+                                        }}>
+                                            <DeleteIcon className="" />
+                                        </button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </NewCustomTable>
+                </div>
             </div>
 
             {/* confirm modal */}

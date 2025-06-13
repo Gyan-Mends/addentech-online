@@ -68,3 +68,139 @@
         --ring: 224.3 76.3% 48%;
     }
 }
+
+.bg-color-dark {
+    @apply bg-gray-900 
+}
+.bg-color-dark-2 {
+    @apply bg-gray-800 
+}
+.dark-text {
+    @apply text-gray-300 
+}
+
+/* Dashboard Global Color System */
+.bg-dashboard-primary {
+    @apply bg-slate-900; /* Main dark background #0F172A */
+}
+
+.bg-dashboard-secondary {
+    @apply bg-slate-800; /* Card/panel background #1E293B */
+}
+
+.bg-dashboard-tertiary {
+    @apply bg-slate-700; /* Lighter panels/inputs #334155 */
+}
+
+/* Text Colors */
+.text-dashboard-primary {
+    @apply text-white; /* Primary white text */
+}
+
+.text-dashboard-secondary {
+    @apply text-slate-300; /* Secondary gray text */
+}
+
+.text-dashboard-muted {
+    @apply text-slate-400; /* Muted/subtle text */
+}
+
+/* Status Colors */
+.bg-status-active {
+    @apply bg-green-600; /* Active status green */
+}
+
+.text-status-active {
+    @apply text-green-400;
+}
+
+.bg-status-inactive {
+    @apply bg-gray-600; /* Inactive status */
+}
+
+.text-status-inactive {
+    @apply text-gray-400;
+}
+
+.bg-status-admin {
+    @apply bg-red-600; /* Admin role red */
+}
+
+.text-status-admin {
+    @apply text-red-400;
+}
+
+/* Action Colors */
+.bg-action-primary {
+    @apply bg-blue-600; /* Primary blue buttons */
+}
+
+.bg-action-primary:hover {
+    @apply bg-blue-700;
+}
+
+.text-action-view {
+    @apply text-green-400; /* View action */
+}
+
+.text-action-edit {
+    @apply text-blue-400; /* Edit action */
+}
+
+.text-action-delete {
+    @apply text-red-400; /* Delete action */
+}
+
+/* Avatar Colors */
+.bg-avatar-purple {
+    @apply bg-purple-600;
+}
+
+.bg-avatar-blue {
+    @apply bg-blue-600;
+}
+
+.bg-avatar-orange {
+    @apply bg-orange-600;
+}
+
+.bg-avatar-green {
+    @apply bg-green-600;
+}
+
+/* Border Colors */
+.border-dashboard {
+    @apply border-slate-700;
+}
+
+.border-dashboard-light {
+    @apply border-slate-600;
+}
+
+/* Input/Form Colors */
+.bg-input-dashboard {
+    @apply bg-slate-700 border-slate-600;
+}
+
+.bg-input-dashboard:focus {
+    @apply bg-slate-600 border-slate-500;
+}
+
+/* Sidebar Colors */
+.bg-sidebar {
+    @apply bg-slate-900;
+}
+
+.bg-sidebar-item {
+    @apply bg-slate-800;
+}
+
+.bg-sidebar-item-active {
+    @apply bg-blue-600;
+}
+
+.bg-sidebar-item:hover {
+    @apply bg-slate-700;
+}
+
+/* custom colors     */
