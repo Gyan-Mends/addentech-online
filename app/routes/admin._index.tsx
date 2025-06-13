@@ -270,8 +270,8 @@ const Admin = () => {
         >
           <div className="space-y-4">
             {dashboardData.departmentPerformance.map((dept: any) => (
-              <div key={dept.name} className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">{dept.name}</h4>
+              <div key={dept.name} className="border border-white/20 rounded-lg p-4">
+                <h4 className="font-semibold mb-2 text-white">{dept.name}</h4>
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <QuickStat label="Completed" value={dept.completed || 0} color="green" />
                   <QuickStat label="In Progress" value={dept.inProgress || 0} color="blue" />

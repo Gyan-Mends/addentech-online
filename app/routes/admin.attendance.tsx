@@ -59,7 +59,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     } catch (error) {
       console.error("Error fetching departments:", error);
     }
-    
+
     // Fetch all users (for admin/manager work mode management)
     let allUsers: Array<{
       _id: string;
@@ -69,7 +69,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       role: string;
       workMode?: string;
     }> = [];
-    
+
     if (["admin", "manager"].includes(currentUser.role)) {
       try {
         allUsers = await Registration.find({}, "_id firstName lastName email role workMode");
@@ -81,22 +81,22 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     // Get attendance data based on user role and parameters
     let attendanceData = [];
     let message = "";
-    
+
     // Only admins and managers can see all attendance records
     const canViewAllAttendance = ["admin", "manager"].includes(currentUser.role);
-    
+
     if (!canViewAllAttendance) {
       // Non-admin/manager users can only see their own attendance
       let queryParams: { userId: string; startDate?: string; endDate?: string } = {
         userId: currentUser._id
       };
-      
+
       // Add date filtering if provided
       if (startDate && endDate) {
         queryParams.startDate = startDate;
         queryParams.endDate = endDate;
       }
-      
+
       // Get attendance data directly from the controller
       const result = await attendanceController.getUserAttendance(queryParams);
       attendanceData = result.data || [];
@@ -132,18 +132,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       } else {
         // Default view for admins/managers - ALL attendance records
         console.log('Admin view: fetching all attendance records');
-        
+
         try {
           // Fetch all attendance records for admin/manager view
           const allAttendance = await Attendance.find({})
             .populate('user', 'firstName lastName email workMode')
             .populate('department', 'name')
             .sort({ date: -1 });
-            
+
           console.log(`Found ${allAttendance.length} total attendance records`);
           attendanceData = allAttendance;
-          message = allAttendance.length > 0 ? 
-            "Showing all attendance records" : 
+          message = allAttendance.length > 0 ?
+            "Showing all attendance records" :
             "No attendance records found in the system";
         } catch (error) {
           console.error('Error fetching all attendance:', error);
@@ -152,7 +152,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         }
       }
     }
-    
+
     if (attendanceData.length === 0) {
       message = "No attendance records found";
     }
@@ -190,17 +190,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // Get the user session first
   const session = await getSession(request.headers.get("Cookie"));
   const userEmail = session.get("email");
-  
+
   if (!userEmail) {
     return json({ success: false, message: "Not authenticated" }, { status: 401 });
   }
-  
+
   // Get current user
   const currentUser = await Registration.findOne({ email: userEmail });
   if (!currentUser) {
     return json({ success: false, message: "User not found" }, { status: 404 });
   }
-  
+
   const formData = await request.formData();
   const action = formData.get("_action") as string;
 
@@ -212,7 +212,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const notes = formData.get("notes") as string;
       // Use the user's configured work mode
       const workMode = currentUser.workMode || "in-house";
-      
+
       // Only get location if work mode is in-house
       let latitude, longitude;
       if (workMode === "in-house") {
@@ -317,7 +317,7 @@ export default function AttendancePage() {
   const navigation = useNavigation();
   const navigate = useNavigate();
   const loaderData = useLoaderData<typeof loader>();
-  
+
   // Get URL parameters for state initialization
   const [searchParams, setSearchParams] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -325,7 +325,7 @@ export default function AttendancePage() {
     }
     return new URLSearchParams();
   });
-  
+
   // Initial states
   const [activeTab, setActiveTab] = useState("today");
   const [dateRange, setDateRange] = useState({
@@ -336,7 +336,7 @@ export default function AttendancePage() {
   const [selectedUser, setSelectedUser] = useState(searchParams.get('userId') || "");
   const actionData = useActionData<typeof action>();
   const isLoading = navigation.state === "loading";
-  
+
   // Function to handle report generation
   const handleGenerateReport = (e: React.FormEvent) => {
     e.preventDefault();
@@ -346,7 +346,7 @@ export default function AttendancePage() {
     if (selectedDepartment) params.set('department', selectedDepartment);
     navigate(`?${params.toString()}`);
   };
-  
+
   // Function to handle filter submission
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -355,17 +355,17 @@ export default function AttendancePage() {
     if (selectedUser) params.set('userId', selectedUser);
     navigate(`?${params.toString()}`);
   };
-  
+
   // Helper function to calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371; // Radius of the Earth in kilometers
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in kilometers
   };
 
@@ -441,13 +441,13 @@ export default function AttendancePage() {
       key: "location",
       label: "WORK MODE",
       render: (row: any) => {
-       
-          return (
-            <span className={`text-xs ${row.workMode === "in-house" ? "text-blue-600" : "text-purple-600"}`}>
-              {row.workMode === "in-house" ? "In-House" : "Remote"}
-            </span>
-          );
-      
+
+        return (
+          <span className={`text-xs ${row.workMode === "in-house" ? "text-blue-600" : "text-purple-600"}`}>
+            {row.workMode === "in-house" ? "In-House" : "Remote"}
+          </span>
+        );
+
       },
     },
     {
@@ -458,24 +458,24 @@ export default function AttendancePage() {
         if (!row.checkInTime || !row.checkOutTime) {
           return "0 hrs 0 mins";
         }
-        
+
         // Calculate work hours
         const checkInTime = new Date(row.checkInTime);
         const checkOutTime = new Date(row.checkOutTime);
-        
+
         // Validate that the dates are valid
         if (isNaN(checkInTime.getTime()) || isNaN(checkOutTime.getTime())) {
           return "0 hrs 0 mins";
         }
-        
+
         const workHours = checkOutTime.getTime() - checkInTime.getTime();
         const hours = Math.floor(workHours / (1000 * 60 * 60));
         const minutes = Math.floor((workHours % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         // Ensure hours and minutes are valid numbers
         const validHours = isNaN(hours) ? 0 : Math.max(0, hours);
         const validMinutes = isNaN(minutes) ? 0 : Math.max(0, minutes);
-        
+
         return `${validHours} hrs ${validMinutes} mins`;
       },
     },
@@ -499,7 +499,7 @@ export default function AttendancePage() {
             {/* Check-out button for records without checkout time */}
             {row.checkInTime && !row.checkOutTime && (
               <Form method="post" className="inline">
-                <input  type="hidden" name="_action" value="checkOut" />
+                <input type="hidden" name="_action" value="checkOut" />
                 <input type="hidden" name="attendanceId" value={row._id} />
                 <Button
                   type="submit"
@@ -543,7 +543,7 @@ export default function AttendancePage() {
     <AdminLayout>
       <div className="space-y-6 !text-white">
         <Toaster />
-        
+
         {/* Header */}
         <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 text-white shadow-md">
           <div className="flex justify-between items-center">
@@ -571,8 +571,8 @@ export default function AttendancePage() {
               <div>
                 <p className="text-sm text-gray-300">Present Today</p>
                 <p className="text-2xl font-bold text-white">
-                  {loaderData?.data?.filter((record: any) => 
-                    new Date(record.date).toDateString() === new Date().toDateString() && 
+                  {loaderData?.data?.filter((record: any) =>
+                    new Date(record.date).toDateString() === new Date().toDateString() &&
                     record.checkInTime && !record.checkOutTime
                   ).length || 0}
                 </p>
@@ -616,8 +616,8 @@ export default function AttendancePage() {
                 label: 'Attendance Stats',
                 data: [
                   loaderData?.data?.length || 0,
-                  loaderData?.data?.filter((record: any) => 
-                    new Date(record.date).toDateString() === new Date().toDateString() && 
+                  loaderData?.data?.filter((record: any) =>
+                    new Date(record.date).toDateString() === new Date().toDateString() &&
                     record.checkInTime && !record.checkOutTime
                   ).length || 0,
                   loaderData?.data?.filter((record: any) => record.workMode === 'remote').length || 0,
@@ -642,7 +642,7 @@ export default function AttendancePage() {
               </h1>
               {loaderData.currentUser && (
                 <p className="text-gray-600 mt-1">
-                  Welcome, {loaderData.currentUser.firstName} {loaderData.currentUser.lastName} | 
+                  Welcome, {loaderData.currentUser.firstName} {loaderData.currentUser.lastName} |
                   Current Work Mode: <span className="font-semibold text-primary">{loaderData.currentUser.workMode === "in-house" ? "In-House" : "Remote"}</span>
                 </p>
               )}
@@ -690,8 +690,8 @@ export default function AttendancePage() {
                   <div className="mt-3 border-t border-blue-200 pt-2">
                     <p className="text-xs font-semibold text-dark-text mb-1">Location Requirements:</p>
                     <p className="text-xs  mb-2">In-house attendance requires you to be physically present at the office location.</p>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="text-xs bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors"
                       onClick={() => {
                         // Handle location capture here
@@ -786,7 +786,7 @@ export default function AttendancePage() {
                   </div>
                 )}
               </div>
-              
+
               <Button
                 type="submit"
                 id="checkInBtn"
@@ -799,14 +799,14 @@ export default function AttendancePage() {
               </Button>
             </Form>
           </div>
-          
-                   {/* Work Mode Management (Admins and Managers only) */}
-           {loaderData.isAdmin && (
-             <div className="mb-8 p-4 bg-dashboard-secondary border border-white/20 rounded-lg shadow">
-               <h2 className="text-lg font-semibold text-white mb-4">Manage Work Modes</h2>
+
+          {/* Work Mode Management (Admins and Managers only) */}
+          {loaderData.isAdmin && (
+            <div className="mb-8 p-4 bg-dashboard-secondary border border-white/20 rounded-lg shadow">
+              <h2 className="text-lg font-semibold text-white mb-4">Manage Work Modes</h2>
               <Form method="post" className="flex flex-col space-y-4">
                 <input type="hidden" name="_action" value="updateWorkMode" />
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-white mb-1">Select User</label>
@@ -819,16 +819,16 @@ export default function AttendancePage() {
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-white mb-1">Work Mode</label>
-                    <select name="newWorkMode"  className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
+                    <select name="newWorkMode" className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
                       <option value="">Select work mode</option>
                       <option value="in-house">In-House</option>
                       <option value="remote">Remote</option>
                     </select>
                   </div>
-                  
+
                   <div className="flex items-end">
                     <Button
                       type="submit"
@@ -843,25 +843,25 @@ export default function AttendancePage() {
             </div>
           )}
 
-                   {/* Role-based access message */}
-           {!loaderData.isAdmin && (
-             <div className="bg-dashboard-secondary border border-white/20 p-4 rounded-lg mb-4">
-               <p className="text-blue-700">
-                 <span className="font-bold">Note:</span> You are viewing your personal attendance records.
-               </p>
-             </div>
-           )}
-          
-                   <Tabs
-           className="flex flex-wrap"
-             selectedKey={activeTab}
-             onSelectionChange={(key) => setActiveTab(key as string)}
-             classNames={{
-               tabList: "bg-dashboard-secondary border border-white/20",
-               tab: "text-gray-300 data-[selected=true]:text-white",
-               tabContent: "text-gray-300 data-[selected=true]:text-white",
-               panel: "pt-6"
-             }}        
+          {/* Role-based access message */}
+          {!loaderData.isAdmin && (
+            <div className="bg-dashboard-secondary border border-white/20 p-4 rounded-lg mb-4">
+              <p className="text-blue-700">
+                <span className="font-bold">Note:</span> You are viewing your personal attendance records.
+              </p>
+            </div>
+          )}
+
+          <Tabs
+            className="flex flex-wrap"
+            selectedKey={activeTab}
+            onSelectionChange={(key) => setActiveTab(key as string)}
+            classNames={{
+              tabList: "bg-dashboard-secondary border border-white/20",
+              tab: "text-gray-300 data-[selected=true]:text-white",
+              tabContent: "text-gray-300 data-[selected=true]:text-white",
+              panel: "pt-6"
+            }}
           >
             <Tab
               key="today"
@@ -873,86 +873,87 @@ export default function AttendancePage() {
               }
             >
               <div className="mt-6 !text-white">
-                               {/* Admin-only filters */}
-                 {loaderData.isAdmin && (
-                   <div className="bg-dashboard-secondary border border-white/20 rounded-lg p-4 mb-6">
-                     <h3 className="text-lg text-white font-semibold mb-2">Filter Attendance</h3>
-                                       <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
-                       <div>
-                         <label className="block text-sm text-white mb-1">
-                           Department
-                         </label>
-                                             <select
-                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-[70vw] lg:max-w-[250px] text-white"
-                         name="department"
-                         value={selectedDepartment}
-                         onChange={(e) => setSelectedDepartment(e.target.value)}
-                       >
-                         <option value="">All Departments</option>
-                         {loaderData.departments.map((dept: any) => (
-                           <option key={dept._id} value={dept._id}>
-                             {dept.name}
-                           </option>
-                         ))}
-                       </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm text-white mb-1">
-                        User
-                      </label>
-                                             <select
-                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-[70vw] lg:max-w-[250px] text-white"
-                         name="userId"
-                         value={selectedUser}
-                         onChange={(e) => setSelectedUser(e.target.value)}
-                       >
-                         <option value="">All Users</option>
-                         {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
-                           <option key={user._id} value={user._id}>
-                             {user.firstName} {user.lastName}
-                           </option>
-                         ))}
-                       </select>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="submit"
-                        color="primary"
-                        className="bg-pink-500"
-                      >
-                        Filter
-                      </Button>
-                      <Button
-                        type="button"
-                        color="default"
-                        variant="bordered"
-                        startContent={<X className="h-4 w-4" />}
-                        onClick={() => {
-                          setSelectedDepartment("");
-                          setSelectedUser("");
-                          navigate(window.location.pathname);
-                        }}
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                  </form>
-                </div>
-              )}
-            </div>
-          </Tab>
-          <Tab
-            key="report"
-            title={
-              <div className="flex items-center space-x-2">
-                <BarChart2 className="h-4 w-4" />
-                <span>Attendance Report</span>
+                {/* Admin-only filters */}
+                {loaderData.isAdmin && (
+                  <div className="bg-dashboard-secondary border border-white/20 rounded-lg p-4 mb-6">
+                    <h3 className="text-lg text-white font-semibold mb-2">Filter Attendance</h3>
+                    <form onSubmit={handleFilter} className="flex flex-wrap items-end gap-4">
+                      <div>
+                        <label className="block text-sm text-white mb-1">
+                          Department
+                        </label>
+                        <select
+                          className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-[70vw] lg:max-w-[250px] text-white"
+                          name="department"
+                          value={selectedDepartment}
+                          onChange={(e) => setSelectedDepartment(e.target.value)}
+                        >
+                          <option value="">All Departments</option>
+                          {loaderData.departments.map((dept: any) => (
+                            <option key={dept._id} value={dept._id}>
+                              {dept.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-white mb-1">
+                          User
+                        </label>
+                        <select
+                          className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-[70vw] lg:max-w-[250px] text-white"
+                          name="userId"
+                          value={selectedUser}
+                          onChange={(e) => setSelectedUser(e.target.value)}
+                        >
+                          <option value="">All Users</option>
+                          {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
+                            <option key={user._id} value={user._id}>
+                              {user.firstName} {user.lastName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          type="submit"
+                          color="primary"
+                          className="bg-pink-500"
+                        >
+                          Filter
+                        </Button>
+                        <Button
+                          type="button"
+                          color="default"
+                          variant="bordered"
+                          startContent={<X className="h-4 w-4 text-white" />}
+                          onClick={() => {
+                            setSelectedDepartment("");
+                            setSelectedUser("");
+                            navigate(window.location.pathname);
+                          }}
+                          className="!text-white border border-white/20"
+                        >
+                          Clear
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+                )}
               </div>
-            }
-          >
-                             <div className="mt-6">
-                 <div className="bg-dashboard-secondary border border-white/20 rounded-lg p-4 mb-6">
-                   <h3 className="text-lg text-white font-semibold mb-2">Generate Report</h3>
+            </Tab>
+            <Tab
+              key="report"
+              title={
+                <div className="flex items-center space-x-2">
+                  <BarChart2 className="h-4 w-4" />
+                  <span>Attendance Report</span>
+                </div>
+              }
+            >
+              <div className="mt-6">
+                <div className="bg-dashboard-secondary border border-white/20 rounded-lg p-4 mb-6">
+                  <h3 className="text-lg text-white font-semibold mb-2">Generate Report</h3>
                   <form onSubmit={handleGenerateReport} className="flex flex-wrap gap-4 items-end">
                     {/* Department filter (admin only) */}
                     {loaderData.isAdmin && (
@@ -960,50 +961,50 @@ export default function AttendancePage() {
                         <label className="block text-sm text-white mb-1">
                           Department
                         </label>
-                                             <select
-                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-full max-w-[250px] text-white"
-                         name="department"
-                         value={selectedDepartment}
-                         onChange={(e) => setSelectedDepartment(e.target.value)}
-                       >
-                         <option value="">All Departments</option>
-                         {loaderData.departments.map((dept: any) => (
-                           <option key={dept._id} value={dept._id}>
-                             {dept.name}
-                           </option>
-                         ))}
-                       </select>
+                        <select
+                          className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 w-full max-w-[250px] text-white"
+                          name="department"
+                          value={selectedDepartment}
+                          onChange={(e) => setSelectedDepartment(e.target.value)}
+                        >
+                          <option value="">All Departments</option>
+                          {loaderData.departments.map((dept: any) => (
+                            <option key={dept._id} value={dept._id}>
+                              {dept.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     )}
                     <div>
                       <label className="block text-sm text-white mb-1">
                         Start Date
                       </label>
-                                           <input
-                         type="date"
-                         name="startDate"
-                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 text-white"
-                         value={dateRange.startDate}
-                         onChange={(e) =>
-                           setDateRange({ ...dateRange, startDate: e.target.value })
-                         }
-                         required
-                       />
+                      <input
+                        type="date"
+                        name="startDate"
+                        className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 text-white"
+                        value={dateRange.startDate}
+                        onChange={(e) =>
+                          setDateRange({ ...dateRange, startDate: e.target.value })
+                        }
+                        required
+                      />
                     </div>
                     <div>
                       <label className="block text-sm text-white mb-1">
                         End Date
                       </label>
-                                           <input
-                         type="date"
-                         name="endDate"
-                         className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 text-white"
-                         value={dateRange.endDate}
-                         onChange={(e) =>
-                           setDateRange({ ...dateRange, endDate: e.target.value })
-                         }
-                         required
-                       />
+                      <input
+                        type="date"
+                        name="endDate"
+                        className="bg-dashboard-secondary border border-white/20 rounded px-3 py-2 text-white"
+                        value={dateRange.endDate}
+                        onChange={(e) =>
+                          setDateRange({ ...dateRange, endDate: e.target.value })
+                        }
+                        required
+                      />
                     </div>
                     <div className="flex gap-2">
                       <Button
@@ -1015,10 +1016,10 @@ export default function AttendancePage() {
                       </Button>
                       <Button
                         type="button"
-                        color="default"
+                        color="primary"
                         variant="bordered"
                         className="!text-white"
-                        startContent={<X className="h-4 w-4" />}
+                        startContent={<X className="h-4 w-4 text-white" />}
                         onClick={() => {
                           setDateRange({
                             startDate: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split("T")[0],
@@ -1033,7 +1034,7 @@ export default function AttendancePage() {
                     </div>
                   </form>
                 </div>
-{/* 
+                {/* 
                 <DataTable
                   columns={columns}
                   data={loaderData.data}
@@ -1075,8 +1076,8 @@ export default function AttendancePage() {
                     {activeTab === "today"
                       ? "No attendance records for today."
                       : activeTab === "report"
-                      ? "Select date range and department to generate a report."
-                      : "Select a department to view attendance."}
+                        ? "Select date range and department to generate a report."
+                        : "Select a department to view attendance."}
                   </p>
                 </div>
               )}

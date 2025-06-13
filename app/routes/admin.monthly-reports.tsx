@@ -647,12 +647,13 @@ export default function MonthlyReportsPage() {
 
   return (
     <AdminLayout>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Monthly Sales Reports
-          </h1>
-        </div>
+      <div className="bg-dashboard-primary p-6 min-h-screen">
+        <div className="bg-dashboard-secondary p-6 rounded-lg border border-white/10 shadow-md">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-dashboard-primary">
+              Monthly Sales Reports
+            </h1>
+          </div>
 
         {actionData && (
           <div
@@ -1381,6 +1382,7 @@ export default function MonthlyReportsPage() {
             )}
           </Card>
         )}
+        </div>
       </div>
     </AdminLayout>
   );

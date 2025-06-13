@@ -163,69 +163,68 @@ const Users = () => {
                     </Button>
                 </div>
                 {/* table  */}
-                    <NewCustomTable
-                        columns={UserColumns}
-                        loadingState={navigation.state === "loading" ? "loading" : "idle"}
-                        totalPages={totalPages}
-                        page={currentPage}
-                        setPage={(page) => (
-                            navigate(`?page=${page}`)
-                        )}>
-                        {users?.map((user, index: number) => (
-                            <TableRow key={index} className="border-b border-dashboard hover:bg-dashboard-tertiary">
-                                <TableCell className="text-xs">
-                                    <p className="!text-xs">
-                                        <User
-                                            avatarProps={{ radius: "sm", src: user.image }}
-                                            name={
-                                                <p className="font-nunito text-xs text-dashboard-primary">
-                                                    {user.firstName + ' ' + user.middleName + ' ' + user.lastName}
-                                                </p>
-                                            }
-                                        />
-                                    </p>
-                                </TableCell>
-                                <TableCell className="text-xs text-dashboard-secondary">{user.email}</TableCell>
-                                <TableCell className="text-dashboard-secondary">{user.phone}</TableCell>
-                                <TableCell className="text-dashboard-secondary">{typeof user.department === 'object' && user.department ? (user.department as any).name : user.department}</TableCell>
-                                <TableCell>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                        user.role === 'admin' ? 'bg-status-admin text-dashboard-primary' :
+                <NewCustomTable
+                    columns={UserColumns}
+                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                    totalPages={totalPages}
+                    page={currentPage}
+                    setPage={(page) => (
+                        navigate(`?page=${page}`)
+                    )}>
+                    {users?.map((user, index: number) => (
+                        <TableRow key={index} className="border-b border-dashboard hover:bg-dashboard-tertiary">
+                            <TableCell className="text-xs">
+                                <p className="!text-xs">
+                                    <User
+                                        avatarProps={{ radius: "sm", src: user.image }}
+                                        name={
+                                            <p className="font-nunito text-xs text-dashboard-primary">
+                                                {user.firstName + ' ' + user.middleName + ' ' + user.lastName}
+                                            </p>
+                                        }
+                                    />
+                                </p>
+                            </TableCell>
+                            <TableCell className="text-xs text-dashboard-secondary">{user.email}</TableCell>
+                            <TableCell className="text-dashboard-secondary">{user.phone}</TableCell>
+                            <TableCell className="text-dashboard-secondary">{typeof user.department === 'object' && user.department ? (user.department as any).name : user.department}</TableCell>
+                            <TableCell>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-status-admin text-dashboard-primary' :
                                         user.role === 'manager' ? 'bg-avatar-blue text-dashboard-primary' :
-                                        user.role === 'department_head' ? 'bg-avatar-purple text-dashboard-primary' :
-                                        'bg-status-active text-dashboard-primary'
+                                            user.role === 'department_head' ? 'bg-avatar-purple text-dashboard-primary' :
+                                                'bg-status-active text-dashboard-primary'
                                     }`}>
-                                        {user.role}
-                                    </span>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex items-center gap-2">
-                                        <button className="text-action-view hover:text-green-300" onClick={() => {
-                                            setIsEditDrawerOpened(true)
-                                            setDataValue(user as any)
-                                            console.log('=== EDIT DEBUG INFO ===');
-                                            console.log('Current page:', currentPage);
-                                            console.log('User data for edit:', user);
-                                            console.log('Department structure:', user.department);
-                                            console.log('Department type:', typeof user.department);
-                                            console.log('Available departments:', departments);
-                                            console.log('========================');
+                                    {user.role}
+                                </span>
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex items-center gap-2">
+                                    <button className="text-action-view hover:text-green-300" onClick={() => {
+                                        setIsEditDrawerOpened(true)
+                                        setDataValue(user as any)
+                                        console.log('=== EDIT DEBUG INFO ===');
+                                        console.log('Current page:', currentPage);
+                                        console.log('User data for edit:', user);
+                                        console.log('Department structure:', user.department);
+                                        console.log('Department type:', typeof user.department);
+                                        console.log('Available departments:', departments);
+                                        console.log('========================');
 
-                                        }}>
-                                            <EditIcon className="" />
-                                        </button>
-                                        <button className="text-action-delete hover:text-red-300" onClick={() => {
-                                            setIsConfirmModalOpened(true)
-                                            setDataValue(user as any)
-                                        }}>
-                                            <DeleteIcon className="" />
-                                        </button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </NewCustomTable>
-                </div>
+                                    }}>
+                                        <EditIcon className="" />
+                                    </button>
+                                    <button className="text-action-delete hover:text-red-300" onClick={() => {
+                                        setIsConfirmModalOpened(true)
+                                        setDataValue(user as any)
+                                    }}>
+                                        <DeleteIcon className="" />
+                                    </button>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </NewCustomTable>
+            </div>
 
             {/* confirm modal */}
             {/* confirm modal */}
@@ -257,6 +256,7 @@ const Users = () => {
                 <Drawer isDrawerOpened={isEditDrawerOpened} handleDrawerClosed={handleEditDrawerClosed} title="Edit User">
                     <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
                         <CustomInput
+                            className="!text-white"
                             label="First name"
                             isRequired
                             defaultValue={dataValue.firstName}
@@ -268,6 +268,7 @@ const Users = () => {
                         />
                         <div className="flex flex-col sm:flex-row gap-4">
                             <CustomInput
+                                className="!text-white"
                                 label="Middle Name"
                                 name="middlename"
                                 defaultValue={dataValue.middleName}
@@ -275,9 +276,9 @@ const Users = () => {
                                 isClearable
                                 type="text"
                                 labelPlacement="outside"
-
                             />
                             <CustomInput
+                                className="!text-white"
                                 label="Last Name"
                                 isRequired
                                 name="lastname"
@@ -289,6 +290,7 @@ const Users = () => {
                             />
                         </div>
                         <CustomInput
+                            className="!text-white"
                             label="Email"
                             isRequired
                             defaultValue={dataValue.email}
@@ -300,6 +302,7 @@ const Users = () => {
                         />
                         <div className=" gap-4">
                             <CustomInput
+                                className="!text-white"
                                 label=" Phone"
                                 isRequired
                                 name="phone"
@@ -323,6 +326,7 @@ const Users = () => {
                         </div>
                         <div className="">
                             <Select
+                                className="!text-white"
                                 label="Role"
                                 labelPlacement="outside"
                                 placeholder="Select Role"
@@ -354,19 +358,19 @@ const Users = () => {
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Select
                                 isRequired
-                                className="flex-1"
+                                className="flex-1 !text-white"
                                 label="Department"
                                 labelPlacement="outside"
                                 placeholder="Select Department"
                                 name="department"
                                 selectedKeys={(() => {
                                     let selectedKey = '';
-                                    
+
                                     // Debug the department selection
                                     console.log('Department selection debug:');
                                     console.log('dataValue.department:', dataValue.department);
                                     console.log('type:', typeof dataValue.department);
-                                    
+
                                     // Handle both cases: department as object or as string ID
                                     if (typeof dataValue.department === 'string') {
                                         selectedKey = dataValue.department;
@@ -377,11 +381,11 @@ const Users = () => {
                                     } else {
                                         console.log('No valid department found');
                                     }
-                                    
+
                                     // Verify the department exists in available departments
                                     const departmentExists = departments.some(dept => dept._id === selectedKey);
                                     console.log('Department exists in list:', departmentExists);
-                                    
+
                                     return selectedKey ? new Set([selectedKey]) : new Set([]);
                                 })()}
                                 onSelectionChange={(keys) => {
@@ -403,6 +407,7 @@ const Users = () => {
                             </Select>
 
                             <CustomInput
+                                className="!text-white flex-1"
                                 label="Position"
                                 isRequired
                                 name="position"
@@ -411,53 +416,52 @@ const Users = () => {
                                 placeholder=" "
                                 type="text"
                                 labelPlacement="outside"
-                                className="flex-1"
                             />
                         </div>
-                            <div className=" ">
-                                <input name="base64Image" value={base64Image} type="hidden" />
-                                <label className="font-nunito block text-sm text-white" htmlFor="image">
-                                    Image
-                                </label>
-                                <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
-                                    {/* The file input */}
-                                    <input
-                                        name="image"
-                                        id="image"
-                                        type="file"
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                        accept="image/*"
-                                        onChange={(event) => {
-                                            const file = event.target.files[0];
-                                            if (file) {
-                                                const reader = new FileReader();
-                                                reader.onloadend = () => {
-                                                    setBase64Image(reader.result as string); // Update state with new image data
-                                                };
-                                                reader.readAsDataURL(file); // Convert file to base64
-                                            }
-                                        }}
+                        <div className=" ">
+                            <input name="base64Image" value={base64Image} type="hidden" />
+                            <label className="font-nunito block text-sm !text-white" htmlFor="image">
+                                Image
+                            </label>
+                            <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
+                                {/* The file input */}
+                                <input
+                                    name="image"
+                                    id="image"
+                                    type="file"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    accept="image/*"
+                                    onChange={(event) => {
+                                        const file = event.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setBase64Image(reader.result as string); // Update state with new image data
+                                            };
+                                            reader.readAsDataURL(file); // Convert file to base64
+                                        }
+                                    }}
+                                />
+                                {/* Display the default image or the uploaded image */}
+                                {base64Image ? (
+                                    <img
+                                        src={base64Image}
+                                        alt="Preview"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-xl"
                                     />
-                                    {/* Display the default image or the uploaded image */}
-                                    {base64Image ? (
-                                        <img
-                                            src={base64Image}
-                                            alt="Preview"
-                                            className="absolute inset-0 w-full h-full object-cover rounded-xl"
-                                        />
-                                    ) : (
-                                        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                                            <Upload className="h-14 w-14 text-gray-400" />
-                                        </span>
-                                    )}
-                                </div>
+                                ) : (
+                                    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <Upload className="h-14 w-14 text-gray-400" />
+                                    </span>
+                                )}
                             </div>
+                        </div>
 
                         <div>
                             <Divider />
 
                             <div className="mt-6">
-                                <label htmlFor="" className="font-nunito text-white">Bio</label>
+                                <label htmlFor="" className="font-nunito !text-white">Bio</label>
                                 <input type="hidden" name="bio" value={content} />
                                 <ReactQuill
                                     value={content} // Bind editor content to state
@@ -470,8 +474,9 @@ const Users = () => {
                             <Divider className="mt-28" />
 
                             <div className="flex flex-col gap-6">
-                                <p className="text-white">Professional Experience </p>
+                                <p className="!text-white">Professional Experience </p>
                                 <CustomInput
+                                    className="!text-white"
                                     defaultValue={dataValue.institution}
                                     label=" Institution"
                                     isRequired
@@ -484,6 +489,7 @@ const Users = () => {
                                 />
                                 <div className="flex gap-4">
                                     <CustomInput
+                                        className="!text-white"
                                         defaultValue={dataValue.positionInstitution}
                                         label=" Position_institution"
                                         isRequired
@@ -495,6 +501,7 @@ const Users = () => {
 
                                     />
                                     <CustomInput
+                                        className="!text-white"
                                         defaultValue={dataValue.dateCompletedInstitution}
                                         label=" Date Completed"
                                         isRequired
@@ -510,8 +517,9 @@ const Users = () => {
                             </div>
                             <Divider className="mt-6" />
                             <div className="flex flex-col gap-6 mt-4">
-                                <p className="text-white">Education Background</p>
+                                <p className="!text-white">Education Background</p>
                                 <CustomInput
+                                    className="!text-white"
                                     defaultValue={dataValue.institutionName}
                                     label="Intution Name"
                                     isRequired
@@ -524,6 +532,7 @@ const Users = () => {
                                 />
                                 <div className="flex gap-4">
                                     <CustomInput
+                                        className="!text-white"
                                         defaultValue={dataValue.positionInstitution}
                                         label=" Program"
                                         isRequired
@@ -535,6 +544,7 @@ const Users = () => {
 
                                     />
                                     <CustomInput
+                                        className="!text-white"
                                         defaultValue={dataValue.dateCompletedProgram}
                                         label="Date Completed"
                                         name="date_c"
@@ -557,7 +567,7 @@ const Users = () => {
                         <input name="currentPage" value={currentPage} type="hidden" />
 
 
-                        <Button size="sm" type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4" onClick={() => {
+                        <Button size="sm" type="submit" className="rounded-xl bg-action-primary text-white text-sm font-nunito h-10 w-40 px-4" onClick={() => {
                             setIsEditModalOpened(false)
                         }}>
                             Update
@@ -571,6 +581,7 @@ const Users = () => {
             <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create User">
                 <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
                     <CustomInput
+                        className="!text-white"
                         label="First name"
                         isClearable
                         name="firstname"
@@ -580,6 +591,7 @@ const Users = () => {
                     />
                     <div className="flex gap-4">
                         <CustomInput
+                            className="!text-white"
                             label="Middle Name"
                             name="middlename"
                             placeholder=" "
@@ -589,6 +601,7 @@ const Users = () => {
 
                         />
                         <CustomInput
+                            className="!text-white"
                             label="Last Name"
                             isRequired
                             name="lastname"
@@ -599,6 +612,7 @@ const Users = () => {
                         />
                     </div>
                     <CustomInput
+                        className="!text-white"
                         label="Email"
                         isRequired
                         name="email"
@@ -609,6 +623,7 @@ const Users = () => {
                     />
                     <div className="flex gap-4">
                         <CustomInput
+                            className="!text-white"
                             label=" Phone"
                             isRequired
                             name="phone"
@@ -619,6 +634,7 @@ const Users = () => {
 
                         />
                         <CustomInput
+                            className="!text-white"
                             label=" Password"
                             isRequired
                             name="password"
@@ -633,11 +649,12 @@ const Users = () => {
                         <Select
                             label="Role"
                             labelPlacement="outside"
+                            className="!text-white"
                             placeholder=" "
                             isRequired
                             name="role"
                             classNames={{
-                                label: "font-nunito text-sm text-white",
+                                label: "font-nunito text-sm !text-white",
                                 popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm border border-white/20 font-nunito ",
                                 trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white  "
                             }}
@@ -648,7 +665,7 @@ const Users = () => {
                                 { key: "manager", value: "manager", display_name: "Manager" },
                                 { key: "staff", value: "staff", display_name: "Staff" },
                             ].map((role) => (
-                                <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                                <SelectItem className="!text-white" key={role.key}>{role.display_name}</SelectItem>
                             ))}
                         </Select>
                     </div>
@@ -661,17 +678,18 @@ const Users = () => {
                             isRequired
                             name="department"
                             classNames={{
-                                label: "font-nunito text-sm text-white",
+                                label: "font-nunito text-sm !text-white",
                                 popoverContent: "z-[10000]  bg-dashboard-secondary shadow-sm  border border-white/20 font-nunito ",
                                 trigger: "   shadow-sm   border border-white/20  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white "
                             }}
                         >
                             {departments.map((department: DepartmentInterface, index: number) => (
-                                <SelectItem key={department._id}>{department.name}</SelectItem>
+                                <SelectItem className="!text-white" key={department._id}>{department.name}</SelectItem>
                             ))}
                         </Select>
 
                         <CustomInput
+                            className="!text-white"
                             label=" Position"
                             isRequired
                             name="position"
@@ -682,7 +700,7 @@ const Users = () => {
 
                         />
                     </div>
-                
+
                     <div className=" ">
                         <label className="font-nunito block text-sm text-white" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
@@ -736,6 +754,7 @@ const Users = () => {
                         <div className="flex flex-col gap-6">
                             <p className="text-white">Professional Experience </p>
                             <CustomInput
+                                className="!text-white"
                                 label=" Institution"
                                 isRequired
                                 name="institution"
@@ -747,6 +766,7 @@ const Users = () => {
                             />
                             <div className="flex gap-4">
                                 <CustomInput
+                                    className="!text-white"
                                     label=" Position_institution"
                                     isRequired
                                     name="position_institution"
@@ -757,6 +777,7 @@ const Users = () => {
 
                                 />
                                 <CustomInput
+                                    className="!text-white"
                                     label=" Date Completed"
                                     isRequired
                                     name="date_completed"
@@ -773,6 +794,7 @@ const Users = () => {
                         <div className="flex flex-col gap-6 mt-4">
                             <p className="text-white">Education Background</p>
                             <CustomInput
+                                className="!text-white"
                                 label="Intution Name"
                                 isRequired
                                 name="institution_name"
@@ -784,6 +806,7 @@ const Users = () => {
                             />
                             <div className="flex gap-4">
                                 <CustomInput
+                                    className="!text-white"
                                     label=" Program"
                                     isRequired
                                     name="program"
@@ -794,6 +817,7 @@ const Users = () => {
 
                                 />
                                 <CustomInput
+                                    className="!text-white"
                                     label="Date Completed"
                                     isRequired
                                     name="date_c"
@@ -813,7 +837,7 @@ const Users = () => {
                     <input name="base64Image" value={base64Image} type="hidden" />
                     <input name="currentPage" value={currentPage} type="hidden" />
 
-                    <button type="submit" className="rounded-xl bg-pink-500 text-white text-sm font-nunito h-10 w-40 px-4">
+                    <button type="submit" className="rounded-xl bg-action-primary text-white text-sm font-nunito h-10 w-40 px-4">
                         Submit
                     </button>
                 </Form>

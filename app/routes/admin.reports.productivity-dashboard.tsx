@@ -188,23 +188,23 @@ const ProductivityDashboard = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 !text-white bg-dashboard-primary min-h-screen">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link to="/admin/reports">
-                            <Button variant="light" size="sm" startContent={<ArrowLeft className="w-4 h-4" />}>
+                            <Button variant="light" size="sm" startContent={<ArrowLeft className="w-4 h-4" />} className="text-dashboard-primary border-dashboard-light">
                                 Back to Reports
                             </Button>
                         </Link>
                         <div>
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-orange-100 rounded-lg">
-                                    <TrendingUp className="w-6 h-6 text-orange-600" />
+                                <div className="p-2 bg-avatar-orange rounded-lg">
+                                    <TrendingUp className="w-6 h-6 text-dashboard-primary" />
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold text-gray-900">Productivity Dashboard</h1>
-                                    <p className="text-gray-600 mt-1">
+                                    <h1 className="text-3xl font-bold text-dashboard-primary">Productivity Dashboard</h1>
+                                    <p className="text-dashboard-secondary mt-1">
                                         Real-time task activity and productivity metrics
                                     </p>
                                 </div>
@@ -214,9 +214,9 @@ const ProductivityDashboard = () => {
                 </div>
 
                 {/* Filters */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/10">
                     <CardHeader>
-                        <h2 className="text-lg font-semibold">Filters</h2>
+                        <h2 className="text-lg font-semibold text-dashboard-primary">Filters</h2>
                     </CardHeader>
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -225,10 +225,15 @@ const ProductivityDashboard = () => {
                                 placeholder="All departments"
                                 value={filters.department || ''}
                                 onChange={(e) => updateFilter('department', e.target.value || null)}
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    trigger: "bg-dashboard-secondary border border-white/20 text-dashboard-primary",
+                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                }}
                             >
-                                <SelectItem key="" value="">All Departments</SelectItem>
+                                <SelectItem key="" value="" className="text-dashboard-primary">All Departments</SelectItem>
                                 {departments?.map((dept: any) => (
-                                    <SelectItem key={dept._id} value={dept._id}>
+                                    <SelectItem key={dept._id} value={dept._id} className="text-dashboard-primary">
                                         {dept.name}
                                     </SelectItem>
                                 ))}
@@ -239,30 +244,35 @@ const ProductivityDashboard = () => {
                                 placeholder="All users"
                                 value={filters.userId || ''}
                                 onChange={(e) => updateFilter('user', e.target.value || null)}
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    trigger: "bg-dashboard-secondary border border-white/20 text-dashboard-primary",
+                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                }}
                             >
-                                <SelectItem key="" value="">All Users</SelectItem>
+                                <SelectItem key="" value="" className="text-dashboard-primary">All Users</SelectItem>
                                 {users?.map((user: any) => (
-                                    <SelectItem key={user._id} value={user._id}>
+                                    <SelectItem key={user._id} value={user._id} className="text-dashboard-primary">
                                         {user.firstName} {user.lastName}
                                     </SelectItem>
                                 ))}
                             </Select>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Start Date</label>
+                                <label className="text-sm font-medium text-dashboard-primary">Start Date</label>
                                 <input 
                                     type="date"
-                                    className="w-full p-2 border rounded-lg"
+                                    className="w-full p-2 border border-white/20 rounded-lg bg-dashboard-secondary text-dashboard-primary"
                                     value={filters.startDate ? new Date(filters.startDate).toISOString().split('T')[0] : ''}
                                     onChange={(e) => updateFilter('startDate', e.target.value || null)}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">End Date</label>
+                                <label className="text-sm font-medium text-dashboard-primary">End Date</label>
                                 <input 
                                     type="date"
-                                    className="w-full p-2 border rounded-lg"
+                                    className="w-full p-2 border border-white/20 rounded-lg bg-dashboard-secondary text-dashboard-primary"
                                     value={filters.endDate ? new Date(filters.endDate).toISOString().split('T')[0] : ''}
                                     onChange={(e) => updateFilter('endDate', e.target.value || null)}
                                 />
@@ -273,44 +283,44 @@ const ProductivityDashboard = () => {
 
                 {/* Summary Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-blue-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <Activity className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                            <h3 className="text-2xl font-bold text-blue-600">{totalActivities}</h3>
-                            <p className="text-gray-600">Total Activities</p>
-                            <p className="text-sm text-gray-500">Avg: {averageDailyActivities}/day</p>
+                            <Activity className="w-12 h-12 text-metric-blue mx-auto mb-3" />
+                            <h3 className="text-3xl font-bold text-metric-blue">{totalActivities}</h3>
+                            <p className="text-dashboard-primary font-medium">Total Activities</p>
+                            <p className="text-sm text-dashboard-secondary">Avg: {averageDailyActivities}/day</p>
                         </CardBody>
                     </Card>
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-emerald-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <Clock className="w-12 h-12 text-green-600 mx-auto mb-3" />
-                            <h3 className="text-2xl font-bold text-green-600">{totalHours.toFixed(1)}</h3>
-                            <p className="text-gray-600">Total Hours</p>
-                            <p className="text-sm text-gray-500">Avg: {averageDailyHours}h/day</p>
+                            <Clock className="w-12 h-12 text-metric-green mx-auto mb-3" />
+                            <h3 className="text-3xl font-bold text-metric-green">{totalHours.toFixed(1)}</h3>
+                            <p className="text-dashboard-primary font-medium">Total Hours</p>
+                            <p className="text-sm text-dashboard-secondary">Avg: {averageDailyHours}h/day</p>
                         </CardBody>
                     </Card>
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-violet-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <Calendar className="w-12 h-12 text-purple-600 mx-auto mb-3" />
-                            <h3 className="text-2xl font-bold text-purple-600">{dashboard.length}</h3>
-                            <p className="text-gray-600">Days Tracked</p>
-                            <p className="text-sm text-gray-500">Activity period</p>
+                            <Calendar className="w-12 h-12 text-metric-purple mx-auto mb-3" />
+                            <h3 className="text-3xl font-bold text-metric-purple">{dashboard.length}</h3>
+                            <p className="text-dashboard-primary font-medium">Days Tracked</p>
+                            <p className="text-sm text-dashboard-secondary">Activity period</p>
                         </CardBody>
                     </Card>
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-amber-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <BarChart3 className="w-12 h-12 text-orange-600 mx-auto mb-3" />
-                            <h3 className="text-2xl font-bold text-orange-600">{allActivityTypes.size}</h3>
-                            <p className="text-gray-600">Activity Types</p>
-                            <p className="text-sm text-gray-500">Different activities</p>
+                            <BarChart3 className="w-12 h-12 text-metric-orange mx-auto mb-3" />
+                            <h3 className="text-3xl font-bold text-metric-orange">{allActivityTypes.size}</h3>
+                            <p className="text-dashboard-primary font-medium">Activity Types</p>
+                            <p className="text-sm text-dashboard-secondary">Different activities</p>
                         </CardBody>
                     </Card>
                 </div>
 
                 {/* Activity Types Legend */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/10">
                     <CardHeader>
-                        <h2 className="text-lg font-semibold">Activity Types</h2>
+                        <h2 className="text-lg font-semibold text-dashboard-primary">Activity Types</h2>
                     </CardHeader>
                     <CardBody>
                         <div className="flex flex-wrap gap-2">
@@ -328,26 +338,26 @@ const ProductivityDashboard = () => {
                 </Card>
 
                 {/* Daily Activity Timeline */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/10">
                     <CardHeader>
-                        <h2 className="text-lg font-semibold">Daily Activity Timeline</h2>
+                        <h2 className="text-lg font-semibold text-dashboard-primary">Daily Activity Timeline</h2>
                     </CardHeader>
                     <CardBody>
                         {dashboard.length === 0 ? (
                             <div className="text-center py-12">
-                                <Activity className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Activity Data</h3>
-                                <p className="text-gray-500">
+                                <Activity className="w-16 h-16 text-dashboard-muted mx-auto mb-4" />
+                                <h3 className="text-xl font-semibold text-dashboard-primary mb-2">No Activity Data</h3>
+                                <p className="text-dashboard-secondary">
                                     No activity found for the selected filters and date range
                                 </p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {dashboard.map((day: any) => (
-                                    <div key={day._id} className="border rounded-lg p-4">
+                                    <div key={day._id} className="border border-white/10 rounded-lg p-4 bg-dashboard-tertiary">
                                         <div className="flex justify-between items-center mb-3">
-                                            <h3 className="text-lg font-semibold">{formatDate(day._id)}</h3>
-                                            <div className="flex gap-4 text-sm text-gray-600">
+                                            <h3 className="text-lg font-semibold text-dashboard-primary">{formatDate(day._id)}</h3>
+                                            <div className="flex gap-4 text-sm text-dashboard-secondary">
                                                 <span>{day.totalActivities} activities</span>
                                                 <span>{day.totalHours.toFixed(1)} hours</span>
                                             </div>
@@ -355,7 +365,7 @@ const ProductivityDashboard = () => {
                                         
                                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                                             {day.activities.map((activity: any, index: number) => (
-                                                <div key={index} className="text-center p-2 bg-gray-50 rounded">
+                                                <div key={index} className="text-center p-2 bg-dashboard-secondary rounded">
                                                     <Chip 
                                                         color={getActivityColor(activity.type)}
                                                         variant="flat"
@@ -364,9 +374,9 @@ const ProductivityDashboard = () => {
                                                     >
                                                         {formatActivityType(activity.type)}
                                                     </Chip>
-                                                    <p className="text-sm font-semibold">{activity.count}</p>
+                                                    <p className="text-sm font-semibold text-dashboard-primary">{activity.count}</p>
                                                     {activity.hours > 0 && (
-                                                        <p className="text-xs text-gray-600">{activity.hours.toFixed(1)}h</p>
+                                                        <p className="text-xs text-dashboard-secondary">{activity.hours.toFixed(1)}h</p>
                                                     )}
                                                 </div>
                                             ))}

@@ -195,25 +195,25 @@ const StaffReportPage = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 !text-white bg-dashboard-primary min-h-screen">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link to="/admin/reports">
-                            <Button variant="light" size="sm" startContent={<ArrowLeft className="w-4 h-4" />}>
+                            <Button variant="light" size="sm" startContent={<ArrowLeft className="w-4 h-4" />} className="text-dashboard-primary border-dashboard-light">
                                 Back to Reports
                             </Button>
                         </Link>
                         <div>
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-green-100 rounded-lg">
-                                    <Icon className="w-6 h-6 text-green-600" />
+                                <div className="p-2 bg-status-active rounded-lg">
+                                    <Icon className="w-6 h-6 text-dashboard-primary" />
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold text-gray-900">
+                                    <h1 className="text-3xl font-bold text-dashboard-primary">
                                         {periodLabels[period as keyof typeof periodLabels]} Staff Report
                                     </h1>
-                                    <p className="text-gray-600 mt-1">
+                                    <p className="text-dashboard-secondary mt-1">
                                         Individual {period} performance and activity analysis
                                     </p>
                                 </div>
@@ -255,7 +255,7 @@ const StaffReportPage = () => {
                 </div>
 
                 {/* Filters */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/10">
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {currentUser?.role !== 'staff' && (
@@ -264,9 +264,14 @@ const StaffReportPage = () => {
                                 placeholder="Choose an employee"
                                 value={selectedUser || ''}
                                 onChange={(e) => handleUserChange(e.target.value)}
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    trigger: "bg-dashboard-secondary border border-white/20 text-dashboard-primary",
+                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                }}
                             >
                                 {users?.map((user: any) => (
-                                    <SelectItem key={user._id} value={user._id}>
+                                    <SelectItem key={user._id} value={user._id} className="text-dashboard-primary">
                                         <div className="flex items-center gap-2">
                                             <Avatar 
                                                 size="sm" 
@@ -274,8 +279,8 @@ const StaffReportPage = () => {
                                                 className="flex-shrink-0"
                                             />
                                             <div>
-                                                <div className="font-medium">{user.firstName} {user.lastName}</div>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="font-medium text-dashboard-primary">{user.firstName} {user.lastName}</div>
+                                                <div className="text-xs text-dashboard-muted">
                                                     {user.role} - {user.department?.name}
                                                 </div>
                                             </div>
@@ -289,16 +294,21 @@ const StaffReportPage = () => {
                                 label="Year"
                                 value={year.toString()}
                                 onChange={(e) => handleYearChange(e.target.value)}
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    trigger: "bg-dashboard-secondary border border-white/20 text-dashboard-primary",
+                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                }}
                             >
                                 {years.map((yr) => (
-                                    <SelectItem key={yr.toString()} value={yr.toString()}>
+                                    <SelectItem key={yr.toString()} value={yr.toString()} className="text-dashboard-primary">
                                         {yr}
                                     </SelectItem>
                                 ))}
                             </Select>
 
                             <div className="flex items-end">
-                                <Chip color="success" variant="flat" className="h-10">
+                                <Chip color="success" variant="flat" className="h-10 bg-status-active text-dashboard-primary">
                                     {periodLabels[period as keyof typeof periodLabels]} Report
                                 </Chip>
                             </div>
@@ -308,13 +318,13 @@ const StaffReportPage = () => {
 
                 {/* Report Content */}
                 {!selectedUser ? (
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/10">
                         <CardBody className="text-center py-12">
-                            <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                            <User className="w-16 h-16 text-dashboard-muted mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-dashboard-primary mb-2">
                                 {currentUser?.role === 'staff' ? 'Loading Your Report...' : 'Select a Staff Member'}
                             </h3>
-                            <p className="text-gray-500">
+                            <p className="text-dashboard-secondary">
                                 {currentUser?.role === 'staff' 
                                     ? 'Please wait while we load your personal activity report'
                                     : 'Choose an employee from the dropdown above to generate the report'
@@ -323,16 +333,16 @@ const StaffReportPage = () => {
                         </CardBody>
                     </Card>
                 ) : !report ? (
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/10">
                         <CardBody className="text-center py-12">
                             <Spinner size="lg" />
-                            <p className="mt-4 text-gray-600">Generating report...</p>
+                            <p className="mt-4 text-dashboard-secondary">Generating report...</p>
                         </CardBody>
                     </Card>
                 ) : (
                     <div className="space-y-6">
                         {/* Employee Info */}
-                        <Card>
+                        <Card className="bg-dashboard-secondary border border-white/10">
                             <CardBody>
                                 <div className="flex items-center gap-4">
                                     <Avatar 
@@ -341,17 +351,18 @@ const StaffReportPage = () => {
                                         className="flex-shrink-0"
                                     />
                                     <div className="flex-grow">
-                                        <h2 className="text-2xl font-bold">{report.user.name}</h2>
-                                        <p className="text-gray-600">{report.user.email}</p>
+                                        <h2 className="text-2xl font-bold text-dashboard-primary">{report.user.name}</h2>
+                                        <p className="text-dashboard-secondary">{report.user.email}</p>
                                         <div className="flex gap-2 mt-2">
                                             <Chip 
                                                 color={getRoleColor(report.user.role)} 
                                                 variant="flat"
                                                 size="sm"
+                                                className="text-dashboard-primary"
                                             >
                                                 {report.user.role.replace('_', ' ').toUpperCase()}
                                             </Chip>
-                                            <Chip color="default" variant="flat" size="sm">
+                                            <Chip color="default" variant="flat" size="sm" className="bg-dashboard-tertiary text-dashboard-primary">
                                                 {report.user.department}
                                             </Chip>
                                         </div>
@@ -362,54 +373,54 @@ const StaffReportPage = () => {
 
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/10">
                                 <CardBody className="text-center">
-                                    <Activity className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-                                    <h3 className="text-2xl font-bold text-blue-600">{report.summary.totalActivities}</h3>
-                                    <p className="text-gray-600">Total Activities</p>
+                                    <Activity className="w-12 h-12 text-action-primary mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-action-primary">{report.summary.totalActivities}</h3>
+                                    <p className="text-dashboard-secondary">Total Activities</p>
                                 </CardBody>
                             </Card>
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/10">
                                 <CardBody className="text-center">
-                                    <Clock className="w-12 h-12 text-green-600 mx-auto mb-3" />
-                                    <h3 className="text-2xl font-bold text-green-600">{report.summary.totalHours.toFixed(1)}</h3>
-                                    <p className="text-gray-600">Hours Logged</p>
+                                    <Clock className="w-12 h-12 text-status-active mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-status-active">{report.summary.totalHours.toFixed(1)}</h3>
+                                    <p className="text-dashboard-secondary">Hours Logged</p>
                                 </CardBody>
                             </Card>
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/10">
                                 <CardBody className="text-center">
-                                    <Award className="w-12 h-12 text-purple-600 mx-auto mb-3" />
-                                    <h3 className="text-2xl font-bold text-purple-600">{report.summary.completedTasks}</h3>
-                                    <p className="text-gray-600">Tasks Completed</p>
+                                    <Award className="w-12 h-12 text-avatar-purple mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-avatar-purple">{report.summary.completedTasks}</h3>
+                                    <p className="text-dashboard-secondary">Tasks Completed</p>
                                 </CardBody>
                             </Card>
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/10">
                                 <CardBody className="text-center">
-                                    <BarChart3 className="w-12 h-12 text-orange-600 mx-auto mb-3" />
-                                    <h3 className="text-2xl font-bold text-orange-600">{Object.keys(report.periodBreakdown).length}</h3>
-                                    <p className="text-gray-600">Periods Tracked</p>
+                                    <BarChart3 className="w-12 h-12 text-avatar-orange mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-avatar-orange">{Object.keys(report.periodBreakdown).length}</h3>
+                                    <p className="text-dashboard-secondary">Periods Tracked</p>
                                 </CardBody>
                             </Card>
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/10">
                                 <CardBody className="text-center">
-                                    <User className="w-12 h-12 text-indigo-600 mx-auto mb-3" />
-                                    <h3 className="text-2xl font-bold text-indigo-600">{report.summary.totalAssignedTasks || 0}</h3>
-                                    <p className="text-gray-600">Assigned Tasks</p>
-                                    <p className="text-sm text-gray-500">Total assigned</p>
+                                    <User className="w-12 h-12 text-avatar-blue mx-auto mb-3" />
+                                    <h3 className="text-2xl font-bold text-avatar-blue">{report.summary.totalAssignedTasks || 0}</h3>
+                                    <p className="text-dashboard-secondary">Assigned Tasks</p>
+                                    <p className="text-sm text-dashboard-muted">Total assigned</p>
                                 </CardBody>
                             </Card>
                         </div>
 
                         {/* Task Status Breakdown */}
                         {report.summary.taskStatusBreakdown && Object.keys(report.summary.taskStatusBreakdown).length > 0 && (
-                        <Card>
+                        <Card className="bg-dashboard-secondary border border-white/10">
                             <CardHeader>
-                                <h2 className="text-xl font-semibold">Task Status Overview</h2>
+                                <h2 className="text-xl font-semibold text-dashboard-primary">Task Status Overview</h2>
                             </CardHeader>
                             <CardBody>
                                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                     {Object.entries(report.summary.taskStatusBreakdown).map(([status, count]: [string, any]) => (
-                                        <div key={status} className="text-center p-4 bg-gray-50 rounded-lg">
+                                        <div key={status} className="text-center p-4 bg-dashboard-tertiary rounded-lg">
                                             <Chip 
                                                 color={getStatusColor(status)} 
                                                 variant="flat"
@@ -417,8 +428,8 @@ const StaffReportPage = () => {
                                             >
                                                 {status.replace('_', ' ').toUpperCase()}
                                             </Chip>
-                                            <p className="text-2xl font-bold">{count}</p>
-                                            <p className="text-sm text-gray-600">tasks</p>
+                                            <p className="text-2xl font-bold text-dashboard-primary">{count}</p>
+                                            <p className="text-sm text-dashboard-secondary">tasks</p>
                                         </div>
                                     ))}
                                 </div>
@@ -427,14 +438,14 @@ const StaffReportPage = () => {
                         )}
 
                         {/* Activity Breakdown */}
-                        <Card>
+                        <Card className="bg-dashboard-secondary border border-white/10">
                             <CardHeader>
-                                <h2 className="text-xl font-semibold">Activity Summary for {year}</h2>
+                                <h2 className="text-xl font-semibold text-dashboard-primary">Activity Summary for {year}</h2>
                             </CardHeader>
                             <CardBody>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {report.summary.activityBreakdown?.map((activity: any) => (
-                                        <div key={activity._id} className="text-center p-4 bg-gray-50 rounded-lg">
+                                        <div key={activity._id} className="text-center p-4 bg-dashboard-tertiary rounded-lg">
                                             <Chip 
                                                 color={getActivityColor(activity._id)} 
                                                 variant="flat"
@@ -442,9 +453,9 @@ const StaffReportPage = () => {
                                             >
                                                 {formatActivityType(activity._id)}
                                             </Chip>
-                                            <p className="text-2xl font-bold">{activity.count}</p>
+                                            <p className="text-2xl font-bold text-dashboard-primary">{activity.count}</p>
                                             {activity.totalHours > 0 && (
-                                                <p className="text-sm text-gray-600">{activity.totalHours.toFixed(1)}h logged</p>
+                                                <p className="text-sm text-dashboard-secondary">{activity.totalHours.toFixed(1)}h logged</p>
                                             )}
                                         </div>
                                     ))}

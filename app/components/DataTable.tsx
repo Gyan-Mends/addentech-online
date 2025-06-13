@@ -82,8 +82,12 @@ export const DataTable: React.FC<DataTableProps> = ({
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            startContent={<Search className="h-4 w-4 text-gray-400" />}
+            startContent={<Search className="h-4 w-4  border border-white/20 text-white" />}
             className="max-w-xs"
+            classNames={{
+              inputWrapper: "bg-dashboard-secondary border border-white/20 text-white",
+              input: "!text-white"
+            }}
           />
         </div>
       )}
@@ -94,7 +98,15 @@ export const DataTable: React.FC<DataTableProps> = ({
         </div>
       ) : (
         <Table
+       
           aria-label="Data table"
+          classNames={{
+            base: "h-[68vh] overflow-y-auto w-full overflow-x-auto shadow-none",
+            wrapper:
+                "bg-dashboard-secondary vertical-scrollbar horizontal-scrollbar !border border-white/10 min-w-full",
+            th: "bg-dashboard-primary",
+            td: "font-nunito text-xs text-dashboard-secondary whitespace-nowrap",
+        }}
           bottomContent={
             pagination && totalPages > 1 ? (
               <div className="flex w-full justify-center">
@@ -107,13 +119,11 @@ export const DataTable: React.FC<DataTableProps> = ({
               </div>
             ) : null
           }
-          classNames={{
-            wrapper: "min-h-[400px]",
-          }}
+         
         >
           <TableHeader>
             {columns.map((column) => (
-              <TableColumn key={column.key}>{column.label}</TableColumn>
+              <TableColumn key={column.key} className="!text-white bg-dashboard-primary">{column.label}</TableColumn>
             ))}
           </TableHeader>
           <TableBody

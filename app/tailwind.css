@@ -79,39 +79,39 @@
     @apply text-gray-300 
 }
 
-/* Dashboard Global Color System */
+/* Dashboard Global Color System - Enhanced */
 .bg-dashboard-primary {
-    @apply bg-slate-900; /* Main dark background #0F172A */
+    @apply bg-gray-900; /* Main dark background - richer black */
 }
 
 .bg-dashboard-secondary {
-    @apply bg-slate-800; /* Card/panel background #1E293B */
+    @apply bg-gray-800; /* Card/panel background - warmer dark */
 }
 
 .bg-dashboard-tertiary {
-    @apply bg-slate-700; /* Lighter panels/inputs #334155 */
+    @apply bg-gray-700; /* Lighter panels/inputs - better contrast */
 }
 
-/* Text Colors */
+/* Text Colors - Enhanced */
 .text-dashboard-primary {
-    @apply text-white; /* Primary white text */
+    @apply text-gray-100; /* Softer white text */
 }
 
 .text-dashboard-secondary {
-    @apply text-slate-300; /* Secondary gray text */
+    @apply text-gray-300; /* Better contrast secondary text */
 }
 
 .text-dashboard-muted {
-    @apply text-slate-400; /* Muted/subtle text */
+    @apply text-gray-400; /* Muted/subtle text */
 }
 
-/* Status Colors */
+/* Status Colors - More Vibrant */
 .bg-status-active {
-    @apply bg-green-600; /* Active status green */
+    @apply bg-emerald-600; /* Brighter active status green */
 }
 
 .text-status-active {
-    @apply text-green-400;
+    @apply text-emerald-400;
 }
 
 .bg-status-inactive {
@@ -123,58 +123,103 @@
 }
 
 .bg-status-admin {
-    @apply bg-red-600; /* Admin role red */
+    @apply bg-rose-600; /* Brighter admin role red */
 }
 
 .text-status-admin {
-    @apply text-red-400;
+    @apply text-rose-400;
 }
 
-/* Action Colors */
+/* Action Colors - Enhanced Vibrancy */
 .bg-action-primary {
     @apply bg-blue-600; /* Primary blue buttons */
 }
 
 .bg-action-primary:hover {
-    @apply bg-blue-700;
+    @apply bg-blue-500;
+}
+
+.text-action-primary {
+    @apply text-blue-400; /* Primary action color */
 }
 
 .text-action-view {
-    @apply text-green-400; /* View action */
+    @apply text-emerald-400; /* View action - brighter green */
 }
 
 .text-action-edit {
-    @apply text-blue-400; /* Edit action */
+    @apply text-sky-400; /* Edit action - brighter blue */
 }
 
 .text-action-delete {
-    @apply text-red-400; /* Delete action */
+    @apply text-rose-400; /* Delete action - brighter red */
 }
 
-/* Avatar Colors */
+/* Avatar Colors - Vibrant Palette */
 .bg-avatar-purple {
-    @apply bg-purple-600;
+    @apply bg-violet-600;
+}
+
+.text-avatar-purple {
+    @apply text-violet-400;
 }
 
 .bg-avatar-blue {
-    @apply bg-blue-600;
+    @apply bg-cyan-600;
+}
+
+.text-avatar-blue {
+    @apply text-cyan-400;
 }
 
 .bg-avatar-orange {
-    @apply bg-orange-600;
+    @apply bg-amber-600;
+}
+
+.text-avatar-orange {
+    @apply text-amber-400;
 }
 
 .bg-avatar-green {
-    @apply bg-green-600;
+    @apply bg-emerald-600;
 }
 
-/* Border Colors */
+.text-avatar-green {
+    @apply text-emerald-400;
+}
+
+/* Border Colors - Enhanced */
 .border-dashboard {
-    @apply border-slate-700;
+    @apply border-gray-600;
 }
 
 .border-dashboard-light {
-    @apply border-slate-600;
+    @apply border-gray-500;
+}
+
+/* Additional Vibrant Colors */
+.text-metric-blue {
+    @apply text-blue-400;
+}
+
+.text-metric-green {
+    @apply text-emerald-400;
+}
+
+.text-metric-purple {
+    @apply text-violet-400;
+}
+
+.text-metric-orange {
+    @apply text-amber-400;
+}
+
+.text-metric-cyan {
+    @apply text-cyan-400;
+}
+
+.text-metric-pink {
+    @apply text-pink-400;
 }
 
 /* Input/Form Colors */

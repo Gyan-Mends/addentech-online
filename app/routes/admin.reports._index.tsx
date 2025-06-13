@@ -92,11 +92,11 @@ const ReportsPage = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6 !text-white">
+            <div className="p-6 space-y-6 !text-white bg-dashboard-primary min-h-screen">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-white">Task Activity Reports</h1>
-                        <p className="text-gray-300 mt-2">
+                        <h1 className="text-3xl font-bold text-dashboard-primary">Task Activity Reports</h1>
+                        <p className="text-dashboard-secondary mt-2">
                             Generate comprehensive reports for departments and individual staff members
                         </p>
                     </div>
@@ -104,50 +104,50 @@ const ReportsPage = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/10 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm text-gray-300">Total Departments</p>
-                                    <p className="text-2xl font-bold text-white">{departments?.length || 0}</p>
+                                    <p className="text-sm text-dashboard-secondary">Total Departments</p>
+                                    <p className="text-2xl font-bold text-dashboard-primary">{departments?.length || 0}</p>
                                 </div>
-                                <Users className="text-blue-400" size={24} />
+                                <Users className="text-action-primary" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/10 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm text-gray-300">Total Users</p>
-                                    <p className="text-2xl font-bold text-white">{users?.length || 0}</p>
+                                    <p className="text-sm text-dashboard-secondary">Total Users</p>
+                                    <p className="text-2xl font-bold text-dashboard-primary">{users?.length || 0}</p>
                                 </div>
-                                <FileText className="text-green-400" size={24} />
+                                <FileText className="text-status-active" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/10 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm text-gray-300">Report Types</p>
-                                    <p className="text-2xl font-bold text-white">6</p>
+                                    <p className="text-sm text-dashboard-secondary">Report Types</p>
+                                    <p className="text-2xl font-bold text-dashboard-primary">6</p>
                                 </div>
-                                <BarChart3 className="text-purple-400" size={24} />
+                                <BarChart3 className="text-avatar-purple" size={24} />
                             </div>
                         </CardBody>
                     </Card>
 
-                    <Card className="bg-dashboard-secondary border border-white/20 shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/10 shadow-md">
                         <CardBody className="p-4">
                             <div className="flex items-center justify-between text-white">
                                 <div>
-                                    <p className="text-sm text-gray-300">Current Year</p>
-                                    <p className="text-2xl font-bold text-white">{new Date().getFullYear()}</p>
+                                    <p className="text-sm text-dashboard-secondary">Current Year</p>
+                                    <p className="text-2xl font-bold text-dashboard-primary">{new Date().getFullYear()}</p>
                                 </div>
-                                <Calendar className="text-amber-400" size={24} />
+                                <Calendar className="text-avatar-orange" size={24} />
                             </div>
                         </CardBody>
                     </Card>

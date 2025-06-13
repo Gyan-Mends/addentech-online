@@ -80,7 +80,6 @@ const Category = () => {
                 </div>
                 
                 {/* Table */}
-                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
                     <NewCustomTable
                         columns={CategoryColumns}
                         loadingState={navigation.state === "loading" ? "loading" : "idle"}
@@ -112,7 +111,6 @@ const Category = () => {
                             </TableRow>
                         ))}
                     </NewCustomTable>
-                </div>
 
                 <ConfirmModal
                     content="Are you sure to delete department" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
@@ -147,8 +145,8 @@ const Category = () => {
                                 type="text"
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    inputWrapper: "bg-white shadow-sm dark:bg-[#333] border border-black/30 focus:bg-[#333]",
+                                    label: "font-nunito text-sm !text-white",
+                                    inputWrapper: "bg-dashboard-secondary shadow-sm  border border-white/20 focus:bg-[#333]",
                                 }}
                             />
                             <input name="seller" value={user?.user} type="hidden" />
@@ -164,14 +162,14 @@ const Category = () => {
                                 className="mt-4 font-nunito text-sm"
                                 defaultValue={dataValue?.description}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                                    label: "font-nunito text-sm !text-white",
+                                    inputWrapper: " shadow-sm bg-dashboard-secondary h-[40vh]  border border-white/20 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out text-white max-w-full"
                                 }}
                             />
 
                             <button
                                 type="submit"
-                                className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4"
+                                className="mt-10 h-10 text-white bg-action-primary rounded-xl font-nunito px-4"
                             >
                                 Update
                             </button>
@@ -201,8 +199,8 @@ const Category = () => {
                             name="description"
                             className="mt-4 font-nunito text-sm"
                             classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: " shadow-sm !bg-white h-[40vh]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                                label: "font-nunito text-sm !text-white",
+                                inputWrapper: " shadow-sm bg-dashboard-secondary  h-[40vh]  border border-white/20 focus:bg-[#333]  focus focus:bg-[#333] hover: hover:transition-all hover:duration-300 hover:ease-in-out max-w-full"
                             }}
                         />
 

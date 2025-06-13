@@ -43,7 +43,7 @@ const CustomInput = ({
                 className={className}
                 classNames={{
                     label: "font-nunito text-sm !text-white",
-                    inputWrapper: "border border-white/20  hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out  bg-dashboard-secondary shadow-sm"
+                    inputWrapper: "border !text-white border-white/20  hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out  bg-dashboard-secondary shadow-sm"
                 }}
             />
         </div>

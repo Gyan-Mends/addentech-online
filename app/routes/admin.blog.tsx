@@ -138,7 +138,6 @@ const Users = () => {
                 </div>
                 
                 {/* Table */}
-                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
                     <NewCustomTable
                         columns={BlogColumns}
                         loadingState={navigation.state === "loading" ? "loading" : "idle"}
@@ -185,7 +184,6 @@ const Users = () => {
                             </TableRow>
                         ))}
                     </NewCustomTable>
-                </div>
             </div>
 
             {/* confirm modal */}
@@ -241,9 +239,9 @@ const Users = () => {
                                 isRequired
                                 name="category"
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
+                                    label: "font-nunito text-sm !text-white",
                                     popoverContent: "focus:dark:bg-[#333] focus-bg-white bg-white shadow-sm dark:bg-[#333] border border-white/5 font-nunito",
-                                    trigger: "bg-white shadow-sm dark:bg-[#333]  border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                                    trigger: "bg-dashboard-secondary !text-white shadow-sm dark:bg-[#333]  border border-white/20 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
                                 }}
                             >
                                 {categories.map((cat) => (
@@ -255,7 +253,7 @@ const Users = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="" className="font-nunito">Subject</label>
+                            <label htmlFor="" className="font-nunito !text-white">Subject</label>
                             <input type="hidden" name="description" value={content} />
                             <ReactQuill
                                 value={content} // Bind editor content to state
@@ -269,9 +267,7 @@ const Users = () => {
 
                         <div className="lg:mt-10  ">
                             <input name="base64Image" value={base64Image} type="hidden" />
-                            <label className="font-nunito block text-sm !text-black" htmlFor="image">
-                                Image
-                            </label>
+                            <label className="font-nunito block text-sm !text-white" htmlFor="image">Image</label>
                             <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
                                 {/* The file input */}
                                 <input
@@ -312,7 +308,7 @@ const Users = () => {
 
 
                         <div className="flex gap-6 mt-6">
-                            <button className="font-montserrat w-40 bg-pink-500 text-white h-10 rounded-lg">Upload blog</button>
+                            <button className="font-montserrat w-40 bg-action-primary text-white h-10 rounded-lg">Upload blog</button>
                         </div>
                     </Form>
                 </Drawer>
@@ -332,6 +328,10 @@ const Users = () => {
                         placeholder=" "
                         type="text"
                         labelPlacement="outside"
+                        classNames={{
+                            inputWrapper: "bg-dashboard-secondary border border-white/20 text-white",
+                            label: "font-nunito text-sm !text-white"
+                        }}
                     />
 
                     <div className="">
@@ -342,9 +342,10 @@ const Users = () => {
                             isRequired
                             name="category"
                             classNames={{
-                                label: "font-nunito text-sm text-default-100",
+                                label: "font-nunito text-sm !text-white",
                                 popoverContent: "z-[1000] focus:bg-white bg-white shadow-lg",
-                                trigger: "bg-white shadow-sm border border-gray-300 hover:border-primary focus:border-primary",
+                                trigger: "bg-dashboard-secondary !text-white shadow-sm border border-white/20 hover:border-primary focus:border-primary",
+                               
                             }}
                         >
                             {
@@ -360,7 +361,7 @@ const Users = () => {
                    </div>
 
                     <div>
-                        <label htmlFor="" className="font-nunito">Subject</label>
+                        <label htmlFor="" className="font-nunito !text-white">Subject</label>
                         <input type="hidden" name="description" value={content} />
                         <ReactQuill
                             value={content}
@@ -374,7 +375,7 @@ const Users = () => {
 
 
                     <div className="mt-14 ">
-                        <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                        <label className="font-nunito block text-sm !text-white" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                             <input
                                 name="image"
@@ -412,7 +413,7 @@ const Users = () => {
                     <input name="base64Image" value={base64Image} type="hidden" />
 
                     <div className="flex gap-6 mt-6">
-                        <button className="font-montserrat w-40 bg-pink-500 text-white h-10 rounded-lg">Upload blog</button>
+                        <button className="font-montserrat w-40 bg-action-primary text-white h-10 rounded-lg">Upload blog</button>
                     </div>
                 </Form>
             </Drawer>

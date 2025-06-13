@@ -379,11 +379,12 @@ export default function LeaveCalendar() {
       
 
       {/* Calendar Controls */}
-      <Card>
+      <Card className="bg-dashboard-secondary border border-white/20">
         <CardBody>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center ">
             <div className="flex items-center gap-4">
               <Button
+                color="primary"
                 variant="light"
                 startContent={<ChevronLeft size={16} />}
                 onClick={() => navigateMonth('prev')}
@@ -391,11 +392,12 @@ export default function LeaveCalendar() {
                 Previous
               </Button>
               
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-white">
                 {monthNames[currentMonth - 1]} {currentYear}
               </h2>
               
               <Button
+                color="primary"
                 variant="light"
                 endContent={<ChevronRight size={16} />}
                 onClick={() => navigateMonth('next')}

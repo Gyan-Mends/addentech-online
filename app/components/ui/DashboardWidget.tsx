@@ -54,7 +54,7 @@ const DashboardWidget: React.FC<DashboardWidgetProps> = ({
       transition={{ duration: 0.3 }}
       className={`w-full ${className}`}
     >
-      <Card className="bg-dashboard-secondary shadow-sm border border-dashboard hover:shadow-md transition-all duration-300">
+      <Card className="bg-dashboard-secondary shadow-sm border border-white/20 hover:shadow-md transition-all duration-300">
         <CardHeader className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-dashboard-tertiary flex items-center justify-center">
