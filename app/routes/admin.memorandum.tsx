@@ -287,7 +287,7 @@ const Users = () => {
         <AdminLayout>
             <div>
                 <div className="flex justify-end">
-                    <Button className="border border-white/30 px-4 py-1 bg-pink-500 text-white" onClick={() => {
+                    <Button className="border border-white/30 px-4 py-1 bg-action-primary text-white" onClick={() => {
                         const randomRef = generateRandomReference();
                         setReferenceNumber(randomRef);
                         setIsDrawerOpen(true);
@@ -369,7 +369,7 @@ const Users = () => {
                     <Form className="flex flex-col gap-6 p-4" method="post">
                         <input
                             name="refNumber"
-                            className="text-sm dark:bg-default-50 shadow-sm border border-black/30 hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
+                            className="text-sm shadow-sm border border-white/20 hover:border-b-action-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full h-10 rounded-xl pl-2"
                             value={referenceNumber} 
                             type="text" 
                             readOnly
@@ -377,11 +377,11 @@ const Users = () => {
 
                         <div className="flex gap-6">
                             <div className="flex-1">
-                                <label className="text-sm font-medium text-foreground-700 block mb-2">
+                                <label className="text-sm font-medium !text-white block mb-2">
                                     From Department <span className="text-danger">*</span>
                                 </label>
                                 <input
-                                    className="w-full px-3 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                                    className="w-full px-3 py-2 border border-white/20 text-white   rounded-md bg-dashboard-secondary cursor-not-allowed"
                                     value={currentUser?.department ? 
                                         departments.find(d => d._id === currentUser.department)?.name || 'Department not found' : 
                                         'No department assigned'}
@@ -390,11 +390,11 @@ const Users = () => {
                                 <input name="fromDepartment" type="hidden" value={currentUser?.department || ''} />
                             </div>
                             <div className="flex-1">
-                                <label className="text-sm font-medium text-foreground-700 block mb-2">
+                                <label className="text-sm font-medium !text-white block mb-2">
                                     From Name <span className="text-danger">*</span>
                                 </label>
                                 <input
-                                    className="w-full px-3 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                                    className="w-full px-3 py-2 border border-white/20 text-white rounded-md bg-dashboard-secondary cursor-not-allowed"
                                     value={currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'User not found'}
                                     readOnly
                                 />
@@ -424,13 +424,13 @@ const Users = () => {
                                     setToDepartmentValue(selectedKey || "");
                                 }}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                    label: "font-nunito text-sm !text-white",
+                                    popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito ",
+                                    trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                    <SelectItem className="!text-white" key={department._id}>{department.name}</SelectItem>
                                 ))}
                             </Select>
                             <Select
@@ -446,13 +446,13 @@ const Users = () => {
                                 }}
                                 isDisabled={!toDepartmentValue}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                    label: "font-nunito text-sm !text-white",
+                                    popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito ",
+                                    trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
                                 {toUsers.map((user: any) => (
-                                    <SelectItem key={user._id}>{`${user.firstName} ${user.lastName}`}</SelectItem>
+                                    <SelectItem className="!text-white" key={user._id}>{`${user.firstName} ${user.lastName}`}</SelectItem>
                                 ))}
                             </Select>
                         </div>
@@ -476,9 +476,9 @@ const Users = () => {
                                 isRequired
                                 name="memoType"
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                    label: "font-nunito text-sm !text-white",
+                                    popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito ",
+                                    trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
                                 {[
@@ -486,7 +486,7 @@ const Users = () => {
                                     { key: "Processing", value: "Processing", display_name: "Processing" },
                                     { key: "Closed", value: "Closed", display_name: "Closed" },
                                 ].map((role) => (
-                                    <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                                    <SelectItem className="!text-white" key={role.key}>{role.display_name}</SelectItem>
                                 ))}
                             </Select>
                             <CustomInput
@@ -506,9 +506,9 @@ const Users = () => {
                             isRequired
                             name="frequency"
                             classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                label: "font-nunito text-sm !text-white",
+                                popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito ",
+                                trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out  max-w-full bg-dashboard-secondary  "
                             }}
                         >
                             {[
@@ -516,12 +516,12 @@ const Users = () => {
                                 { key: "Every Week", value: "Every Week", display_name: "Every Week" },
                                 { key: "Every Month", value: "Every Month", display_name: "Every Month" },
                             ].map((role) => (
-                                <SelectItem key={role.key}>{role.display_name}</SelectItem>
+                                <SelectItem  className="!text-white" key={role.key}>{role.display_name}</SelectItem>
                             ))}
                         </Select>
 
                         <div>
-                            <label htmlFor="" className="font-nunito">Remarks</label>
+                            <label htmlFor="" className="font-nunito !text-white">Remarks</label>
                             <input type="hidden" name="remark" value={contentTwo} />
                             <ReactQuill
                                 value={contentTwo}
@@ -544,13 +544,13 @@ const Users = () => {
                                     setCcDepartmentValue(selectedKey || "");
                                 }}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                    label: "font-nunito text-sm !text-white",
+                                    popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito ",
+                                    trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
                                 {departments.map((department: DepartmentInterface) => (
-                                    <SelectItem key={department._id}>{department.name}</SelectItem>
+                                    <SelectItem className="!text-white" key={department._id}>{department.name}</SelectItem>
                                 ))}
                             </Select>
                             <Select
@@ -566,19 +566,19 @@ const Users = () => {
                                 }}
                                 isDisabled={!ccDepartmentValue}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito ",
-                                    trigger: " shadow-sm   border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white  "
+                                    label: "font-nunito text-sm !text-white",
+                                    popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito ",
+                                    trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
                                 {ccUsers.map((user: any) => (
-                                    <SelectItem key={user._id}>{`${user.firstName} ${user.lastName}`}</SelectItem>
+                                    <SelectItem className="!text-white" key={user._id}>{`${user.firstName} ${user.lastName}`}</SelectItem>
                                 ))}
                             </Select>
                         </div>
 
                         <div className=" ">
-                            <label className="font-nunito block text-sm" htmlFor="">Image</label>
+                            <label className="font-nunito block text-sm !text-white" htmlFor="">Image</label>
                             <input name="image" type="text" hidden />
                             <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
                                 <input
@@ -606,7 +606,7 @@ const Users = () => {
                         <input name="emailCheck" type="hidden" value="on" />
 
                         <div className="flex gap-6 mt-6">
-                            <button  className="font-montserrat w-40 !bg-pink-500 text-white py-2 rounded-md">Send Memo</button>
+                            <button  className="font-montserrat w-40  bg-primary text-white py-2 rounded-md">Send Memo</button>
                         </div>
 
                         <input name="intent" value="create" type="hidden" />
@@ -621,7 +621,7 @@ const Users = () => {
                     handleDrawerClosed={() => setIsViewDrawerOpen(false)}
                     title="View Memo"
                 >
-                    <div className="font-nunito text-xs flex flex-col gap-4 mt-6 p-4">
+                    <div className="font-nunito text-xs !text-white flex flex-col gap-4 mt-6 p-4">
                         <span className="flex justify-between">
                             <p> Reference Number:</p>
                             <p>{dataValue?.refNumber}</p>
@@ -692,7 +692,7 @@ const Users = () => {
                     <Form className="flex flex-col gap-6 p-4" method="post">
                         <input
                             name="refNumber"
-                            className="text-sm dark:bg-default-50 shadow-sm   border border-black/30   hover:border-b-pink-500 hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full h-10 rounded-xl pl-2"
+                            className="text-sm shadow-sm   border border-white/20   hover:border-b-action-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full h-10 rounded-xl pl-2"
                             value={dataValue?.refNumber} type="text" />
 
                         <div className="flex gap-6">
@@ -709,6 +709,7 @@ const Users = () => {
                                 setDataValue={setDataValue}
                                 fieldName="fromDepartment"
                                 isObject={true}
+
                             />
                             <FormSelect
                                 label="From Name"
@@ -727,14 +728,14 @@ const Users = () => {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-sm font-medium text-foreground-700">
+                            <label className="text-sm font-medium !text-white">
                                 Memo Date <span className="text-danger">*</span>
                             </label>
                             <input
                                 type="date"
                                 name="memoDate"
                                 required
-                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-action-primary "
                                 value={dataValue?.memoDate || ''}
                                 onChange={(e) => setDataValue((prev: any) => ({
                                     ...prev,
@@ -775,7 +776,7 @@ const Users = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="" className="font-nunito">Subject</label>
+                            <label htmlFor="" className="font-nunito !text-white">Subject</label>
                             <input type="hidden" name="subject" value={content} />
                             <ReactQuill
                                 value={content}
@@ -802,14 +803,14 @@ const Users = () => {
                                 fieldName="memoType"
                             />
                             <div className="flex-1 flex flex-col gap-1">
-                                <label className="text-sm font-medium text-foreground-700">
+                                <label className="text-sm font-medium !text-white">
                                     Due Date <span className="text-danger">*</span>
                                 </label>
                                 <input
                                     type="date"
                                     name="dueDate"
                                     required
-                                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                    className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-action-primary"
                                     value={dataValue?.dueDate || ''}
                                     onChange={(e) => setDataValue((prev: any) => ({
                                         ...prev,
@@ -836,7 +837,7 @@ const Users = () => {
                         />
 
                         <div>
-                            <label htmlFor="" className="font-nunito">Remarks</label>
+                            <label htmlFor="" className="font-nunito !text-white">Remarks</label>
                             <input type="hidden" name="remark" value={contentTwo} />
                             <ReactQuill
                                 value={contentTwo}
@@ -879,9 +880,7 @@ const Users = () => {
 
                         <div className=" ">
                             <input name="base64Image" value={base64Image} type="hidden" />
-                            <label className="font-nunito block text-sm !text-black" htmlFor="image">
-                                Image
-                            </label>
+                            <label className="font-nunito block text-sm !text-white" htmlFor="image">Image</label>
                             <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
                                 <input
                                     name="image"
@@ -918,7 +917,7 @@ const Users = () => {
                         <input name="emailCheck" type="hidden" value="on" />
 
                         <div className="flex gap-6 mt-6">
-                            <button color="primary" className="font-montserrat w-40 !bg-pink-500 text-white py-2 rounded-md">Update Memo</button>
+                            <button color="primary" className="font-montserrat w-40 !bg-primary text-white py-2 rounded-md">Update Memo</button>
                         </div>
 
                         <input name="intent" value="update" type="hidden" />

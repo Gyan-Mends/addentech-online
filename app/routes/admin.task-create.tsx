@@ -242,29 +242,28 @@ const TaskCreate = () => {
             <div className="p-6 space-y-6">
                 {/* Error/Success Messages */}
                 {error && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="border-rose-400/50 bg-dashboard-secondary">
                         <CardBody>
-                            <p className="text-danger-700">{error}</p>
+                            <p className="text-rose-400">{error}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {actionData && !actionData.success && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="border-rose-400/50 bg-dashboard-secondary">
                         <CardBody>
-                            <p className="text-danger-700">{actionData.message}</p>
+                            <p className="text-rose-400">{actionData.message}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {/* Header */}
                 <div className="flex items-center gap-4">
-                  
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                        <h1 className="text-3xl font-bold text-dashboard-primary">
                             Create New Task
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">
+                        <p className="text-dashboard-secondary mt-2">
                             Fill out the form below to create a new task
                         </p>
                     </div>
@@ -291,17 +290,17 @@ const TaskCreate = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Task Information */}
                         <div className="lg:col-span-2 space-y-6">
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardHeader>
-                                    <h3 className="text-lg font-semibold">Basic Information</h3>
+                                    <h3 className="text-lg font-semibold text-dashboard-primary">Basic Information</h3>
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <Input
                                         name="title"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                            label: "font-nunito text-dashboard-primary",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                         }}
                                         label="Task Title"
                                         placeholder="Enter task title"
@@ -316,8 +315,8 @@ const TaskCreate = () => {
                                         name="description"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                            label: "font-nunito text-dashboard-primary",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                         }}
                                         label="Description"
                                         placeholder="Describe the task in detail"
@@ -334,48 +333,50 @@ const TaskCreate = () => {
                                             name="priority"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-black",
-                                                trigger: "font-nunito bg-white border border-black/20",
+                                                label: "font-nunito text-dashboard-primary",
+                                                trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                popoverContent: "bg-dashboard-secondary border border-white/20"
                                             }}
                                             label="Priority"
                                             selectedKeys={[priority]}
                                             onSelectionChange={(keys) => setPriority(Array.from(keys)[0] as string)}
                                         >
-                                            <SelectItem key="low" value="low">Low</SelectItem>
-                                            <SelectItem key="medium" value="medium">Medium</SelectItem>
-                                            <SelectItem key="high" value="high">High</SelectItem>
-                                            <SelectItem key="critical" value="critical">Critical</SelectItem>
+                                            <SelectItem key="low" value="low" className="text-dashboard-primary">Low</SelectItem>
+                                            <SelectItem key="medium" value="medium" className="text-dashboard-primary">Medium</SelectItem>
+                                            <SelectItem key="high" value="high" className="text-dashboard-primary">High</SelectItem>
+                                            <SelectItem key="critical" value="critical" className="text-dashboard-primary">Critical</SelectItem>
                                         </Select>
                                         
                                         <Input
                                             name="category"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-black",
-                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                                label: "font-nunito text-dashboard-primary",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                             }}
                                             label="Category"
                                             placeholder="e.g., Development, Marketing"
                                             value={category}
                                             onValueChange={setCategory}
-                                            startContent={<Tag size={16} />}
+                                            startContent={<Tag size={16} className="text-dashboard-secondary" />}
                                         />
                                     </div>
                                 </CardBody>
                             </Card>
 
                             {/* Assignment and Department */}
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardHeader>
-                                    <h3 className="text-lg font-semibold">Assignment & Department</h3>
+                                    <h3 className="text-lg font-semibold text-dashboard-primary">Assignment & Department</h3>
                                 </CardHeader>
                                 <CardBody className="space-y-10">
                                     <Select
                                         name="department"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-black",
-                                            trigger: "font-nunito bg-white border border-black/20",
+                                            label: "font-nunito text-dashboard-primary",
+                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            popoverContent: "bg-dashboard-secondary border border-white/20"
                                         }}
                                         label="Department"
                                         selectedKeys={selectedDepartment ? [selectedDepartment] : []}
@@ -386,7 +387,7 @@ const TaskCreate = () => {
                                         isDisabled={currentUser?.role === 'department_head'}
                                     >
                                         {departments?.map((dept: any) => (
-                                            <SelectItem key={dept._id} value={dept._id}>
+                                            <SelectItem key={dept._id} value={dept._id} className="text-dashboard-primary">
                                                 {dept.name}
                                             </SelectItem>
                                         ))}
@@ -395,8 +396,9 @@ const TaskCreate = () => {
                                     <Select
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-black",
-                                            trigger: "font-nunito bg-white border border-black/20",
+                                            label: "font-nunito text-dashboard-primary",
+                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            popoverContent: "bg-dashboard-secondary border border-white/20"
                                         }}
                                         label="Assign To Department Heads"
                                         selectionMode="multiple"
@@ -410,7 +412,7 @@ const TaskCreate = () => {
                                         }
                                     >
                                         {getFilteredUsers().map((user: any) => (
-                                            <SelectItem key={user._id} value={user._id}>
+                                            <SelectItem key={user._id} value={user._id} className="text-dashboard-primary">
                                                 {user.firstName} {user.lastName} (Department Head)
                                             </SelectItem>
                                         ))}
@@ -419,9 +421,9 @@ const TaskCreate = () => {
                             </Card>
 
                             {/* Dates and Time */}
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardHeader>
-                                    <h3 className="text-lg font-semibold">Timeline</h3>
+                                    <h3 className="text-lg font-semibold text-dashboard-primary">Timeline</h3>
                                 </CardHeader>
                                 <CardBody className="space-y-10">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -429,13 +431,13 @@ const TaskCreate = () => {
                                             type="date"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-black",
-                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                                label: "font-nunito text-dashboard-primary",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                             }}
                                             label="Start Date (Optional)"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
-                                            startContent={<Calendar size={16} />}
+                                            startContent={<Calendar size={16} className="text-dashboard-secondary" />}
                                         />
                                         
                                         <Input
@@ -443,14 +445,14 @@ const TaskCreate = () => {
                                             type="date"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-black",
-                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                                label: "font-nunito text-dashboard-primary",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                             }}
                                             label="Due Date"
                                             value={dueDate}
                                             onChange={(e) => setDueDate(e.target.value)}
                                             isRequired
-                                            startContent={<Calendar size={16} />}
+                                            startContent={<Calendar size={16} className="text-dashboard-secondary" />}
                                             errorMessage={actionData?.errors?.dueDate}
                                             isInvalid={!!actionData?.errors?.dueDate}
                                         />
@@ -460,8 +462,8 @@ const TaskCreate = () => {
                                         type="number"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                            label: "font-nunito text-dashboard-primary",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                         }}
                                         label="Estimated Hours (Optional)"
                                         placeholder="0"
@@ -469,23 +471,23 @@ const TaskCreate = () => {
                                         onValueChange={setEstimatedHours}
                                         step="0.5"
                                         min="0"
-                                        startContent={<Clock size={16} />}
+                                        startContent={<Clock size={16} className="text-dashboard-secondary" />}
                                     />
                                 </CardBody>
                             </Card>
 
                             {/* Tags */}
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardHeader>
-                                    <h3 className="text-lg font-semibold">Tags</h3>
+                                    <h3 className="text-lg font-semibold text-dashboard-primary">Tags</h3>
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <div className="flex gap-2">
                                         <Input
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-black",
-                                                inputWrapper: "font-nunito bg-white border border-black/20",
+                                                label: "font-nunito text-dashboard-primary",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                             }}
                                             placeholder="Add a tag"
                                             value={currentTag}
@@ -500,12 +502,12 @@ const TaskCreate = () => {
                                     {tags.length > 0 && (
                                         <div className="flex flex-wrap gap-2">
                                             {tags.map((tag, index) => (
-                                                <div key={index} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full text-sm">
-                                                    <span>{tag}</span>
+                                                <div key={index} className="flex items-center gap-1 bg-dashboard-tertiary px-2 py-1 rounded-full text-sm border border-white/10">
+                                                    <span className="text-dashboard-primary">{tag}</span>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeTag(tag)}
-                                                        className="text-red-500 hover:text-red-700"
+                                                        className="text-rose-400 hover:text-rose-300"
                                                     >
                                                         ×
                                                     </button>
@@ -520,16 +522,19 @@ const TaskCreate = () => {
                         {/* Sidebar - Additional Options */}
                         <div className="space-y-6">
                             {/* Approval Workflow */}
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardHeader>
-                                    <h3 className="text-lg font-semibold">Approval Workflow</h3>
+                                    <h3 className="text-lg font-semibold text-dashboard-primary">Approval Workflow</h3>
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <Switch
                                         isSelected={approvalRequired}
                                         onValueChange={setApprovalRequired}
+                                        classNames={{
+                                            label: "text-dashboard-primary"
+                                        }}
                                     >
-                                        Requires Approval
+                                        <span className="text-dashboard-primary">Requires Approval</span>
                                     </Switch>
                                     
                                     {approvalRequired && (
@@ -539,9 +544,14 @@ const TaskCreate = () => {
                                             selectedKeys={approvers}
                                             onSelectionChange={(keys) => setApprovers(Array.from(keys) as string[])}
                                             placeholder="Select approvers"
+                                            classNames={{
+                                                label: "text-dashboard-primary",
+                                                trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                popoverContent: "bg-dashboard-secondary border border-white/20"
+                                            }}
                                         >
                                             {getApprovalUsers().map((user: any) => (
-                                                <SelectItem key={user._id} value={user._id}>
+                                                <SelectItem key={user._id} value={user._id} className="text-dashboard-primary">
                                                     {user.firstName} {user.lastName} ({user.role})
                                                 </SelectItem>
                                             ))}
@@ -551,16 +561,19 @@ const TaskCreate = () => {
                             </Card>
 
                             {/* Recurring Task */}
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardHeader>
-                                    <h3 className="text-lg font-semibold">Recurring Task</h3>
+                                    <h3 className="text-lg font-semibold text-dashboard-primary">Recurring Task</h3>
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <Switch
                                         isSelected={isRecurring}
                                         onValueChange={setIsRecurring}
+                                        classNames={{
+                                            label: "text-dashboard-primary"
+                                        }}
                                     >
-                                        Make Recurring
+                                        <span className="text-dashboard-primary">Make Recurring</span>
                                     </Switch>
                                     
                                     {isRecurring && (
@@ -569,11 +582,16 @@ const TaskCreate = () => {
                                                 label="Frequency"
                                                 selectedKeys={[recurringFrequency]}
                                                 onSelectionChange={(keys) => setRecurringFrequency(Array.from(keys)[0] as string)}
+                                                classNames={{
+                                                    label: "text-dashboard-primary",
+                                                    trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                                }}
                                             >
-                                                <SelectItem key="daily" value="daily">Daily</SelectItem>
-                                                <SelectItem key="weekly" value="weekly">Weekly</SelectItem>
-                                                <SelectItem key="monthly" value="monthly">Monthly</SelectItem>
-                                                <SelectItem key="yearly" value="yearly">Yearly</SelectItem>
+                                                <SelectItem key="daily" value="daily" className="text-dashboard-primary">Daily</SelectItem>
+                                                <SelectItem key="weekly" value="weekly" className="text-dashboard-primary">Weekly</SelectItem>
+                                                <SelectItem key="monthly" value="monthly" className="text-dashboard-primary">Monthly</SelectItem>
+                                                <SelectItem key="yearly" value="yearly" className="text-dashboard-primary">Yearly</SelectItem>
                                             </Select>
                                             
                                             <Input
@@ -584,6 +602,11 @@ const TaskCreate = () => {
                                                 onValueChange={setRecurringInterval}
                                                 min="1"
                                                 description={`Every ${recurringInterval} ${recurringFrequency.replace('ly', '')}(s)`}
+                                                classNames={{
+                                                    label: "text-dashboard-primary",
+                                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                    description: "text-dashboard-secondary"
+                                                }}
                                             />
                                             
                                             <Input
@@ -591,6 +614,10 @@ const TaskCreate = () => {
                                                 label="End Date (Optional)"
                                                 value={recurringEndDate}
                                                 onChange={(e) => setRecurringEndDate(e.target.value)}
+                                                classNames={{
+                                                    label: "text-dashboard-primary",
+                                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                                }}
                                             />
                                         </div>
                                     )}
@@ -598,7 +625,7 @@ const TaskCreate = () => {
                             </Card>
 
                             {/* Action Buttons */}
-                            <Card>
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardBody>
                                     <div className="space-y-3">
                                         <Button
@@ -614,7 +641,7 @@ const TaskCreate = () => {
                                         <Button
                                             variant="light"
                                             size="lg"
-                                            className="w-full"
+                                            className="w-full text-dashboard-secondary hover:text-dashboard-primary"
                                             onClick={() => navigate('/admin/task-management')}
                                         >
                                             Cancel

@@ -591,12 +591,19 @@ const TaskManagement = () => {
                 </Card>
 
                 {/* Tasks Table */}
-                <Card className="bg-dashboard-secondary border border-white/20">
+                <Card  className="bg-dashboard-secondary  border border-white/20"
+                >
                     <CardHeader>
                         <h3 className="text-lg font-semibold text-white">Tasks</h3>
                     </CardHeader>
                     <CardBody>
-                        <Table aria-label="Tasks table">
+                        <Table aria-label="Tasks table"
+                         classNames={{
+                            base: "h-[68vh] overflow-y-auto w-full overflow-x-auto shadow-none",
+                            th: "bg-dashboard-primary !text-white",
+                            td: "font-nunito text-xs text-dashboard-secondary whitespace-nowrap",
+                            wrapper: "bg-dashboard-secondary vertical-scrollbar horizontal-scrollbar !border border-white/10 min-w-full",
+                        }}>
                             <TableHeader>
                                 <TableColumn>TASK</TableColumn>
                                 <TableColumn>ASSIGNEE</TableColumn>

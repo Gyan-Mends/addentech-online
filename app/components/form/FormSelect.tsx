@@ -70,14 +70,15 @@ export default function FormSelect({
       selectedKeys={getSelectedKey()}
       onSelectionChange={handleSelectionChange}
       classNames={{
-        label: "font-nunito text-sm text-default-100",
-        popoverContent: "z-[10000] bg-white shadow-sm dark:bg-default-50 border border-black/5 font-nunito",
-        trigger: "shadow-sm border border-black/30 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full !bg-white"
+        label: "font-nunito text-sm !text-white",
+        popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm dark:bg-default-50 border border-white/20 font-nunito",
+        trigger: "shadow-sm border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out max-w-full bg-dashboard-secondary border-white/20"
       }}
       {...props}
     >
       {options.map((option) => (
         <SelectItem 
+          className="!text-white"
           key={option[optionKey] || option._id || option.key} 
           value={option[optionValue] || option._id || option.value}
         >

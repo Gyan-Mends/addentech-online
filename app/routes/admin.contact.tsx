@@ -88,7 +88,6 @@ const Category = () => {
                 </div>
                 
                 {/* Table */}
-                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
                     <NewCustomTable
                         columns={ContactColumns}
                         loadingState={navigation.state === "loading" ? "loading" : "idle"}
@@ -117,10 +116,9 @@ const Category = () => {
                             </TableRow>
                         ))}
                     </NewCustomTable>
-                </div>
 
 
-                <ConfirmModal className="dark:bg-[#333] !bg-[#020817] border border-white/20"
+                <ConfirmModal 
                     content="Are you sure to delete category" header="Comfirm Delete" isOpen={confirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                     <div className="flex gap-4">
                         <Button size="sm" color="danger" className="font-montserrat font-semibold" onPress={handleConfirmModalClosed}>

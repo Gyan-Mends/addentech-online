@@ -399,17 +399,17 @@ const EnhancedTaskManagement = () => {
             <div className="p-6 space-y-6">
                 {/* Success/Error Messages */}
                 {error && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="border-rose-400/50 bg-dashboard-secondary">
                         <CardBody>
-                            <p className="text-danger-700">{error}</p>
+                            <p className="text-rose-400">{error}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {actionData && (
-                    <Card className={`border-${actionData.success ? 'success' : 'danger'}-200 bg-${actionData.success ? 'success' : 'danger'}-50`}>
+                    <Card className={`border-${actionData.success ? 'emerald' : 'rose'}-400/50 bg-dashboard-secondary`}>
                         <CardBody>
-                            <p className={`text-${actionData.success ? 'success' : 'danger'}-700`}>
+                            <p className={`text-${actionData.success ? 'emerald' : 'rose'}-400`}>
                                 {actionData.message}
                             </p>
                         </CardBody>
@@ -419,10 +419,10 @@ const EnhancedTaskManagement = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                        <h1 className="text-3xl font-bold text-dashboard-primary">
                             {getPageTitle()}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">
+                        <p className="text-dashboard-secondary mt-2">
                             {currentUser?.role === 'staff' && "View and manage your assigned tasks and all department tasks"}
                             {currentUser?.role === 'department_head' && "Manage department tasks, assign to members, and track progress"}
                             {(currentUser?.role === 'admin' || currentUser?.role === 'manager') && "Full task management with advanced permissions and assignment capabilities"}
@@ -440,6 +440,7 @@ const EnhancedTaskManagement = () => {
                         <Button
                             variant="flat"
                             onClick={() => navigate('/admin/task-management')}
+                            className="text-dashboard-secondary hover:text-dashboard-primary"
                         >
                             Regular View
                         </Button>
@@ -448,38 +449,38 @@ const EnhancedTaskManagement = () => {
 
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-blue-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <h3 className="text-2xl font-bold text-blue-600">{stats.totalTasks || 0}</h3>
-                            <p className="text-sm text-gray-600">Total Tasks</p>
+                            <h3 className="text-3xl font-bold text-metric-blue">{stats.totalTasks || 0}</h3>
+                            <p className="text-dashboard-primary font-medium">Total Tasks</p>
                         </CardBody>
                     </Card>
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-emerald-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <h3 className="text-2xl font-bold text-green-600">{stats.activeTasks || 0}</h3>
-                            <p className="text-sm text-gray-600">Active Tasks</p>
+                            <h3 className="text-3xl font-bold text-metric-green">{stats.activeTasks || 0}</h3>
+                            <p className="text-dashboard-primary font-medium">Active Tasks</p>
                         </CardBody>
                     </Card>
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-amber-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <h3 className="text-2xl font-bold text-orange-600">{stats.overdueTasks || 0}</h3>
-                            <p className="text-sm text-gray-600">Overdue Tasks</p>
+                            <h3 className="text-3xl font-bold text-metric-orange">{stats.overdueTasks || 0}</h3>
+                            <p className="text-dashboard-primary font-medium">Overdue Tasks</p>
                         </CardBody>
                     </Card>
-                    <Card>
+                    <Card className="bg-dashboard-secondary border border-white/20 hover:border-violet-400/50 transition-colors">
                         <CardBody className="text-center">
-                            <h3 className="text-2xl font-bold text-purple-600">{stats.completedTasks || 0}</h3>
-                            <p className="text-sm text-gray-600">Completed Tasks</p>
+                            <h3 className="text-3xl font-bold text-metric-purple">{stats.completedTasks || 0}</h3>
+                            <p className="text-dashboard-primary font-medium">Completed Tasks</p>
                         </CardBody>
                     </Card>
                 </div>
 
                 {/* Filters */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
                         <div className="flex items-center gap-2">
-                            <Filter size={20} />
-                            <h3 className="text-lg font-semibold">Filters</h3>
+                            <Filter size={20} className="text-dashboard-primary" />
+                            <h3 className="text-lg font-semibold text-dashboard-primary">Filters</h3>
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -489,33 +490,47 @@ const EnhancedTaskManagement = () => {
                                 placeholder="Search title, description..."
                                 value={searchQuery}
                                 onValueChange={setSearchQuery}
-                                startContent={<Search size={16} />}
+                                startContent={<Search size={16} className="text-dashboard-secondary" />}
                                 isClearable
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                }}
                             />
 
                             <Select
                                 label="Status"
                                 selectedKeys={[selectedStatus]}
                                 onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                }}
                             >
-                                <SelectItem key="all" value="all">All Status</SelectItem>
-                                <SelectItem key="not_started" value="not_started">Not Started</SelectItem>
-                                <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
-                                <SelectItem key="under_review" value="under_review">Under Review</SelectItem>
-                                <SelectItem key="completed" value="completed">Completed</SelectItem>
-                                <SelectItem key="on_hold" value="on_hold">On Hold</SelectItem>
+                                <SelectItem key="all" value="all" className="text-dashboard-primary">All Status</SelectItem>
+                                <SelectItem key="not_started" value="not_started" className="text-dashboard-primary">Not Started</SelectItem>
+                                <SelectItem key="in_progress" value="in_progress" className="text-dashboard-primary">In Progress</SelectItem>
+                                <SelectItem key="under_review" value="under_review" className="text-dashboard-primary">Under Review</SelectItem>
+                                <SelectItem key="completed" value="completed" className="text-dashboard-primary">Completed</SelectItem>
+                                <SelectItem key="on_hold" value="on_hold" className="text-dashboard-primary">On Hold</SelectItem>
                             </Select>
 
                             <Select
                                 label="Priority"
                                 selectedKeys={[selectedPriority]}
                                 onSelectionChange={(keys) => setSelectedPriority(Array.from(keys)[0] as string)}
+                                classNames={{
+                                    label: "text-dashboard-primary",
+                                    trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                                }}
                             >
-                                <SelectItem key="all" value="all">All Priority</SelectItem>
-                                <SelectItem key="low" value="low">Low</SelectItem>
-                                <SelectItem key="medium" value="medium">Medium</SelectItem>
-                                <SelectItem key="high" value="high">High</SelectItem>
-                                <SelectItem key="critical" value="critical">Critical</SelectItem>
+                                <SelectItem key="all" value="all" className="text-dashboard-primary">All Priority</SelectItem>
+                                <SelectItem key="low" value="low" className="text-dashboard-primary">Low</SelectItem>
+                                <SelectItem key="medium" value="medium" className="text-dashboard-primary">Medium</SelectItem>
+                                <SelectItem key="high" value="high" className="text-dashboard-primary">High</SelectItem>
+                                <SelectItem key="critical" value="critical" className="text-dashboard-primary">Critical</SelectItem>
                             </Select>
 
                             {(currentUser?.role === 'admin' || currentUser?.role === 'manager') && (
@@ -523,10 +538,15 @@ const EnhancedTaskManagement = () => {
                                     label="Department"
                                     selectedKeys={[selectedDepartment]}
                                     onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
+                                    classNames={{
+                                        label: "text-dashboard-primary",
+                                        trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                        popoverContent: "bg-dashboard-secondary border border-white/20"
+                                    }}
                                 >
-                                    <SelectItem key="all" value="all">All Departments</SelectItem>
+                                    <SelectItem key="all" value="all" className="text-dashboard-primary">All Departments</SelectItem>
                                     {departments?.map((dept: any) => (
-                                        <SelectItem key={dept._id} value={dept._id}>
+                                        <SelectItem key={dept._id} value={dept._id} className="text-dashboard-primary">
                                             {dept.name}
                                         </SelectItem>
                                     ))}
@@ -538,7 +558,7 @@ const EnhancedTaskManagement = () => {
                             <Button color="primary" onClick={applyFilters}>
                                 Apply Filters
                             </Button>
-                            <Button variant="light" onClick={clearFilters}>
+                            <Button variant="light" onClick={clearFilters} className="text-dashboard-secondary hover:text-dashboard-primary">
                                 Clear All
                             </Button>
                         </div>
@@ -546,13 +566,24 @@ const EnhancedTaskManagement = () => {
                 </Card>
 
                 {/* Tasks Table */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
-                        <h3 className="text-lg font-semibold">Tasks ({total})</h3>
+                        <h3 className="text-lg font-semibold text-dashboard-primary">Tasks ({total})</h3>
                     </CardHeader>
                     <CardBody>
                         {tasks && tasks.length > 0 ? (
-                            <Table aria-label="Enhanced tasks table">
+                            <Table 
+                                aria-label="Enhanced tasks table"
+                                classNames={{
+                                    wrapper: "bg-dashboard-secondary",
+                                    table: "bg-dashboard-secondary",
+                                    thead: "bg-dashboard-tertiary",
+                                    tbody: "bg-dashboard-secondary",
+                                    tr: "hover:bg-dashboard-tertiary border-b border-white/10",
+                                    th: "bg-dashboard-tertiary text-dashboard-primary border-b border-white/20",
+                                    td: "text-dashboard-primary border-b border-white/10"
+                                }}
+                            >
                                 <TableHeader>
                                     <TableColumn>Task</TableColumn>
                                     <TableColumn>Status</TableColumn>
@@ -701,7 +732,7 @@ const EnhancedTaskManagement = () => {
                             </Table>
                         ) : (
                             <div className="text-center py-8">
-                                <p className="text-gray-500">No tasks found matching your criteria.</p>
+                                <p className="text-dashboard-secondary">No tasks found matching your criteria.</p>
                             </div>
                         )}
                     </CardBody>
@@ -709,15 +740,15 @@ const EnhancedTaskManagement = () => {
 
                 {/* Status Update Modal */}
                 <Modal isOpen={showStatusModal} onClose={() => setShowStatusModal(false)}>
-                    <ModalContent>
-                        <ModalHeader>Update Task Status</ModalHeader>
+                    <ModalContent className="bg-dashboard-secondary border border-white/20">
+                        <ModalHeader className="text-dashboard-primary">Update Task Status</ModalHeader>
                         <ModalBody>
                             {selectedTask && (
                                 <div className="space-y-4">
                                     <div>
-                                        <h3 className="font-semibold text-lg mb-2">Task: {selectedTask.title}</h3>
-                                        <p className="text-sm text-gray-600">
-                                            Current Status: <span className="font-medium">{selectedTask.status}</span>
+                                        <h3 className="font-semibold text-lg mb-2 text-dashboard-primary">Task: {selectedTask.title}</h3>
+                                        <p className="text-sm text-dashboard-secondary">
+                                            Current Status: <span className="font-medium text-dashboard-primary">{selectedTask.status}</span>
                                         </p>
                                     </div>
                                     
@@ -725,12 +756,17 @@ const EnhancedTaskManagement = () => {
                                         label="New Status"
                                         selectedKeys={[statusValue]}
                                         onSelectionChange={(keys) => setStatusValue(Array.from(keys)[0] as string)}
+                                        classNames={{
+                                            label: "text-dashboard-primary",
+                                            trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            popoverContent: "bg-dashboard-secondary border border-white/20"
+                                        }}
                                     >
-                                        <SelectItem key="not_started" value="not_started">Not Started</SelectItem>
-                                        <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
-                                        <SelectItem key="under_review" value="under_review">Under Review</SelectItem>
-                                        <SelectItem key="completed" value="completed">Completed</SelectItem>
-                                        <SelectItem key="on_hold" value="on_hold">On Hold</SelectItem>
+                                        <SelectItem key="not_started" value="not_started" className="text-dashboard-primary">Not Started</SelectItem>
+                                        <SelectItem key="in_progress" value="in_progress" className="text-dashboard-primary">In Progress</SelectItem>
+                                        <SelectItem key="under_review" value="under_review" className="text-dashboard-primary">Under Review</SelectItem>
+                                        <SelectItem key="completed" value="completed" className="text-dashboard-primary">Completed</SelectItem>
+                                        <SelectItem key="on_hold" value="on_hold" className="text-dashboard-primary">On Hold</SelectItem>
                                     </Select>
                                     
                                     <Textarea
@@ -739,12 +775,16 @@ const EnhancedTaskManagement = () => {
                                         value={statusReason}
                                         onValueChange={setStatusReason}
                                         minRows={3}
+                                        classNames={{
+                                            label: "text-dashboard-primary",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
                                 </div>
                             )}
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => setShowStatusModal(false)}>
+                            <Button variant="light" onClick={() => setShowStatusModal(false)} className="text-dashboard-secondary hover:text-dashboard-primary">
                                 Cancel
                             </Button>
                             <Button color="primary" onClick={submitStatusUpdate}>
@@ -756,13 +796,13 @@ const EnhancedTaskManagement = () => {
 
                 {/* Assign Task Modal */}
                 <Modal isOpen={showAssignModal} onClose={() => setShowAssignModal(false)}>
-                    <ModalContent>
-                        <ModalHeader>Assign Task to Department Member</ModalHeader>
+                    <ModalContent className="bg-dashboard-secondary border border-white/20">
+                        <ModalHeader className="text-dashboard-primary">Assign Task to Department Member</ModalHeader>
                         <ModalBody>
                             {selectedTask && (
                                 <div className="space-y-4">
                                     <div>
-                                        <h3 className="font-semibold text-lg mb-2">Task: {selectedTask.title}</h3>
+                                        <h3 className="font-semibold text-lg mb-2 text-dashboard-primary">Task: {selectedTask.title}</h3>
                                     </div>
                                     
                                     <Select
@@ -776,9 +816,14 @@ const EnhancedTaskManagement = () => {
                                             console.log('🎯 Selected user details:', selectedUser);
                                             setAssignedMember(selectedUserId);
                                         }}
+                                        classNames={{
+                                            label: "text-dashboard-primary",
+                                            trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            popoverContent: "bg-dashboard-secondary border border-white/20"
+                                        }}
                                     >
                                         {users.map((user: any) => (
-                                            <SelectItem key={user._id} value={user._id}>
+                                            <SelectItem key={user._id} value={user._id} className="text-dashboard-primary">
                                                 {user.firstName} {user.lastName} ({user.role})
                                             </SelectItem>
                                         ))}
@@ -790,12 +835,16 @@ const EnhancedTaskManagement = () => {
                                         value={assignmentInstructions}
                                         onValueChange={setAssignmentInstructions}
                                         minRows={3}
+                                        classNames={{
+                                            label: "text-dashboard-primary",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
                                 </div>
                             )}
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => setShowAssignModal(false)}>
+                            <Button variant="light" onClick={() => setShowAssignModal(false)} className="text-dashboard-secondary hover:text-dashboard-primary">
                                 Cancel
                             </Button>
                             <Button 
@@ -811,15 +860,15 @@ const EnhancedTaskManagement = () => {
 
                 {/* Add Comment Modal */}
                 <Modal isOpen={showCommentModal} onClose={() => setShowCommentModal(false)}>
-                    <ModalContent>
-                        <ModalHeader>
+                    <ModalContent className="bg-dashboard-secondary border border-white/20">
+                        <ModalHeader className="text-dashboard-primary">
                             {replyingTo ? 'Reply to Comment' : 'Add Comment'}
                         </ModalHeader>
                         <ModalBody>
                             {selectedTask && (
                                 <div className="space-y-4">
                                     <div>
-                                        <h3 className="font-semibold text-lg mb-2">Task: {selectedTask.title}</h3>
+                                        <h3 className="font-semibold text-lg mb-2 text-dashboard-primary">Task: {selectedTask.title}</h3>
                                     </div>
                                     
                                     <Textarea
@@ -828,12 +877,16 @@ const EnhancedTaskManagement = () => {
                                         value={comment}
                                         onValueChange={setComment}
                                         minRows={4}
+                                        classNames={{
+                                            label: "text-dashboard-primary",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
                                 </div>
                             )}
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => setShowCommentModal(false)}>
+                            <Button variant="light" onClick={() => setShowCommentModal(false)} className="text-dashboard-secondary hover:text-dashboard-primary">
                                 Cancel
                             </Button>
                             <Button 
@@ -848,35 +901,35 @@ const EnhancedTaskManagement = () => {
                 </Modal>
 
                 {/* Feature Summary */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
-                        <h3 className="text-lg font-semibold">Enhanced Features Summary</h3>
+                        <h3 className="text-lg font-semibold text-dashboard-primary">Enhanced Features Summary</h3>
                     </CardHeader>
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <h4 className="font-medium mb-2">✅ Status Management</h4>
-                                <p className="text-sm text-gray-600">Users can change task status with role-based permissions and optional reasoning.</p>
+                                <h4 className="font-medium mb-2 text-dashboard-primary">✅ Status Management</h4>
+                                <p className="text-sm text-dashboard-secondary">Users can change task status with role-based permissions and optional reasoning.</p>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2">✅ Department Head Assignment</h4>
-                                <p className="text-sm text-gray-600">Department heads can assign tasks to their team members with instructions.</p>
+                                <h4 className="font-medium mb-2 text-dashboard-primary">✅ Department Head Assignment</h4>
+                                <p className="text-sm text-dashboard-secondary">Department heads can assign tasks to their team members with instructions.</p>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2">✅ Role-based Permissions</h4>
-                                <p className="text-sm text-gray-600">Different access levels: Admin/Manager (full), Department Head (limited), Staff (assigned only).</p>
+                                <h4 className="font-medium mb-2 text-dashboard-primary">✅ Role-based Permissions</h4>
+                                <p className="text-sm text-dashboard-secondary">Different access levels: Admin/Manager (full), Department Head (limited), Staff (assigned only).</p>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2">✅ Department-wide Visibility</h4>
-                                <p className="text-sm text-gray-600">Staff can view all department tasks but only modify assigned ones.</p>
+                                <h4 className="font-medium mb-2 text-dashboard-primary">✅ Department-wide Visibility</h4>
+                                <p className="text-sm text-dashboard-secondary">Staff can view all department tasks but only modify assigned ones.</p>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2">✅ Comment Threading</h4>
-                                <p className="text-sm text-gray-600">Support for replies to comments with nested conversation threads.</p>
+                                <h4 className="font-medium mb-2 text-dashboard-primary">✅ Comment Threading</h4>
+                                <p className="text-sm text-dashboard-secondary">Support for replies to comments with nested conversation threads.</p>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-2">✅ Enhanced Filtering</h4>
-                                <p className="text-sm text-gray-600">Advanced search and filtering capabilities with role-appropriate options.</p>
+                                <h4 className="font-medium mb-2 text-dashboard-primary">✅ Enhanced Filtering</h4>
+                                <p className="text-sm text-dashboard-secondary">Advanced search and filtering capabilities with role-appropriate options.</p>
                             </div>
                         </div>
                     </CardBody>

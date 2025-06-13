@@ -114,7 +114,6 @@ const Category = () => {
                 </div>
                 
                 {/* Table */}
-                <div className="bg-color-dark-2 border border-white/10 rounded-xl p-6">
                     <NewCustomTable
                         columns={CategoryColumns}
                         loadingState={navigation.state === "loading" ? "loading" : "idle"}
@@ -146,7 +145,6 @@ const Category = () => {
                             </TableRow>
                         ))}
                     </NewCustomTable>
-                </div>
 
                 {dataValue && (
                     <Drawer title="Edit Category" isDrawerOpened={editModalOpened} handleDrawerClosed={handleEditModalClose}>
@@ -171,15 +169,15 @@ const Category = () => {
                                 className="mt-4 font-nunito text-sm"
                                 defaultValue={dataValue?.description}
                                 classNames={{
-                                    label: "font-nunito text-sm text-default-100",
-                                    inputWrapper: " shadow-sm   border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 bg-white hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                                    label: "font-nunito text-sm !text-white",
+                                    inputWrapper: " bg-dashboard-secondary shadow-sm   border border-white/20 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500  hover:transition-all hover:duration-300 hover:ease-in-out max-w-full"
                                 }}
                             />
 
 
 
                             <button onClick={() => {
-                            }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
+                            }} type="submit" className="mt-10 h-10 text-white bg-action-primary rounded-xl font-nunito px-4">
                                 Update
                             </button>
                         </Form>
@@ -231,14 +229,14 @@ const Category = () => {
                             name="description"
                             className="mt-4 font-nunito text-sm"
                             classNames={{
-                                label: "font-nunito text-sm text-default-100",
-                                inputWrapper: " shadow-sm   border border-black/30 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500 bg-white hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full"
+                                label: "font-nunito text-sm !text-white",
+                                inputWrapper: " bg-dashboard-secondary shadow-sm   border border-white/20 focus:bg-[#333]  focus focus:bg-[#333] hover:border-b-pink-500  hover:transition-all hover:duration-300 hover:ease-in-out max-w-full"
                             }}
                         />
 
 
                         <button onClick={() => {
-                        }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
+                        }} type="submit" className="mt-10 h-10 text-white bg-action-primary rounded-xl font-nunito px-4">
                             Submit
                         </button>
                     </Form>
