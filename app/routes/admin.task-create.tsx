@@ -299,8 +299,8 @@ const TaskCreate = () => {
                                         name="title"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary",
-                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            label: "font-nunito text-dashboard-primary !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                         }}
                                         label="Task Title"
                                         placeholder="Enter task title"
@@ -315,8 +315,8 @@ const TaskCreate = () => {
                                         name="description"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary",
-                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            label: "font-nunito text-dashboard-primary !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                         }}
                                         label="Description"
                                         placeholder="Describe the task in detail"
@@ -333,8 +333,8 @@ const TaskCreate = () => {
                                             name="priority"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary",
-                                                trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                label: "font-nunito text-dashboard-primary !text-white",
+                                                trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                                 popoverContent: "bg-dashboard-secondary border border-white/20"
                                             }}
                                             label="Priority"
@@ -351,8 +351,8 @@ const TaskCreate = () => {
                                             name="category"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                label: "font-nunito text-dashboard-primary !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                             }}
                                             label="Category"
                                             placeholder="e.g., Development, Marketing"
@@ -374,8 +374,8 @@ const TaskCreate = () => {
                                         name="department"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary",
-                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            label: "font-nunito text-dashboard-primary !text-white",
+                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                             popoverContent: "bg-dashboard-secondary border border-white/20"
                                         }}
                                         label="Department"
@@ -396,7 +396,7 @@ const TaskCreate = () => {
                                     <Select
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary",
+                                            label: "font-nunito text-dashboard-primary !text-white",
                                             trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
                                             popoverContent: "bg-dashboard-secondary border border-white/20"
                                         }}
@@ -431,8 +431,8 @@ const TaskCreate = () => {
                                             type="date"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                label: "font-nunito text-dashboard-primary !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                             }}
                                             label="Start Date (Optional)"
                                             value={startDate}
@@ -445,8 +445,8 @@ const TaskCreate = () => {
                                             type="date"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                label: "font-nunito text-dashboard-primary !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                             }}
                                             label="Due Date"
                                             value={dueDate}
@@ -462,8 +462,8 @@ const TaskCreate = () => {
                                         type="number"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary",
-                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            label: "font-nunito text-dashboard-primary !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                         }}
                                         label="Estimated Hours (Optional)"
                                         placeholder="0"
@@ -486,8 +486,8 @@ const TaskCreate = () => {
                                         <Input
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                label: "font-nunito text-dashboard-primary !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                             }}
                                             placeholder="Add a tag"
                                             value={currentTag}
@@ -531,7 +531,7 @@ const TaskCreate = () => {
                                         isSelected={approvalRequired}
                                         onValueChange={setApprovalRequired}
                                         classNames={{
-                                            label: "text-dashboard-primary"
+                                            label: "text-dashboard-primary !text-white"
                                         }}
                                     >
                                         <span className="text-dashboard-primary">Requires Approval</span>
@@ -545,8 +545,8 @@ const TaskCreate = () => {
                                             onSelectionChange={(keys) => setApprovers(Array.from(keys) as string[])}
                                             placeholder="Select approvers"
                                             classNames={{
-                                                label: "text-dashboard-primary",
-                                                trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                label: "text-dashboard-primary !text-white",
+                                                trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                                 popoverContent: "bg-dashboard-secondary border border-white/20"
                                             }}
                                         >
@@ -570,7 +570,7 @@ const TaskCreate = () => {
                                         isSelected={isRecurring}
                                         onValueChange={setIsRecurring}
                                         classNames={{
-                                            label: "text-dashboard-primary"
+                                                label: "text-dashboard-primary !text-white"
                                         }}
                                     >
                                         <span className="text-dashboard-primary">Make Recurring</span>
@@ -583,8 +583,8 @@ const TaskCreate = () => {
                                                 selectedKeys={[recurringFrequency]}
                                                 onSelectionChange={(keys) => setRecurringFrequency(Array.from(keys)[0] as string)}
                                                 classNames={{
-                                                    label: "text-dashboard-primary",
-                                                    trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                    label: "text-dashboard-primary !text-white",
+                                                    trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                                     popoverContent: "bg-dashboard-secondary border border-white/20"
                                                 }}
                                             >
@@ -603,8 +603,8 @@ const TaskCreate = () => {
                                                 min="1"
                                                 description={`Every ${recurringInterval} ${recurringFrequency.replace('ly', '')}(s)`}
                                                 classNames={{
-                                                    label: "text-dashboard-primary",
-                                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                                    label: "text-dashboard-primary !text-white",
+                                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
                                                     description: "text-dashboard-secondary"
                                                 }}
                                             />
@@ -615,8 +615,8 @@ const TaskCreate = () => {
                                                 value={recurringEndDate}
                                                 onChange={(e) => setRecurringEndDate(e.target.value)}
                                                 classNames={{
-                                                    label: "text-dashboard-primary",
-                                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                                    label: "text-dashboard-primary !text-white",
+                                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white"
                                                 }}
                                             />
                                         </div>
