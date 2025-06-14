@@ -555,7 +555,7 @@ const LeaveManagement = () => {
                                 startContent={<Search size={16} />}
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito text-white",
+                                    label: "font-nunito !text-white ",
                                     inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20",
                                     
                                 }}
@@ -571,7 +571,7 @@ const LeaveManagement = () => {
                                 labelPlacement="outside"
                                 onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
                                 classNames={{
-                                    label: "font-nunito text-white",
+                                    label: "font-nunito !text-white",
                                     trigger: "font-nunito bg-dashboard-tertiary border border-white/20",
                                 }}
                             >
@@ -590,7 +590,7 @@ const LeaveManagement = () => {
                                     onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
                                     labelPlacement="outside"
                                     classNames={{
-                                        label: "font-nunito text-white",
+                                        label: "font-nunito !text-white",
                                         trigger: "font-nunito bg-dashboard-tertiary border border-white/20",
                                     }}
                                 >
@@ -610,7 +610,7 @@ const LeaveManagement = () => {
                                 size="sm"
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito text-white",
+                                    label: "font-nunito !text-white",
                                     inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20",
                                 }}
                                 value={startDate}
@@ -625,7 +625,7 @@ const LeaveManagement = () => {
                                 size="sm"
                                 labelPlacement="outside"
                                 classNames={{
-                                    label: "font-nunito text-white",
+                                    label: "font-nunito !text-white",
                                     inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20",
                                 }}
                                 value={endDate}
@@ -636,7 +636,7 @@ const LeaveManagement = () => {
                             {/* Filter Actions */}
                             <div className="flex gap-2 items-end">
                                 <Button
-                                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm !text-white"
                                     size="sm"
                                     onClick={applyFilters}
                                    
@@ -647,7 +647,7 @@ const LeaveManagement = () => {
                                     variant="bordered"
                                     size="sm"
                                     onClick={clearFilters}
-                                    className="flex-1 border-white/20 text-white hover:bg-dashboard-tertiary"
+                                    className="flex-1 border-white/20 text-white hover:bg-dashboard-tertiary !text-white"
                                 >
                                     Clear
                                 </Button>
@@ -796,12 +796,13 @@ const LeaveManagement = () => {
                                                 </span>
                                             </td>
                                             <td className="p-3">
-                                                <span className="text-sm">{formatDate(leave.submissionDate)}</span>
+                                                <span className="text-sm text-white">{formatDate(leave.submissionDate)}</span>
                                             </td>
                                             <td className="p-3">
                                                 <div className="flex gap-2">
                                                     <Link to={`/admin/leave/${leave._id}`}>
                                                         <Button
+                                                        color="primary"
                                                             size="sm"
                                                             variant="light"
                                                             startContent={<Eye size={14} />}

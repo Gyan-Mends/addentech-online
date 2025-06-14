@@ -413,14 +413,14 @@ const EmployeeLeaveApplication = () => {
             <div className="relative">
                 <Toaster position="top-right" />
             </div>
-            <div className="p-6 max-w-4xl mx-auto space-y-6">
+            <div className="p-6 max-w-4xl mx-auto space-y-6 !text-white">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                        <h1 className="text-3xl font-bold text-dashboard-primary">
                             New Leave Application
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">
+                        <p className="text-dashboard-secondary mt-2">
                             Submit a new leave application for approval
                         </p>
                     </div>
@@ -428,28 +428,28 @@ const EmployeeLeaveApplication = () => {
 
                 {/* Error Display */}
                 {actionData && !actionData.success && (
-                    <Card className="border-danger-200 bg-danger-50">
+                    <Card className="border-red-400/50 bg-dashboard-secondary">
                         <CardBody>
-                            <p className="text-danger-700">{actionData.message}</p>
+                            <p className="text-red-400">{actionData.message}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {/* Success Display */}
                 {actionData?.success && (
-                    <Card className="border-success-200 bg-success-50">
+                    <Card className="border-green-400/50 bg-dashboard-secondary">
                         <CardBody>
-                            <p className="text-success-700">{actionData.message}</p>
+                            <p className="text-green-400">{actionData.message}</p>
                         </CardBody>
                     </Card>
                 )}
 
                 {/* Application Form */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
                         <div className="flex items-center gap-2">
-                            <FileText size={20} />
-                            <h2 className="text-xl font-semibold">Leave Application Details</h2>
+                            <FileText size={20} className="text-dashboard-primary" />
+                            <h2 className="text-xl font-semibold text-dashboard-primary">Leave Application Details</h2>
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -462,7 +462,9 @@ const EmployeeLeaveApplication = () => {
                                     placeholder="Select leave type"
                                     labelPlacement="outside"
                                     classNames={{
-                                        label: "font-nunito",
+                                        label: "font-nunito text-dashboard-primary !text-white",
+                                        trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                        popoverContent: "bg-dashboard-secondary border border-white/20"
                                     }}
                                     isRequired
                                     variant="bordered"
@@ -470,7 +472,7 @@ const EmployeeLeaveApplication = () => {
                                     onSelectionChange={(keys) => setSelectedLeaveType(Array.from(keys)[0] as string)}
                                 >
                                     {leaveTypes.map((type) => (
-                                        <SelectItem key={type.key} value={type.key}>
+                                        <SelectItem key={type.key} value={type.key} className="text-dashboard-primary">
                                             {type.label}
                                         </SelectItem>
                                     ))}
@@ -487,9 +489,14 @@ const EmployeeLeaveApplication = () => {
                                     defaultSelectedKeys={["normal"]}
                                     variant="bordered"
                                     labelPlacement="outside"
+                                    classNames={{
+                                        label: "font-nunito text-dashboard-primary !text-white",
+                                        trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                        popoverContent: "bg-dashboard-secondary border border-white/20"
+                                    }}
                                 >
                                     {priorities.map((priority) => (
-                                        <SelectItem key={priority.key} value={priority.key}>
+                                        <SelectItem key={priority.key} value={priority.key} className="text-dashboard-primary">
                                             {priority.label}
                                         </SelectItem>
                                     ))}
@@ -497,7 +504,7 @@ const EmployeeLeaveApplication = () => {
 
                                 {/* Start Date */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <label className="text-sm font-medium text-dashboard-primary">
                                         Start Date *
                                     </label>
                                     <Input
@@ -507,12 +514,15 @@ const EmployeeLeaveApplication = () => {
                                         isRequired
                                         min={new Date().toISOString().split('T')[0]}
                                         onChange={(e) => setStartDate(new Date(e.target.value))}
+                                        classNames={{
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
                                 </div>
 
                                 {/* End Date */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <label className="text-sm font-medium text-dashboard-primary">
                                         End Date *
                                     </label>
                                     <Input
@@ -522,6 +532,9 @@ const EmployeeLeaveApplication = () => {
                                         isRequired
                                         min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                                         onChange={(e) => setEndDate(new Date(e.target.value))}
+                                        classNames={{
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -531,15 +544,15 @@ const EmployeeLeaveApplication = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Leave Policy Info */}
                                     {selectedPolicy && (
-                                        <Card className="border-blue-200 bg-blue-50">
+                                        <Card className="border-blue-400/50 bg-dashboard-secondary">
                                             <CardHeader className="pb-2">
-                                                <h3 className="text-lg font-semibold text-blue-800 flex items-center gap-2">
-                                                    <Info size={18} />
+                                                <h3 className="text-lg font-semibold text-blue-400 flex items-center gap-2">
+                                                    <Info size={18} className="text-blue-400" />
                                                     Policy Information
                                                 </h3>
                                             </CardHeader>
                                             <CardBody className="pt-0">
-                                                <div className="space-y-2 text-sm">
+                                                <div className="space-y-2 text-sm text-dashboard-primary">
                                                     <p><strong>Description:</strong> {selectedPolicy.description}</p>
                                                     <p><strong>Max Consecutive Days:</strong> {selectedPolicy.maxConsecutiveDays}</p>
                                                     <p><strong>Advance Notice:</strong> {selectedPolicy.minAdvanceNotice} days</p>
@@ -556,19 +569,19 @@ const EmployeeLeaveApplication = () => {
 
                                     {/* Balance Information */}
                                     {selectedBalance ? (
-                                        <Card className="border-green-200 bg-green-50">
+                                        <Card className="border-green-400/50 bg-dashboard-secondary">
                                             <CardHeader className="pb-2">
-                                                <h3 className="text-lg font-semibold text-green-800 flex items-center gap-2">
-                                                    <CheckCircle size={18} />
+                                                <h3 className="text-lg font-semibold text-green-400 flex items-center gap-2">
+                                                    <CheckCircle size={18} className="text-green-400" />
                                                     Your Balance
                                                 </h3>
                                             </CardHeader>
                                             <CardBody className="pt-0">
-                                                <div className="space-y-2 text-sm">
+                                                <div className="space-y-2 text-sm text-dashboard-primary">
                                                     <p><strong>Total Allocated:</strong> {selectedBalance.totalAllocated} days</p>
                                                     <p><strong>Used:</strong> {selectedBalance.used} days</p>
                                                     <p><strong>Pending:</strong> {selectedBalance.pending} days</p>
-                                                    <p className="text-lg font-semibold text-green-700">
+                                                    <p className="text-lg font-semibold text-green-400">
                                                         <strong>Available:</strong> {selectedBalance.remaining} days
                                                     </p>
                                                     {selectedBalance.carriedForward > 0 && (
@@ -580,10 +593,10 @@ const EmployeeLeaveApplication = () => {
                                             </CardBody>
                                         </Card>
                                     ) : selectedLeaveType && (
-                                        <Card className="border-orange-200 bg-orange-50">
+                                        <Card className="border-orange-400/50 bg-dashboard-secondary">
                                             <CardBody>
-                                                <div className="text-center text-orange-700">
-                                                    <AlertTriangle size={24} className="mx-auto mb-2" />
+                                                <div className="text-center text-orange-400">
+                                                    <AlertTriangle size={24} className="mx-auto mb-2 text-orange-400" />
                                                     <p>No balance found for this leave type</p>
                                                     <p className="text-sm">Contact HR for balance setup</p>
                                                 </div>
@@ -611,11 +624,11 @@ const EmployeeLeaveApplication = () => {
 
                             {/* Total Days Display */}
                             {totalDays > 0 && (
-                                <Card className="bg-blue-50 border-blue-200">
+                                <Card className="bg-dashboard-secondary border border-blue-400/50">
                                     <CardBody className="py-4">
                                         <div className="flex items-center gap-2">
-                                            <CalendarDays size={16} className="text-blue-600" />
-                                            <span className="text-blue-800 font-medium">
+                                            <CalendarDays size={16} className="text-blue-400" />
+                                            <span className="text-blue-400 font-medium">
                                                 Total Leave Days: {totalDays} day{totalDays !== 1 ? 's' : ''}
                                             </span>
                                         </div>
@@ -635,23 +648,27 @@ const EmployeeLeaveApplication = () => {
                                 labelPlacement="outside"
                                 value={reason}
                                 onValueChange={setReason}
+                                classNames={{
+                                    label: "text-dashboard-primary !text-white",
+                                    inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                }}
                             />
 
                             {/* Additional Information */}
-                            <Card className="bg-gray-50 border-gray-200">
+                            <Card className="bg-dashboard-secondary border border-white/20">
                                 <CardBody>
-                                    <h3 className="font-semibold text-gray-800 mb-3">Important Information</h3>
-                                    <ul className="space-y-2 text-sm text-gray-600">
+                                    <h3 className="font-semibold text-dashboard-primary mb-3">Important Information</h3>
+                                    <ul className="space-y-2 text-sm text-dashboard-secondary">
                                         <li className="flex items-start gap-2">
-                                            <Clock size={14} className="mt-0.5 text-gray-400" />
+                                            <Clock size={14} className="mt-0.5 text-dashboard-muted" />
                                             <span>Leave applications should be submitted at least 3 days in advance</span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <Clock size={14} className="mt-0.5 text-gray-400" />
+                                            <Clock size={14} className="mt-0.5 text-dashboard-muted" />
                                             <span>Emergency leaves can be submitted with immediate effect</span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <Clock size={14} className="mt-0.5 text-gray-400" />
+                                            <Clock size={14} className="mt-0.5 text-dashboard-muted" />
                                             <span>You will receive email notifications about approval status</span>
                                         </li>
                                     </ul>
@@ -685,27 +702,27 @@ const EmployeeLeaveApplication = () => {
                 </Card>
 
                 {/* Leave Policy Information */}
-                <Card>
+                <Card className="bg-dashboard-secondary border border-white/20">
                     <CardHeader>
-                        <h3 className="text-lg font-semibold">Leave Policy Summary</h3>
+                        <h3 className="text-lg font-semibold text-dashboard-primary">Leave Policy Summary</h3>
                     </CardHeader>
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h4 className="font-medium text-gray-800 mb-2">Annual Leave</h4>
-                                <p className="text-sm text-gray-600">21 working days per year</p>
+                                <h4 className="font-medium text-dashboard-primary mb-2">Annual Leave</h4>
+                                <p className="text-sm text-dashboard-secondary">21 working days per year</p>
                             </div>
                             <div>
-                                <h4 className="font-medium text-gray-800 mb-2">Sick Leave</h4>
-                                <p className="text-sm text-gray-600">12 days per year (medical certificate required for 3+ consecutive days)</p>
+                                <h4 className="font-medium text-dashboard-primary mb-2">Sick Leave</h4>
+                                <p className="text-sm text-dashboard-secondary">12 days per year (medical certificate required for 3+ consecutive days)</p>
                             </div>
                             <div>
-                                <h4 className="font-medium text-gray-800 mb-2">Maternity Leave</h4>
-                                <p className="text-sm text-gray-600">126 days (as per local labor law)</p>
+                                <h4 className="font-medium text-dashboard-primary mb-2">Maternity Leave</h4>
+                                <p className="text-sm text-dashboard-secondary">126 days (as per local labor law)</p>
                             </div>
                             <div>
-                                <h4 className="font-medium text-gray-800 mb-2">Emergency Leave</h4>
-                                <p className="text-sm text-gray-600">Up to 3 days (manager discretion)</p>
+                                <h4 className="font-medium text-dashboard-primary mb-2">Emergency Leave</h4>
+                                <p className="text-sm text-dashboard-secondary">Up to 3 days (manager discretion)</p>
                             </div>
                         </div>
                     </CardBody>

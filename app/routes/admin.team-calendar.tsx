@@ -356,22 +356,21 @@ export default function LeaveCalendar() {
 
   return (
    <AdminLayout>
- <div className="p-6 space-y-6">
+ <div className="p-6 space-y-6 !text-white">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-dashboard-primary">
             Leave Calendar
           </h1>
-         
         </div>
       </div>
 
       {/* Role-based access message */}
       {!isAdmin && !isDepartmentHead && (
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <p className="text-blue-700">
-            <span className="font-bold">Note:</span> You are viewing your personal leave calendar.
+        <div className="bg-dashboard-secondary border border-blue-400/50 p-4 rounded-lg">
+          <p className="text-dashboard-primary">
+            <span className="font-bold text-blue-400">Note:</span> You are viewing your personal leave calendar.
           </p>
         </div>
       )}
@@ -381,18 +380,19 @@ export default function LeaveCalendar() {
       {/* Calendar Controls */}
       <Card className="bg-dashboard-secondary border border-white/20">
         <CardBody>
-          <div className="flex justify-between items-center ">
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <Button
                 color="primary"
                 variant="light"
                 startContent={<ChevronLeft size={16} />}
                 onClick={() => navigateMonth('prev')}
+                className="text-dashboard-primary hover:text-blue-400"
               >
                 Previous
               </Button>
               
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-bold text-dashboard-primary">
                 {monthNames[currentMonth - 1]} {currentYear}
               </h2>
               
@@ -401,6 +401,7 @@ export default function LeaveCalendar() {
                 variant="light"
                 endContent={<ChevronRight size={16} />}
                 onClick={() => navigateMonth('next')}
+                className="text-dashboard-primary hover:text-blue-400"
               >
                 Next
               </Button>
@@ -412,10 +413,14 @@ export default function LeaveCalendar() {
                   placeholder="All Departments"
                   size="sm"
                   className="w-48"
+                  classNames={{
+                    trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                    popoverContent: "bg-dashboard-secondary border border-white/20"
+                  }}
                 >
-                  <SelectItem key="all" value="all">All Departments</SelectItem>
+                  <SelectItem key="all" value="all" className="text-dashboard-primary">All Departments</SelectItem>
                   {departments.map((dept: any) => (
-                    <SelectItem key={dept._id} value={dept._id}>
+                    <SelectItem key={dept._id} value={dept._id} className="text-dashboard-primary">
                       {dept.name}
                     </SelectItem>
                   ))}
@@ -428,9 +433,13 @@ export default function LeaveCalendar() {
                 className="w-32"
                 selectedKeys={[viewMode]}
                 onSelectionChange={(keys) => setViewMode(Array.from(keys)[0] as 'month' | 'week')}
+                classNames={{
+                  trigger: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                  popoverContent: "bg-dashboard-secondary border border-white/20"
+                }}
               >
-                <SelectItem key="month" value="month">Month</SelectItem>
-                <SelectItem key="week" value="week">Week</SelectItem>
+                <SelectItem key="month" value="month" className="text-dashboard-primary">Month</SelectItem>
+                <SelectItem key="week" value="week" className="text-dashboard-primary">Week</SelectItem>
               </Select>
             </div>
           </div>
@@ -438,13 +447,13 @@ export default function LeaveCalendar() {
       </Card>
 
       {/* Calendar Grid */}
-      <Card>
+      <Card className="bg-dashboard-secondary border border-white/20">
         <CardBody className="p-0">
           <div className="overflow-x-auto">
             {/* Calendar Header */}
-            <div className="grid grid-cols-7 border-b">
+            <div className="grid grid-cols-7 border-b border-white/20">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="p-4 text-center font-semibold bg-gray-50 dark:bg-gray-800">
+                <div key={day} className="p-4 text-center font-semibold bg-dashboard-tertiary text-dashboard-primary">
                   {day}
                 </div>
               ))}
@@ -465,14 +474,14 @@ export default function LeaveCalendar() {
                 return (
                   <div
                     key={day}
-                    className={`border-r border-b p-2 min-h-[120px] ${
-                      isCurrentDay ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                    } ${isWeekendDay ? 'bg-gray-50 dark:bg-gray-800/50' : ''}`}
+                    className={`border-r border-b border-white/10 p-2 min-h-[120px] bg-dashboard-secondary ${
+                      isCurrentDay ? 'bg-blue-500/20 border-blue-400/50' : ''
+                    } ${isWeekendDay ? 'bg-dashboard-tertiary/50' : ''}`}
                   >
                     {/* Day Number */}
                     <div className={`text-sm font-medium mb-2 ${
-                      isCurrentDay ? 'text-blue-600 font-bold' : 
-                      isWeekendDay ? 'text-gray-500' : 'text-gray-900 dark:text-white'
+                      isCurrentDay ? 'text-blue-400 font-bold' : 
+                      isWeekendDay ? 'text-dashboard-muted' : 'text-dashboard-primary'
                     }`}>
                       {day}
                     </div>
@@ -500,7 +509,7 @@ export default function LeaveCalendar() {
                       ))}
                       
                       {dayLeaves.length > 3 && (
-                        <div className="text-xs text-gray-500 p-1">
+                        <div className="text-xs text-dashboard-muted p-1">
                           +{dayLeaves.length - 3} more
                         </div>
                       )}
@@ -514,48 +523,48 @@ export default function LeaveCalendar() {
       </Card>
 
       {/* Legend */}
-      <Card>
+      <Card className="bg-dashboard-secondary border border-white/20">
         <CardHeader>
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Info size={18} />
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-dashboard-primary">
+            <Info size={18} className="text-dashboard-primary" />
             Legend
           </h3>
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-200 rounded"></div>
-              <span className="text-sm">Annual Leave</span>
+              <div className="w-3 h-3 bg-blue-400 rounded"></div>
+              <span className="text-sm text-dashboard-primary">Annual Leave</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-200 rounded"></div>
-              <span className="text-sm">Sick Leave</span>
+              <div className="w-3 h-3 bg-red-400 rounded"></div>
+              <span className="text-sm text-dashboard-primary">Sick Leave</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-orange-200 rounded"></div>
-              <span className="text-sm">Emergency Leave</span>
+              <div className="w-3 h-3 bg-orange-400 rounded"></div>
+              <span className="text-sm text-dashboard-primary">Emergency Leave</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-200 rounded"></div>
-              <span className="text-sm">Maternity/Paternity</span>
+              <div className="w-3 h-3 bg-green-400 rounded"></div>
+              <span className="text-sm text-dashboard-primary">Maternity/Paternity</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-purple-200 rounded"></div>
-              <span className="text-sm">Study Leave</span>
+              <div className="w-3 h-3 bg-purple-400 rounded"></div>
+              <span className="text-sm text-dashboard-primary">Study Leave</span>
             </div>
           </div>
           
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-dashboard-secondary">
             <div className="flex items-center gap-2">
-              <Clock size={14} />
+              <Clock size={14} className="text-dashboard-secondary" />
               <span>Pending Approval</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-100 border-2 border-blue-500 rounded"></div>
+              <div className="w-3 h-3 bg-blue-400/30 border-2 border-blue-400 rounded"></div>
               <span>Today</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gray-200 rounded"></div>
+              <div className="w-3 h-3 bg-dashboard-muted rounded"></div>
               <span>Weekend</span>
             </div>
           </div>
@@ -564,11 +573,11 @@ export default function LeaveCalendar() {
 
       {/* Policy Violations Alert */}
       {(isAdmin || isDepartmentHead) && policyViolations.length > 0 && (
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-orange-400/50 bg-dashboard-secondary">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-orange-800 flex items-center gap-2">
-                <AlertTriangle size={18} />
+              <h3 className="text-lg font-semibold text-orange-400 flex items-center gap-2">
+                <AlertTriangle size={18} className="text-orange-400" />
                 Policy Violations ({policyViolations.length})
               </h3>
               <Button
@@ -576,6 +585,7 @@ export default function LeaveCalendar() {
                 variant="light"
                 color="warning"
                 onPress={() => setShowPolicyViolations(!showPolicyViolations)}
+                className="text-orange-400 hover:text-orange-300"
               >
                 {showPolicyViolations ? 'Hide' : 'Show'} Details
               </Button>
@@ -585,13 +595,13 @@ export default function LeaveCalendar() {
             <CardBody className="pt-0">
               <div className="space-y-3">
                 {policyViolations.map((violation, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border border-orange-200 rounded-lg bg-white">
+                  <div key={index} className="flex items-center justify-between p-3 border border-orange-400/30 rounded-lg bg-dashboard-tertiary">
                     <div>
-                      <p className="font-medium text-orange-800">{violation.employeeName}</p>
-                      <p className="text-sm text-orange-600">{violation.leaveType} - {violation.violation}</p>
+                      <p className="font-medium text-orange-300">{violation.employeeName}</p>
+                      <p className="text-sm text-orange-400">{violation.leaveType} - {violation.violation}</p>
                     </div>
                     <div className="text-right text-sm">
-                      <p className="text-orange-700">
+                      <p className="text-orange-300">
                         Required: {violation.required} | Actual: {violation.actual}
                       </p>
                     </div>
@@ -605,26 +615,26 @@ export default function LeaveCalendar() {
 
       {/* Team Balance Overview */}
       {(isAdmin || isDepartmentHead) && teamBalances.length > 0 && (
-        <Card>
+        <Card className="bg-dashboard-secondary border border-white/20">
           <CardHeader>
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Users size={18} />
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-dashboard-primary">
+              <Users size={18} className="text-dashboard-primary" />
               Team Leave Balance Overview
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-3 max-h-60 overflow-y-auto">
               {teamBalances.slice(0, 10).map((member, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 border border-white/20 rounded-lg bg-dashboard-tertiary">
                   <div>
-                    <p className="font-medium">{member.employee.name}</p>
-                    <p className="text-sm text-gray-600">{member.employee.department}</p>
+                    <p className="font-medium text-dashboard-primary">{member.employee.name}</p>
+                    <p className="text-sm text-dashboard-secondary">{member.employee.department}</p>
                   </div>
                   <div className="flex gap-2">
                     {member.balances.slice(0, 3).map((balance: any, idx: number) => (
                       <div key={idx} className="text-center">
-                        <p className="text-xs text-gray-500 capitalize">{balance.leaveType}</p>
-                        <p className="text-sm font-medium">{balance.remaining}/{balance.totalAllocated}</p>
+                        <p className="text-xs text-dashboard-muted capitalize">{balance.leaveType}</p>
+                        <p className="text-sm font-medium text-dashboard-primary">{balance.remaining}/{balance.totalAllocated}</p>
                       </div>
                     ))}
                   </div>
@@ -632,7 +642,7 @@ export default function LeaveCalendar() {
               ))}
             </div>
             {teamBalances.length > 10 && (
-              <p className="text-sm text-gray-500 text-center mt-3">
+              <p className="text-sm text-dashboard-muted text-center mt-3">
                 +{teamBalances.length - 10} more team members
               </p>
             )}
@@ -641,9 +651,9 @@ export default function LeaveCalendar() {
       )}
 
       {/* Upcoming Leaves List */}
-      <Card>
+      <Card className="bg-dashboard-secondary border border-white/20">
         <CardHeader>
-          <h3 className="text-lg font-semibold">Upcoming Leaves This Month</h3>
+          <h3 className="text-lg font-semibold text-dashboard-primary">Upcoming Leaves This Month</h3>
         </CardHeader>
         <CardBody>
           <div className="space-y-3">
@@ -654,21 +664,21 @@ export default function LeaveCalendar() {
               })
               .slice(0, 10)
               .map((leave: any) => (
-                <div key={leave._id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={leave._id} className="flex items-center justify-between p-3 border border-white/20 rounded-lg bg-dashboard-tertiary hover:bg-dashboard-tertiary/80 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${getLeaveTypeColor(leave.leaveType).split(' ')[0]}`}></div>
                     <div>
-                      <p className="font-medium">
+                      <p className="font-medium text-dashboard-primary">
                         {leave.employee?.firstName} {leave.employee?.lastName}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-dashboard-secondary">
                         {leave.employee?.department?.name}
                       </p>
                     </div>
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-dashboard-primary">
                       {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
                     </p>
                     <div className="flex items-center gap-2">
@@ -679,7 +689,7 @@ export default function LeaveCalendar() {
                       >
                         {leave.status}
                       </Badge>
-                      <span className="text-xs text-gray-600 capitalize">
+                      <span className="text-xs text-dashboard-muted capitalize">
                         {leave.leaveType}
                       </span>
                     </div>
@@ -689,7 +699,7 @@ export default function LeaveCalendar() {
           </div>
           
           {leaves.length === 0 && (
-            <p className="text-center text-gray-600 py-8">
+            <p className="text-center text-dashboard-muted py-8">
               No upcoming leaves scheduled for this month
             </p>
           )}
