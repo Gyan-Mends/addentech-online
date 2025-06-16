@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button, Navbar, Spinner } from "@nextui-org/react";
-import { Link } from "@remix-run/react";
+import { Link, useLocation } from "@remix-run/react";
 import {
     ArrowRight,
     ExternalLink,
@@ -10,15 +10,25 @@ import {
     Instagram,
     Menu,
     X,
+    Youtube,
+    MapPin,
+    Mail,
+    Phone,
 } from "lucide-react";
 import logo from "~/components/images/addentech_logo.png";
+import ctaBackground from "~/components/images/cta2_files/geometric-background-vector-white-cube-patterns_53876-126683.jpg";
 import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 import ScrollAnimation from "~/components/animation";
 
+
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+    const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    
+    // Check if we're on the homepage
+    const isHomepage = location.pathname === "/";
 
     useEffect(() => {
         const handleScroll = () => {
@@ -78,10 +88,13 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             <Link
                                 key={name}
                                 to={path}
-                                className={`text-sm font-medium transition-colors duration-300 !text-black  ${!isScrolled 
-                                        ? '!text-white hover:text-foreground'
-                                        : ' '
-                                    }`}
+                                className={`text-sm font-medium transition-colors duration-300 ${
+                                    !isScrolled && isHomepage
+                                        ? 'text-white hover:text-white/80'
+                                        : isScrolled
+                                        ? 'text-black hover:text-pink-500'
+                                        : 'text-black hover:text-pink-500'
+                                }`}
                             >
                                 {name}
                             </Link>
@@ -156,126 +169,161 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
 
             {/* CTA Section */}
-            <section className="py-20 lg:px-20 px-4 bg-gray-100">
-                <div className="container">
+            <section 
+                className="py-20 lg:px-20 px-4 relative overflow-hidden"
+                style={{
+                    backgroundImage: `url(${ctaBackground})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
+                {/* Section Overlay */}
+                <div className="absolute inset-0 bg-black/10" />
+                
+                <div className="container relative z-10">
                     <ScrollAnimation>
-                        <div className="rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-600/20 p-8 md:p-12 lg:p-16 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
+                        <div className=" p-8 md:p-12 lg:p-16 relative overflow-hidden">
+                            {/* Card Overlay */}
+                            <div className="absolute inset-0  rounded-2xl" />
+                            
                             <div className="relative z-10 max-w-3xl">
-                                <h2 className="text-3xl md:text-4xl font-bold mb-4">Transform your business with us effectively</h2>
-                                <p className="text-muted-foreground mb-8 text-lg">
-                                    Ready to revolutionize your legal practice with cutting-edge technology? Get in touch with our team
-                                    today.
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4  drop-shadow-lg">
+                                    Transform your business with us effectively
+                                </h2>
+                                <p className=" mb-8 text-lg drop-shadow-md">
+                                    Ready to revolutionize your legal practice with cutting-edge technology? Get in touch with our team today.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4">
-                                    <Button className="bg-pink-500 text-white">Contact Us <ArrowRight className="h-4 w-4" /></Button>
+                                    <Button className="bg-pink-500 text-white hover:bg-pink-600 shadow-lg transition-all duration-300">
+                                        Contact Us <ArrowRight className="h-4 w-4 ml-2" />
+                                    </Button>
                                 </div>
                             </div>
                         </div>
                     </ScrollAnimation>
                 </div>
             </section>
+            <footer className="border-t border-gray-200 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-[150px] px-4">
+                {/* Main Footer Content */}
+                <div className="py-16">
+                    <div className="mx-auto px-4 sm:px-6 lg:px-0">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-            <footer className="border-t border-t-white-500/20  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-20 px-4">
-                <div className="container py-12">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <ScrollAnimation>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center">
-                                    <div className="h-8 w-8 rounded bg-pink-500 flex items-center justify-center text-white font-bold font-montserrat">
-                                        A
-                                    </div>
-                                    <span className="ml-2 text-xl font-bold text-pink-500 font-montserrat">ADDENTECH</span>
+                            {/* About Addentech */}
+                            <div className="lg:col-span-2">
+                                <div className="mb-6">
+                                    <img src={logo} alt="Addentech Logo" className="w-40 h-12" />
                                 </div>
-                                <p className="text-muted-foreground mb-4">
-                                    Transforming the legal landscape with innovative technology solutions.
+                                <p className="text-muted-foreground leading-relaxed mb-6 max-w-md">
+                                    Transforming the legal landscape with innovative technology solutions. We provide cutting-edge 
+                                    digital transformation services to help law firms and legal professionals thrive in the modern era.
                                 </p>
-                                <div className="flex gap-4">
+                                <div className="flex space-x-4">
                                     {Object.entries(socialLinks).map(([social, { icon: Icon, url }]) => (
                                         <Link
                                             key={social}
                                             to={url}
-                                            target="_blank" // Opens the link in a new tab
-                                            rel="noopener noreferrer" // Security best practice
-                                            className="text-muted-foreground hover:text-foreground"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-10 h-10 rounded-full border border-pink-500/40 flex items-center justify-center hover:bg-pink-500 hover:text-white transition-all duration-300"
                                         >
-                                            <span className="sr-only">{social}</span>
-                                            <div className="h-8 w-8 rounded-full border border-pink-500/40 flex items-center justify-center">
-                                                <Icon className="h-4 w-4 text-pink-500" />
-                                            </div>
+                                            <Icon className="w-5 h-5 text-pink-500 hover:text-white" />
                                         </Link>
                                     ))}
                                 </div>
                             </div>
-                        </ScrollAnimation>
-                        <ScrollAnimation>
+
+                            {/* Our Services */}
                             <div>
-                                <h3 className="font-bold font-montserrat mb-4 ">Company</h3>
-                                <ul className="space-y-2 ">
-                                    {Object.entries(navigationLinks).map(([item, url]) => (
-                                        <li key={item}>
-                                            <Link to={url} className="!text-default-400 hover:text-foreground">
-                                                {item}
+                                <h4 className="font-bold font-montserrat text-lg mb-6">Our Services</h4>
+                                <ul className="space-y-3">
+                                    <li><Link to="/services" className="text-muted-foreground hover:text-pink-500 transition-colors">Digital Transformation</Link></li>
+                                    <li><Link to="/services" className="text-muted-foreground hover:text-pink-500 transition-colors">Software Development</Link></li>
+                                    <li><Link to="/services" className="text-muted-foreground hover:text-pink-500 transition-colors">AI Solutions</Link></li>
+                                    <li><Link to="/services" className="text-muted-foreground hover:text-pink-500 transition-colors">E-Discovery</Link></li>
+                                    <li><Link to="/services" className="text-muted-foreground hover:text-pink-500 transition-colors">Client Portals</Link></li>
+                                    <li><Link to="/services" className="text-muted-foreground hover:text-pink-500 transition-colors">Legal Tech Consulting</Link></li>
+                                </ul>
+                            </div>
+
+                            {/* Quick Links */}
+                            <div>
+                                <h4 className="font-bold font-montserrat text-lg mb-6">Quick Links</h4>
+                                <ul className="space-y-3">
+                                    {Object.entries(navigationLinks).map(([name, path]) => (
+                                        <li key={name}>
+                                            <Link to={path} className="text-muted-foreground hover:text-pink-500 transition-colors">
+                                                {name}
                                             </Link>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
-                        </ScrollAnimation>
-                        <ScrollAnimation>
-                            <div>
-                                <h3 className="font-medium mb-4">Services</h3>
-                                <ul className="space-y-2">
-                                    {[
-                                        "Digital Transformation",
-                                        "Software Development",
-                                        "AI Solutions",
-                                        "E-Discovery",
-                                        "Client Portals",
-                                    ].map((item) => (
-                                        <li key={item}>
-                                            <Link to="#" className="!text-default-400 hover:text-foreground">
-                                                {item}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
+                        </div>
+
+                        {/* Contact Information */}
+                        <div className="mt-12 pt-8 border-t border-gray-200">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div>
+                                    <h4 className="font-bold font-montserrat text-lg mb-4">Contact Us</h4>
+                                    <div className="space-y-3">
+                                        <p className="flex items-center gap-3 text-muted-foreground">
+                                            <MapPin className="w-5 h-5 " />
+                                            <span>Accra, Ghana</span>
+                                        </p>
+                                        <p className="flex items-center gap-3">
+                                            <Mail className="w-5 h-5 " />
+                                            <a href="mailto:info@addentech.com" className="text-muted-foreground hover:text-pink-500 transition-colors">
+                                                info@addentech.com
+                                            </a>
+                                        </p>
+                                        <p className="flex items-center gap-3">
+                                            <Phone className="w-5 h-5 " />
+                                            <a href="tel:+233123456789" className="text-muted-foreground hover:text-pink-500 transition-colors">
+                                                +233 (0) 123 456 789
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-bold font-montserrat text-lg mb-4">Get Started</h4>
+                                    <p className="text-muted-foreground text-sm mb-4">
+                                        Ready to transform your legal practice with cutting-edge technology?
+                                    </p>
+                                   
+                                </div>
+
+                                <div>
+                                    <h4 className="font-bold font-montserrat text-lg mb-4">Our Expertise</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">Legal Tech</span>
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">Cloud Solutions</span>
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">AI & ML</span>
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">Case Management</span>
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">Document Automation</span>
+                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs">Compliance</span>
+                                    </div>
+                                </div>
                             </div>
-                        </ScrollAnimation>
-                        <ScrollAnimation>
-                            <div>
-                                <h3 className="font-medium mb-4">Legal</h3>
-                                <ul className="space-y-2">
-                                    {["Terms", "Privacy", "Cookies", "Licenses", "Settings"].map((item) => (
-                                        <li key={item}>
-                                            <Link to="#" className="!text-default-400 hover:text-foreground">
-                                                {item}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </ScrollAnimation>
+                        </div>
                     </div>
-                    <div className="border-t border-t-white/10 border-border/40 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                        <ScrollAnimation>
-                            <p className="text-sm text-muted-foreground">
+                </div>
+
+                {/* Bottom Footer */}
+                <div className="border-t border-gray-200 py-6">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div className="text-muted-foreground text-sm">
                                 © {new Date().getFullYear()} Addentech. All rights reserved.
-                            </p>
-                        </ScrollAnimation>
-                        <ScrollAnimation>
-                            <div className="flex gap-4 mt-4 md:mt-0">
-                                <Link to="#" className="text-sm text-muted-foreground hover:text-foreground">
-                                    Privacy Policy
-                                </Link>
-                                <Link to="#" className="text-sm text-muted-foreground hover:text-foreground">
-                                    Terms of Service
-                                </Link>
-                                <Link to="#" className="text-sm text-muted-foreground hover:text-foreground">
-                                    Cookies Settings
-                                </Link>
                             </div>
-                        </ScrollAnimation>
+                            <div className="flex gap-6 text-sm">
+                                <Link to="#" className="text-muted-foreground hover:text-pink-500 transition-colors">Privacy Policy</Link>
+                                <Link to="#" className="text-muted-foreground hover:text-pink-500 transition-colors">Terms of Service</Link>
+                                <Link to="#" className="text-muted-foreground hover:text-pink-500 transition-colors">Cookie Settings</Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </footer>
