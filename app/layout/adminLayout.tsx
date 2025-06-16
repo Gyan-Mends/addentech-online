@@ -336,12 +336,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                         </div>
                                     </Link>
 
-                                    <Link to="/admin/enhanced-tasks">
-                                        <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm bg-sidebar-item hover:bg-sidebar-item:hover transition-colors duration-200 text-dashboard-secondary hover:text-dashboard-primary">
-                                            <CheckSquare className="h-3 w-3" />
-                                            Enhanced Tasks
-                                        </div>
-                                    </Link>
+                                    
                                 </div>
                             </div>
                         )}

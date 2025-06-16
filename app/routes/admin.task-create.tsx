@@ -296,11 +296,12 @@ const TaskCreate = () => {
                                 </CardHeader>
                                 <CardBody className="space-y-4">
                                     <Input
+                                        variant="bordered"
                                         name="title"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary !text-white",
-                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                            label: "font-nunito !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                         }}
                                         label="Task Title"
                                         placeholder="Enter task title"
@@ -313,10 +314,11 @@ const TaskCreate = () => {
                                     
                                     <Textarea
                                         name="description"
+                                        variant="bordered"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary !text-white",
-                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                            label: "font-nunito !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                         }}
                                         label="Description"
                                         placeholder="Describe the task in detail"
@@ -330,11 +332,12 @@ const TaskCreate = () => {
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <Select
+                                            variant="bordered"
                                             name="priority"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary !text-white",
-                                                trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                                label: "font-nunito !text-white",
+                                                trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                                 popoverContent: "bg-dashboard-secondary border border-white/20"
                                             }}
                                             label="Priority"
@@ -348,11 +351,12 @@ const TaskCreate = () => {
                                         </Select>
                                         
                                         <Input
+                                            variant="bordered"
                                             name="category"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary !text-white",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                             }}
                                             label="Category"
                                             placeholder="e.g., Development, Marketing"
@@ -371,11 +375,12 @@ const TaskCreate = () => {
                                 </CardHeader>
                                 <CardBody className="space-y-10">
                                     <Select
+                                        variant="bordered"
                                         name="department"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary !text-white",
-                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                            label: "font-nunito !text-white",
+                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                             popoverContent: "bg-dashboard-secondary border border-white/20"
                                         }}
                                         label="Department"
@@ -394,10 +399,11 @@ const TaskCreate = () => {
                                     </Select>
 
                                     <Select
+                                        variant="bordered"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary !text-white",
-                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            label: "font-nunito !text-white",
+                                            trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                             popoverContent: "bg-dashboard-secondary border border-white/20"
                                         }}
                                         label="Assign To Department Heads"
@@ -428,11 +434,12 @@ const TaskCreate = () => {
                                 <CardBody className="space-y-10">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <Input
+                                            variant="bordered"
                                             type="date"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary !text-white",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                             }}
                                             label="Start Date (Optional)"
                                             value={startDate}
@@ -441,12 +448,13 @@ const TaskCreate = () => {
                                         />
                                         
                                         <Input
+                                            variant="bordered"
                                             name="dueDate"
                                             type="date"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary !text-white",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                             }}
                                             label="Due Date"
                                             value={dueDate}
@@ -459,11 +467,12 @@ const TaskCreate = () => {
                                     </div>
                                     
                                     <Input
+                                        variant="bordered"
                                         type="number"
                                         labelPlacement="outside"
                                         classNames={{
-                                            label: "font-nunito text-dashboard-primary !text-white",
-                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                            label: "font-nunito !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                         }}
                                         label="Estimated Hours (Optional)"
                                         placeholder="0"
@@ -484,17 +493,18 @@ const TaskCreate = () => {
                                 <CardBody className="space-y-4">
                                     <div className="flex gap-2">
                                         <Input
+                                            variant="bordered"
                                             labelPlacement="outside"
                                             classNames={{
-                                                label: "font-nunito text-dashboard-primary !text-white",
-                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-white",
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary !text-white",
                                             }}
                                             placeholder="Add a tag"
                                             value={currentTag}
                                             onValueChange={setCurrentTag}
                                             onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                                         />
-                                        <Button onClick={addTag} color="primary" variant="flat">
+                                        <Button onClick={addTag} color="primary" variant="flat" className="!text-white">
                                             Add
                                         </Button>
                                     </div>
@@ -539,6 +549,7 @@ const TaskCreate = () => {
                                     
                                     {approvalRequired && (
                                         <Select
+                                            variant="bordered"
                                             label="Approvers"
                                             selectionMode="multiple"
                                             selectedKeys={approvers}
@@ -579,6 +590,7 @@ const TaskCreate = () => {
                                     {isRecurring && (
                                         <div className="space-y-3">
                                             <Select
+                                                variant="bordered"
                                                 label="Frequency"
                                                 selectedKeys={[recurringFrequency]}
                                                 onSelectionChange={(keys) => setRecurringFrequency(Array.from(keys)[0] as string)}
@@ -595,6 +607,7 @@ const TaskCreate = () => {
                                             </Select>
                                             
                                             <Input
+                                                variant="bordered"
                                                 type="number"
                                                 label="Interval"
                                                 placeholder="1"
@@ -610,6 +623,7 @@ const TaskCreate = () => {
                                             />
                                             
                                             <Input
+                                                variant="bordered"
                                                 type="date"
                                                 label="End Date (Optional)"
                                                 value={recurringEndDate}

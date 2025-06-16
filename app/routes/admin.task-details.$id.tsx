@@ -415,23 +415,23 @@ const TaskDetails = () => {
 
     const renderComments = (comments: any[], level = 0) => {
         return comments.map((comment) => (
-            <div key={comment._id} className={`mb-4 ${level > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4' : ''}`}>
+            <div key={comment._id} className={`mb-4 ${level > 0 ? 'ml-8 border-l-2 border-white/20 pl-4' : ''}`}>
                 <div className="flex items-start space-x-3">
                     <Avatar 
                         name={`${comment.user.firstName} ${comment.user.lastName}`}
                         size="sm"
                     />
                     <div className="flex-1">
-                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                        <div className="bg-dashboard-primary border border-white/10 rounded-lg p-3">
                             <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-medium">
+                                <span className="text-sm font-medium text-white">
                                     {comment.user.firstName} {comment.user.lastName}
                                 </span>
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-gray-400">
                                     {formatDate(comment.timestamp)}
                                 </span>
                             </div>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                            <p className="text-sm text-gray-300">
                                 {comment.message}
                             </p>
                         </div>
@@ -439,7 +439,7 @@ const TaskDetails = () => {
                             <Button
                                 size="sm"
                                 variant="light"
-                                className="mt-1"
+                                className="mt-1 text-gray-300 hover:text-white"
                                 startContent={<Reply size={14} />}
                                 onClick={() => {
                                     setReplyingTo(comment._id);
@@ -463,12 +463,10 @@ const TaskDetails = () => {
     if (!permissions.canView) {
         return (
             <AdminLayout>
-                <div className="p-6">
-                    <Card className="border-danger-200 bg-danger-50">
-                        <CardBody>
-                            <p className="text-danger-700">You don't have permission to view this task.</p>
-                        </CardBody>
-                    </Card>
+                <div className="space-y-6 !text-white">
+                    <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400">
+                        <p>You don't have permission to view this task.</p>
+                    </div>
                 </div>
             </AdminLayout>
         );
@@ -476,105 +474,108 @@ const TaskDetails = () => {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
+            <div className="space-y-6 !text-white">
                 {/* Success/Error Messages */}
                 {actionData && (
-                    <Card className={`border-${actionData.success ? 'success' : 'danger'}-200 bg-${actionData.success ? 'success' : 'danger'}-50`}>
-                        <CardBody>
-                            <p className={`text-${actionData.success ? 'success' : 'danger'}-700`}>
-                                {actionData.message}
-                            </p>
-                        </CardBody>
-                    </Card>
+                    <div className={`p-4 rounded-lg border ${actionData.success 
+                        ? 'border-green-500/20 bg-green-500/10 text-green-400' 
+                        : 'border-red-500/20 bg-red-500/10 text-red-400'
+                    }`}>
+                        <p>{actionData.message}</p>
+                    </div>
                 )}
 
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Button
-                            variant="light"
-                            startContent={<ArrowLeft size={16} />}
-                            onClick={() => navigate('/admin/task-management')}
-                        >
-                            Back to Tasks
-                        </Button>
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                                {task.title}
-                            </h1>
-                            <div className="flex items-center gap-3 mt-2">
-                                <Chip
-                                    color={getStatusColor(task.status)}
-                                    variant="flat"
-                                    size="sm"
-                                >
-                                    {task.status.replace('_', ' ').toUpperCase()}
-                                </Chip>
-                                <Chip
-                                    color={getPriorityColor(task.priority)}
-                                    variant="flat"
-                                    size="sm"
-                                >
-                                    {task.priority.toUpperCase()} PRIORITY
-                                </Chip>
-                                {isOverdue(task.dueDate, task.status) && (
-                                    <Badge color="danger" variant="flat">
-                                        OVERDUE
-                                    </Badge>
-                                )}
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                           
+                            <div>
+                                <h1 className="text-3xl font-bold text-white">
+                                    {task.title}
+                                </h1>
+                                <div className="flex items-center gap-3 mt-2">
+                                    <Chip
+                                        color={getStatusColor(task.status)}
+                                        variant="flat"
+                                        size="sm"
+                                    >
+                                        {task.status.replace('_', ' ').toUpperCase()}
+                                    </Chip>
+                                    <Chip
+                                        color={getPriorityColor(task.priority)}
+                                        variant="flat"
+                                        size="sm"
+                                    >
+                                        {task.priority.toUpperCase()} PRIORITY
+                                    </Chip>
+                                    {isOverdue(task.dueDate, task.status) && (
+                                        <Badge color="danger" variant="flat">
+                                            OVERDUE
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Action Dropdown */}
-                    <Dropdown>
-                        <DropdownTrigger>
-                            <Button
-                                variant="flat"
-                                endContent={<MoreVertical size={16} />}
+                        {/* Action Dropdown */}
+                        <Dropdown className="bg-dashboard-secondary border border-white/20">
+                            <DropdownTrigger>
+                                <Button
+                                    variant="flat"
+                                    endContent={<MoreVertical size={16} />}
+                                    className="bg-action-primary text-white hover:bg-action-primary"
+                                >
+                                    Actions
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu 
+                                aria-label="Task actions"
+                                className="bg-dashboard-secondary border-none"
                             >
-                                Actions
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Task actions">
-                            {permissions.canChangeStatus && (
-                                <DropdownItem
-                                    key="status"
-                                    startContent={<CheckCircle size={16} />}
-                                    onClick={() => setShowStatusModal(true)}
-                                >
-                                    Change Status
-                                </DropdownItem>
-                            )}
-                            {permissions.canAssign && (
-                                <DropdownItem
-                                    key="assign"
-                                    startContent={<UserPlus size={16} />}
-                                    onClick={() => setShowAssignModal(true)}
-                                >
-                                    Assign to Member
-                                </DropdownItem>
-                            )}
-                            {permissions.canEdit && (
-                                <DropdownItem
-                                    key="edit"
-                                    startContent={<Edit size={16} />}
-                                    onClick={() => setShowEditModal(true)}
-                                >
-                                    Edit Task
-                                </DropdownItem>
-                            )}
-                            {permissions.canComment && (
-                                <DropdownItem
-                                    key="comment"
-                                    startContent={<MessageSquare size={16} />}
-                                    onClick={() => setShowCommentModal(true)}
-                                >
-                                    Add Comment
-                                </DropdownItem>
-                            )}
-                        </DropdownMenu>
-                    </Dropdown>
+                                {permissions.canChangeStatus && (
+                                    <DropdownItem
+                                        key="status"
+                                        startContent={<CheckCircle size={16} />}
+                                        onClick={() => setShowStatusModal(true)}
+                                        className="text-gray-300 hover:text-white"
+                                    >
+                                        Change Status
+                                    </DropdownItem>
+                                )}
+                                {permissions.canAssign && (
+                                    <DropdownItem
+                                        key="assign"
+                                        startContent={<UserPlus size={16} />}
+                                        onClick={() => setShowAssignModal(true)}
+                                        className="text-gray-300 hover:text-white"
+                                    >
+                                        Assign to Member
+                                    </DropdownItem>
+                                )}
+                                {permissions.canEdit && (
+                                    <DropdownItem
+                                        key="edit"
+                                        startContent={<Edit size={16} />}
+                                        onClick={() => setShowEditModal(true)}
+                                        className="text-gray-300 hover:text-white"
+                                    >
+                                        Edit Task
+                                    </DropdownItem>
+                                )}
+                                {permissions.canComment && (
+                                    <DropdownItem
+                                        key="comment"
+                                        startContent={<MessageSquare size={16} />}
+                                        onClick={() => setShowCommentModal(true)}
+                                        className="text-gray-300 hover:text-white"
+                                    >
+                                        Add Comment
+                                    </DropdownItem>
+                                )}
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
                 </div>
 
                 {/* Main Content */}
@@ -582,23 +583,23 @@ const TaskDetails = () => {
                     {/* Task Details */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Description */}
-                        <Card>
-                            <CardHeader>
-                                <h3 className="text-lg font-semibold">Description</h3>
-                            </CardHeader>
-                            <CardBody>
-                                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                        <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-white">Description</h3>
+                            </div>
+                            <div>
+                                <p className="text-gray-300 whitespace-pre-wrap">
                                     {task.description}
                                 </p>
-                            </CardBody>
-                        </Card>
+                            </div>
+                        </div>
 
                         {/* Progress */}
-                        <Card>
-                            <CardHeader>
-                                <h3 className="text-lg font-semibold">Progress</h3>
-                            </CardHeader>
-                            <CardBody>
+                        {/* <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-white">Progress</h3>
+                            </div>
+                            <div>
                                 <div className="space-y-3">
                                     <Progress
                                         value={task.progress || 0}
@@ -606,72 +607,72 @@ const TaskDetails = () => {
                                         size="lg"
                                         showValueLabel
                                     />
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-gray-300">
                                         {task.progress || 0}% Complete
                                     </p>
                                 </div>
-                            </CardBody>
-                        </Card>
+                            </div>
+                        </div> */}
 
                         {/* Comments */}
-                        <Card>
-                            <CardHeader className="flex justify-between items-center">
-                                <h3 className="text-lg font-semibold">Comments</h3>
+                        <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold text-white">Comments</h3>
                                 {permissions.canComment && (
                                     <Button
                                         size="sm"
-                                        color="primary"
+                                        className="bg-action-primary text-white hover:bg-action-primary"
                                         startContent={<Plus size={16} />}
                                         onClick={() => setShowCommentModal(true)}
                                     >
                                         Add Comment
                                     </Button>
                                 )}
-                            </CardHeader>
-                            <CardBody>
+                            </div>
+                            <div>
                                 {task.comments && task.comments.length > 0 ? (
                                     <div className="space-y-4">
                                         {renderComments(task.comments)}
                                     </div>
                                 ) : (
-                                    <p className="text-gray-500 text-center py-4">
+                                    <p className="text-gray-400 text-center py-4">
                                         No comments yet. Be the first to comment!
                                     </p>
                                 )}
-                            </CardBody>
-                        </Card>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Task Info */}
-                        <Card>
-                            <CardHeader>
-                                <h3 className="text-lg font-semibold">Task Information</h3>
-                            </CardHeader>
-                            <CardBody className="space-y-4">
+                        <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-white">Task Information</h3>
+                            </div>
+                            <div className="space-y-4">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">Department</p>
-                                    <p className="text-sm">{task.department.name}</p>
+                                    <p className="text-sm font-medium text-gray-400">Department</p>
+                                    <p className="text-sm text-gray-300">{task.department.name}</p>
                                 </div>
                                 
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">Created By</p>
-                                    <p className="text-sm">
+                                    <p className="text-sm font-medium text-gray-400">Created By</p>
+                                    <p className="text-sm text-gray-300">
                                         {task.createdBy.firstName} {task.createdBy.lastName}
                                     </p>
                                 </div>
 
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">Assigned To</p>
+                                    <p className="text-sm font-medium text-gray-400">Assigned To</p>
                                     {task.assignedTo && task.assignedTo.length > 0 ? (
                                         <div className="space-y-2">
                                             {task.assignedTo.map((assignee: any, index: number) => (
-                                                <div key={assignee._id} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                                                    <p className="text-sm font-medium">
+                                                <div key={assignee._id} className="bg-dashboard-primary border border-white/10 rounded-lg p-2">
+                                                    <p className="text-sm font-medium text-white">
                                                         {assignee.firstName} {assignee.lastName}
                                                     </p>
-                                                    <p className="text-xs text-gray-500 capitalize">
+                                                    <p className="text-xs text-gray-400 capitalize">
                                                         {assignee.role?.replace('_', ' ')}
                                                         {index === 0 && task.assignedTo.length > 1 && ' (Primary)'}
                                                         {index > 0 && ' (Delegated)'}
@@ -681,31 +682,31 @@ const TaskDetails = () => {
                                             
                                             {/* Assignment History */}
                                             {task.assignmentHistory && task.assignmentHistory.length > 0 && (
-                                                <div className="border-t pt-2">
-                                                    <p className="text-xs font-medium text-gray-600 mb-1">Assignment History</p>
+                                                <div className="border-t border-white/10 pt-2">
+                                                    <p className="text-xs font-medium text-gray-400 mb-1">Assignment History</p>
                                                     <div className="space-y-1">
                                                         {task.assignmentHistory.slice(-3).map((assignment: any, index: number) => (
-                                                            <div key={index} className="text-xs text-gray-500">
-                                                                <span className="font-medium">
+                                                            <div key={index} className="text-xs text-gray-400">
+                                                                <span className="font-medium text-gray-300">
                                                                     {assignment.assignedBy.firstName} {assignment.assignedBy.lastName}
                                                                 </span>
                                                                 {' '}assigned to{' '}
-                                                                <span className="font-medium">
+                                                                <span className="font-medium text-gray-300">
                                                                     {assignment.assignedTo.firstName} {assignment.assignedTo.lastName}
                                                                 </span>
-                                                                <div className="text-xs text-gray-400">
+                                                                <div className="text-xs text-gray-500">
                                                                     {new Date(assignment.assignedAt).toLocaleDateString()} at {new Date(assignment.assignedAt).toLocaleTimeString()}
                                                                     {assignment.assignmentLevel === 'delegation' && ' (Delegated)'}
                                                                 </div>
                                                                 {assignment.instructions && (
-                                                                    <div className="text-xs italic text-gray-400 mt-1">
+                                                                    <div className="text-xs italic text-gray-500 mt-1">
                                                                         "{assignment.instructions}"
                                                                     </div>
                                                                 )}
                                                             </div>
                                                         ))}
                                                         {task.assignmentHistory.length > 3 && (
-                                                            <p className="text-xs text-gray-400">
+                                                            <p className="text-xs text-gray-500">
                                                                 ...and {task.assignmentHistory.length - 3} more assignments
                                                             </p>
                                                         )}
@@ -714,13 +715,13 @@ const TaskDetails = () => {
                                             )}
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-gray-500">Not assigned</p>
+                                        <p className="text-sm text-gray-400">Not assigned</p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">Due Date</p>
-                                    <p className={`text-sm ${isOverdue(task.dueDate, task.status) ? 'text-red-600' : ''}`}>
+                                    <p className="text-sm font-medium text-gray-400">Due Date</p>
+                                    <p className={`text-sm ${isOverdue(task.dueDate, task.status) ? 'text-red-400' : 'text-gray-300'}`}>
                                         {formatDate(task.dueDate)}
                                         {isOverdue(task.dueDate, task.status) && (
                                             <span className="block text-xs">Overdue</span>
@@ -729,30 +730,30 @@ const TaskDetails = () => {
                                 </div>
 
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">Created</p>
-                                    <p className="text-sm">{formatDate(task.createdAt)}</p>
+                                    <p className="text-sm font-medium text-gray-400">Created</p>
+                                    <p className="text-sm text-gray-300">{formatDate(task.createdAt)}</p>
                                 </div>
 
                                 {task.updatedAt !== task.createdAt && (
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Last Updated</p>
-                                        <p className="text-sm">{formatDate(task.updatedAt)}</p>
+                                        <p className="text-sm font-medium text-gray-400">Last Updated</p>
+                                        <p className="text-sm text-gray-300">{formatDate(task.updatedAt)}</p>
                                     </div>
                                 )}
-                            </CardBody>
-                        </Card>
+                            </div>
+                        </div>
 
                         {/* Quick Actions */}
-                        <Card>
-                            <CardHeader>
-                                <h3 className="text-lg font-semibold">Quick Actions</h3>
-                            </CardHeader>
-                            <CardBody className="space-y-3">
+                        {/* <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
+                            </div>
+                            <div className="space-y-3">
                                 {permissions.canChangeStatus && (
                                     <Button
                                         color="primary"
                                         variant="flat"
-                                        className="w-full"
+                                        className="w-full bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30"
                                         startContent={<CheckCircle size={16} />}
                                         onClick={() => setShowStatusModal(true)}
                                     >
@@ -764,7 +765,7 @@ const TaskDetails = () => {
                                     <Button
                                         color="secondary"
                                         variant="flat"
-                                        className="w-full"
+                                        className="w-full bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30"
                                         startContent={<UserPlus size={16} />}
                                         onClick={() => setShowAssignModal(true)}
                                     >
@@ -776,7 +777,7 @@ const TaskDetails = () => {
                                     <Button
                                         color="warning"
                                         variant="flat"
-                                        className="w-full"
+                                        className="w-full bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30"
                                         startContent={<Edit size={16} />}
                                         onClick={() => setShowEditModal(true)}
                                     >
@@ -788,7 +789,7 @@ const TaskDetails = () => {
                                     <Button
                                         color="success"
                                         variant="flat"
-                                        className="w-full"
+                                        className="w-full bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30"
                                         startContent={<CheckCircle size={16} />}
                                         onClick={() => {
                                             setEditStatus('completed');
@@ -799,43 +800,58 @@ const TaskDetails = () => {
                                         Mark Complete
                                     </Button>
                                 )}
-                            </CardBody>
-                        </Card>
+                            </div>
+                        </div> */}
 
                         {/* Tags */}
                         {task.tags && task.tags.length > 0 && (
-                            <Card>
-                                <CardHeader>
-                                    <h3 className="text-lg font-semibold">Tags</h3>
-                                </CardHeader>
-                                <CardBody>
+                            <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                                <div className="mb-4">
+                                    <h3 className="text-lg font-semibold text-white">Tags</h3>
+                                </div>
+                                <div>
                                     <div className="flex flex-wrap gap-2">
                                         {task.tags.map((tag: string, index: number) => (
-                                            <Chip key={index} size="sm" variant="flat">
+                                            <Chip key={index} size="sm" variant="flat" className="bg-white/10 text-gray-300">
                                                 {tag}
                                             </Chip>
                                         ))}
                                     </div>
-                                </CardBody>
-                            </Card>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {/* Status Update Modal */}
-                <Modal isOpen={showStatusModal} onClose={() => setShowStatusModal(false)}>
+                <Modal 
+                    isOpen={showStatusModal} 
+                    onClose={() => setShowStatusModal(false)}
+                    classNames={{
+                        base: "bg-dashboard-secondary border border-white/20",
+                        header: "border-b border-white/20",
+                        body: "text-white",
+                        footer: "border-t border-white/20"
+                    }}
+                >
                     <ModalContent>
-                        <ModalHeader>Update Task Status</ModalHeader>
+                        <ModalHeader className="text-white">Update Task Status</ModalHeader>
                         <ModalBody>
                             <div className="space-y-4">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-2">
-                                        Current Status: <span className="font-medium">{task.status}</span>
+                                    <p className="text-sm text-gray-300 mb-2">
+                                        Current Status: <span className="font-medium text-white">{task.status}</span>
                                     </p>
                                     <Select
+                                        variant="bordered"
                                         label="New Status"
                                         selectedKeys={[editStatus]}
                                         onSelectionChange={(keys) => setEditStatus(Array.from(keys)[0] as string)}
+                                        classNames={{
+                                            trigger: "bg-dashboard-tertiary border-white/20 text-white",
+                                            value: "text-white",
+                                            label: "!text-white"
+                                        }}
                                     >
                                         <SelectItem key="not_started" value="not_started">Not Started</SelectItem>
                                         <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
@@ -846,19 +862,33 @@ const TaskDetails = () => {
                                 </div>
                                 
                                 <Textarea
+                                    variant="bordered"
                                     label="Reason for Status Change (Optional)"
                                     placeholder="Why are you changing the status?"
                                     value={statusReason}
                                     onValueChange={setStatusReason}
                                     minRows={3}
+                                    variant="bordered"
+                                    classNames={{
+                                        input: "bg-dashboard-tertiary text-white",
+                                        inputWrapper: "bg-dashboard-tertiary border-white/20",
+                                        label: "!text-white"
+                                    }}
                                 />
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => setShowStatusModal(false)}>
+                            <Button 
+                                variant="light" 
+                                onClick={() => setShowStatusModal(false)}
+                                className="text-gray-300 hover:text-white border border-white/20"
+                            >
                                 Cancel
                             </Button>
-                            <Button color="primary" onClick={handleStatusUpdate}>
+                            <Button 
+                                className="bg-action-primary text-white hover:bg-action-primary" 
+                                onClick={handleStatusUpdate}
+                            >
                                 Update Status
                             </Button>
                         </ModalFooter>
@@ -866,16 +896,32 @@ const TaskDetails = () => {
                 </Modal>
 
                 {/* Assign Member Modal */}
-                <Modal isOpen={showAssignModal} onClose={() => setShowAssignModal(false)}>
+                <Modal 
+                    isOpen={showAssignModal} 
+                    onClose={() => setShowAssignModal(false)}
+                    classNames={{
+                        base: "bg-dashboard-secondary border border-white/20",
+                        header: "border-b border-white/20",
+                        body: "text-white",
+                        footer: "border-t border-white/20"
+                    }}
+                >
                     <ModalContent>
-                        <ModalHeader>Assign Task to Department Member</ModalHeader>
+                        <ModalHeader className="text-white">Assign Task to Department Member</ModalHeader>
                         <ModalBody>
                             <div className="space-y-4">
                                 <Select
+                                    variant="bordered"
                                     label="Select Member"
                                     placeholder="Choose a department member"
                                     selectedKeys={assignedMember ? [assignedMember] : []}
                                     onSelectionChange={(keys) => setAssignedMember(Array.from(keys)[0] as string)}
+                                    variant="bordered"
+                                    classNames={{
+                                        trigger: "bg-dashboard-tertiary border-white/20 text-white",
+                                        value: "text-white",
+                                        label: "!text-white"
+                                    }}
                                 >
                                     {departmentUsers.map((user: any) => (
                                         <SelectItem key={user._id} value={user._id}>
@@ -885,20 +931,31 @@ const TaskDetails = () => {
                                 </Select>
                                 
                                 <Textarea
+                                    variant="bordered"
                                     label="Assignment Instructions (Optional)"
                                     placeholder="Provide specific instructions for the assigned member"
                                     value={assignmentInstructions}
                                     onValueChange={setAssignmentInstructions}
                                     minRows={3}
+                                    variant="bordered"
+                                    classNames={{
+                                        input: "bg-dashboard-tertiary text-white",
+                                        inputWrapper: "bg-dashboard-tertiary border-white/20",
+                                        label: "!text-white"
+                                    }}
                                 />
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => setShowAssignModal(false)}>
+                            <Button 
+                                variant="light" 
+                                onClick={() => setShowAssignModal(false)}
+                                className="text-gray-300 hover:text-white border border-white/20"
+                            >
                                 Cancel
                             </Button>
                             <Button 
-                                color="primary" 
+                                className="bg-action-primary text-white hover:bg-action-primary" 
                                 onClick={handleAssignMember}
                                 isDisabled={!assignedMember}
                             >
@@ -909,28 +966,58 @@ const TaskDetails = () => {
                 </Modal>
 
                 {/* Edit Task Modal */}
-                <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)}>
+                <Modal 
+                    isOpen={showEditModal} 
+                    onClose={() => setShowEditModal(false)}
+                    classNames={{
+                        base: "bg-dashboard-secondary border border-white/20",
+                        header: "border-b border-white/20",
+                        body: "text-white",
+                        footer: "border-t border-white/20"
+                    }}
+                >
                     <ModalContent>
-                        <ModalHeader>Edit Task</ModalHeader>
+                        <ModalHeader className="text-white">Edit Task</ModalHeader>
                         <ModalBody>
                             <div className="space-y-4">
                                 <Input
+                                    variant="bordered"
                                     label="Task Title"
                                     value={editTitle}
                                     onValueChange={setEditTitle}
+                                    variant="bordered"
+                                    classNames={{
+                                        input: "bg-dashboard-primary text-white",
+                                        inputWrapper: "bg-dashboard-primary border-white/20",
+                                        label: "!text-white"
+                                    }}
                                 />
                                 
                                 <Textarea
+                                    variant="bordered"
                                     label="Description"
                                     value={editDescription}
                                     onValueChange={setEditDescription}
                                     minRows={4}
+                                    variant="bordered"
+                                    classNames={{
+                                        input: "bg-dashboard-primary text-white",
+                                        inputWrapper: "bg-dashboard-primary border-white/20",
+                                        label: "!text-white"
+                                    }}
                                 />
                                 
                                 <Select
+                                    variant="bordered"
                                     label="Priority"
                                     selectedKeys={[editPriority]}
                                     onSelectionChange={(keys) => setEditPriority(Array.from(keys)[0] as string)}
+                                    variant="bordered"
+                                    classNames={{
+                                        trigger: "bg-dashboard-tertiary border-white/20 text-white",
+                                        value: "text-white",
+                                        label: "!text-white"
+                                    }}
                                 >
                                     <SelectItem key="low" value="low">Low</SelectItem>
                                     <SelectItem key="medium" value="medium">Medium</SelectItem>
@@ -939,18 +1026,32 @@ const TaskDetails = () => {
                                 </Select>
                                 
                                 <Input
+                                    variant="bordered"
                                     type="date"
                                     label="Due Date"
                                     value={editDueDate}
                                     onChange={(e) => setEditDueDate(e.target.value)}
+                                    variant="bordered"
+                                    classNames={{
+                                        input: "bg-dashboard-tertiary text-white",
+                                        inputWrapper: "bg-dashboard-tertiary border-white/20",
+                                        label: "!text-white"
+                                    }}
                                 />
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => setShowEditModal(false)}>
+                            <Button 
+                                variant="light" 
+                                onClick={() => setShowEditModal(false)}
+                                className="text-gray-300 hover:text-white border border-white/20"
+                            >
                                 Cancel
                             </Button>
-                            <Button color="primary" onClick={handleUpdateTask}>
+                            <Button 
+                                className="bg-action-primary text-white hover:bg-action-primary" 
+                                onClick={handleUpdateTask}
+                            >
                                 Update Task
                             </Button>
                         </ModalFooter>
@@ -958,34 +1059,54 @@ const TaskDetails = () => {
                 </Modal>
 
                 {/* Add Comment Modal */}
-                <Modal isOpen={showCommentModal} onClose={() => {
-                    setShowCommentModal(false);
-                    setReplyingTo(null);
-                    setComment('');
-                }}>
+                <Modal 
+                    isOpen={showCommentModal} 
+                    onClose={() => {
+                        setShowCommentModal(false);
+                        setReplyingTo(null);
+                        setComment('');
+                    }}
+                    classNames={{
+                        base: "bg-dashboard-secondary border border-white/20",
+                        header: "border-b border-white/20",
+                        body: "text-white",
+                        footer: "border-t border-white/20"
+                    }}
+                >
                     <ModalContent>
-                        <ModalHeader>
+                        <ModalHeader className="text-white">
                             {replyingTo ? 'Reply to Comment' : 'Add Comment'}
                         </ModalHeader>
                         <ModalBody>
                             <Textarea
+                                variant="bordered"
                                 label="Your Comment"
                                 placeholder="Write your comment here..."
                                 value={comment}
                                 onValueChange={setComment}
                                 minRows={4}
+                                variant="bordered"
+                                classNames={{
+                                    input: "bg-dashboard-tertiary text-white",
+                                    inputWrapper: "bg-dashboard-tertiary border-white/20",
+                                    label: "!text-white"
+                                }}
                             />
                         </ModalBody>
                         <ModalFooter>
-                            <Button variant="light" onClick={() => {
-                                setShowCommentModal(false);
-                                setReplyingTo(null);
-                                setComment('');
-                            }}>
+                            <Button 
+                                variant="light" 
+                                onClick={() => {
+                                    setShowCommentModal(false);
+                                    setReplyingTo(null);
+                                    setComment('');
+                                }}
+                                className="text-gray-300 hover:text-white border border-white/20"
+                            >
                                 Cancel
                             </Button>
                             <Button 
-                                color="primary" 
+                                className="bg-action-primary text-white hover:bg-action-primary" 
                                 onClick={() => handleAddComment(replyingTo || undefined)}
                                 isDisabled={!comment.trim()}
                             >

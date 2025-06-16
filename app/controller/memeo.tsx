@@ -84,32 +84,68 @@ class MemoController {
                             remark
                         };
 
+                        // Prepare attachment if image exists
+                        let attachments: Array<{
+                            filename: string;
+                            content: string;
+                            encoding: string;
+                        }> = [];
+
+                        if (base64Image && base64Image.trim() !== '') {
+                            // Extract the base64 data and determine file type
+                            const base64Data = base64Image.includes(',') 
+                                ? base64Image.split(',')[1] 
+                                : base64Image;
+                            
+                            // Determine file extension from base64 header
+                            let fileExtension = 'jpg'; // default
+                            if (base64Image.includes('data:image/png')) {
+                                fileExtension = 'png';
+                            } else if (base64Image.includes('data:image/jpeg') || base64Image.includes('data:image/jpg')) {
+                                fileExtension = 'jpg';
+                            } else if (base64Image.includes('data:image/gif')) {
+                                fileExtension = 'gif';
+                            } else if (base64Image.includes('data:application/pdf')) {
+                                fileExtension = 'pdf';
+                            }
+
+                            attachments.push({
+                                filename: `memo_attachment_${refNumber}.${fileExtension}`,
+                                content: base64Data,
+                                encoding: 'base64'
+                            });
+                        }
+
                         // Send email to the "To" recipient
                         const toEmailTemplate = createMemoEmailTemplate(
                             memoData,
                             `${toUser.firstName} ${toUser.lastName}`,
-                            'TO'
+                            'TO',
+                            attachments.length > 0
                         );
 
                         await sendEmail({
                             from: currentUser.email,
                             to: toUser.email,
                             subject: `New Memo: ${subject} (Ref: ${refNumber})`,
-                            html: toEmailTemplate
+                            html: toEmailTemplate,
+                            attachments: attachments.length > 0 ? attachments : undefined
                         });
 
                         // Send email to the "CC" recipient
                         const ccEmailTemplate = createMemoEmailTemplate(
                             memoData,
                             `${ccUser.firstName} ${ccUser.lastName}`,
-                            'CC'
+                            'CC',
+                            attachments.length > 0
                         );
 
                         await sendEmail({
                             from: currentUser.email,
                             to: ccUser.email,
                             subject: `CC: New Memo - ${subject} (Ref: ${refNumber})`,
-                            html: ccEmailTemplate
+                            html: ccEmailTemplate,
+                            attachments: attachments.length > 0 ? attachments : undefined
                         });
 
                         console.log('Emails sent successfully for memo:', refNumber);
@@ -247,31 +283,67 @@ class MemoController {
                                 remark: remark || ''
                             };
 
+                            // Prepare attachment if image exists
+                            let attachments: Array<{
+                                filename: string;
+                                content: string;
+                                encoding: string;
+                            }> = [];
+
+                            if (updatedImage && updatedImage.trim() !== '') {
+                                // Extract the base64 data and determine file type
+                                const base64Data = updatedImage.includes(',') 
+                                    ? updatedImage.split(',')[1] 
+                                    : updatedImage;
+                                
+                                // Determine file extension from base64 header
+                                let fileExtension = 'jpg'; // default
+                                if (updatedImage.includes('data:image/png')) {
+                                    fileExtension = 'png';
+                                } else if (updatedImage.includes('data:image/jpeg') || updatedImage.includes('data:image/jpg')) {
+                                    fileExtension = 'jpg';
+                                } else if (updatedImage.includes('data:image/gif')) {
+                                    fileExtension = 'gif';
+                                } else if (updatedImage.includes('data:application/pdf')) {
+                                    fileExtension = 'pdf';
+                                }
+
+                                attachments.push({
+                                    filename: `memo_attachment_${refNumber}.${fileExtension}`,
+                                    content: base64Data,
+                                    encoding: 'base64'
+                                });
+                            }
+
                             // Send updated memo emails
                             const toEmailTemplate = createMemoEmailTemplate(
                                 memoData,
                                 `${toUser.firstName} ${toUser.lastName}`,
-                                'TO'
+                                'TO',
+                                attachments.length > 0
                             );
 
                             await sendEmail({
                                 from: currentUser.email,
                                 to: toUser.email,
                                 subject: `Updated Memo: ${subject} (Ref: ${refNumber})`,
-                                html: toEmailTemplate
+                                html: toEmailTemplate,
+                                attachments: attachments.length > 0 ? attachments : undefined
                             });
 
                             const ccEmailTemplate = createMemoEmailTemplate(
                                 memoData,
                                 `${ccUser.firstName} ${ccUser.lastName}`,
-                                'CC'
+                                'CC',
+                                attachments.length > 0
                             );
 
                             await sendEmail({
                                 from: currentUser.email,
                                 to: ccUser.email,
                                 subject: `CC: Updated Memo - ${subject} (Ref: ${refNumber})`,
-                                html: ccEmailTemplate
+                                html: ccEmailTemplate,
+                                attachments: attachments.length > 0 ? attachments : undefined
                             });
                         }
                     } catch (emailError) {

@@ -492,17 +492,32 @@ const TaskManagement = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                             {/* Search */}
                             <Input
+                                className="text-white "
+                                variant="bordered"
+                                placeholder=" "
+                                labelPlacement="outside"
                                 label="Search Tasks"
-                                placeholder="Search title, description..."
                                 value={searchQuery}
                                 onValueChange={setSearchQuery}
                                 startContent={<Search size={16} />}
                                 size="sm"
-                                clearable
+                                isClearable
+                                classNames={{   
+                                    label: "!text-white",
+                                    inputWrapper: "text-white border border-white/20",
+                                }}
                             />
 
                             {/* Status Filter */}
                             <Select
+                                className="text-white"
+                                variant="bordered"
+                                placeholder=" "
+                                classNames={{
+                                    label: "!text-white",
+                                    trigger: "!text-white border border-white/20",
+                                }}
+                                labelPlacement="outside"
                                 label="Status"
                                 size="sm"
                                 selectedKeys={[selectedStatus]}
@@ -518,6 +533,14 @@ const TaskManagement = () => {
 
                             {/* Priority Filter */}
                             <Select
+                                className="text-white"
+                                variant="bordered"
+                                labelPlacement="outside"
+                                placeholder=" "
+                                classNames={{
+                                    label: "!text-white",
+                                    trigger: "!text-white border border-white/20",
+                                }}
                                 label="Priority"
                                 size="sm"
                                 selectedKeys={[selectedPriority]}
@@ -533,6 +556,14 @@ const TaskManagement = () => {
                             {/* Department Filter (Admin/Manager only) */}
                             {canViewAllStats && (
                                 <Select
+                                className="text-white"
+                                variant="bordered"
+                                labelPlacement="outside"
+                                placeholder=" "
+                                classNames={{
+                                    label: "!text-white",
+                                    trigger: "!text-white !border border-white/20",
+                                }}
                                     label="Department"
                                     size="sm"
                                     selectedKeys={[selectedDepartment]}
@@ -549,6 +580,14 @@ const TaskManagement = () => {
 
                             {/* Due Date Start */}
                             <Input
+                            className="text-white"
+                            variant="bordered"
+                            placeholder=" "
+                            labelPlacement="outside"
+                            classNames={{
+                                label: "!text-white",
+                                inputWrapper: "!text-white border border-white/20",
+                            }}
                                 type="date"
                                 label="Due Date From"
                                 size="sm"
@@ -559,6 +598,14 @@ const TaskManagement = () => {
 
                             {/* Due Date End */}
                             <Input
+                            className="text-white"
+                            variant="bordered"
+                            placeholder=" "
+                            labelPlacement="outside"
+                                classNames={{
+                                label: "!text-white",
+                                inputWrapper: "!text-white border border-white/20",
+                            }}
                                 type="date"
                                 label="Due Date To"
                                 size="sm"

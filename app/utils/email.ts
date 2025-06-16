@@ -56,7 +56,8 @@ export const createMemoEmailTemplate = (
     remark: string;
   },
   recipientName: string,
-  recipientType: 'TO' | 'CC'
+  recipientType: 'TO' | 'CC',
+  hasAttachment: boolean = false
 ) => {
   return `
     <!DOCTYPE html>
@@ -78,6 +79,7 @@ export const createMemoEmailTemplate = (
             .badge-primary { background-color: #007bff; color: white; }
             .badge-warning { background-color: #ffc107; color: #212529; }
             .badge-success { background-color: #28a745; color: white; }
+            .attachment-notice { background-color: #e3f2fd; border: 1px solid #2196f3; border-radius: 4px; padding: 10px; margin: 15px 0; color: #1976d2; }
         </style>
     </head>
     <body>
@@ -138,6 +140,13 @@ export const createMemoEmailTemplate = (
                 <div class="field">
                     <div class="label">Remarks:</div>
                     <div class="value">${memoData.remark}</div>
+                </div>
+                ` : ''}
+
+                ${hasAttachment ? `
+                <div class="attachment-notice">
+                    <strong>📎 Attachment Included</strong><br>
+                    This memo includes a file attachment. Please check your email attachments to view the document.
                 </div>
                 ` : ''}
             </div>
