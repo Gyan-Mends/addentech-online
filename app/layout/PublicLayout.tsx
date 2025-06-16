@@ -26,9 +26,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-
+    
     // Check if we're on the homepage
     const isHomepage = location.pathname === "/";
+    const isServicesPage = location.pathname === "/services";
+    const isAboutPage = location.pathname === "/about";
 
     useEffect(() => {
         const handleScroll = () => {
@@ -88,12 +90,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             <Link
                                 key={name}
                                 to={path}
-                                className={`text-sm font-medium transition-colors duration-300 ${!isScrolled && isHomepage
+                                className={`text-sm font-medium transition-colors duration-300 ${
+                                    !isScrolled && (isHomepage || isServicesPage || isAboutPage)
                                         ? 'text-white hover:text-white/80'
-                                        : isScrolled
-                                            ? 'text-black hover:text-pink-500'
-                                            : 'text-black hover:text-pink-500'
-                                    }`}
+                                        : 'text-black hover:text-pink-500'
+                                }`}
                             >
                                 {name}
                             </Link>
@@ -317,7 +318,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             <div className="text-muted-foreground text-sm">
                                 © {new Date().getFullYear()} Addentech. All rights reserved.
                             </div>
-                            
+
 
                         </div>
                     </div>
