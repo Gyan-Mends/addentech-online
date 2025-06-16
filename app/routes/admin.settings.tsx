@@ -179,38 +179,38 @@ export default function Settings() {
 
     return (
         <AdminLayout>
-            <div className="container mx-auto p-6 max-w-4xl">
+            <div className="container mx-auto p-6 max-w-4xl !text-white">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                    <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
+                    <h1 className="text-2xl font-bold text-dashboard-primary">Settings</h1>
+                    <p className="text-dashboard-secondary mt-1">Manage your account settings and preferences</p>
                 </div>
 
                 {actionData?.success && (
-                    <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+                    <div className="mb-4 p-4 bg-green-500/20 border border-green-400/50 text-green-400 rounded-md">
                         {actionData.message}
                     </div>
                 )}
 
                 {actionData?.error && (
-                    <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                    <div className="mb-4 p-4 bg-red-500/20 border border-red-400/50 text-red-400 rounded-md">
                         {actionData.error}
                     </div>
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Profile Information Card */}
-                    <Card className="shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20">
                         <CardHeader className="pb-3">
                             <div className="flex items-center gap-3">
                                 <Avatar
                                     src={userProfile.profileImage}
                                     name={userProfile.name}
                                     size="lg"
-                                    className="text-pink-500"
+                                    className="text-blue-400"
                                 />
                                 <div>
-                                    <h2 className="text-xl font-semibold">Profile Information</h2>
-                                    <p className="text-gray-600 text-sm">Update your personal details</p>
+                                    <h2 className="text-xl font-semibold text-dashboard-primary">Profile Information</h2>
+                                    <p className="text-dashboard-secondary text-sm">Update your personal details</p>
                                 </div>
                             </div>
                         </CardHeader>
@@ -223,61 +223,88 @@ export default function Settings() {
                                         name="name"
                                         label="Full Name"
                                         defaultValue={userProfile.name}
-                                        startContent={<User className="h-4 w-4 text-pink-500" />}
+                                        startContent={<User className="h-4 w-4 text-blue-400" />}
                                         variant="bordered"
                                         required
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
 
                                     <Input
                                         name="email"
                                         label="Email Address"
                                         defaultValue={userProfile.email}
-                                        startContent={<Mail className="h-4 w-4 text-pink-500" />}
+                                        startContent={<Mail className="h-4 w-4 text-blue-400" />}
                                         variant="bordered"
                                         disabled
                                         description="Email cannot be changed"
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-muted",
+                                            description: "text-dashboard-muted"
+                                        }}
                                     />
 
                                     <Input
                                         name="phone"
                                         label="Phone Number"
                                         defaultValue={userProfile.phone}
-                                        startContent={<Phone className="h-4 w-4 text-pink-500" />}
+                                        startContent={<Phone className="h-4 w-4 text-blue-400" />}
                                         variant="bordered"
                                         placeholder="Enter your phone number"
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                     />
 
                                     <Input
                                         label="Department"
                                         value={userProfile.department}
-                                        startContent={<Building className="h-4 w-4 text-pink-500" />}
+                                        startContent={<Building className="h-4 w-4 text-blue-400" />}
                                         variant="bordered"
                                         disabled
                                         description="Department is managed by administrators"
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-muted",
+                                            description: "text-dashboard-muted"
+                                        }}
                                     />
 
                                     <Input
                                         label="Role"
                                         value={userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)}
-                                        startContent={<User className="h-4 w-4 text-pink-500" />}
+                                        startContent={<User className="h-4 w-4 text-blue-400" />}
                                         variant="bordered"
                                         disabled
                                         description="Role is managed by administrators"
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-muted",
+                                            description: "text-dashboard-muted"
+                                        }}
                                     />
 
                                     <Input
                                         label="Date Joined"
                                         value={userProfile.dateJoined}
-                                        startContent={<Calendar className="h-4 w-4 text-pink-500" />}
+                                        startContent={<Calendar className="h-4 w-4 text-blue-400" />}
                                         variant="bordered"
                                         disabled
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-muted"
+                                        }}
                                     />
                                 </div>
 
                                 <Button
                                     type="submit"
                                     color="primary"
-                                    className="mt-6 bg-pink-500 hover:bg-pink-600"
+                                    className="mt-6 bg-blue-500 hover:bg-blue-600 text-white"
                                     disabled={isSubmitting}
                                     fullWidth
                                 >
@@ -295,15 +322,15 @@ export default function Settings() {
                     </Card>
 
                     {/* Change Password Card */}
-                    <Card className="shadow-md">
+                    <Card className="bg-dashboard-secondary border border-white/20">
                         <CardHeader className="pb-3">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-pink-100 rounded-full">
-                                    <Key className="h-5 w-5 text-pink-500" />
+                                <div className="p-2 bg-blue-500/20 rounded-full">
+                                    <Key className="h-5 w-5 text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-semibold">Change Password</h2>
-                                    <p className="text-gray-600 text-sm">Update your account password</p>
+                                    <h2 className="text-xl font-semibold text-dashboard-primary">Change Password</h2>
+                                    <p className="text-dashboard-secondary text-sm">Update your account password</p>
                                 </div>
                             </div>
                         </CardHeader>
@@ -318,6 +345,10 @@ export default function Settings() {
                                         type={showCurrentPassword ? "text" : "password"}
                                         variant="bordered"
                                         required
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                         endContent={
                                             <button
                                                 type="button"
@@ -325,9 +356,9 @@ export default function Settings() {
                                                 className="focus:outline-none"
                                             >
                                                 {showCurrentPassword ? (
-                                                    <EyeOff className="h-4 w-4 text-gray-400" />
+                                                    <EyeOff className="h-4 w-4 text-dashboard-muted" />
                                                 ) : (
-                                                    <Eye className="h-4 w-4 text-gray-400" />
+                                                    <Eye className="h-4 w-4 text-dashboard-muted" />
                                                 )}
                                             </button>
                                         }
@@ -340,6 +371,11 @@ export default function Settings() {
                                         variant="bordered"
                                         required
                                         description="Password must be at least 6 characters long"
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
+                                            description: "text-dashboard-muted"
+                                        }}
                                         endContent={
                                             <button
                                                 type="button"
@@ -347,9 +383,9 @@ export default function Settings() {
                                                 className="focus:outline-none"
                                             >
                                                 {showNewPassword ? (
-                                                    <EyeOff className="h-4 w-4 text-gray-400" />
+                                                    <EyeOff className="h-4 w-4 text-dashboard-muted" />
                                                 ) : (
-                                                    <Eye className="h-4 w-4 text-gray-400" />
+                                                    <Eye className="h-4 w-4 text-dashboard-muted" />
                                                 )}
                                             </button>
                                         }
@@ -361,6 +397,10 @@ export default function Settings() {
                                         type={showConfirmPassword ? "text" : "password"}
                                         variant="bordered"
                                         required
+                                        classNames={{
+                                            label: "text-dashboard-primary !text-white",
+                                            inputWrapper: "bg-dashboard-tertiary border border-white/20 text-dashboard-primary"
+                                        }}
                                         endContent={
                                             <button
                                                 type="button"
@@ -368,9 +408,9 @@ export default function Settings() {
                                                 className="focus:outline-none"
                                             >
                                                 {showConfirmPassword ? (
-                                                    <EyeOff className="h-4 w-4 text-gray-400" />
+                                                    <EyeOff className="h-4 w-4 text-dashboard-muted" />
                                                 ) : (
-                                                    <Eye className="h-4 w-4 text-gray-400" />
+                                                    <Eye className="h-4 w-4 text-dashboard-muted" />
                                                 )}
                                             </button>
                                         }
@@ -380,7 +420,7 @@ export default function Settings() {
                                 <Button
                                     type="submit"
                                     color="primary"
-                                    className="mt-6 bg-pink-500 hover:bg-pink-600"
+                                    className="mt-6 bg-blue-500 hover:bg-blue-600 text-white"
                                     disabled={isSubmitting}
                                     fullWidth
                                 >
@@ -399,27 +439,27 @@ export default function Settings() {
                 </div>
 
                 {/* Security Information */}
-                <Card className="mt-6 shadow-md">
+                <Card className="mt-6 bg-dashboard-secondary border border-white/20">
                     <CardHeader>
-                        <h3 className="text-lg font-semibold">Security Information</h3>
+                        <h3 className="text-lg font-semibold text-dashboard-primary">Security Information</h3>
                     </CardHeader>
                     <CardBody>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <p className="font-medium text-gray-700">Account Status</p>
-                                <p className="text-green-600">Active</p>
+                                <p className="font-medium text-dashboard-primary">Account Status</p>
+                                <p className="text-green-400">Active</p>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-700">Last Login</p>
-                                <p className="text-gray-600">Today</p>
+                                <p className="font-medium text-dashboard-primary">Last Login</p>
+                                <p className="text-dashboard-secondary">Today</p>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-700">Account Type</p>
-                                <p className="text-gray-600 capitalize">{userProfile.role}</p>
+                                <p className="font-medium text-dashboard-primary">Account Type</p>
+                                <p className="text-dashboard-secondary capitalize">{userProfile.role}</p>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-700">Two-Factor Authentication</p>
-                                <p className="text-gray-500">Not enabled</p>
+                                <p className="font-medium text-dashboard-primary">Two-Factor Authentication</p>
+                                <p className="text-dashboard-muted">Not enabled</p>
                             </div>
                         </div>
                     </CardBody>

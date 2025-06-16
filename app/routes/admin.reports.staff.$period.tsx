@@ -465,17 +465,17 @@ const StaffReportPage = () => {
 
                         {/* All Assigned Tasks */}
                         {report.summary.assignedTasksList && report.summary.assignedTasksList.length > 0 && (
-                        <Card>
+                        <Card className="bg-dashboard-secondary border border-white/10">
                             <CardHeader>
-                                <h2 className="text-xl font-semibold">All Assigned Tasks ({year})</h2>
+                                <h2 className="text-xl font-semibold text-dashboard-primary">All Assigned Tasks ({year})</h2>
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-3">
                                     {report.summary.assignedTasksList.map((task: any) => (
-                                        <div key={task._id} className="flex justify-between items-center p-4 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div key={task._id} className="flex justify-between items-center p-4 bg-dashboard-tertiary border border-white/10 rounded-lg hover:bg-dashboard-tertiary/80 transition-colors">
                                             <div className="flex-grow">
-                                                <h5 className="font-semibold text-gray-900">{task.title}</h5>
-                                                <div className="text-sm text-gray-600 mt-1">
+                                                <h5 className="font-semibold text-dashboard-primary">{task.title}</h5>
+                                                <div className="text-sm text-dashboard-secondary mt-1">
                                                     <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                                                     {task.createdBy && (
                                                         <span className="ml-4">• Assigned by: {task.createdBy.firstName} {task.createdBy.lastName}</span>
@@ -509,53 +509,53 @@ const StaffReportPage = () => {
                         )}
 
                         {/* Period Breakdown */}
-                        <Card>
+                        <Card className="bg-dashboard-secondary border border-white/10">
                             <CardHeader>
-                                <h2 className="text-xl font-semibold">{periodLabels[period as keyof typeof periodLabels]} Performance</h2>
+                                <h2 className="text-xl font-semibold text-dashboard-primary">{periodLabels[period as keyof typeof periodLabels]} Performance</h2>
                             </CardHeader>
                             <CardBody>
                                 <div className="space-y-6">
                                     {report.periodBreakdown && Object.entries(report.periodBreakdown)
                                         .filter(([periodName, data]) => periodName && data)
                                         .map(([periodName, data]: [string, any]) => (
-                                        <div key={periodName || 'unknown'} className="border rounded-lg p-4">
+                                        <div key={periodName || 'unknown'} className="border border-white/20 rounded-lg p-4 bg-dashboard-tertiary">
                                             <div className="flex justify-between items-center mb-4">
-                                                <h3 className="text-lg font-semibold">
+                                                <h3 className="text-lg font-semibold text-dashboard-primary">
                                                     {periodName || 'Unknown Period'}
                                                 </h3>
-                                                <div className="text-sm text-gray-600">
+                                                <div className="text-sm text-dashboard-secondary">
                                                     {new Date(data.dateRange.start).toLocaleDateString()} - {new Date(data.dateRange.end).toLocaleDateString()}
                                                 </div>
                                             </div>
                                             
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                                <div className="text-center p-3 bg-blue-50 rounded">
-                                                    <p className="text-xl font-bold text-blue-600">{data.totalActivities}</p>
-                                                    <p className="text-sm text-blue-600">Activities</p>
+                                                <div className="text-center p-3 bg-blue-500/20 border border-blue-400/30 rounded">
+                                                    <p className="text-xl font-bold text-blue-400">{data.totalActivities}</p>
+                                                    <p className="text-sm text-blue-300">Activities</p>
                                                 </div>
-                                                <div className="text-center p-3 bg-green-50 rounded">
-                                                    <p className="text-xl font-bold text-green-600">{data.totalHours.toFixed(1)}</p>
-                                                    <p className="text-sm text-green-600">Hours</p>
+                                                <div className="text-center p-3 bg-green-500/20 border border-green-400/30 rounded">
+                                                    <p className="text-xl font-bold text-green-400">{data.totalHours.toFixed(1)}</p>
+                                                    <p className="text-sm text-green-300">Hours</p>
                                                 </div>
-                                                <div className="text-center p-3 bg-purple-50 rounded">
-                                                    <p className="text-xl font-bold text-purple-600">{data.activityStats?.length || 0}</p>
-                                                    <p className="text-sm text-purple-600">Activity Types</p>
+                                                <div className="text-center p-3 bg-purple-500/20 border border-purple-400/30 rounded">
+                                                    <p className="text-xl font-bold text-purple-400">{data.activityStats?.length || 0}</p>
+                                                    <p className="text-sm text-purple-300">Activity Types</p>
                                                 </div>
-                                                <div className="text-center p-3 bg-orange-50 rounded">
-                                                    <p className="text-xl font-bold text-orange-600">{data.assignedTasks || 0}</p>
-                                                    <p className="text-sm text-orange-600">Assigned Tasks</p>
+                                                <div className="text-center p-3 bg-orange-500/20 border border-orange-400/30 rounded">
+                                                    <p className="text-xl font-bold text-orange-400">{data.assignedTasks || 0}</p>
+                                                    <p className="text-sm text-orange-300">Assigned Tasks</p>
                                                 </div>
                                             </div>
 
                                             {data.activityStats && data.activityStats.length > 0 && (
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                                                     {data.activityStats.map((activity: any) => (
-                                                        <div key={activity._id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                                            <span className="font-medium">{formatActivityType(activity._id)}</span>
+                                                        <div key={activity._id} className="flex justify-between items-center p-2 bg-dashboard-secondary border border-white/10 rounded">
+                                                            <span className="font-medium text-dashboard-primary">{formatActivityType(activity._id)}</span>
                                                             <div className="text-right">
-                                                                <span className="font-bold">{activity.count}</span>
+                                                                <span className="font-bold text-dashboard-primary">{activity.count}</span>
                                                                 {activity.totalHours > 0 && (
-                                                                    <span className="text-sm text-gray-600 ml-2">({activity.totalHours.toFixed(1)}h)</span>
+                                                                    <span className="text-sm text-dashboard-secondary ml-2">({activity.totalHours.toFixed(1)}h)</span>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -566,13 +566,13 @@ const StaffReportPage = () => {
                                             {/* Assigned Tasks for this period */}
                                             {data.tasksList && data.tasksList.length > 0 && (
                                                 <div className="mt-4">
-                                                    <h4 className="font-semibold mb-3">Assigned Tasks in this Period</h4>
+                                                    <h4 className="font-semibold mb-3 text-dashboard-primary">Assigned Tasks in this Period</h4>
                                                     <div className="space-y-2">
                                                         {data.tasksList.map((task: any) => (
-                                                            <div key={task._id} className="flex justify-between items-center p-3 bg-white border rounded-lg">
+                                                            <div key={task._id} className="flex justify-between items-center p-3 bg-dashboard-secondary border border-white/10 rounded-lg hover:bg-dashboard-secondary/80 transition-colors">
                                                                 <div className="flex-grow">
-                                                                    <h5 className="font-medium text-gray-900">{task.title}</h5>
-                                                                    <p className="text-sm text-gray-600">
+                                                                    <h5 className="font-medium text-dashboard-primary">{task.title}</h5>
+                                                                    <p className="text-sm text-dashboard-secondary">
                                                                         Due: {new Date(task.dueDate).toLocaleDateString()}
                                                                         {task.createdBy && (
                                                                             <span className="ml-2">• Assigned by: {task.createdBy.firstName} {task.createdBy.lastName}</span>

@@ -120,7 +120,7 @@ const Home = () => {
               className="w-full h-full object-cover opacity-60"
             />
 
-            <div className="absolute inset-0 bg-black/50"></div>
+            <div className="absolute inset-0 bg-black/40"></div>
           </div>
 
           {/* Animated Background Elements */}

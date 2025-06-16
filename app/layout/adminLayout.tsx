@@ -271,7 +271,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
-                
+
                 <nav
                     className="flex flex-col flex-1 px-2 py-4 space-y-6 overflow-y-auto"
                     style={{
@@ -307,7 +307,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         }
 
                         {/* Task Management Accordion */}
-                        <li 
+                        <li
                             className={`bg-sidebar-item hover:bg-sidebar-item:hover py-3 font-nunito p-1 rounded-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-dashboard-secondary text-sm cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}
                             onClick={handleTaskAccordionToggle}
                             data-task-accordion
@@ -350,7 +350,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         )}
 
                         {/* Leave Management Accordion */}
-                        <li 
+                        <li
                             className={`bg-sidebar-item hover:bg-sidebar-item:hover py-3 font-nunito p-1 rounded-lg flex items-center gap-4 transition-all duration-300 ease-in-out text-dashboard-secondary text-sm cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}
                             onClick={handleLeaveAccordionToggle}
                             data-leave-accordion
@@ -470,26 +470,28 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                     <ChevronDown className="h-4 w-4 text-dashboard-secondary" />
                                 </div>
                             </DropdownTrigger>
-                            <DropdownMenu 
+                            <DropdownMenu
                                 aria-label="User menu"
                                 className="bg-dashboard-secondary border border-white/20"
                             >
-                                <DropdownItem 
-                                    key="profile" 
+                                <DropdownItem
+                                    key="profile"
                                     className="text-white hover:bg-dashboard-tertiary"
                                     startContent={<User className="h-4 w-4" />}
                                 >
                                     Profile
                                 </DropdownItem>
-                                <DropdownItem 
-                                    key="settings" 
+                                <DropdownItem
+                                    key="settings"
                                     className="text-white hover:bg-dashboard-tertiary"
                                     startContent={<Settings className="h-4 w-4" />}
                                 >
-                                    Settings
+                                    <Link to="/admin/settings">
+                                        Settings
+                                    </Link>
                                 </DropdownItem>
-                                <DropdownItem 
-                                    key="logout" 
+                                <DropdownItem
+                                    key="logout"
                                     className="text-red-400 hover:bg-red-900/20"
                                     startContent={<LogOut className="h-4 w-4" />}
                                     onClick={async () => {
@@ -500,12 +502,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                                     'Content-Type': 'application/json',
                                                 },
                                             });
-                                            
+
                                             if (response.ok) {
                                                 // Clear any local storage or session data if needed
                                                 localStorage.clear();
                                                 sessionStorage.clear();
-                                                
+
                                                 // Redirect to login page
                                                 window.location.href = '/addentech-login';
                                             } else {
