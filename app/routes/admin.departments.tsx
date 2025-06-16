@@ -154,6 +154,7 @@ const Category = () => {
                             <input name="id" value={dataValue?._id} type="hidden" />
 
                             <Textarea
+                                variant="bordered"
                                 autoFocus
                                 label="Department description"
                                 labelPlacement="outside"
@@ -192,6 +193,7 @@ const Category = () => {
                         <input hidden name="intent" value="create" type="" />
 
                         <Textarea
+                            variant="bordered"
                             autoFocus
                             label="Department description"
                             labelPlacement="outside"
@@ -205,7 +207,7 @@ const Category = () => {
                         />
 
                         <button onClick={() => {
-                        }} type="submit" className="mt-10 h-10 text-white bg-pink-500 rounded-xl font-nunito px-4">
+                        }} type="submit" className="mt-10 h-10 text-white bg-action-primary rounded-xl font-nunito px-4">
                             Submit
                         </button>
                     </Form>

@@ -92,6 +92,7 @@ const Users = () => {
 
     const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
     const modules = {
+        // toolbar color and background
         toolbar: [
             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
@@ -478,7 +479,7 @@ const Users = () => {
                         <input name="currentPage" value={currentPage} type="hidden" />
 
 
-                        <Button size="sm" type="submit" className="rounded-xl bg-action-primary text-white text-sm font-nunito h-10 w-40 px-4" onClick={() => {
+                        <Button size="sm" type="submit" className="rounded-xl bg-action-primary text-white text-sm mt-20 font-nunito h-10 w-40 px-4" onClick={() => {
                             setIsEditModalOpened(false)
                         }}>
                             Update
@@ -492,7 +493,6 @@ const Users = () => {
             <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create User">
                 <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
                     <CustomInput
-                        className="!text-white"
                         label="First name"
                         isClearable
                         name="firstname"
@@ -555,6 +555,7 @@ const Users = () => {
                     </div>
                     <div className="">
                         <Select
+                        variant="bordered"
                             label="Role"
                             labelPlacement="outside"
                             className="!text-white"
@@ -564,7 +565,7 @@ const Users = () => {
                             classNames={{
                                 label: "font-nunito text-sm !text-white",
                                 popoverContent: "z-[10000] bg-dashboard-secondary shadow-sm border border-white/20 font-nunito ",
-                                trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white  "
+                                trigger: " shadow-sm text-gray-400  border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white  "
                             }}
                         >
                             {[
@@ -580,6 +581,7 @@ const Users = () => {
 
                     <div className="flex gap-4">
                         <Select
+                            variant="bordered"
                             label="Departments"
                             labelPlacement="outside"
                             placeholder=" "
@@ -588,7 +590,7 @@ const Users = () => {
                             classNames={{
                                 label: "font-nunito text-sm !text-white",
                                 popoverContent: "z-[10000]  bg-dashboard-secondary shadow-sm  border border-white/20 font-nunito ",
-                                trigger: "   shadow-sm   border border-white/20  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full text-white "
+                                trigger: "shadow-sm text-gray-400  border border-white/20  hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full !text-white "
                             }}
                         >
                             {departments.map((department: DepartmentInterface, index: number) => (
@@ -662,7 +664,7 @@ const Users = () => {
                     <input name="base64Image" value={base64Image} type="hidden" />
                     <input name="currentPage" value={currentPage} type="hidden" />
 
-                    <button type="submit" className="rounded-xl bg-action-primary text-white text-sm font-nunito h-10 w-40 px-4">
+                    <button type="submit" className="rounded-xl bg-action-primary text-white text-sm font-nunito mt-20 h-10 w-40 px-4">
                         Submit
                     </button>
                 </Form>

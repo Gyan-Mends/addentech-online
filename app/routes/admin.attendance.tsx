@@ -803,43 +803,50 @@ export default function AttendancePage() {
           {/* Work Mode Management (Admins and Managers only) */}
           {loaderData.isAdmin && (
             <div className="mb-8 p-4 bg-dashboard-secondary border border-white/20 rounded-lg shadow">
-              <h2 className="text-lg font-semibold text-white mb-4">Manage Work Modes</h2>
-              <Form method="post" className="flex flex-col space-y-4">
-                <input type="hidden" name="_action" value="updateWorkMode" />
+              <h2 className="text-lg font-semibold text-white mb-4">Admin Controls</h2>
+              
+              {/* Work Mode Management */}
+              <div className="mb-6">
+                <h3 className="text-md font-semibold text-white mb-3">Manage Work Modes</h3>
+                <Form method="post" className="flex flex-col space-y-4">
+                  <input type="hidden" name="_action" value="updateWorkMode" />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-1">Select User</label>
-                    <select name="targetUserId" className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
-                      <option value="">Choose a user</option>
-                      {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
-                        <option key={user._id} value={user._id}>
-                          {user.firstName} {user.lastName} - {user.workMode === "in-house" ? "In-House" : "Remote"}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-1">Select User</label>
+                      <select name="targetUserId" className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
+                        <option value="">Choose a user</option>
+                        {loaderData.allUsers && loaderData.allUsers.map((user: any) => (
+                          <option key={user._id} value={user._id}>
+                            {user.firstName} {user.lastName} - {user.workMode === "in-house" ? "In-House" : "Remote"}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-1">Work Mode</label>
-                    <select name="newWorkMode" className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
-                      <option value="">Select work mode</option>
-                      <option value="in-house">In-House</option>
-                      <option value="remote">Remote</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-1">Work Mode</label>
+                      <select name="newWorkMode" className="w-full px-3 py-2 border border-white/20 bg-dashboard-secondary rounded-md !text-white" required>
+                        <option value="">Select work mode</option>
+                        <option value="in-house">In-House</option>
+                        <option value="remote">Remote</option>
+                      </select>
+                    </div>
 
-                  <div className="flex items-end">
-                    <Button
-                      type="submit"
-                      className="bg-blue-500 text-white w-full"
-                      isLoading={isLoading}
-                    >
-                      Update Work Mode
-                    </Button>
+                    <div className="flex items-end">
+                      <Button
+                        type="submit"
+                        className="bg-blue-500 text-white w-full"
+                        isLoading={isLoading}
+                      >
+                        Update Work Mode
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Form>
+                </Form>
+              </div>
+
+
             </div>
           )}
 

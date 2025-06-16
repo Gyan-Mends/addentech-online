@@ -3,42 +3,176 @@ import Attendance from "~/modal/attendance";
 import Registration from "~/modal/registration";
 import { scheduleJob } from "node-schedule";
 
-// Schedule auto-checkout job to run every day at 6pm
-scheduleJob('0 18 * * *', async function() {
-  try {
-    console.log('Running automatic checkout at 6pm');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Find all attendance records from today that don't have checkout times
-    const records = await Attendance.find({
-      date: {
-        $gte: today,
-        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-      },
-      checkOutTime: { $exists: false }
-    });
-    
-    console.log(`Found ${records.length} attendance records without checkout`);
-    
-    // Auto checkout each record
-    const checkOutTime = new Date();
-    for (const record of records) {
-      const checkInTime = new Date(record.checkInTime);
-      const workHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+class AttendanceController {
+  constructor() {
+    // Initialize the auto-checkout job when the controller is created
+    this.initializeAutoCheckoutJob();
+  }
+
+  // Initialize the scheduled job for auto-checkout
+  private initializeAutoCheckoutJob() {
+    try {
+      // Schedule auto-checkout job to run every day at 6pm (18:00)
+      scheduleJob('auto-checkout-6pm', '0 18 * * *', async () => {
+        console.log('Running automatic checkout at 6pm');
+        await this.performAutoCheckout();
+      });
       
-      record.checkOutTime = checkOutTime;
-      record.workHours = parseFloat(workHours.toFixed(2));
-      await record.save();
+      console.log('Auto-checkout job scheduled for 6:00 PM daily');
+      console.log('Note: If auto-checkout is not working, you can manually trigger it from the admin panel');
+    } catch (error) {
+      console.error('Error scheduling auto-checkout job:', error);
+      console.log('Auto-checkout scheduling failed. Manual trigger is still available in admin panel.');
+    }
+  }
+
+  // Manual method to perform auto-checkout (can be called manually for testing)
+  async performAutoCheckout() {
+    try {
+      console.log('Starting automatic checkout process...');
+      const now = new Date();
+      console.log('Current time:', now.toISOString());
+      
+      // Create date range for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      
+      // Also create a range for the last 7 days to catch any missed checkouts
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      
+      console.log('Date ranges:', {
+        today: { start: today.toISOString(), end: tomorrow.toISOString() },
+        lastWeek: { start: weekAgo.toISOString(), end: tomorrow.toISOString() }
+      });
+      
+      // First, let's see all attendance records without checkout
+      const allRecordsWithoutCheckout = await Attendance.find({
+        checkOutTime: { $exists: false }
+      }).populate('user', 'firstName lastName email');
+      
+      console.log(`Total records without checkout: ${allRecordsWithoutCheckout.length}`);
+      allRecordsWithoutCheckout.forEach(record => {
+        console.log(`Record: ${(record.user as any)?.firstName} ${(record.user as any)?.lastName}, Date: ${record.date}, CheckIn: ${record.checkInTime}`);
+      });
+      
+      // Find all attendance records from today that don't have checkout times
+      const todayRecords = await Attendance.find({
+        date: {
+          $gte: today,
+          $lt: tomorrow,
+        },
+        checkOutTime: { $exists: false }
+      }).populate('user', 'firstName lastName email');
+      
+      console.log(`Found ${todayRecords.length} attendance records from today without checkout`);
+      
+      // Find records from the last week that don't have checkout times
+      const recentRecords = await Attendance.find({
+        date: {
+          $gte: weekAgo,
+          $lt: tomorrow,
+        },
+        checkOutTime: { $exists: false }
+      }).populate('user', 'firstName lastName email');
+      
+      console.log(`Found ${recentRecords.length} attendance records from last week without checkout`);
+      
+      // Process records (prioritize today's records, then recent ones)
+      let recordsToProcess = [];
+      
+      if (todayRecords.length > 0) {
+        console.log('Processing today\'s records first...');
+        recordsToProcess = todayRecords;
+      } else if (recentRecords.length > 0) {
+        console.log('No today\'s records found, processing recent records...');
+        recordsToProcess = recentRecords;
+      } else {
+        // If no records found with date range, try alternative approach
+        console.log('No records found with date ranges, trying alternative approach...');
+        
+        // Try finding records where the date field is recent (regardless of time)
+        const todayString = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+        const alternativeRecords = await Attendance.find({
+          checkOutTime: { $exists: false }
+        }).populate('user', 'firstName lastName email');
+        
+        // Filter records manually by checking if the date is recent
+        const recentAlternativeRecords = alternativeRecords.filter(record => {
+          const recordDate = new Date(record.date);
+          const recordDateString = recordDate.toISOString().split('T')[0];
+          const daysDiff = (today.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24);
+          return daysDiff >= 0 && daysDiff <= 7; // Within last 7 days
+        });
+        
+        console.log(`Found ${recentAlternativeRecords.length} records using alternative date matching`);
+        recordsToProcess = recentAlternativeRecords;
+      }
+      
+      if (recordsToProcess.length > 0) {
+        return await this.processCheckoutRecords(recordsToProcess);
+      }
+      
+      console.log('No records to auto-checkout');
+      return {
+        success: true,
+        message: 'No records to auto-checkout',
+        count: 0
+      };
+    } catch (error: any) {
+      console.error('Error in auto-checkout process:', error);
+      return {
+        success: false,
+        message: `Error in auto-checkout: ${error.message}`,
+        count: 0
+      };
+    }
+  }
+
+  // Helper method to process checkout records
+  private async processCheckoutRecords(records: any[]) {
+    console.log(`Processing ${records.length} records for checkout`);
+    
+    // Auto checkout each record at 6:00 PM
+    const checkOutTime = new Date();
+    checkOutTime.setHours(18, 0, 0, 0); // Set to exactly 6:00 PM
+    
+    let successCount = 0;
+    
+    for (const record of records) {
+      try {
+        console.log(`Processing record for user: ${(record.user as any)?.firstName} ${(record.user as any)?.lastName}`);
+        console.log(`Record details: ID=${record._id}, CheckIn=${record.checkInTime}, Date=${record.date}`);
+        
+        const checkInTime = new Date(record.checkInTime);
+        const workHours = (checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60);
+        
+        // Ensure work hours is not negative
+        const validWorkHours = Math.max(0, workHours);
+        
+        record.checkOutTime = checkOutTime;
+        record.workHours = parseFloat(validWorkHours.toFixed(2));
+        
+        const savedRecord = await record.save();
+        console.log(`Successfully saved checkout for record ${record._id}`);
+        
+        successCount++;
+        console.log(`Auto-checked out user: ${(record.user as any)?.firstName} ${(record.user as any)?.lastName} - Work hours: ${validWorkHours.toFixed(2)}`);
+      } catch (error: any) {
+        console.error(`Error auto-checking out record ${record._id}:`, error);
+      }
     }
     
-    console.log(`Auto-checked out ${records.length} users`);
-  } catch (error) {
-    console.error('Error in auto-checkout job:', error);
+    console.log(`Auto-checked out ${successCount} out of ${records.length} users`);
+    
+    return {
+      success: true,
+      message: `Auto-checked out ${successCount} users`,
+      count: successCount,
+      total: records.length
+    };
   }
-});
 
-class AttendanceController {
   // Helper method to calculate distance between two coordinates using Haversine formula
   private calculateDistance(
     lat1: number,
