@@ -54,14 +54,14 @@ const About = () => {
                 >
                     {/* Background overlay */}
                     <div className="absolute inset-0 bg-black/50"></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-600/20"></div>
+                    
                     <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                     <div className="container relative">
                         <div className="max-w-3xl mx-auto text-center mb-12">
                             <ScrollAnimation>
                                 <h1 className="text-4xl font-montserrat md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter mb-6 text-white drop-shadow-lg">
-                                    <span className="text-pink-400">Transforming </span>The Legal Landscape With{" "}
-                                    <span className="text-pink-400">
+                                    <span className="">Transforming </span>The Legal Landscape With{" "}
+                                    <span className="">
                                         Technology
                                     </span>
                                 </h1>

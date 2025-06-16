@@ -470,96 +470,7 @@ const Users = () => {
                                     className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
                                 />
                             </div>
-
-                            <Divider className="mt-28" />
-
-                            <div className="flex flex-col gap-6">
-                                <p className="!text-white">Professional Experience </p>
-                                <CustomInput
-                                    className="!text-white"
-                                    defaultValue={dataValue.institution}
-                                    label=" Institution"
-                                    isRequired
-                                    name="institution"
-                                    isClearable
-                                    placeholder=" "
-                                    type="text"
-                                    labelPlacement="outside"
-
-                                />
-                                <div className="flex gap-4">
-                                    <CustomInput
-                                        className="!text-white"
-                                        defaultValue={dataValue.positionInstitution}
-                                        label=" Position_institution"
-                                        isRequired
-                                        name="position_institution"
-                                        isClearable
-                                        placeholder=" "
-                                        type="text"
-                                        labelPlacement="outside"
-
-                                    />
-                                    <CustomInput
-                                        className="!text-white"
-                                        defaultValue={dataValue.dateCompletedInstitution}
-                                        label=" Date Completed"
-                                        isRequired
-                                        name="date_completed"
-                                        isClearable
-                                        placeholder=" "
-                                        type="date"
-                                        labelPlacement="outside"
-
-                                    />
-
-                                </div>
-                            </div>
-                            <Divider className="mt-6" />
-                            <div className="flex flex-col gap-6 mt-4">
-                                <p className="!text-white">Education Background</p>
-                                <CustomInput
-                                    className="!text-white"
-                                    defaultValue={dataValue.institutionName}
-                                    label="Intution Name"
-                                    isRequired
-                                    name="institution_name"
-                                    isClearable
-                                    placeholder=" "
-                                    type="text"
-                                    labelPlacement="outside"
-
-                                />
-                                <div className="flex gap-4">
-                                    <CustomInput
-                                        className="!text-white"
-                                        defaultValue={dataValue.positionInstitution}
-                                        label=" Program"
-                                        isRequired
-                                        name="program"
-                                        isClearable
-                                        placeholder=" "
-                                        type="text"
-                                        labelPlacement="outside"
-
-                                    />
-                                    <CustomInput
-                                        className="!text-white"
-                                        defaultValue={dataValue.dateCompletedProgram}
-                                        label="Date Completed"
-                                        name="date_c"
-                                        isClearable
-                                        placeholder=" "
-                                        type="date"
-                                        labelPlacement="outside"
-
-                                    />
-
-                                </div>
-                            </div>
                         </div>
-
-
 
                         <input name="admin" value={user?._id} type="hidden" />
                         <input name="intent" value="update" type="hidden" />
@@ -598,7 +509,6 @@ const Users = () => {
                             isClearable
                             type="text"
                             labelPlacement="outside"
-
                         />
                         <CustomInput
                             className="!text-white"
@@ -624,25 +534,23 @@ const Users = () => {
                     <div className="flex gap-4">
                         <CustomInput
                             className="!text-white"
-                            label=" Phone"
+                            label="Phone"
                             isRequired
                             name="phone"
                             isClearable
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
-
                         />
                         <CustomInput
                             className="!text-white"
-                            label=" Password"
+                            label="Password"
                             isRequired
                             name="password"
                             isClearable
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
-
                         />
                     </div>
                     <div className="">
@@ -690,14 +598,13 @@ const Users = () => {
 
                         <CustomInput
                             className="!text-white"
-                            label=" Position"
+                            label="Position"
                             isRequired
                             name="position"
                             isClearable
                             placeholder=" "
                             type="text"
                             labelPlacement="outside"
-
                         />
                     </div>
 
@@ -748,88 +655,6 @@ const Users = () => {
                                 className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
                             />
                         </div>
-
-                        <Divider className="mt-28" />
-
-                        <div className="flex flex-col gap-6">
-                            <p className="text-white">Professional Experience </p>
-                            <CustomInput
-                                className="!text-white"
-                                label=" Institution"
-                                isRequired
-                                name="institution"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
-                            <div className="flex gap-4">
-                                <CustomInput
-                                    className="!text-white"
-                                    label=" Position_institution"
-                                    isRequired
-                                    name="position_institution"
-                                    isClearable
-                                    placeholder=" "
-                                    type="text"
-                                    labelPlacement="outside"
-
-                                />
-                                <CustomInput
-                                    className="!text-white"
-                                    label=" Date Completed"
-                                    isRequired
-                                    name="date_completed"
-                                    isClearable
-                                    placeholder=" "
-                                    type="date"
-                                    labelPlacement="outside"
-
-                                />
-
-                            </div>
-                        </div>
-                        <Divider className="mt-6" />
-                        <div className="flex flex-col gap-6 mt-4">
-                            <p className="text-white">Education Background</p>
-                            <CustomInput
-                                className="!text-white"
-                                label="Intution Name"
-                                isRequired
-                                name="institution_name"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            />
-                            <div className="flex gap-4">
-                                <CustomInput
-                                    className="!text-white"
-                                    label=" Program"
-                                    isRequired
-                                    name="program"
-                                    isClearable
-                                    placeholder=" "
-                                    type="text"
-                                    labelPlacement="outside"
-
-                                />
-                                <CustomInput
-                                    className="!text-white"
-                                    label="Date Completed"
-                                    isRequired
-                                    name="date_c"
-                                    isClearable
-                                    placeholder=" "
-                                    type="date"
-                                    labelPlacement="outside"
-
-                                />
-
-                            </div>
-                        </div>
                     </div>
 
                     <input name="admin" value={user?._id} type="hidden" />
@@ -864,15 +689,7 @@ export const action: ActionFunction = async ({ request }) => {
     const department = formData.get("department") as string;
     const id = formData.get("id") as string;
     const bio = formData.get("bio") as string;
-    const institution = formData.get("institution") as string;
-    const positionInstitution = formData.get("position_institution") as string;
-    const dateCompletedInstitution = formData.get("date_completed") as string;
-    const institutionName = formData.get("institution_name") as string;
-    const program = formData.get("program") as string;
-    const dateCompletedProgram = formData.get("date_c") as string;
     const currentPage = formData.get("currentPage") as string;
-
-
 
     switch (intent) {
         case "create":
@@ -890,15 +707,8 @@ export const action: ActionFunction = async ({ request }) => {
                 department,
                 base64Image,
                 bio,
-                institutionName,
-                program,
-                dateCompletedProgram,
-                institution,
-                positionInstitution,
-                dateCompletedInstitution,
             });
             return user;
-
 
         case "delete":
             const deleteUser = await usersController.DeleteUser({
@@ -920,12 +730,6 @@ export const action: ActionFunction = async ({ request }) => {
                 base64Image,
                 id,
                 bio,
-                institutionName,
-                program,
-                dateCompletedProgram,
-                institution,
-                positionInstitution,
-                dateCompletedInstitution,
             })
             return updateUser
         case "logout":

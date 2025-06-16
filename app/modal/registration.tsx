@@ -107,32 +107,8 @@ const RegistrationSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
-  // New fields for education background
+  // Bio field
   bio: {
-    required: false,
-    type: String,
-  },
-  institutionName: {
-    required: false,
-    type: String,
-  },
-  program: {
-    required: false,
-    type: String,
-  },
-  dateCompletedProgram: {
-    required: false,
-    type: String,
-  },
-  institution: {
-    required: false,
-    type: String,
-  },
-  positionInstitution: {
-    required: false,
-    type: String,
-  },
-  dateCompletedInstitution: {
     required: false,
     type: String,
   },

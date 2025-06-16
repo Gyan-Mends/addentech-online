@@ -136,6 +136,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     const [isCollapsed, setIsCollapsed] = useState(false); // Desktop sidebar collapse toggle
     const [userRole, setUserRole] = useState<string>("staff");
     const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
+    const [userProfile, setUserProfile] = useState<any>(null); // Store complete user profile data
     const [isLeaveDropdownOpen, setIsLeaveDropdownOpen] = useState(false);
     const [isTaskDropdownOpen, setIsTaskDropdownOpen] = useState(false);
     const navigation = useNavigation();
@@ -219,6 +220,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 if (response.ok) {
                     const userData = await response.json();
                     setUserRole(userData.role || "staff");
+                    setUserProfile(userData); // Store complete user profile data
 
                     // Set user permissions
                     if (userData.permissions) {
@@ -227,7 +229,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
                     console.log("User profile loaded:", {
                         role: userData.role,
-                        permissions: userData.permissions
+                        permissions: userData.permissions,
+                        profile: userData
                     });
                 }
             } catch (error) {
@@ -430,7 +433,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                     <div className="flex-1 max-w-md mx-2 sm:mx-4 rounded hidden sm:block">
                         <Input
                             startContent={
-                                <Search className="h-4 w-4 text-pink-500" />
+                                <Search className="h-4 w-4 text-gray-500" />
                             }
                             onValueChange={(value) => {
                                 const timeoutId = setTimeout(() => {
@@ -443,7 +446,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                             className="w-full"
                             classNames={{
                                 inputWrapper:
-                                    "border  shadow-sm focus:bg-gray-50 focus:ring-1 focus:ring-pink-500 rounded-md hover:bg-color-dark-2 focus:bg-color-dark-2 ring-0  bg-color-dark-2 border-white/40",
+                                    "border shadow-sm rounded-md ring-0 bg-color-dark-2 border-white/40 focus:border-white/40 focus:ring-0 focus:ring-offset-0 !focus:bg-color-dark-2 focus:outline-none focus:shadow-none !hover:bg-color-dark-2",
                             }}
                         />
                     </div>
@@ -457,22 +460,21 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                         </div>
 
                         {/* User Profile Dropdown */}
-                        <Dropdown placement="bottom-end">
+                        <Dropdown  placement="bottom-end" className="rounded-lg bg-dashboard-secondary border border-white/20">
                             <DropdownTrigger>
-                                <div className="flex items-center space-x-2 cursor-pointer hover:bg-dashboard-tertiary p-2 rounded-lg transition-colors">
+                                <div className="flex items-center  cursor-pointer hover:bg-dashboard-tertiary  rounded-lg transition-colors">
                                     <Avatar
                                         size="sm"
+                                        src={userProfile?.profileImage || userProfile?.image || userProfile?.avatar}
                                         className="bg-avatar-purple"
                                         fallback={
                                             <User className="h-4 w-4 text-white" />
                                         }
                                     />
-                                    <ChevronDown className="h-4 w-4 text-dashboard-secondary" />
                                 </div>
                             </DropdownTrigger>
                             <DropdownMenu
-                                aria-label="User menu"
-                                className="bg-dashboard-secondary border border-white/20"
+                                className="bg-dashboard-secondary border-none rounded-lg"
                             >
                                 <DropdownItem
                                     key="profile"

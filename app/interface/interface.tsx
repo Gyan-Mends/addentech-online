@@ -15,14 +15,8 @@ export interface RegistrationInterface {
     status: string,
     lastLogin: Date,
     workMode: string,  // Added workMode field
-    // New education background fields
+    // Bio field
     bio?: string,
-    institutionName?: string,
-    program?: string,
-    dateCompletedProgram?: string,
-    institution?: string,
-    positionInstitution?: string,
-    dateCompletedInstitution?: string,
 }
 
 export interface LeaveInterface {

@@ -19,12 +19,6 @@ class UsersController {
         department,
         base64Image,
         bio,
-        institutionName,
-        program,
-        dateCompletedProgram,
-        institution,
-        positionInstitution,
-        dateCompletedInstitution,
     }: {
           firstName: string;
           middleName: string;
@@ -39,12 +33,6 @@ class UsersController {
           department: string;
           base64Image: string;
           bio?: string;
-          institutionName?: string;
-          program?: string;
-          dateCompletedProgram?: string;
-          institution?: string;
-          positionInstitution?: string;
-          dateCompletedInstitution?: string;
       }) {
         try {
             if (intent === "create") {
@@ -80,12 +68,6 @@ class UsersController {
                     department,
                   image: base64Image,
                   bio,
-                  institutionName,
-                  program,
-                  dateCompletedProgram,
-                  institution,
-                  positionInstitution,
-                  dateCompletedInstitution,
               });
 
                 // Save user details
@@ -159,12 +141,6 @@ class UsersController {
         department,
         base64Image,
         bio,
-        institutionName,
-        program,
-        dateCompletedProgram,
-        institution,
-        positionInstitution,
-        dateCompletedInstitution,
     }: {
     firstName: string;
     middleName?: string;
@@ -178,12 +154,6 @@ class UsersController {
     department?: string;
     base64Image?: string;
     bio?: string;
-    institutionName?: string;
-    program?: string;
-    dateCompletedProgram?: string;
-    institution?: string;
-    positionInstitution?: string;
-    dateCompletedInstitution?: string;
 }) {
       try {
           // Find the user to update
@@ -213,12 +183,6 @@ class UsersController {
             department,
             image: updatedImage,
             bio,
-            institutionName,
-            program,
-            dateCompletedProgram,
-            institution,
-            positionInstitution,
-            dateCompletedInstitution,
         };
 
         // Remove undefined values from the payload
