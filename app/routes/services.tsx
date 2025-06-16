@@ -269,10 +269,20 @@ export default function ServicesPage() {
              {/* Hero Section */}
              <section
                 id="hero-section"
-                className="relative overflow-hidden  lg:py-24 py-16 md:py-32 "
+                className="relative overflow-hidden lg:py-24 py-16 md:py-32"
+                style={{
+                    backgroundImage: `url(https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80)`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
             >
+                {/* Background overlay */}
+                <div className="absolute inset-0 bg-black/50"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-600/20"></div>
+                
                 {/* Animated background elements */}
-                <div className="absolute inset-0 opacity-30">
+                <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-pink-500/20 rounded-full filter blur-3xl animate-blob"></div>
                     <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
                     <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-fuchsia-500/20 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
@@ -286,13 +296,13 @@ export default function ServicesPage() {
                         variants={fadeInUpVariants}
                     >
                        
-                        <h1 className="text-4xl md:text-5xl font-montserrat font-bold lg:text-6xl leading-tight tracking-tight mb-6">
+                        <h1 className="text-4xl md:text-5xl font-montserrat font-bold lg:text-6xl leading-tight tracking-tight mb-6 text-white drop-shadow-lg">
                             Here is How We Can{" "}
-                            <span className="text-pink-500">
+                            <span className="text-pink-400">
                                 Help Your Business
                             </span>
                         </h1>
-                        <p className="text-xl  max-w-[800px] leading-relaxed">
+                        <p className="text-xl text-white/90 max-w-[800px] leading-relaxed drop-shadow-md">
                             Comprehensive services tailored to your needs, designed to elevate your business in the digital landscape.
                         </p>
                         {/* <div className="flex flex-wrap gap-4 mt-8">

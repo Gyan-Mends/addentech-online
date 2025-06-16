@@ -26,7 +26,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    
+
     // Check if we're on the homepage
     const isHomepage = location.pathname === "/";
 
@@ -70,8 +70,8 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="scroll-smooth">
             {/* Navbar */}
             <header className={`px-4 lg:px-[125px] top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isScrolled
-                    ? 'fixed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 '
-                    : 'absolute'
+                ? 'fixed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 '
+                : 'absolute'
                 }`}>
                 <div className="container flex h-16 items-center justify-between">
                     {/* Logo */}
@@ -88,13 +88,12 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             <Link
                                 key={name}
                                 to={path}
-                                className={`text-sm font-medium transition-colors duration-300 ${
-                                    !isScrolled && isHomepage
+                                className={`text-sm font-medium transition-colors duration-300 ${!isScrolled && isHomepage
                                         ? 'text-white hover:text-white/80'
                                         : isScrolled
-                                        ? 'text-black hover:text-pink-500'
-                                        : 'text-black hover:text-pink-500'
-                                }`}
+                                            ? 'text-black hover:text-pink-500'
+                                            : 'text-black hover:text-pink-500'
+                                    }`}
                             >
                                 {name}
                             </Link>
@@ -110,8 +109,8 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                             onClick={handleToggleMenu}
                             aria-label="Toggle menu"
                             className={`transition-colors duration-300 ${isScrolled
-                                    ? 'text-foreground hover:bg-default-100'
-                                    : ' hover:bg-white/10'
+                                ? 'text-foreground hover:bg-default-100'
+                                : ' hover:bg-white/10'
                                 }`}
                         >
                             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -169,7 +168,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
 
             {/* CTA Section */}
-            <section 
+            <section
                 className="py-20 lg:px-20 px-4 relative overflow-hidden"
                 style={{
                     backgroundImage: `url(${ctaBackground})`,
@@ -180,13 +179,13 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             >
                 {/* Section Overlay */}
                 <div className="absolute inset-0 bg-black/10" />
-                
+
                 <div className="container relative z-10">
                     <ScrollAnimation>
                         <div className=" p-8 md:p-12 lg:p-16 relative overflow-hidden">
                             {/* Card Overlay */}
                             <div className="absolute inset-0  rounded-2xl" />
-                            
+
                             <div className="relative z-10 max-w-3xl">
                                 <h2 className="text-3xl md:text-4xl font-bold mb-4  drop-shadow-lg">
                                     Transform your business with us effectively
@@ -216,7 +215,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                     <img src={logo} alt="Addentech Logo" className="w-40 h-12" />
                                 </div>
                                 <p className="text-muted-foreground leading-relaxed mb-6 max-w-md">
-                                    Transforming the legal landscape with innovative technology solutions. We provide cutting-edge 
+                                    Transforming the legal landscape with innovative technology solutions. We provide cutting-edge
                                     digital transformation services to help law firms and legal professionals thrive in the modern era.
                                 </p>
                                 <div className="flex space-x-4">
@@ -292,7 +291,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                                     <p className="text-muted-foreground text-sm mb-4">
                                         Ready to transform your legal practice with cutting-edge technology?
                                     </p>
-                                   
+
                                 </div>
 
                                 <div>
@@ -314,15 +313,12 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                 {/* Bottom Footer */}
                 <div className="border-t border-gray-200 py-6">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
                             <div className="text-muted-foreground text-sm">
                                 © {new Date().getFullYear()} Addentech. All rights reserved.
                             </div>
-                            <div className="flex gap-6 text-sm">
-                                <Link to="#" className="text-muted-foreground hover:text-pink-500 transition-colors">Privacy Policy</Link>
-                                <Link to="#" className="text-muted-foreground hover:text-pink-500 transition-colors">Terms of Service</Link>
-                                <Link to="#" className="text-muted-foreground hover:text-pink-500 transition-colors">Cookie Settings</Link>
-                            </div>
+                            
+
                         </div>
                     </div>
                 </div>

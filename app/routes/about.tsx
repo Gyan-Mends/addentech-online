@@ -43,20 +43,31 @@ const About = () => {
         <PublicLayout>
             <main className="flex-1">
                 {/* Hero Section */}
-                <section className="relative overflow-hidden py-10 md:py-28 mt-10 lg:mt-0 px-4 lg:px-[125px]">
+                <section 
+                    className="relative overflow-hidden py-10 md:py-28 mt-10 lg:mt-0 px-4 lg:px-[125px]"
+                    style={{
+                        backgroundImage: `url(https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80)`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat'
+                    }}
+                >
+                    {/* Background overlay */}
+                    <div className="absolute inset-0 bg-black/50"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-600/20"></div>
                     <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
                     <div className="container relative">
                         <div className="max-w-3xl mx-auto text-center mb-12">
                             <ScrollAnimation>
-                                <h1 className="text-4xl font-montserrat md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter mb-6">
-                                    <span className="text-pink-500">Transforming </span>The Legal Landscape With{" "}
-                                    <span className="text-pink-500">
+                                <h1 className="text-4xl font-montserrat md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter mb-6 text-white drop-shadow-lg">
+                                    <span className="text-pink-400">Transforming </span>The Legal Landscape With{" "}
+                                    <span className="text-pink-400">
                                         Technology
                                     </span>
                                 </h1>
                             </ScrollAnimation>
                             <ScrollAnimation delay={0.3}>
-                                <p className="text-xl text-muted-foreground max-w-[800px] mx-auto font-nunito">
+                                <p className="text-xl text-white/90 max-w-[800px] mx-auto font-nunito drop-shadow-md">
                                     Providing innovative legal tech solutions that streamline workflows, enhance client experiences, and
                                     revolutionize the practice of law.
                                 </p>
