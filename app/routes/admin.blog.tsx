@@ -128,12 +128,20 @@ const Users = () => {
                             <h1 className="text-2xl font-bold text-white">Blog Management</h1>
                             <p className="text-gray-300 mt-1">Create and manage blog posts</p>
                         </div>
+                        <div className="flex gap-4">
+                        <Button className="border text-white border-white/20 px-4 py-1 bg-blue-600 hover:bg-blue-700" onClick={() => {
+                            navigate("/admin/category")
+                        }}>
+                            <Plus />
+                            Categories
+                        </Button>
                         <Button className="border text-white border-white/20 px-4 py-1 bg-blue-600 hover:bg-blue-700" onClick={() => {
                             setIsCreateModalOpened(true)
                         }}>
                             <Plus />
                             Create Blog
                         </Button>
+                        </div>
                     </div>
                 </div>
                 

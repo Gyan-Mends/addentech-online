@@ -99,13 +99,7 @@ const navItems: NavItem[] = [
         roles: ["admin"],
         permission: "view_blog"
     },
-    {
-        to: "/admin/category",
-        icon: <Tag className="h-4 w-4 hover:text-white dark-text" />,
-        label: "Blog Categories",
-        roles: ["admin"],
-        permission: "view_categories"
-    },
+  
     {
         to: "/admin/contact",
         icon: <Mail className="h-4 w-4 hover:text-white dark-text" />,
@@ -389,6 +383,20 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                         <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm bg-sidebar-item hover:bg-sidebar-item:hover transition-colors duration-200 text-dashboard-secondary hover:text-dashboard-primary">
                                             <Calendar className="h-3 w-3" />
                                             Team Calendar
+                                        </div>
+                                    </Link>
+
+                                    <Link to="/admin/leave-policies">
+                                        <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm bg-sidebar-item hover:bg-sidebar-item:hover transition-colors duration-200 text-dashboard-secondary hover:text-dashboard-primary">
+                                            <Shield className="h-3 w-3" />
+                                            Leave Policies
+                                        </div>
+                                    </Link>
+
+                                    <Link to="/employee-leave-balance">
+                                        <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm bg-sidebar-item hover:bg-sidebar-item:hover transition-colors duration-200 text-dashboard-secondary hover:text-dashboard-primary">
+                                            <BarChart className="h-3 w-3" />
+                                            Leave Balance
                                         </div>
                                     </Link>
                                 </div>

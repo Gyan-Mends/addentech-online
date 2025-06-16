@@ -457,14 +457,19 @@ const EmployeeLeaveApplication = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Leave Type */}
                                 <Select
+
                                     name="leaveType"
                                     label="Leave Type"
                                     placeholder="Select leave type"
                                     labelPlacement="outside"
                                     classNames={{
                                         label: "font-nunito text-dashboard-primary !text-white",
-                                        trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary",
-                                        popoverContent: "bg-dashboard-secondary border border-white/20"
+                                        trigger: "font-nunito bg-dashboard-tertiary border border-white/20 text-dashboard-primary text-gray-400",
+                                        popoverContent: "bg-dashboard-secondary border border-white/20",
+                                        value: "text-gray-400",
+                                       
+                                       
+                                       
                                     }}
                                     isRequired
                                     variant="bordered"
@@ -472,7 +477,7 @@ const EmployeeLeaveApplication = () => {
                                     onSelectionChange={(keys) => setSelectedLeaveType(Array.from(keys)[0] as string)}
                                 >
                                     {leaveTypes.map((type) => (
-                                        <SelectItem key={type.key} value={type.key} className="text-dashboard-primary">
+                                        <SelectItem key={type.key} value={type.key} className="!text-white">
                                             {type.label}
                                         </SelectItem>
                                     ))}
@@ -681,6 +686,7 @@ const EmployeeLeaveApplication = () => {
                             {/* Submit Button */}
                             <div className="flex justify-end gap-4">
                                 <Button
+                                    className="text-white"
                                     type="button"
                                     variant="light"
                                     onClick={() => window.history.back()}

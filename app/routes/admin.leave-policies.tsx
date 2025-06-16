@@ -79,10 +79,13 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function LeavePolicies() {
-    const { policies } = useLoaderData<typeof loader>();
+    const loaderData = useLoaderData<typeof loader>();
     const actionData = useActionData<typeof action>();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+
+    // Handle potential error state
+    const policies = 'policies' in loaderData ? loaderData.policies : [];
 
     const handleCreateNew = () => {
         setModalMode('create');
@@ -91,75 +94,98 @@ export default function LeavePolicies() {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-3xl font-bold">Leave Policies Management</h1>
-                        <p className="text-gray-600 mt-2">Configure leave types, allocations, and approval workflows</p>
+            <div className="space-y-6 !text-white">
+                {/* Header */}
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 text-white shadow-md">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white">Leave Policies Management</h1>
+                            <p className="text-gray-300 mt-2">Configure leave types, allocations, and approval workflows</p>
+                        </div>
+                        <Button
+                            className="bg-action-primary text-white hover:bg-action-primary"
+                            startContent={<Plus size={16} />}
+                            onClick={handleCreateNew}
+                        >
+                            New Policy
+                        </Button>
                     </div>
-                    <Button
-                        color="primary"
-                        startContent={<Plus size={16} />}
-                        onClick={handleCreateNew}
-                    >
-                        New Policy
-                    </Button>
                 </div>
 
+                {/* Action Message */}
                 {actionData && (
-                    <Card className={actionData.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
-                        <CardBody>
-                            <p className={actionData.success ? "text-green-700" : "text-red-700"}>
-                                {actionData.message || actionData.error}
-                            </p>
-                        </CardBody>
-                    </Card>
+                    <div className={`p-4 rounded-lg border ${
+                        (actionData as any).success 
+                            ? "border-green-500/20 bg-green-500/10 text-green-400" 
+                            : "border-red-500/20 bg-red-500/10 text-red-400"
+                    }`}>
+                        <p>
+                            {(actionData as any).message || (actionData as any).error}
+                        </p>
+                    </div>
                 )}
 
-                <Card>
-                    <CardBody>
-                        <Table aria-label="Leave policies table" className="shadow-none border-none">
-                            <TableHeader>
-                                <TableColumn>Leave Type</TableColumn>
-                                <TableColumn>Allocation</TableColumn>
-                                <TableColumn>Max Consecutive</TableColumn>
-                                <TableColumn>Advance Notice</TableColumn>
-                                <TableColumn>Actions</TableColumn>
-                            </TableHeader>
-                            <TableBody>
-                                {policies.map((policy: any) => (
-                                    <TableRow key={policy._id}>
-                                        <TableCell>
-                                            <div>
-                                                <p className="font-medium capitalize">{policy.leaveType}</p>
-                                                <p className="text-sm text-gray-600">{policy.description}</p>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{policy.defaultAllocation} days</TableCell>
-                                        <TableCell>{policy.maxConsecutiveDays} days</TableCell>
-                                        <TableCell>{policy.minAdvanceNotice} days</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                size="sm"
-                                                variant="light"
-                                                startContent={<Edit size={14} />}
-                                            >
-                                                Edit
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </CardBody>
-                </Card>
+                {/* Policies Table */}
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                    <Table 
+                        aria-label="Leave policies table" 
+                        className="bg-dashboard-secondary"
+                        classNames={{
+                            wrapper: "bg-dashboard-secondary shadow-none",
+                            th: "bg-dashboard-secondary text-white border-b border-white/20",
+                            td: "text-gray-300 border-b border-white/10"
+                        }}
+                    >
+                        <TableHeader className="bg-dashboard-primary">
+                            <TableColumn className="text-white">Leave Type</TableColumn>
+                            <TableColumn className="text-white">Allocation</TableColumn>
+                            <TableColumn className="text-white">Max Consecutive</TableColumn>
+                            <TableColumn className="text-white">Advance Notice</TableColumn>
+                            <TableColumn className="text-white">Actions</TableColumn>
+                        </TableHeader>
+                        <TableBody>
+                            {policies.map((policy: any) => (
+                                <TableRow key={policy._id} className="hover:bg-white/5">
+                                    <TableCell>
+                                        <div>
+                                            <p className="font-medium capitalize text-white">{policy.leaveType}</p>
+                                            <p className="text-sm text-gray-400">{policy.description}</p>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-gray-300">{policy.defaultAllocation} days</TableCell>
+                                    <TableCell className="text-gray-300">{policy.maxConsecutiveDays} days</TableCell>
+                                    <TableCell className="text-gray-300">{policy.minAdvanceNotice} days</TableCell>
+                                    <TableCell>
+                                        <Button
+                                            size="sm"
+                                            className="bg-blue-500 text-white hover:bg-blue-600"
+                                            startContent={<Edit size={14} />}
+                                        >
+                                            Edit
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
 
                 {/* Policy Modal */}
-                <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+                <Modal 
+                    isOpen={isOpen} 
+                    onClose={onClose} 
+                    size="2xl"
+                    classNames={{
+                        base: "bg-dashboard-secondary border border-white/20",
+                        header: "bg-dashboard-secondary border-b border-white/20",
+                        body: "bg-dashboard-secondary",
+                        footer: "bg-dashboard-secondary border-t border-white/20"
+                    }}
+                >
                     <ModalContent>
                         <Form method="post">
                             <ModalHeader>
-                                <h3 className="text-lg font-bold">Create New Policy</h3>
+                                <h3 className="text-lg font-bold text-white">Create New Policy</h3>
                             </ModalHeader>
                             <ModalBody>
                                 <div className="space-y-8">
@@ -167,22 +193,28 @@ export default function LeavePolicies() {
                                     
                                     <div className="grid grid-cols-2 gap-4">
                                         <Input
-                                        labelPlacement="outside"
-                                        classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
-                                        }}
+                                            labelPlacement="outside"
+                                            placeholder=" "
+                                            variant="bordered"
+                                            classNames={{
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                input: "text-white"
+                                            }}
                                             label="Leave Type"
                                             name="leaveType"
                                             isRequired
                                         />
                                         <Input
-                                        labelPlacement="outside"
-                                        classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
-                                        }}
-                                            label="Default Allocation "
+                                            labelPlacement="outside"
+                                            placeholder=" "
+                                            variant="bordered"
+                                            classNames={{
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                input: "text-white"
+                                            }}
+                                            label="Default Allocation (days)"
                                             name="defaultAllocation"
                                             type="number"
                                             isRequired
@@ -191,9 +223,12 @@ export default function LeavePolicies() {
 
                                     <Input
                                         labelPlacement="outside"
+                                        placeholder=" "
+                                        variant="bordered"
                                         classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
+                                            label: "font-nunito !text-white",
+                                            inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                            input: "text-white"
                                         }}
                                         label="Description"
                                         name="description"
@@ -202,34 +237,43 @@ export default function LeavePolicies() {
 
                                     <div className="grid grid-cols-3 gap-4">
                                         <Input
-                                        labelPlacement="outside"
-                                        classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
-                                        }}
+                                            labelPlacement="outside"
+                                            placeholder=" "
+                                            variant="bordered"
+                                            classNames={{
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                input: "text-white"
+                                            }}
                                             label="Max Consecutive Days"
                                             name="maxConsecutiveDays"
                                             type="number"
                                             isRequired
                                         />
                                         <Input
-                                        labelPlacement="outside"
-                                        classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
-                                        }}
-                                            label="Min Advance Notice "
+                                            labelPlacement="outside"
+                                            placeholder=" "
+                                            variant="bordered"
+                                            classNames={{
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                input: "text-white"
+                                            }}
+                                            label="Min Advance Notice (days)"
                                             name="minAdvanceNotice"
                                             type="number"
                                             isRequired
                                         />
                                         <Input
-                                        labelPlacement="outside"
-                                        classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
-                                        }}
-                                            label="Max Advance Booking "
+                                            labelPlacement="outside"
+                                            placeholder=" "
+                                            variant="bordered"
+                                            classNames={{
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                input: "text-white"
+                                            }}
+                                            label="Max Advance Booking (days)"
                                             name="maxAdvanceBooking"
                                             type="number"
                                             defaultValue="365"
@@ -238,15 +282,25 @@ export default function LeavePolicies() {
                                     </div>
 
                                     <div className="flex gap-4 items-center">
-                                        <Switch name="carryForwardAllowed">
-                                            Allow Carry Forward
+                                        <Switch 
+                                            name="carryForwardAllowed"
+                                            classNames={{
+                                                base: "text-white",
+                                                wrapper: "bg-white/20",
+                                                thumb: "bg-white"
+                                            }}
+                                        >
+                                            <span className="text-white">Allow Carry Forward</span>
                                         </Switch>
                                         <Input
-                                        labelPlacement="outside"
-                                        classNames={{
-                                            label: "font-nunito text-black",
-                                            inputWrapper: "font-nunito bg-white border border-black/20",
-                                        }}
+                                            labelPlacement="outside"
+                                            placeholder=" "
+                                            variant="bordered"
+                                            classNames={{
+                                                label: "font-nunito !text-white",
+                                                inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                input: "text-white"
+                                            }}
                                             label="Carry Forward Limit"
                                             name="carryForwardLimit"
                                             type="number"
@@ -255,30 +309,43 @@ export default function LeavePolicies() {
                                         />
                                     </div>
 
-                                    <Switch name="documentRequired">
-                                        Documents Required
+                                    <Switch 
+                                        name="documentRequired"
+                                        classNames={{
+                                            base: "text-white",
+                                            wrapper: "bg-white/20",
+                                            thumb: "bg-white"
+                                        }}
+                                    >
+                                        <span className="text-white">Documents Required</span>
                                     </Switch>
 
-                                    <div className="border-t pt-4">
-                                        <h4 className="font-medium mb-3">Approval Workflow Limits</h4>
+                                    <div className="border-t border-white/20 pt-4">
+                                        <h4 className="font-medium mb-3 text-white">Approval Workflow Limits</h4>
                                         <div className="grid grid-cols-2 gap-4">
                                             <Input
-                                            labelPlacement="outside"
-                                            classNames={{
-                                                label: "font-nunito text-black",
-                                                inputWrapper: "font-nunito bg-white border border-black/20",
-                                            }}
+                                                labelPlacement="outside"
+                                                placeholder=" "
+                                                variant="bordered"
+                                                classNames={{
+                                                    label: "font-nunito !text-white",
+                                                    inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                    input: "text-white"
+                                                }}
                                                 label="Manager Max Days"
                                                 name="managerMaxDays"
                                                 type="number"
                                                 defaultValue="30"
                                             />
                                             <Input
-                                            labelPlacement="outside"
-                                            classNames={{
-                                                label: "font-nunito text-black",
-                                                inputWrapper: "font-nunito bg-white border border-black/20",
-                                            }}
+                                                labelPlacement="outside"
+                                                placeholder=" "
+                                                variant="bordered"
+                                                classNames={{
+                                                    label: "font-nunito !text-white",
+                                                    inputWrapper: "font-nunito bg-dashboard-secondary border border-white/20 text-white",
+                                                    input: "text-white"
+                                                }}
                                                 label="Dept Head Max Days"
                                                 name="deptHeadMaxDays"
                                                 type="number"
@@ -289,10 +356,17 @@ export default function LeavePolicies() {
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                                <Button variant="light" onPress={onClose}>
+                                <Button 
+                                    variant="light" 
+                                    onPress={onClose}
+                                    className="text-gray-300 hover:text-white"
+                                >
                                     Cancel
                                 </Button>
-                                <Button type="submit" color="primary">
+                                <Button 
+                                    type="submit" 
+                                    className="bg-action-primary text-white hover:bg-action-primary"
+                                >
                                     Create Policy
                                 </Button>
                             </ModalFooter>

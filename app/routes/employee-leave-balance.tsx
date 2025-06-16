@@ -77,7 +77,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function EmployeeLeaveBalance() {
-    const { user, balances, recentLeaves, analytics, currentYear, error } = useLoaderData<typeof loader>();
+    const loaderData = useLoaderData<typeof loader>();
+    const { user, balances, recentLeaves, analytics, currentYear } = loaderData;
+    const error = 'error' in loaderData ? loaderData.error : null;
+    
     const [selectedBalance, setSelectedBalance] = useState<any>(null);
     const [selectedYear, setSelectedYear] = useState(currentYear.toString());
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -121,12 +124,10 @@ export default function EmployeeLeaveBalance() {
     if (error) {
         return (
             <AdminLayout>
-                <div className="p-6">
-                    <Card className="border-red-200 bg-red-50">
-                        <CardBody>
-                            <p className="text-red-700">{error}</p>
-                        </CardBody>
-                    </Card>
+                <div className="space-y-6 !text-white">
+                    <div className="p-4 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400">
+                        <p>{error}</p>
+                    </div>
                 </div>
             </AdminLayout>
         );
@@ -134,34 +135,24 @@ export default function EmployeeLeaveBalance() {
 
     return (
         <AdminLayout>
-            <div className="p-6 space-y-6">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h1 className="text-3xl font-bold">My Leave Balance</h1>
-                       
-                    </div>
-                    <div className="flex gap-3">
-                        {/* <Select
-                            size="sm"
-                            selectedKeys={[selectedYear]}
-                            onSelectionChange={(keys) => setSelectedYear(Array.from(keys)[0] as string)}
-                            className="w-24"
-                        >
-                            {availableYears.map(year => (
-                                <SelectItem key={year.toString()} value={year.toString()}>
-                                    {year}
-                                </SelectItem>
-                            ))}
-                        </Select> */}
-                        <Link to="/employee-leave-application">
-                            <Button
-                                className="bg-pink-500 text-white shadow-sm"
-                                startContent={<Plus size={16} />}
-
-                            >
-                                Apply for Leave
-                            </Button>
-                        </Link>
+            <div className="space-y-6 !text-white">
+                {/* Header */}
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 text-white shadow-md">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white">My Leave Balance</h1>
+                            <p className="text-gray-300 mt-2">Track your leave allocations and usage</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <Link to="/employee-leave-application">
+                                <Button
+                                    className="bg-action-primary text-white hover:bg-action-primary shadow-sm"
+                                    startContent={<Plus size={16} />}
+                                >
+                                    Apply for Leave
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
@@ -169,26 +160,26 @@ export default function EmployeeLeaveBalance() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {balances.length === 0 ? (
                         <div className="col-span-full">
-                            <Card>
-                                <CardBody className="text-center py-12">
+                            <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                                <div className="text-center py-12">
                                     <Calendar className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                                    <p className="text-gray-600">No leave balances found</p>
-                                    <p className="text-sm text-gray-500 mt-2">
+                                    <p className="text-gray-300">No leave balances found</p>
+                                    <p className="text-sm text-gray-400 mt-2">
                                         Your leave balances will appear here once they're set up
                                     </p>
-                                </CardBody>
-                            </Card>
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         balances.map((balance: any) => (
-                            <Card key={balance._id} className="border-l-4 border-l-blue-500">
-                                <CardHeader className="pb-2">
+                            <div key={balance._id} className="bg-dashboard-secondary border border-white/20 border-l-4 border-l-blue-500 rounded-xl p-6 shadow-md">
+                                <div className="pb-2">
                                     <div className="flex justify-between items-start w-full">
                                         <div>
-                                            <h3 className="text-lg font-semibold capitalize">
+                                            <h3 className="text-lg font-semibold capitalize text-white">
                                                 {balance.leaveType.replace('_', ' ')}
                                             </h3>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-300">
                                                 {balance.remaining} days remaining
                                             </p>
                                         </div>
@@ -205,13 +196,14 @@ export default function EmployeeLeaveBalance() {
                                                 variant="light"
                                                 isIconOnly
                                                 onPress={() => viewTransactionHistory(balance)}
+                                                className="text-gray-300 hover:text-white"
                                             >
                                                 <Eye size={14} />
                                             </Button>
                                         </div>
                                     </div>
-                                </CardHeader>
-                                <CardBody className="pt-0">
+                                </div>
+                                <div className="pt-0">
                                     <div className="space-y-3">
                                         <Progress
                                             value={calculateUsagePercentage(balance.used, balance.totalAllocated)}
@@ -222,114 +214,122 @@ export default function EmployeeLeaveBalance() {
                                         
                                         <div className="grid grid-cols-3 gap-2 text-xs">
                                             <div className="text-center">
-                                                <p className="font-medium">{balance.totalAllocated}</p>
-                                                <p className="text-gray-500">Allocated</p>
+                                                <p className="font-medium text-white">{balance.totalAllocated}</p>
+                                                <p className="text-gray-400">Allocated</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="font-medium">{balance.used}</p>
-                                                <p className="text-gray-500">Used</p>
+                                                <p className="font-medium text-white">{balance.used}</p>
+                                                <p className="text-gray-400">Used</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="font-medium">{balance.pending}</p>
-                                                <p className="text-gray-500">Pending</p>
+                                                <p className="font-medium text-white">{balance.pending}</p>
+                                                <p className="text-gray-400">Pending</p>
                                             </div>
                                         </div>
 
                                         {balance.carriedForward > 0 && (
-                                            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                                            <div className="text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 p-2 rounded">
                                                 <p>+ {balance.carriedForward} days carried forward</p>
                                             </div>
                                         )}
 
                                         {balance.transactions && balance.transactions.length > 0 && (
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-xs text-gray-400">
                                                 Last updated: {formatDate(balance.lastUpdated || balance.createdAt)}
                                             </div>
                                         )}
                                     </div>
-                                </CardBody>
-                            </Card>
+                                </div>
+                            </div>
                         ))
                     )}
                 </div>
 
                 {/* Enhanced Analytics */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <Card className="bg-gradient-to-r from-blue-500 to-blue-600">
-                        <CardBody className="text-center p-6 text-white">
+                    <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                        <div className="text-center text-white">
                             <Calendar className="w-8 h-8 mx-auto mb-3" />
                             <h3 className="text-2xl font-bold">
                                 {balances.reduce((sum: number, b: any) => sum + b.totalAllocated, 0)}
                             </h3>
                             <p className="text-sm opacity-90">Total Annual Leave</p>
-                        </CardBody>
-                    </Card>
+                        </div>
+                    </div>
 
-                    <Card className="bg-gradient-to-r from-orange-500 to-orange-600">
-                        <CardBody className="text-center p-6 text-white">
+                    <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                        <div className="text-center text-white">
                             <Clock className="w-8 h-8 mx-auto mb-3" />
                             <h3 className="text-2xl font-bold">
                                 {analytics.totalDaysUsed}
                             </h3>
                             <p className="text-sm opacity-90">Days Used This Year</p>
-                        </CardBody>
-                    </Card>
+                        </div>
+                    </div>
 
-                    <Card className="bg-gradient-to-r from-green-500 to-green-600">
-                        <CardBody className="text-center p-6 text-white">
+                    <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                        <div className="text-center text-white">
                             <TrendingUp className="w-8 h-8 mx-auto mb-3" />
                             <h3 className="text-2xl font-bold">
                                 {analytics.totalDaysRemaining}
                             </h3>
                             <p className="text-sm opacity-90">Days Remaining</p>
-                        </CardBody>
-                    </Card>
+                        </div>
+                    </div>
 
-                    <Card className="bg-gradient-to-r from-purple-500 to-purple-600">
-                        <CardBody className="text-center p-6 text-white">
+                    <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                        <div className="text-center text-white">
                             <BarChart3 className="w-8 h-8 mx-auto mb-3" />
                             <h3 className="text-lg font-bold capitalize">
                                 {analytics.mostUsedLeaveType.replace('_', ' ')}
                             </h3>
                             <p className="text-sm opacity-90">Most Used Leave Type</p>
-                        </CardBody>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Recent Activity */}
-                <Card>
-                    <CardHeader>
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                    <div className="mb-4">
                         <div className="flex items-center gap-2">
-                            <History className="w-5 h-5" />
-                            <h3 className="text-lg font-semibold">Recent Leave Activity</h3>
+                            <History className="w-5 h-5 text-white" />
+                            <h3 className="text-lg font-semibold text-white">Recent Leave Activity</h3>
                         </div>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <div>
                         {recentLeaves.length === 0 ? (
                             <div className="text-center py-8">
                                 <Clock className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                                <p className="text-gray-600">No recent leave activity</p>
-                                <p className="text-sm text-gray-500 mt-2">
+                                <p className="text-gray-300">No recent leave activity</p>
+                                <p className="text-sm text-gray-400 mt-2">
                                     Your leave applications and approvals will appear here
                                 </p>
                             </div>
                         ) : (
-                            <Table aria-label="Recent leave activity">
+                            <Table 
+                                aria-label="Recent leave activity"
+                                className="bg-dashboard-secondary"
+                                classNames={{
+                                    wrapper: "bg-dashboard-secondary shadow-none",
+                                    th: "bg-dashboard-secondary text-white border-b border-white/20",
+                                    td: "text-gray-300 border-b border-white/10"
+                                }}
+                            >
                                 <TableHeader>
-                                    <TableColumn>Leave Type</TableColumn>
-                                    <TableColumn>Duration</TableColumn>
-                                    <TableColumn>Days</TableColumn>
-                                    <TableColumn>Status</TableColumn>
-                                    <TableColumn>Applied</TableColumn>
+                                    <TableColumn className="text-white">Leave Type</TableColumn>
+                                    <TableColumn className="text-white">Duration</TableColumn>
+                                    <TableColumn className="text-white">Days</TableColumn>
+                                    <TableColumn className="text-white">Status</TableColumn>
+                                    <TableColumn className="text-white">Applied</TableColumn>
                                 </TableHeader>
                                 <TableBody>
                                     {recentLeaves.map((leave: any) => (
-                                        <TableRow key={leave._id}>
-                                            <TableCell className="capitalize">{leave.leaveType}</TableCell>
-                                            <TableCell>
+                                        <TableRow key={leave._id} className="hover:bg-white/5">
+                                            <TableCell className="capitalize text-gray-300">{leave.leaveType}</TableCell>
+                                            <TableCell className="text-gray-300">
                                                 {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
                                             </TableCell>
-                                            <TableCell>{leave.totalDays} days</TableCell>
+                                            <TableCell className="text-gray-300">{leave.totalDays} days</TableCell>
                                             <TableCell>
                                                 <Chip
                                                     color={
@@ -342,25 +342,25 @@ export default function EmployeeLeaveBalance() {
                                                     {leave.status}
                                                 </Chip>
                                             </TableCell>
-                                            <TableCell>{formatDate(leave.submissionDate)}</TableCell>
+                                            <TableCell className="text-gray-300">{formatDate(leave.submissionDate)}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
                         )}
-                    </CardBody>
-                </Card>
+                    </div>
+                </div>
 
                 {/* Leave Policies Info */}
-                <Card>
-                    <CardHeader>
-                        <h3 className="text-lg font-semibold">Leave Policy Information</h3>
-                    </CardHeader>
-                    <CardBody>
+                <div className="bg-dashboard-secondary border border-white/20 rounded-xl p-6 shadow-md">
+                    <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-white">Leave Policy Information</h3>
+                    </div>
+                    <div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h4 className="font-medium mb-3">Important Notes</h4>
-                                <ul className="text-sm space-y-2 text-gray-600">
+                                <h4 className="font-medium mb-3 text-white">Important Notes</h4>
+                                <ul className="text-sm space-y-2 text-gray-300">
                                     <li>• Leave requests require advance notice</li>
                                     <li>• Some leave types may require documentation</li>
                                     <li>• Unused leave may be carried forward (policy dependent)</li>
@@ -368,21 +368,29 @@ export default function EmployeeLeaveBalance() {
                                 </ul>
                             </div>
                             <div>
-                                <h4 className="font-medium mb-3">Need Help?</h4>
+                                <h4 className="font-medium mb-3 text-white">Need Help?</h4>
                                 <div className="space-y-2">
                                     <Link to="/admin/leave-management">
-                                        <Button variant="light" size="sm" className="w-full">
+                                        <Button 
+                                            variant="light" 
+                                            size="sm" 
+                                            className="w-full text-gray-300 hover:text-white border border-white/20"
+                                        >
                                             View All My Applications
                                         </Button>
                                     </Link>
-                                    <Button variant="light" size="sm" className="w-full">
+                                    <Button 
+                                        variant="light" 
+                                        size="sm" 
+                                        className="w-full text-gray-300 hover:text-white border border-white/20"
+                                    >
                                         Contact HR
                                     </Button>
                                 </div>
                             </div>
                         </div>
-                    </CardBody>
-                </Card>
+                    </div>
+                </div>
             </div>
         </AdminLayout>
     );
