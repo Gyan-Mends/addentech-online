@@ -364,7 +364,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                                         <div className="flex items-center gap-2 py-2 px-3 rounded-md text-sm bg-sidebar-item hover:bg-sidebar-item:hover transition-colors duration-200 text-dashboard-secondary hover:text-dashboard-primary">
                                             <LayoutDashboard className="h-3 w-3" />
                                             Leave Dashboard
-                                        </div>
+                                        </div> 
                                     </Link>
 
                                     <Link to="/employee-leave-application">
