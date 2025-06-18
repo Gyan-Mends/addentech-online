@@ -1,7 +1,7 @@
-import { Button, Card, Input, Select, SelectItem, Spinner, Tab, Tabs, Textarea } from "@nextui-org/react";
+import { Button, Card, Input, Select, SelectItem, Spinner, Tab, Tabs, Textarea, TableRow, TableCell } from "@nextui-org/react";
 import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { DataTable } from "../components/DataTable";
+import NewCustomTable from "~/components/table/newTable";
 import AdminLayout from "~/layout/adminLayout";
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import monthlyReportController from "~/controller/monthlyReport";
@@ -275,6 +275,8 @@ export default function MonthlyReportsPage() {
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const isLoading = navigation.state === "loading";
 
@@ -511,60 +513,36 @@ export default function MonthlyReportsPage() {
   
   // Columns for reports table
   const columns = [
-    {
-      key: "department",
-      label: "DEPARTMENT",
-      render: (row: any) => {
+    { title: "DEPARTMENT", allowSort: true },
+    { title: "PERIOD", allowSort: true },
+    { title: "TYPE", allowSort: true },
+    { title: "PACKAGE", allowSort: false },
+    { title: "FIRMS", allowSort: false },
+    { title: "USERS", allowSort: false },
+    { title: "AMOUNT (GHS)", allowSort: true },
+    { title: "STATUS", allowSort: true },
+    { title: "ACTIONS", allowSort: false },
+  ];
+
+  // Helper function to render table row cells
+  const renderReportTableCell = (row: any, columnIndex: number) => {
+    switch (columnIndex) {
+      case 0: // DEPARTMENT
         const department = row.department || {};
         return department.name || "Unknown";
-      },
-    },
-    {
-      key: "month",
-      label: "PERIOD",
-      render: (row: any) => {
+      case 1: // PERIOD
         return `${getMonthName(row.month)} ${row.year}`;
-      },
-    },
-    {
-      key: "type",
-      label: "TYPE",
-      render: (row: any) => {
+      case 2: // TYPE
         return row.type;
-      },
-    },
-    {
-      key: "package",
-      label: "PACKAGE",
-      render: (row: any) => {
+      case 3: // PACKAGE
         return row.subscriptionPackage;
-      },
-    },
-    {
-      key: "firms",
-      label: "FIRMS",
-      render: (row: any) => {
+      case 4: // FIRMS
         return row.numberOfFirms;
-      },
-    },
-    {
-      key: "users",
-      label: "USERS",
-      render: (row: any) => {
+      case 5: // USERS
         return row.numberOfUsers;
-      },
-    },
-    {
-      key: "amount",
-      label: "AMOUNT (GHS)",
-      render: (row: any) => {
+      case 6: // AMOUNT (GHS)
         return `₵${row.amount.toLocaleString()}`;
-      },
-    },
-    {
-      key: "status",
-      label: "STATUS",
-      render: (row: any) => {
+      case 7: // STATUS
         return (
           <span
             className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -580,12 +558,7 @@ export default function MonthlyReportsPage() {
             {row.status.toUpperCase()}
           </span>
         );
-      },
-    },
-    {
-      key: "actions",
-      label: "ACTIONS",
-      render: (row: any) => {
+      case 8: // ACTIONS
         return (
           <div className="flex space-x-2">
             <Button
@@ -614,7 +587,6 @@ export default function MonthlyReportsPage() {
               </Form>
             )}
             {row.status === "submitted" && 
-              // Only show Review button to admin and manager roles
               ((currentUser as any).role === 'admin' || (currentUser as any).role === 'manager') && (
                 <Button
                   size="sm"
@@ -628,7 +600,6 @@ export default function MonthlyReportsPage() {
                 </Button>
               )
             }
-            {/* AI Analysis button - available for all reports */}
             <Button
               size="sm"
               color="secondary"
@@ -641,9 +612,10 @@ export default function MonthlyReportsPage() {
             </Button>
           </div>
         );
-      },
-    },
-  ];
+      default:
+        return "";
+    }
+  };
 
   return (
     <AdminLayout>
@@ -808,14 +780,31 @@ export default function MonthlyReportsPage() {
                   }
                   
                   if (filteredReports.length > 0) {
+                    const totalItems = filteredReports.length;
+                    const totalPages = Math.ceil(totalItems / itemsPerPage);
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const currentData = filteredReports.slice(startIndex, endIndex);
+                    
                     return (
                       <>
-                        <DataTable
+                        <NewCustomTable
+                          totalPages={totalPages}
+                          loadingState={isLoading ? "loading" : "idle"}
                           columns={columns}
-                          data={filteredReports}
-                          pagination
-                          search
-                        />
+                          page={currentPage}
+                          setPage={setCurrentPage}
+                        >
+                          {currentData.map((report: any, index: number) => (
+                            <TableRow key={report._id || index}>
+                              {columns.map((_, columnIndex) => (
+                                <TableCell key={columnIndex}>
+                                  {renderReportTableCell(report, columnIndex)}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          ))}
+                        </NewCustomTable>
                       </>
                     );
                   } else {

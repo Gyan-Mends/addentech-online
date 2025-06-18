@@ -1,6 +1,6 @@
-import { Button, Input, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Button, Input, Spinner, Tab, Tabs, TableRow, TableCell } from "@nextui-org/react";
 import { Form, useActionData, useLoaderData, useNavigation, useNavigate } from "@remix-run/react";
-import { DataTable } from "../components/DataTable";
+import NewCustomTable from "~/components/table/newTable";
 import AdminLayout from "~/layout/adminLayout";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import attendanceController from "~/controller/attendance";
@@ -334,6 +334,8 @@ export default function AttendancePage() {
   });
   const [selectedDepartment, setSelectedDepartment] = useState(searchParams.get('department') || "");
   const [selectedUser, setSelectedUser] = useState(searchParams.get('userId') || "");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const actionData = useActionData<typeof action>();
   const isLoading = navigation.state === "loading";
 
@@ -391,12 +393,22 @@ export default function AttendancePage() {
 
   // Columns for attendance table
   const columns = [
-    {
-      key: "user",
-      label: "USER",
-      render: (row: any) => {
+    { title: "USER", allowSort: true },
+    { title: "DEPARTMENT", allowSort: true },
+    { title: "DATE", allowSort: true },
+    { title: "CHECK IN", allowSort: false },
+    { title: "CHECK OUT", allowSort: false },
+    { title: "WORK MODE", allowSort: false },
+    { title: "WORK HOURS", allowSort: false },
+    { title: "STATUS", allowSort: false },
+    { title: "ACTIONS", allowSort: false },
+  ];
+
+  // Helper function to render table row cells
+  const renderTableCell = (row: any, columnIndex: number) => {
+    switch (columnIndex) {
+      case 0: // USER
         const user = row.user || {};
-        // Highlight the current user's records
         const isCurrentUser = user._id === loaderData.currentUser?.id;
         return (
           <span className={isCurrentUser ? "font-bold text-blue-600" : ""}>
@@ -404,99 +416,43 @@ export default function AttendancePage() {
             {isCurrentUser && " (You)"}
           </span>
         );
-      },
-    },
-    {
-      key: "department",
-      label: "DEPARTMENT",
-      render: (row: any) => {
+      case 1: // DEPARTMENT
         const department = row.department || {};
         return department.name || "";
-      },
-    },
-    {
-      key: "date",
-      label: "DATE",
-      render: (row: any) => {
+      case 2: // DATE
         return new Date(row.date).toLocaleDateString();
-      },
-    },
-    {
-      key: "checkInTime",
-      label: "CHECK IN",
-      render: (row: any) => {
+      case 3: // CHECK IN
         return new Date(row.checkInTime).toLocaleTimeString();
-      },
-    },
-    {
-      key: "checkOutTime",
-      label: "CHECK OUT",
-      render: (row: any) => {
+      case 4: // CHECK OUT
         return row.checkOutTime
           ? new Date(row.checkOutTime).toLocaleTimeString()
           : "Not checked out";
-      },
-    },
-    {
-      key: "location",
-      label: "WORK MODE",
-      render: (row: any) => {
-
+      case 5: // WORK MODE
         return (
           <span className={`text-xs ${row.workMode === "in-house" ? "text-blue-600" : "text-purple-600"}`}>
             {row.workMode === "in-house" ? "In-House" : "Remote"}
           </span>
         );
-
-      },
-    },
-    {
-      key: "workHours",
-      label: "WORK HOURS",
-      render: (row: any) => {
-        // Check if both check-in and check-out times exist
+      case 6: // WORK HOURS
         if (!row.checkInTime || !row.checkOutTime) {
           return "0 hrs 0 mins";
         }
-
-        // Calculate work hours
         const checkInTime = new Date(row.checkInTime);
         const checkOutTime = new Date(row.checkOutTime);
-
-        // Validate that the dates are valid
         if (isNaN(checkInTime.getTime()) || isNaN(checkOutTime.getTime())) {
           return "0 hrs 0 mins";
         }
-
         const workHours = checkOutTime.getTime() - checkInTime.getTime();
         const hours = Math.floor(workHours / (1000 * 60 * 60));
         const minutes = Math.floor((workHours % (1000 * 60 * 60)) / (1000 * 60));
-
-        // Ensure hours and minutes are valid numbers
         const validHours = isNaN(hours) ? 0 : Math.max(0, hours);
         const validMinutes = isNaN(minutes) ? 0 : Math.max(0, minutes);
-
         return `${validHours} hrs ${validMinutes} mins`;
-      },
-    },
-    {
-      key: "status",
-      label: "STATUS",
-      render: (row: any) => {
-        return (
-          // if checkout show out of office else show present
-          row.checkOutTime ? "Out of Office" : "In Office"
-        );
-      },
-    },
-    {
-      key: "actions",
-      label: "ACTIONS",
-      render: (row: any) => {
-        // Actions container to hold multiple buttons
+      case 7: // STATUS
+        return row.checkOutTime ? "Out of Office" : "In Office";
+      case 8: // ACTIONS
         return (
           <div className="flex space-x-2">
-            {/* Check-out button for records without checkout time */}
             {row.checkInTime && !row.checkOutTime && (
               <Form method="post" className="inline">
                 <input type="hidden" name="_action" value="checkOut" />
@@ -513,8 +469,6 @@ export default function AttendancePage() {
                 </Button>
               </Form>
             )}
-
-            {/* Delete button for admin/manager roles */}
             {loaderData.isAdmin && (
               <Form method="post" className="inline" onSubmit={(e) => {
                 if (!confirm('Are you sure you want to delete this attendance record?')) {
@@ -535,9 +489,10 @@ export default function AttendancePage() {
             )}
           </div>
         );
-      },
-    },
-  ];
+      default:
+        return "";
+    }
+  };
 
   return (
     <AdminLayout>
@@ -1068,15 +1023,33 @@ export default function AttendancePage() {
           ) : (
             <>
               {loaderData && 'data' in loaderData && loaderData.data && loaderData.data.length > 0 ? (
-                <DataTable
-                  columns={columns}
-                  data={loaderData.data.map((record: any) => ({
-                    ...record,
-                    searchableText: `${record.user?.firstName || ''} ${record.user?.lastName || ''} ${record.department?.name || ''} ${record.status || ''}`.toLowerCase()
-                  }))}
-                  pagination
-                  search
-                />
+                (() => {
+                  const totalItems = loaderData.data.length;
+                  const totalPages = Math.ceil(totalItems / itemsPerPage);
+                  const startIndex = (currentPage - 1) * itemsPerPage;
+                  const endIndex = startIndex + itemsPerPage;
+                  const currentData = loaderData.data.slice(startIndex, endIndex);
+                  
+                  return (
+                    <NewCustomTable
+                      totalPages={totalPages}
+                      loadingState={isLoading ? "loading" : "idle"}
+                      columns={columns}
+                      page={currentPage}
+                      setPage={setCurrentPage}
+                    >
+                      {currentData.map((record: any, index: number) => (
+                        <TableRow key={record._id || index}>
+                          {columns.map((_, columnIndex) => (
+                            <TableCell key={columnIndex}>
+                              {renderTableCell(record, columnIndex)}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </NewCustomTable>
+                  );
+                })()
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-500">

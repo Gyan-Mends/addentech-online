@@ -5,7 +5,7 @@ import { BarChart2, CheckSquare, Clock, FileText, User, Users, HomeIcon, Buildin
 import React, { useEffect, useState } from "react"
 import ChartComponent from "~/components/charts/Chart"
 import { CardBody } from "~/components/acternity/3d"
-import PerformanceTable from "~/components/tables/PerformanceTable"
+import NewCustomTable from "~/components/table/newTable"
 import MetricCard from "~/components/ui/customCard"
 import DashboardMetricCard from "~/components/ui/DashboardMetricCard"
 import DashboardWidget, { QuickStat, TeamMemberItem } from "~/components/ui/DashboardWidget"
