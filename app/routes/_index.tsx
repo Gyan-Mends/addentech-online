@@ -1,7 +1,7 @@
 import PublicLayout from "~/layout/PublicLayout";
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Chip } from "@nextui-org/react";
 import heroimage from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
-import CheckedIcon from "~/components/icons/CheckedIcon";
+import { CheckCircle } from "lucide-react";
 import { Link, useLoaderData } from "@remix-run/react";
 import img5 from "~/components/images/668c2173193fa0089dc32016_image-bg.jpg"
 import { ProductCard } from "~/components/produt";
@@ -242,7 +242,7 @@ const Home = () => {
                       (item, i) => (
                         <li key={i} className="flex items-center gap-2">
                           <div className="h-5 w-5 rounded-full bg-pink-500 flex items-center justify-center">
-                            <CheckedIcon className="h-3 w-3 text-white" />
+                            <CheckCircle className="h-3 w-3 text-white" />
                           </div>
                           <span className="font-nunito">{item}</span>
                         </li>
@@ -323,7 +323,7 @@ const Home = () => {
                       <CardBody className="pt-0">
                         <p className="text-gray-600 leading-relaxed mb-4">{service.description}</p>
                         <div className="flex items-center text-sm text-gray-500">
-                          <CheckedIcon className="w-4 h-4 text-green-500 mr-2" />
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
                           <span>Available 24/7</span>
                         </div>
                       </CardBody>
@@ -472,7 +472,7 @@ const Home = () => {
                       <ul className="space-y-2">
                         {phase.items.map((item, j) => (
                           <li key={j} className="flex items-start gap-2">
-                            <CheckedIcon className="h-4 w-4 text-white bg-gradient rounded mt-1" />
+                            <CheckCircle className="h-4 w-4 text-white bg-gradient rounded mt-1" />
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}

@@ -4,14 +4,7 @@ import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redi
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import BackIcon from "~/components/icons/BackIcon";
-import CloseIcon from "~/components/icons/CloseIcon";
-import { DeleteIcon } from "~/components/icons/DeleteIcon";
-import { EditIcon } from "~/components/icons/EditIcon";
-import NotificationIcon from "~/components/icons/NotificationIcon";
-import PlusIcon from "~/components/icons/PlusIcon";
-import { SearchIcon } from "~/components/icons/SearchIcon";
-import UserIcon from "~/components/icons/UserIcon";
+import { ArrowLeft, X, Trash2, Edit, Bell, Search, User as UserIcon } from "lucide-react";
 import ConfirmModal from "~/components/modal/confirmModal";
 import CreateModal from "~/components/modal/createModal";
 import EditModal from "~/components/modal/EditModal";
@@ -25,12 +18,11 @@ import { DepartmentInterface, MemoInterface, RegistrationInterface } from "~/int
 import AdminLayout from "~/layout/adminLayout";
 import { getSession } from "~/session";
 import { v4 as uuidv4 } from "uuid";
-import { FileUploader } from "~/components/icons/uploader";
+import { Upload as FileUpload } from "lucide-react";
 import memo from "~/controller/memeo";
 import memoController from "~/controller/memeo";
 import { MemoColumns } from "~/components/table/columns";
-import { ChevronDownIcon } from "~/components/icons/ArrowDown";
-import { EyeIcon } from "~/components/icons/EyeIcon";
+import { ChevronDown, Eye } from "lucide-react";
 import { Plus, FileText, Download, ChevronsDownIcon, DownloadCloudIcon, Upload } from "lucide-react";
 import Drawer from "~/components/modal/drawer";
 import Registration from "~/modal/registration";
@@ -319,18 +311,18 @@ const Users = () => {
                                     setIsConfirmModalOpened(true)
                                     setDataValue(memo)
                                 }}>
-                                    <DeleteIcon className="text-red-500" />
+                                                                            <Trash2 className="text-red-500" />
                                 </button>
                                 <button onClick={() => {
                                     handleEdit(memo);
                                 }}>
-                                    <EditIcon className="text-blue-500" />
+                                                                            <Edit className="text-blue-500" />
                                 </button>
                                 <button onClick={() => {
                                     setIsViewDrawerOpen(true)
                                     setDataValue(memo)
                                 }}>
-                                    <EyeIcon className="" />
+                                                                            <Eye className="" />
                                 </button>
                                 {(memo.image && memo.image !== '') ? (
                                     <a
@@ -598,7 +590,7 @@ const Users = () => {
                                         }
                                     }}
                                 />
-                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"><FileUploader className="h-20 w-20 text-white" /></span>
+                                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"><FileUpload className="h-20 w-20 text-white" /></span>
                             </div>
                         </div>
 

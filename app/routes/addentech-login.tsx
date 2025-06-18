@@ -16,9 +16,7 @@ import {
     useEffect,
     useState
 } from "react";
-import EmailIcon from "~/components/icons/EmailIcon";
-import { EyeSlashFilledIcon } from "~/components/icons/EyeFilled";
-import { EyeFilledIcon } from "~/components/icons/EyeSlash";
+import { Mail, EyeOff, Eye } from "lucide-react";
 import logo from "~/components/images/Dennislaw-Logo.svg"
 import CustomInput from "~/components/ui/CustomInput";
 
@@ -63,7 +61,7 @@ const Login = () => {
                             labelPlacement="outside"
                             placeholder="Enter your email "
                             type="email"
-                            endContent={<EmailIcon className="text-xl text-default-400 " />}
+                            endContent={<Mail className="text-xl text-default-400 " />}
                             className="placeholder:text-gray-300"
                         />
                         {emailError && (
@@ -87,9 +85,9 @@ const Login = () => {
                                     onClick={handleVisibility}
                                 >
                                     {isVisible ? (
-                                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        <EyeOff className="text-2xl text-default-400 pointer-events-none" />
                                     ) : (
-                                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        <Eye className="text-2xl text-default-400 pointer-events-none" />
                                     )}
                                 </button>
                             }

@@ -3,8 +3,7 @@ import { Button, Input, Textarea, TableRow, TableCell, Tooltip, Skeleton } from 
 import { ActionFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { Toaster } from "react-hot-toast";
-import PlusIcon from "~/components/icons/PlusIcon";
-import { SearchIcon } from "~/components/icons/SearchIcon";
+import { Search, Edit, Trash2, ArrowLeft, X } from "lucide-react";
 import CreateModal from "~/components/modal/createModal";
 import EditModal from "~/components/modal/EditModal";
 import { CategoryColumns } from "~/components/table/columns";
@@ -13,15 +12,11 @@ import { errorToast, successToast } from "~/components/toast";
 import AdminLayout from "~/layout/adminLayout";
 import ViewModal from "~/components/modal/viewModal";
 import ConfirmModal from "~/components/modal/confirmModal";
-import { EditIcon } from "~/components/icons/EditIcon";
-import { DeleteIcon } from "~/components/icons/DeleteIcon";
 import { getSession } from "~/session";
-import BackIcon from "~/components/icons/BackIcon";
 import NewCustomTable from "~/components/table/newTable";
 import { CategoryInterface } from "~/interface/interface";
 import category from "~/controller/categoryController";
 import usersController from "~/controller/Users";
-import CloseIcon from "~/components/icons/CloseIcon";
 import CustomInput from "~/components/ui/CustomInput";
 import { Plus } from "lucide-react";
 import Drawer from "~/components/modal/drawer";
@@ -132,13 +127,13 @@ const Category = () => {
                                         setDataValue(categories)
 
                                     }}>
-                                        <EditIcon className="w-4 h-4 text-primary" />
+                                        <Edit className="w-4 h-4 text-primary" />
                                     </button >
                                     <button onClick={() => {
                                         setDataValue(categories)
                                         setConfirmModalOpened(true)
                                     }}>
-                                        <DeleteIcon className="w-4 h-4 text-danger" />
+                                        <Trash2 className="w-4 h-4 text-danger" />
                                     </button>
 
                                 </TableCell>

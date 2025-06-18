@@ -4,9 +4,7 @@ import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubm
 import { Plus, Upload } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
-import { DeleteIcon } from "~/components/icons/DeleteIcon"
-import { EditIcon } from "~/components/icons/EditIcon"
-import { FileUploader } from "~/components/icons/uploader"
+import { Trash2, Edit, Upload as FileUpload } from "lucide-react"
 import ConfirmModal from "~/components/modal/confirmModal"
 import Drawer from "~/components/modal/drawer"
 import { UserColumns } from "~/components/table/columns"
@@ -212,13 +210,13 @@ const Users = () => {
                                         console.log('========================');
 
                                     }}>
-                                        <EditIcon className="" />
+                                        <Edit className="" />
                                     </button>
                                     <button className="text-action-delete hover:text-red-300" onClick={() => {
                                         setIsConfirmModalOpened(true)
                                         setDataValue(user as any)
                                     }}>
-                                        <DeleteIcon className="" />
+                                        <Trash2 className="" />
                                     </button>
                                 </div>
                             </TableCell>

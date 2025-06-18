@@ -1,13 +1,12 @@
 import toast from "react-hot-toast";
-import CheckedIcon from "./icons/CheckedIcon";
-import ErrorIcon from "./icons/ErrorIcon";
+import { CheckCircle, AlertCircle } from "lucide-react";
 
 export const errorToast = (message: string) => {
     return toast(
         (t) => (
             <div className="flex flex-col gap-2 ">
                 <div className="flex gap-2">
-                    <ErrorIcon className=" text-2xl text-danger" />
+                    <AlertCircle className=" text-2xl text-danger" />
                     <span className="font-poppins text-slate-800">{message}</span>
                 </div>
             </div>
@@ -22,7 +21,7 @@ export const successToast = (message: string) => {
     return toast(() => (
         <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-                <CheckedIcon className=" text-2xl text-primary" />
+                <CheckCircle className=" text-2xl text-primary" />
                 <span className="font-poppins text-slate-800">{message}</span>
             </div>
         </div>

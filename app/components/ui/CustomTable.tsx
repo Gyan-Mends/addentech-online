@@ -1,7 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, Pagination } from "@nextui-org/react";
-import LoaderIcon from "../icons/LoaderIcon";
-import noDataIllustration from "~/components/icons/no-data.svg"
+import { Loader2, Database } from "lucide-react";
 
 interface ColumnInterface {
     title?: string;
@@ -51,10 +50,11 @@ const CustomTble = (
                 </TableHeader>
                 <TableBody
                     loadingState={loadingState}
-                    loadingContent={<LoaderIcon className="text-white" />}
+                    loadingContent={<Loader2 className="text-white animate-spin" />}
                     emptyContent={
-                        <div className="h-full flex items-center justify-center">
-                            <img className="h-[65vh]" src={noDataIllustration} alt="" />
+                        <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                            <Database size={64} className="mb-4 opacity-50" />
+                            <p className="text-lg">No data available</p>
                         </div>
                     }
                 >

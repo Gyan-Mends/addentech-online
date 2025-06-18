@@ -2,7 +2,7 @@ import { Badge, Button, Chip } from "@nextui-org/react"
 import { Link, useLoaderData } from "@remix-run/react"
 import { CardBody, CardContainer, CardItem } from "~/components/acternity/3d"
 import { StatCard } from "~/components/card"
-import CheckedIcon from "~/components/icons/CheckedIcon"
+import { CheckCircle } from "lucide-react"
 import { ProductCard } from "~/components/produt"
 import { TeamMember } from "~/components/team"
 import { TestimonialCard } from "~/components/testimonial"
@@ -120,7 +120,7 @@ const About = () => {
                                         <ScrollAnimation delay={0.3}>
                                             <div key={i} className="flex items-start gap-3">
                                                 <div className="mt-1">
-                                                    <CheckedIcon className="h-5 w-5 text-pink-500" />
+                                                    <CheckCircle className="h-5 w-5 text-pink-500" />
                                                 </div>
                                                 <p className="font-nunito">{item}</p>
                                             </div>

@@ -868,7 +868,6 @@ const TaskDetails = () => {
                                     value={statusReason}
                                     onValueChange={setStatusReason}
                                     minRows={3}
-                                    variant="bordered"
                                     classNames={{
                                         input: "bg-dashboard-tertiary text-white",
                                         inputWrapper: "bg-dashboard-tertiary border-white/20",
@@ -916,7 +915,6 @@ const TaskDetails = () => {
                                     placeholder="Choose a department member"
                                     selectedKeys={assignedMember ? [assignedMember] : []}
                                     onSelectionChange={(keys) => setAssignedMember(Array.from(keys)[0] as string)}
-                                    variant="bordered"
                                     classNames={{
                                         trigger: "bg-dashboard-tertiary border-white/20 text-white",
                                         value: "text-white",
@@ -937,7 +935,6 @@ const TaskDetails = () => {
                                     value={assignmentInstructions}
                                     onValueChange={setAssignmentInstructions}
                                     minRows={3}
-                                    variant="bordered"
                                     classNames={{
                                         input: "bg-dashboard-tertiary text-white",
                                         inputWrapper: "bg-dashboard-tertiary border-white/20",
@@ -985,7 +982,6 @@ const TaskDetails = () => {
                                     label="Task Title"
                                     value={editTitle}
                                     onValueChange={setEditTitle}
-                                    variant="bordered"
                                     classNames={{
                                         input: "bg-dashboard-primary text-white",
                                         inputWrapper: "bg-dashboard-primary border-white/20",
@@ -999,7 +995,6 @@ const TaskDetails = () => {
                                     value={editDescription}
                                     onValueChange={setEditDescription}
                                     minRows={4}
-                                    variant="bordered"
                                     classNames={{
                                         input: "bg-dashboard-primary text-white",
                                         inputWrapper: "bg-dashboard-primary border-white/20",
@@ -1012,7 +1007,6 @@ const TaskDetails = () => {
                                     label="Priority"
                                     selectedKeys={[editPriority]}
                                     onSelectionChange={(keys) => setEditPriority(Array.from(keys)[0] as string)}
-                                    variant="bordered"
                                     classNames={{
                                         trigger: "bg-dashboard-tertiary border-white/20 text-white",
                                         value: "text-white",
@@ -1031,7 +1025,6 @@ const TaskDetails = () => {
                                     label="Due Date"
                                     value={editDueDate}
                                     onChange={(e) => setEditDueDate(e.target.value)}
-                                    variant="bordered"
                                     classNames={{
                                         input: "bg-dashboard-tertiary text-white",
                                         inputWrapper: "bg-dashboard-tertiary border-white/20",
@@ -1085,7 +1078,6 @@ const TaskDetails = () => {
                                 value={comment}
                                 onValueChange={setComment}
                                 minRows={4}
-                                variant="bordered"
                                 classNames={{
                                     input: "bg-dashboard-tertiary text-white",
                                     inputWrapper: "bg-dashboard-tertiary border-white/20",

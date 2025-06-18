@@ -5,8 +5,7 @@ import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubm
 import { CategoryColumns } from "~/components/table/columns";
 import AdminLayout from "~/layout/adminLayout";
 import ConfirmModal from "~/components/modal/confirmModal";
-import { EditIcon } from "~/components/icons/EditIcon";
-import { DeleteIcon } from "~/components/icons/DeleteIcon";
+import { Edit, Trash2 } from "lucide-react";
 import { getSession } from "~/session";
 import NewCustomTable from "~/components/table/newTable";
 import { CategoryInterface, DepartmentInterface } from "~/interface/interface";
@@ -98,13 +97,13 @@ const Category = () => {
                                         setDataValue(dept)
 
                                     }}>
-                                        <EditIcon className="text-primary" />
+                                        <Edit className="text-primary" />
                                     </button >
                                     <button onClick={() => {
                                         setDataValue(dept)
                                         setConfirmModalOpened(true)
                                     }}>
-                                        <DeleteIcon className="text-danger" />
+                                        <Trash2 className="text-danger" />
                                     </button>
 
                                 </TableCell>

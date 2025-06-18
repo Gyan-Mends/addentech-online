@@ -5,9 +5,7 @@ import { Plus, Upload } from "lucide-react"
 import { log } from "node:console"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
-import { DeleteIcon } from "~/components/icons/DeleteIcon"
-import { EditIcon } from "~/components/icons/EditIcon"
-import { FileUploader } from "~/components/icons/uploader"
+import { Trash2, Edit, Upload as FileUpload } from "lucide-react"
 import ConfirmModal from "~/components/modal/confirmModal"
 import Drawer from "~/components/modal/drawer"
 import { BlogColumns } from "~/components/table/columns"
@@ -179,13 +177,13 @@ const Users = () => {
                                         setIsEditModalOpened(true)
                                         setDataValue(blog)
                                     }}>
-                                        <EditIcon className="text-primary" />
+                                        <Edit className="text-primary" />
                                     </button>
                                     <button onClick={() => {
                                         setIsConfirmModalOpened(true)
                                         setDataValue(blog)
                                     }}>
-                                        <DeleteIcon className="text-danger" />
+                                        <Trash2 className="text-danger" />
                                     </button>
 
                                 </TableCell>
@@ -410,7 +408,7 @@ const Users = () => {
                                 />
                             ) : (
                                 <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                                    <FileUploader className="h-20 w-20 text-white" />
+                                    <FileUpload className="h-20 w-20 text-white" />
                                 </span>
                             )}
                         </div>
