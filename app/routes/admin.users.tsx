@@ -1,21 +1,20 @@
-import { Button, Divider, Select, SelectItem, TableCell, TableRow, Tooltip, User } from "@nextui-org/react"
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, } from "@remix-run/node"
-import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react"
+import { Button, Divider, Select, SelectItem, TableCell, TableRow, User } from "@nextui-org/react"
+import { LinksFunction, MetaFunction } from "@remix-run/node"
+import { useNavigate } from "@remix-run/react"
 import { Plus, Upload } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 import { Trash2, Edit, Upload as FileUpload } from "lucide-react"
+import axios from "axios"
 import ConfirmModal from "~/components/modal/confirmModal"
 import Drawer from "~/components/modal/drawer"
 import { UserColumns } from "~/components/table/columns"
 import NewCustomTable from "~/components/table/newTable"
 import { errorToast, successToast } from "~/components/toast"
 import CustomInput from "~/components/ui/CustomInput"
-import department from "~/controller/departments"
-import usersController from "~/controller/Users"
 import { DepartmentInterface, RegistrationInterface } from "~/interface/interface"
 import AdminLayout from "~/layout/adminLayout"
-import { getSession } from "~/session"
+
 export const links: LinksFunction = () => {
     return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
 };
@@ -54,33 +53,77 @@ const Users = () => {
     const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
     const [base64Image, setBase64Image] = useState<any>()
     const [isConfirmModalOpened, setIsConfirmModalOpened] = useState(false)
-    const [isEditModalOpened, setIsEditModalOpened] = useState(false)
     const [isEditDrawerOpened, setIsEditDrawerOpened] = useState(false)
     const [dataValue, setDataValue] = useState<RegistrationInterface>()
-    const [isLoading, setIsLoading] = useState(false)
-    const submit = useSubmit()
-    const actionData = useActionData<{
+    const navigate = useNavigate()
+    
+    // Data state
+    const [user, setUser] = useState<{ _id: string } | null>(null)
+    const [users, setUsers] = useState<RegistrationInterface[]>([])
+    const [totalPages, setTotalPages] = useState(1)
+    const [departments, setDepartments] = useState<DepartmentInterface[]>([])
+    const [currentPage, setCurrentPage] = useState(1)
+    
+    // Loading and error states
+    const [fetchLoading, setFetchLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    
+    // Form states
+    const [content, setContent] = useState("");
+    const [actionData, setActionData] = useState<{
         message: string;
         success: boolean;
         status: number;
-    }>()
-    const navigate = useNavigate()
-    const navigation = useNavigation()
-    const {
-        user,
-        users,
-        totalPages,
-        departments,
-        currentPage
-    } = useLoaderData<{
-        user: { _id: string },
-        users: RegistrationInterface[],
-        totalPages: number,
-        departments: DepartmentInterface[],
-        currentPage: number
-    }>()
-    const [content, setContent] = useState("");
-    const [department, setDepartment] = useState()
+    } | null>(null)
+
+    // Fetch users data
+    const fetchUsers = async (page = 1, search_term = "") => {
+        try {
+            setFetchLoading(true);
+            const response = await axios.get(`/api/users?page=${page}&search_term=${search_term}`);
+            if (response.data.success) {
+                const data = response.data.data;
+                setUser(data.user);
+                setUsers(data.users);
+                setTotalPages(data.totalPages);
+                setDepartments(data.departments);
+                setCurrentPage(data.currentPage);
+            }
+        } catch (error: any) {
+            setError(error.response?.data?.message || "Failed to fetch users");
+        } finally {
+            setFetchLoading(false);
+        }
+    };
+
+    // Handle user actions (create, update, delete)
+    const handleUserAction = async (formData: FormData) => {
+        try {
+            const response = await axios.post("/api/users", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            
+            setActionData(response.data);
+            
+            if (response.data.success) {
+                // Refresh the users list
+                await fetchUsers(currentPage);
+            }
+            
+            return response.data;
+        } catch (error: any) {
+            const errorData = error.response?.data || { message: "An error occurred", success: false };
+            setActionData(errorData);
+            return errorData;
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
     useEffect(() => {
         // Set the initial content from dataValue.description
         if (dataValue?.bio) {
@@ -115,9 +158,6 @@ const Users = () => {
         }
     }, [actionData])
 
-    const handleClick = () => {
-        setIsCreateModalOpened(true)
-    }
     const handleCreateModalClosed = () => {
         setIsCreateModalOpened(false)
     }
@@ -129,25 +169,36 @@ const Users = () => {
         setIsEditDrawerOpened(false)
     }
 
-
-    useEffect(() => {
-        const timeOut = setTimeout(() => {
-            setIsLoading(true)
-        }, 1000)
-        return () => clearTimeout(timeOut)
-    }, [])
-
-    useEffect(() => {
-        if (dataValue?.department) {
-            // setDataValue(dataValue.department);
-        }
-    }, [dataValue]);
-
     useEffect(() => {
         if (dataValue?.image) {
             setBase64Image(dataValue.image); // Set the image from the database as the initial value
         }
     }, [dataValue]);
+
+    const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        formData.append("intent", "update");
+        formData.append("id", dataValue?._id || "");
+        formData.append("admin", user?._id || "");
+        formData.append("base64Image", base64Image || "");
+        formData.append("bio", content);
+        formData.append("currentPage", currentPage.toString());
+        
+        await handleUserAction(formData);
+    };
+
+    const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        formData.append("intent", "create");
+        formData.append("admin", user?._id || "");
+        formData.append("base64Image", base64Image || "");
+        formData.append("bio", content);
+        formData.append("currentPage", currentPage.toString());
+        
+        await handleUserAction(formData);
+    };
 
     return (
         <AdminLayout>
@@ -164,12 +215,13 @@ const Users = () => {
                 {/* table  */}
                 <NewCustomTable
                     columns={UserColumns}
-                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                    loadingState={fetchLoading ? "loading" : "idle"}
                     totalPages={totalPages}
                     page={currentPage}
-                    setPage={(page) => (
-                        navigate(`?page=${page}`)
-                    )}>
+                    setPage={(page) => {
+                        setCurrentPage(page);
+                        fetchUsers(page);
+                    }}>
                     {users?.map((user, index: number) => (
                         <TableRow key={index} className="border-b border-dashboard hover:bg-dashboard-tertiary">
                             <TableCell className="text-xs">
@@ -226,21 +278,18 @@ const Users = () => {
             </div>
 
             {/* confirm modal */}
-            {/* confirm modal */}
             <ConfirmModal header="Confirm Delete" content="Are you sure to delete user?" isOpen={isConfirmModalOpened} onOpenChange={handleConfirmModalClosed}>
                 <div className="flex gap-4">
                     <Button color="success" variant="flat" className="font-montserrat font-semibold !text-white" size="sm" onPress={handleConfirmModalClosed}>
                         No
                     </Button>
-                    <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onPress={() => {
+                    <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onPress={async () => {
                         setIsConfirmModalOpened(false)
                         if (dataValue) {
-                            submit({
-                                intent: "delete",
-                                id: dataValue?._id
-                            }, {
-                                method: "post"
-                            })
+                            const formData = new FormData();
+                            formData.append("intent", "delete");
+                            formData.append("id", dataValue._id);
+                            await handleUserAction(formData);
                         }
                     }} >
                         Yes
@@ -248,12 +297,10 @@ const Users = () => {
                 </div>
             </ConfirmModal>
 
-            {/* Create Modal */}
-            {/* Create Modal */}
+            {/* Edit Modal */}
             {dataValue && (
-                console.log(dataValue),
                 <Drawer isDrawerOpened={isEditDrawerOpened} handleDrawerClosed={handleEditDrawerClosed} title="Edit User">
-                    <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
+                    <form onSubmit={handleEditSubmit} className="flex flex-col gap-4 p-4 !text-white">
                         <CustomInput
                             className="!text-white"
                             label="First name"
@@ -312,16 +359,6 @@ const Users = () => {
                                 labelPlacement="outside"
 
                             />
-                            {/* <CustomInput
-                                label=" Password"
-                                isRequired
-                                name="password"
-                                isClearable
-                                placeholder=" "
-                                type="text"
-                                labelPlacement="outside"
-
-                            /> */}
                         </div>
                         <div className="">
                             <Select
@@ -330,7 +367,7 @@ const Users = () => {
                                 labelPlacement="outside"
                                 placeholder="Select Role"
                                 isRequired
-                                defaultSelectedKeys={[dataValue.role]} // Ensure dataValue.role matches a valid key
+                                defaultSelectedKeys={[dataValue.role]}
                                 name="role"
                                 classNames={{
                                     label: "font-nunito text-sm !text-white",
@@ -353,7 +390,6 @@ const Users = () => {
                             </Select>
                         </div>
 
-
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Select
                                 isRequired
@@ -364,32 +400,13 @@ const Users = () => {
                                 name="department"
                                 selectedKeys={(() => {
                                     let selectedKey = '';
-
-                                    // Debug the department selection
-                                    console.log('Department selection debug:');
-                                    console.log('dataValue.department:', dataValue.department);
-                                    console.log('type:', typeof dataValue.department);
-
-                                    // Handle both cases: department as object or as string ID
                                     if (typeof dataValue.department === 'string') {
                                         selectedKey = dataValue.department;
-                                        console.log('Using string department ID:', selectedKey);
                                     } else if (dataValue.department?._id) {
                                         selectedKey = dataValue.department._id;
-                                        console.log('Using department._id:', selectedKey);
-                                    } else {
-                                        console.log('No valid department found');
                                     }
-
-                                    // Verify the department exists in available departments
-                                    const departmentExists = departments.some(dept => dept._id === selectedKey);
-                                    console.log('Department exists in list:', departmentExists);
-
                                     return selectedKey ? new Set([selectedKey]) : new Set([]);
                                 })()}
-                                onSelectionChange={(keys) => {
-                                    console.log('Department selection changed:', keys);
-                                }}
                                 classNames={{
                                     label: "font-nunito text-sm !text-white",
                                     popoverContent:
@@ -410,7 +427,7 @@ const Users = () => {
                                 label="Position"
                                 isRequired
                                 name="position"
-                                defaultValue={dataValue.role}
+                                defaultValue={dataValue.position}
                                 isClearable
                                 placeholder=" "
                                 type="text"
@@ -418,12 +435,10 @@ const Users = () => {
                             />
                         </div>
                         <div className=" ">
-                            <input name="base64Image" value={base64Image} type="hidden" />
                             <label className="font-nunito block text-sm !text-white" htmlFor="image">
                                 Image
                             </label>
                             <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-400 rounded-xl dark:border-white/30 mt-2">
-                                {/* The file input */}
                                 <input
                                     name="image"
                                     id="image"
@@ -435,13 +450,12 @@ const Users = () => {
                                         if (file) {
                                             const reader = new FileReader();
                                             reader.onloadend = () => {
-                                                setBase64Image(reader.result as string); // Update state with new image data
+                                                setBase64Image(reader.result as string);
                                             };
-                                            reader.readAsDataURL(file); // Convert file to base64
+                                            reader.readAsDataURL(file);
                                         }
                                     }}
                                 />
-                                {/* Display the default image or the uploaded image */}
                                 {base64Image ? (
                                     <img
                                         src={base64Image}
@@ -458,38 +472,27 @@ const Users = () => {
 
                         <div>
                             <Divider />
-
                             <div className="mt-6">
                                 <label htmlFor="" className="font-nunito !text-white">Bio</label>
-                                <input type="hidden" name="bio" value={content} />
                                 <ReactQuill
-                                    value={content} // Bind editor content to state
-                                    onChange={setContent} // Update state on change
+                                    value={content}
+                                    onChange={setContent}
                                     modules={modules}
                                     className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
                                 />
                             </div>
                         </div>
 
-                        <input name="admin" value={user?._id} type="hidden" />
-                        <input name="intent" value="update" type="hidden" />
-                        <input name="id" value={dataValue?._id} type="hidden" />
-                        <input name="currentPage" value={currentPage} type="hidden" />
-
-
-                        <Button size="sm" type="submit" className="rounded-xl bg-action-primary text-white text-sm mt-20 font-nunito h-10 w-40 px-4" onClick={() => {
-                            setIsEditModalOpened(false)
-                        }}>
+                        <Button size="sm" type="submit" className="rounded-xl bg-action-primary text-white text-sm mt-20 font-nunito h-10 w-40 px-4">
                             Update
                         </Button>
-                    </Form>
+                    </form>
                 </Drawer>
-            )
-            }
-            {/* Create Modal */}
+            )}
+
             {/* Create Modal */}
             <Drawer isDrawerOpened={isCreateModalOpened} handleDrawerClosed={handleCreateModalClosed} title="Create User">
-                <Form method="post" className="flex flex-col gap-4 p-4 !text-white">
+                <form onSubmit={handleCreateSubmit} className="flex flex-col gap-4 p-4 !text-white">
                     <CustomInput
                         label="First name"
                         isClearable
@@ -553,7 +556,7 @@ const Users = () => {
                     </div>
                     <div className="">
                         <Select
-                        variant="bordered"
+                            variant="bordered"
                             label="Role"
                             labelPlacement="outside"
                             className="!text-white"
@@ -644,127 +647,24 @@ const Users = () => {
 
                     <div>
                         <Divider />
-
                         <div className="mt-6">
                             <label htmlFor="" className="font-nunito text-white">Bio</label>
-                            <input type="hidden" name="bio" value={content} />
                             <ReactQuill
-                                value={content} // Bind editor content to state
-                                onChange={setContent} // Update state on change
+                                value={content}
+                                onChange={setContent}
                                 modules={modules}
                                 className="md:!h-[30vh] mt-2 font-nunito rounded w-full  !font-nunito"
                             />
                         </div>
                     </div>
 
-                    <input name="admin" value={user?._id} type="hidden" />
-                    <input name="intent" value="create" type="hidden" />
-                    <input name="base64Image" value={base64Image} type="hidden" />
-                    <input name="currentPage" value={currentPage} type="hidden" />
-
                     <button type="submit" className="rounded-xl bg-action-primary text-white text-sm font-nunito mt-20 h-10 w-40 px-4">
                         Submit
                     </button>
-                </Form>
+                </form>
             </Drawer>
         </AdminLayout >
     )
 }
 
-export default Users
-
-export const action: ActionFunction = async ({ request }) => {
-    const formData = await request.formData();
-    const firstName = formData.get("firstname") as string;
-    const lastName = formData.get("lastname") as string;
-    const middleName = formData.get("middlename") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const phone = formData.get("phone") as string;
-    const base64Image = formData.get("base64Image") as string;
-    const role = formData.get("role") as string;
-    const admin = formData.get("admin") as string;
-    const position = formData.get("position") as string;
-    const intent = formData.get("intent") as string;
-    const department = formData.get("department") as string;
-    const id = formData.get("id") as string;
-    const bio = formData.get("bio") as string;
-    const currentPage = formData.get("currentPage") as string;
-
-    switch (intent) {
-        case "create":
-            const user = await usersController.CreateUser({
-                firstName,
-                middleName,
-                lastName,
-                email,
-                admin,
-                password,
-                phone,
-                role,
-                intent,
-                position,
-                department,
-                base64Image,
-                bio,
-            });
-            return user;
-
-        case "delete":
-            const deleteUser = await usersController.DeleteUser({
-                id
-            })
-            return deleteUser
-
-        case "update":
-            const updateUser = await usersController.UpdateUser({
-                firstName,
-                middleName,
-                lastName,
-                email,
-                admin,
-                phone,
-                role,
-                position,
-                department,
-                base64Image,
-                id,
-                bio,
-            })
-            return updateUser
-        case "logout":
-            const logout = await usersController.logout(intent)
-            return logout
-        default:
-            return json({
-                message: "Bad request",
-                success: false,
-                status: 400
-            })
-    }
-}
-
-export const loader: LoaderFunction = async ({ request }) => {
-    const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") as string) || 1;
-    const search_term = url.searchParams.get("search_term") as string;
-
-    const session = await getSession(request.headers.get("Cookie"));
-    const token = session.get("email");
-    // if (!token) {
-    //     return redirect("/")
-    // }
-    const { user, users, totalPages } = await usersController.FetchUsers({
-        request,
-        page,
-        search_term
-    });
-    const { departments } = await department.getDepartments({
-        request,
-        page,
-        search_term
-    });
-
-    return json({ user, users, totalPages, departments, currentPage: page });
-}
-
+export default Users 

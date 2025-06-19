@@ -3,14 +3,8 @@ import {
     Input,
 } from "@nextui-org/react";
 import {
-    ActionFunction,
-    json
-} from "@remix-run/node";
-import {
-    Form,
     Link,
-    useActionData,
-    useNavigation
+    useNavigate
 } from "@remix-run/react";
 import {
     useEffect,
@@ -19,28 +13,84 @@ import {
 import { Mail, EyeOff, Eye } from "lucide-react";
 import logo from "~/components/images/Dennislaw-Logo.svg"
 import CustomInput from "~/components/ui/CustomInput";
-
-import login from "~/controller/login";
+import axios from "axios";
 
 const Login = () => {
-    const actionData = useActionData<any>();
+    const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(false);
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
-    const navigation = useNavigation();
-
-    const isSubmitting = navigation.state === "submitting";
-
-    useEffect(() => {
-        if (actionData) {
-            setEmailError(actionData.emailError?.email || "");
-            setPasswordError(actionData.passwordError?.password || "");
-        }
-    }, [actionData]);
+    const [emailErrorMessage, setEmailErrorMessage] = useState("");
+    const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        rememberMe: false
+    });
 
     const handleVisibility = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         setIsVisible(!isVisible);
+    };
+
+    const handleInputChange = (field: string, value: string | boolean) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+        // Clear errors when user starts typing
+        if (field === 'email') {
+            setEmailError("");
+            setEmailErrorMessage("");
+        }
+        if (field === 'password') {
+            setPasswordError("");
+            setPasswordErrorMessage("");
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        
+        // Clear previous errors
+        setEmailError("");
+        setPasswordError("");
+        setEmailErrorMessage("");
+        setPasswordErrorMessage("");
+
+        try {
+            const formDataToSend = new FormData();
+            formDataToSend.append("email", formData.email);
+            formDataToSend.append("password", formData.password);
+            formDataToSend.append("rememberMe", formData.rememberMe ? "on" : "off");
+
+            const response = await axios.post("/api/auth/login", formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data.success) {
+                // Redirect to the appropriate dashboard
+                navigate(response.data.redirectUrl);
+            }
+        } catch (error: any) {
+            if (error.response?.data) {
+                const errorData = error.response.data;
+                if (errorData.emailError) {
+                    setEmailError(errorData.emailError.email);
+                    setEmailErrorMessage(errorData.emailErrorMessage);
+                }
+                if (errorData.passwordError) {
+                    setPasswordError(errorData.passwordError.password);
+                    setPasswordErrorMessage(errorData.passwordErrorMessage);
+                }
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -53,7 +103,7 @@ const Login = () => {
                     <p className="text-gray-500 italic font-nunito">A legal material portal</p>
                 </div>
 
-                <Form method="post" className=" flex flex-col gap-6">
+                <form onSubmit={handleSubmit} className=" flex flex-col gap-6">
                     <div>
                         <Input
                             name="email"
@@ -61,12 +111,14 @@ const Login = () => {
                             labelPlacement="outside"
                             placeholder="Enter your email "
                             type="email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
                             endContent={<Mail className="text-xl text-default-400 " />}
                             className="placeholder:text-gray-300"
                         />
                         {emailError && (
                             <p className="text-danger font-nunito text-md mt-2">
-                                {actionData?.emailErrorMessage}
+                                {emailErrorMessage}
                             </p>
                         )}
                     </div>
@@ -78,9 +130,12 @@ const Login = () => {
                             labelPlacement="outside"
                             type={isVisible ? "text" : "password"}
                             placeholder="Enter your password "
+                            value={formData.password}
+                            onChange={(e) => handleInputChange('password', e.target.value)}
                             className="placeholder:text-gray-300"
                             endContent={
                                 <button
+                                    type="button"
                                     className="focus:outline-none"
                                     onClick={handleVisibility}
                                 >
@@ -94,41 +149,33 @@ const Login = () => {
                         />
                         {passwordError && (
                             <p className="text-danger font-nunito text-md mt-2">
-                                {actionData?.passwordErrorMessage}
+                                {passwordErrorMessage}
                             </p>
                         )}
                     </div>
 
                     <div className="flex justify-between mt-4 gap-4">
-                        <Checkbox type="checkbox" name="rememberMe">
+                        <Checkbox 
+                            isSelected={formData.rememberMe}
+                            onValueChange={(value) => handleInputChange('rememberMe', value)}
+                        >
                             <p className="font-nunito text-sm ">Remember me</p>
                         </Checkbox>
-                        <input type="text" name="intent" hidden value="create" />
                         <Link to="">
                             <p className="text-danger font-nunito text-sm">Forgot password?</p>
                         </Link>
                     </div>
                     <button
+                        type="submit"
                         className="font-nunito bg-primary-500 hover:bg-primary-600  text-lg hover:transition hover:duration-500 hover:-translate-y-2 text-white w-full h-10 mt-10 rounded-xl"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Loggin in..." : "Login"}
                     </button>
-                </Form>
+                </form>
             </div>
         </div>
     );
 };
 
 export default Login;
-
-export const action: ActionFunction = async ({ request }) => {
-    const formData = await request.formData();
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const rememberMe = formData.get("rememberMe") === "on";
-
-    const signin = await login.Logins({ request, email, password, rememberMe });
-
-    return signin;
-};
