@@ -1,7 +1,5 @@
 import { Avatar, Button, Checkbox, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Skeleton, TableCell, TableRow, User } from "@nextui-org/react";
 import FormSelect from "~/components/form/FormSelect";
-import { ActionFunction, json, LinksFunction, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigate, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { ArrowLeft, X, Trash2, Edit, Bell, Search, User as UserIcon } from "lucide-react";
@@ -11,69 +9,42 @@ import EditModal from "~/components/modal/EditModal";
 import NewCustomTable from "~/components/table/newTable";
 import { errorToast, successToast } from "~/components/toast";
 import CustomInput from "~/components/ui/CustomInput";
-import department from "~/controller/departments";
-import taskController from "~/controller/task";
-import usersController from "~/controller/Users";
 import { DepartmentInterface, MemoInterface, RegistrationInterface } from "~/interface/interface";
 import AdminLayout from "~/layout/adminLayout";
-import { getSession } from "~/session";
 import { v4 as uuidv4 } from "uuid";
 import { Upload as FileUpload } from "lucide-react";
-import memo from "~/controller/memeo";
-import memoController from "~/controller/memeo";
 import { MemoColumns } from "~/components/table/columns";
 import { ChevronDown, Eye } from "lucide-react";
 import { Plus, FileText, Download, ChevronsDownIcon, DownloadCloudIcon, Upload } from "lucide-react";
 import Drawer from "~/components/modal/drawer";
-import Registration from "~/modal/registration";
+import axios from "axios";
 
-export const links: LinksFunction = () => {
-    return [{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" }];
-};
-
-export const meta: MetaFunction = () => {
-    return [
-        { title: "Memorandum | Addentech" },
-        {
-            name: "description",
-            content: "Manage organizational memorandums.",
-        },
-        {
-            name: "author",
-            content: "MendsGyan",
-        },
-        { name: "og:title", content: "Addentech" },
-        {
-            name: "og:description",
-            content: "",
-        },
-        {
-            name: "og:image",
-            content:
-                "https://res.cloudinary.com/app-deity/image/upload/v1701282976/qfdbysyu0wqeugtcq9wq.jpg",
-        },
-        { name: "og:url", content: "https://marry-right.vercel.app" },
-        {
-            name: "keywords",
-            content: "Addentech, Addentech Ghana, Addentech Ghana Limited, memorandum, memo management, document management"
-        },
-    ];
-};
+// ReactQuill dynamic import
+const ReactQuill = typeof window === "object" ? require("react-quill") : () => false;
 
 const Users = () => {
+    // State management
+    const [memos, setMemos] = useState<MemoInterface[]>([]);
+    const [departments, setDepartments] = useState<DepartmentInterface[]>([]);
+    const [users, setUsers] = useState<RegistrationInterface[]>([]);
+    const [currentUser, setCurrentUser] = useState<RegistrationInterface | null>(null);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    // Modal and drawer states
     const [isCreateModalOpened, setIsCreateModalOpened] = useState(false);
     const [base64Image, setBase64Image] = useState<any>();
     const [isConfirmModalOpened, setIsConfirmModalOpened] = useState(false);
     const [isEditModalOpened, setIsEditModalOpened] = useState(false);
     const [dataValue, setDataValue] = useState<any>();
     const [isLoading, setIsLoading] = useState(false);
-    const submit = useSubmit();
-    const actionData = useActionData<any>();
-    const navigate = useNavigate();
-    const navigation = useNavigation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false);
     const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+    
+    // Form states
     const [referenceNumber, setReferenceNumber] = useState('');
     const [content, setContent] = useState("");
     const [contentTwo, setContentTow] = useState("");
@@ -91,77 +62,169 @@ const Users = () => {
     const [toUsers, setToUsers] = useState<any[]>([]);
     const [ccUsers, setCcUsers] = useState<any[]>([]);
 
-    console.log("This is the ref:" + referenceNumber);
-
-    function formatTime(date: Date) {
-        const now = new Date();
-        const isToday = date.toDateString() === now.toDateString();
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedTime = `${(hours % 12) || 12}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
-        return isToday ? `${formattedTime} Today` : formattedTime;
-    }
-
-    const {
-        departments,
-        memos,
-        totalPages,
-        users,
-        currentUser,
-        currentPage
-    } = useLoaderData<{
-        departments: DepartmentInterface[]
-        users: RegistrationInterface[]
-        memos: MemoInterface[]
-        totalPages: number
-        currentUser: RegistrationInterface
-        currentPage: number
-    }>()
-
-
-
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message);
+    // Fetch memos
+    const fetchMemos = async (page = 1, search = "") => {
+        try {
+            setLoading(true);
+            const params = new URLSearchParams();
+            params.set('page', page.toString());
+            if (search) params.set('search_term', search);
+            
+            const response = await axios.get(`/api/memos?${params.toString()}`);
+            
+            if (response.data.success) {
+                setMemos(response.data.data || []);
+                setTotalPages(response.data.totalPages || 1);
+                setCurrentUser(response.data.currentUser);
             } else {
-                errorToast(actionData.message);
+                errorToast(response.data.message || "Failed to fetch memos");
             }
+        } catch (error: any) {
+            console.error("Error fetching memos:", error);
+            errorToast(error.response?.data?.message || "Error fetching memos");
+        } finally {
+            setLoading(false);
         }
-    }, [actionData]);
+    };
 
-    useEffect(() => {
-        const timeOut = setTimeout(() => {
+    // Fetch departments
+    const fetchDepartments = async () => {
+        try {
+            const response = await axios.get('/api/departments');
+            if (response.data.success) {
+                setDepartments(response.data.data.departments || []);
+            }
+        } catch (error) {
+            console.error("Error fetching departments:", error);
+        }
+    };
+
+    // Fetch users
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('/api/users');
+            if (response.data.success) {
+                setUsers(response.data.data.users || []);
+            }
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
+
+    // Handle memo actions (create, update, delete)
+    const handleMemoAction = async (formData: FormData) => {
+        try {
             setIsLoading(true);
-        }, 1000);
-        return () => clearTimeout(timeOut);
+            const response = await axios.post('/api/memos', formData);
+            
+            if (response.data.success) {
+                successToast(response.data.message);
+                await fetchMemos(currentPage, searchTerm); // Refresh data
+                
+                // Close modals/drawers
+                setIsDrawerOpen(false);
+                setIsEditDrawerOpen(false);
+                setIsConfirmModalOpened(false);
+                
+                // Reset form
+                resetForm();
+            } else {
+                errorToast(response.data.message);
+            }
+        } catch (error: any) {
+            console.error("Error with memo action:", error);
+            errorToast(error.response?.data?.message || "Error processing memo action");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Reset form
+    const resetForm = () => {
+        setContent("");
+        setContentTow("");
+        setBase64Image("");
+        setDepartmentValue("");
+        setFromNameValue("");
+        setToNameValue("");
+        setToDepartmentValue("");
+        setCcNameValue("");
+        setCcDepartmentValue("");
+        setMemoTypeValue("");
+        setFrequencyValue("");
+        setDueDateValue("");
+        setDataValue(null);
+    };
+
+    // Generate random reference number
+    const generateRandomReference = () => {
+        return 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    };
+
+    // Handle create memo
+    const handleCreateMemo = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        formData.append('intent', 'create');
+        formData.append('base64Image', base64Image || '');
+        
+        await handleMemoAction(formData);
+    };
+
+    // Handle update memo
+    const handleUpdateMemo = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        formData.append('intent', 'update');
+        formData.append('base64Image', base64Image || '');
+        formData.append('id', dataValue?._id || '');
+        
+        await handleMemoAction(formData);
+    };
+
+    // Handle delete memo
+    const handleDeleteMemo = async () => {
+        if (!dataValue?._id) return;
+        
+        const formData = new FormData();
+        formData.append('intent', 'delete');
+        formData.append('id', dataValue._id);
+        
+        await handleMemoAction(formData);
+    };
+
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        fetchMemos(page, searchTerm);
+    };
+
+    // Handle search
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1);
+        fetchMemos(1, searchTerm);
+    };
+
+    // Load initial data
+    useEffect(() => {
+        fetchMemos();
+        fetchDepartments();
+        fetchUsers();
     }, []);
 
     // Filter users by department when to department changes
     useEffect(() => {
-        console.log('=== TO DEPARTMENT FILTERING DEBUG ===');
-        console.log('toDepartmentValue:', toDepartmentValue);
-        console.log('users array length:', users?.length || 0);
-        console.log('users sample:', users?.slice(0, 2));
-        
         if (toDepartmentValue && users) {
             const filteredUsers = users.filter(user => {
-                // Handle both cases: department as object or as string ID
                 const userDeptId = typeof user.department === 'object' 
                     ? (user.department as DepartmentInterface)?._id 
                     : user.department;
                 
-                console.log(`User: ${user.firstName} ${user.lastName}`);
-                console.log('  - user.department:', user.department);
-                console.log('  - typeof user.department:', typeof user.department);
-                console.log('  - userDeptId extracted:', userDeptId);
-                console.log('  - toDepartmentValue:', toDepartmentValue);
-                console.log('  - Match?', userDeptId === toDepartmentValue);
-                
                 return userDeptId === toDepartmentValue;
             });
-            console.log('Filtered users result:', filteredUsers);
             setToUsers(filteredUsers);
         } else {
             setToUsers([]);
@@ -173,7 +236,6 @@ const Users = () => {
     useEffect(() => {
         if (ccDepartmentValue && users) {
             const filteredUsers = users.filter(user => {
-                // Handle both cases: department as object or as string ID
                 const userDeptId = typeof user.department === 'object' 
                     ? (user.department as DepartmentInterface)?._id 
                     : user.department;
@@ -187,9 +249,36 @@ const Users = () => {
         setCcNameValue(""); // Reset selection when department changes
     }, [ccDepartmentValue, users]);
 
-    const generateRandomReference = () => {
-        return 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-    };
+    // Set base64 image when dataValue changes
+    useEffect(() => {
+        if (dataValue?.image) {
+            setBase64Image(dataValue.image);
+        }
+    }, [dataValue]);
+
+    // Set department value when dataValue changes
+    useEffect(() => {
+        if (dataValue?.fromDepartment && typeof dataValue.fromDepartment === 'object') {
+            setDepartmentValue((dataValue.fromDepartment as DepartmentInterface)._id);
+        }
+    }, [dataValue]);
+
+    // Set from name value when dataValue changes
+    useEffect(() => {
+        if (dataValue?.fromName && typeof dataValue.fromName === 'object') {
+            setFromNameValue((dataValue.fromName as RegistrationInterface)._id);
+        }
+    }, [dataValue]);
+
+    function formatTime(date: Date) {
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedTime = `${(hours % 12) || 12}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+        return isToday ? `${formattedTime} Today` : formattedTime;
+    }
 
     const handleConfirmModalClosed = () => {
         setIsConfirmModalOpened(false)
@@ -201,7 +290,6 @@ const Users = () => {
         setReferenceNumber(randomRef);
     };
 
-    const ReactQuill = typeof window === "object" ? require("react-quill") : () => false
     const modules = {
         toolbar: [
             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
@@ -213,24 +301,6 @@ const Users = () => {
             ['clean']
         ],
     };
-
-    useEffect(() => {
-        if (dataValue?.image) {
-            setBase64Image(dataValue.image);
-        }
-    }, [dataValue]);
-
-    useEffect(() => {
-        if (dataValue?.fromDepartment && typeof dataValue.fromDepartment === 'object') {
-            setDepartmentValue((dataValue.fromDepartment as DepartmentInterface)._id);
-        }
-    }, [dataValue]);
-
-    useEffect(() => {
-        if (dataValue?.fromName && typeof dataValue.fromName === 'object') {
-            setFromNameValue((dataValue.fromName as RegistrationInterface)._id);
-        }
-    }, [dataValue]);
 
     const handleEdit = (data: any) => {
         // Set the content for the Quill editors
@@ -291,12 +361,10 @@ const Users = () => {
 
                 <NewCustomTable
                     columns={MemoColumns}
-                    loadingState={navigation.state === "loading" ? "loading" : "idle"}
+                    loadingState={loading ? "loading" : "idle"}
                     totalPages={totalPages}
                     page={currentPage}
-                    setPage={(page) => (
-                        navigate(`?page=${page}`)
-                    )}>
+                    setPage={handlePageChange}>
                     {memos?.map((memo, index: number) => (
                         <TableRow key={index}>
                             <TableCell>{memo.refNumber}</TableCell>
@@ -311,18 +379,18 @@ const Users = () => {
                                     setIsConfirmModalOpened(true)
                                     setDataValue(memo)
                                 }}>
-                                                                            <Trash2 className="text-red-500" />
+                                    <Trash2 className="text-red-500" />
                                 </button>
                                 <button onClick={() => {
                                     handleEdit(memo);
                                 }}>
-                                                                            <Edit className="text-blue-500" />
+                                    <Edit className="text-blue-500" />
                                 </button>
                                 <button onClick={() => {
                                     setIsViewDrawerOpen(true)
                                     setDataValue(memo)
                                 }}>
-                                                                            <Eye className="" />
+                                    <Eye className="" />
                                 </button>
                                 {(memo.image && memo.image !== '') ? (
                                     <a
@@ -345,7 +413,6 @@ const Users = () => {
                                     </button>
                                 )}
                             </TableCell>
-
                         </TableRow>
                     ))}
                 </NewCustomTable>
@@ -358,7 +425,7 @@ const Users = () => {
                     }}
                     title="Create Memo"
                 >
-                    <Form className="flex flex-col gap-6 p-4" method="post">
+                    <form className="flex flex-col gap-6 p-4" onSubmit={handleCreateMemo}>
                         <input
                             name="refNumber"
                             className="text-sm shadow-sm border border-white/20 hover:border-b-action-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full h-10 rounded-xl pl-2"
@@ -421,7 +488,7 @@ const Users = () => {
                                     trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
-                                {departments.map((department: DepartmentInterface) => (
+                                {departments && departments.map((department: DepartmentInterface) => (
                                     <SelectItem className="!text-white" key={department._id}>{department.name}</SelectItem>
                                 ))}
                             </Select>
@@ -541,7 +608,7 @@ const Users = () => {
                                     trigger: " shadow-sm   border border-white/20 hover:border-b-primary hover:transition-all hover:duration-300 hover:ease-in-out hover:bg-white max-w-full bg-dashboard-secondary  "
                                 }}
                             >
-                                {departments.map((department: DepartmentInterface) => (
+                                {departments && departments.map((department: DepartmentInterface) => (
                                     <SelectItem className="!text-white" key={department._id}>{department.name}</SelectItem>
                                 ))}
                             </Select>
@@ -598,13 +665,11 @@ const Users = () => {
                         <input name="emailCheck" type="hidden" value="on" />
 
                         <div className="flex gap-6 mt-6">
-                            <button  className="font-montserrat w-40  bg-primary text-white py-2 rounded-md">Send Memo</button>
+                            <button type="submit" className="font-montserrat w-40  bg-primary text-white py-2 rounded-md" disabled={isLoading}>
+                                {isLoading ? "Sending..." : "Send Memo"}
+                            </button>
                         </div>
-
-                        <input name="intent" value="create" type="hidden" />
-                        <input name="base64Image" value={base64Image} type="hidden" />
-
-                    </Form>
+                    </form>
                 </Drawer>
 
                 {/* View Memo */}
@@ -681,7 +746,7 @@ const Users = () => {
                     handleDrawerClosed={() => setIsEditDrawerOpen(false)}
                     title="Edit Memo"
                 >
-                    <Form className="flex flex-col gap-6 p-4" method="post">
+                    <form className="flex flex-col gap-6 p-4" onSubmit={handleUpdateMemo}>
                         <input
                             name="refNumber"
                             className="text-sm shadow-sm   border border-white/20   hover:border-b-action-primary hover:transition-all hover:duration-300 hover:ease-in-out bg-dashboard-secondary max-w-full h-10 rounded-xl pl-2"
@@ -909,14 +974,11 @@ const Users = () => {
                         <input name="emailCheck" type="hidden" value="on" />
 
                         <div className="flex gap-6 mt-6">
-                            <button color="primary" className="font-montserrat w-40 !bg-primary text-white py-2 rounded-md">Update Memo</button>
+                            <button type="submit" className="font-montserrat w-40 !bg-primary text-white py-2 rounded-md" disabled={isLoading}>
+                                {isLoading ? "Updating..." : "Update Memo"}
+                            </button>
                         </div>
-
-                        <input name="intent" value="update" type="hidden" />
-                        <input name="base64Image" value={base64Image} type="hidden" />
-                        <input name="id" value={dataValue?._id} type="hidden" />
-
-                    </Form>
+                    </form>
                 </Drawer>
             </div>
 
@@ -925,156 +987,16 @@ const Users = () => {
                     <Button color="success" variant="flat" className="font-montserrat font-semibold" size="sm" onPress={handleConfirmModalClosed}>
                         No
                     </Button>
-                    <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onClick={() => {
-                        setIsConfirmModalOpened(false)
-                        if (dataValue) {
-                            submit({
-                                intent: "delete",
-                                id: dataValue?._id
-                            }, {
-                                method: "post"
-                            })
-                        }
-                    }} >
-                        Yes
+                    <Button color="danger" variant="flat" className="font-montserrat font-semibold " size="sm" onClick={handleDeleteMemo} disabled={isLoading}>
+                        {isLoading ? "Deleting..." : "Yes"}
                     </Button>
                 </div>
             </ConfirmModal>
+
+            <Toaster />
         </AdminLayout>
     );
 };
 
 export default Users;
-
-export const action: ActionFunction = async ({ request }) => {
-    const formData = await request.formData();
-
-    const refNumber = formData.get("refNumber") as string;
-    const fromDepartment = formData.get("fromDepartment") as string;
-    const fromName = formData.get("fromName") as string;
-    const memoDate = formData.get("memoDate") as string;
-    const toDepartment = formData.get("toDepartment") as string;
-    const toName = formData.get("toName") as string;
-    const subject = formData.get("subject") as string;
-    const memoType = formData.get("memoType") as string;
-    const dueDate = formData.get("dueDate") as string;
-    const frequency = formData.get("frequency") as string;
-    const remark = formData.get("remark") as string;
-    const ccDepartment = formData.get("ccDepartment") as string;
-    const ccName = formData.get("ccName") as string;
-    const base64Image = formData.get("base64Image") as string
-    const emailCheck = true; // Always true as requested
-    const intent = formData.get("intent") as string
-    const id = formData.get("id") as string;
-
-    // Get current user for email sending
-    const session = await getSession(request.headers.get("Cookie"));
-    const token = session.get("email");
-    const currentUser = token ? await Registration.findOne({ email: token }) : null;
-
-    if (!currentUser) {
-        return json({
-            message: "User not authenticated",
-            success: false,
-            status: 401
-        });
-    }
-
-    switch (intent) {
-        case "create":
-            const memo = await memoController.Memo({
-                refNumber,
-                fromDepartment,
-                fromName,
-                memoDate,
-                toDepartment,
-                toName,
-                subject,
-                memoType,
-                dueDate,
-                frequency,
-                remark,
-                ccDepartment,
-                ccName,
-                emailCheck,
-                base64Image,
-                currentUser,
-            })
-            return memo
-
-        case "update":
-            const updateMemo = await memoController.UpdateMemo({
-                id,
-                refNumber,
-                fromDepartment,
-                fromName,
-                memoDate,
-                toDepartment,
-                toName,
-                subject,
-                memoType,
-                dueDate,
-                frequency,
-                remark,
-                ccDepartment,
-                ccName,
-                emailCheck,
-                base64Image,
-                currentUser,
-            })
-            return updateMemo
-
-        case "delete":
-            const deleteMemo = await memoController.DeleteMemo({
-                id
-            })
-            return deleteMemo
-
-        default:
-            return json({
-                message: "Invalid intent",
-                success: false,
-                status: 400
-            })
-    }
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-    const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") as string) || 1;
-    const search_term = url.searchParams.get("search_term") as string;
-    const session = await getSession(request.headers.get("Cookie"));
-    const token = session.get("email");
-
-    if (!token) {
-        return redirect("/addentech-login");
-    }
-
-    // Get current user without populating department to keep it as ID
-    const currentUser = await Registration.findOne({ email: token });
-    
-    if (!currentUser) {
-        return redirect("/addentech-login");
-    }
-
-    const { departments } = await department.getDepartments({
-        request,
-        page,
-        search_term,
-    });
-
-    const { users } = await usersController.FetchUsers({
-        request,
-        page,
-        search_term,
-    });
-    
-    const { memos, totalPages } = await memoController.FetchMemo({
-        request,
-        page,
-        search_term,
-    });
-
-    return json({ departments, memos, totalPages, users, currentUser, currentPage: page });
-};
 
