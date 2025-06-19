@@ -142,39 +142,74 @@ export default function AttendancePage() {
       formData.append('action', 'checkIn');
       formData.append('notes', checkInNotes);
 
-      // Get location for in-house work mode
+      // Automatically get location for in-house work mode
       if (currentUser?.workMode === 'in-house') {
         try {
+          // Show loading message
+          const loadingToast = "Getting your location for attendance verification...";
+          console.log(loadingToast);
+          
           // Request location permission and get current position
           const position = await getCurrentLocation();
           formData.append('latitude', position.coords.latitude.toString());
           formData.append('longitude', position.coords.longitude.toString());
           formData.append('locationName', 'Office Location');
+          
+          console.log('Location captured:', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          });
+          
         } catch (locationError: any) {
           console.error("Location error:", locationError);
           
-          // Handle different location errors
-          if (locationError.code === 1) { // PERMISSION_DENIED
-            const allowLocation = confirm(
-              "Location access is required for in-house workers to verify attendance location. " +
-              "Please allow location access and try again. Do you want to continue without location?"
-            );
-            
-            if (!allowLocation) {
-              errorToast("Location access is required for in-house attendance");
-              setIsSubmitting(false);
-              return;
-            }
-          } else if (locationError.code === 2) { // POSITION_UNAVAILABLE
-            errorToast("Unable to determine your location. Please check your GPS settings.");
-            setIsSubmitting(false);
-            return;
-          } else if (locationError.code === 3) { // TIMEOUT
-            errorToast("Location request timed out. Please try again.");
-            setIsSubmitting(false);
-            return;
-          } else {
-            errorToast("Location access is required for in-house attendance. Please enable location services.");
+          // Handle different location errors with specific messages
+          let errorMessage = "";
+          let shouldContinue = false;
+          
+          switch (locationError.code) {
+            case 1: // PERMISSION_DENIED
+              errorMessage = "Location access denied. In-house attendance requires location verification to confirm you are at the office.";
+              const allowRetry = confirm(
+                "Location access is required for in-house workers to verify attendance location.\n\n" +
+                "Please:\n" +
+                "1. Click 'Allow' when prompted for location access\n" +
+                "2. Or enable location services in your browser settings\n\n" +
+                "Would you like to try again?"
+              );
+              
+              if (allowRetry) {
+                setIsSubmitting(false);
+                return; // Let user try again
+              } else {
+                shouldContinue = false;
+              }
+              break;
+              
+            case 2: // POSITION_UNAVAILABLE
+              errorMessage = "Unable to determine your location. Please check your GPS settings and ensure you have a good signal.";
+              shouldContinue = false;
+              break;
+              
+            case 3: // TIMEOUT
+              errorMessage = "Location request timed out. Please try again with a better internet connection.";
+              const retryTimeout = confirm("Location request timed out. Would you like to try again?");
+              if (retryTimeout) {
+                setIsSubmitting(false);
+                return; // Let user try again
+              }
+              shouldContinue = false;
+              break;
+              
+            default:
+              errorMessage = "Location services are not available. Please ensure location services are enabled in your browser.";
+              shouldContinue = false;
+              break;
+          }
+          
+          if (!shouldContinue) {
+            errorToast(errorMessage);
             setIsSubmitting(false);
             return;
           }

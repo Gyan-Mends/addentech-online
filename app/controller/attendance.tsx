@@ -227,7 +227,7 @@ class AttendanceController {
     locationName?: string;
   }) {
     try {
-      console.log('Check-in attempt:', { userId, departmentId, workMode });
+      console.log('Check-in attempt:', { userId, departmentId, workMode, hasLocation: !!(latitude && longitude) });
       
       // Check if today is a weekend (Saturday or Sunday)
       if (this.isWeekend()) {
@@ -282,7 +282,17 @@ class AttendanceController {
       }
 
       // Validate location for in-house attendance
-      if (workMode === "in-house" && (latitude && longitude)) {
+      if (workMode === "in-house") {
+        // Location is mandatory for in-house workers
+        if (!latitude || !longitude) {
+          console.log('Check-in failed: Location required for in-house attendance');
+          return json({
+            message: "Location access is required for in-house attendance. Please enable location services and allow location access.",
+            success: false,
+            status: 400,
+          });
+        }
+
         // Office location coordinates (as specified in requirements)
         const officeLatitude = 5.660881;
         const officeLongitude = -0.156627;
@@ -295,12 +305,16 @@ class AttendanceController {
           officeLongitude
         );
         
-        console.log('Location check:', { userCoords: {latitude, longitude}, officeCoords: {officeLatitude, officeLongitude}, distance });
+        console.log('Location check:', { 
+          userCoords: {latitude, longitude}, 
+          officeCoords: {officeLatitude, officeLongitude}, 
+          distance: `${distance.toFixed(3)} km` 
+        });
         
         // If user is not within 100 meters of the office
         if (distance > 0.1) { // 0.1 km = 100 meters
           return json({
-            message: "You are not at the office location. In-house attendance requires your physical presence.",
+            message: `You are not at the office location (${(distance * 1000).toFixed(0)}m away). In-house attendance requires your physical presence within 100m of the office.`,
             success: false,
             status: 400,
           });
@@ -331,15 +345,19 @@ class AttendanceController {
         status: 'present'
       };
       
+      // Add location data if provided (mandatory for in-house, optional for remote)
       if (latitude && longitude) {
         attendanceData.location = { 
           latitude, 
           longitude,
-          locationName: locationName || 'Unknown location'
+          locationName: locationName || (workMode === 'in-house' ? 'Office Location' : 'Remote Location')
         };
       }
       
-      console.log('Creating attendance record with data:', attendanceData);
+      console.log('Creating attendance record with data:', {
+        ...attendanceData,
+        location: attendanceData.location ? 'Location included' : 'No location'
+      });
       const attendance = new Attendance(attendanceData);
 
       const savedAttendance = await attendance.save();
@@ -347,7 +365,9 @@ class AttendanceController {
 
       if (savedAttendance) {
         return json({
-          message: "Check-in successful",
+          message: workMode === 'in-house' 
+            ? "Check-in successful - Location verified" 
+            : "Check-in successful",
           success: true,
           status: 201,
           data: savedAttendance,
