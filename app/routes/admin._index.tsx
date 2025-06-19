@@ -1,8 +1,6 @@
-import { LoaderFunction, json, redirect } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
-import { getSession } from "~/session";
-import Registration from "~/modal/registration";
-import dashboard from "~/controller/dashboard";
+import { Link } from "@remix-run/react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import AdminLayout from "~/layout/adminLayout";
 import DashboardMetricCard from "~/components/ui/DashboardMetricCard";
 import DashboardWidget, { QuickStat, TeamMemberItem } from "~/components/ui/DashboardWidget";
@@ -28,62 +26,91 @@ import {
   PieChart,
   Home,
   BookOpen,
-  Mail
+  Mail,
+  Loader2
 } from "lucide-react";
 import { Button, Progress, Chip, Avatar } from "@nextui-org/react";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
-export const loader: LoaderFunction = async ({ request }) => {
-  try {
-    const session = await getSession(request.headers.get("Cookie"));
-    const email = session.get("email");
-    
-    if (!email) {
-      return redirect("/addentech-login");
-    }
-    
-    const currentUser = await Registration.findOne({ email });
-    if (!currentUser) {
-      return redirect("/addentech-login");
-    }
-    
-    // Get comprehensive dashboard data based on user role
-    const dashboardData = await dashboard.getRoleDashboardData(
-      currentUser._id.toString(),
-      currentUser.role,
-      currentUser.department?.toString()
-    );
-    
-    return json({
-      currentUser: {
-        id: currentUser._id,
-        firstName: currentUser.firstName,
-        lastName: currentUser.lastName,
-        email: currentUser.email,
-        role: currentUser.role,
-        department: currentUser.department,
-        workMode: currentUser.workMode
-      },
-      dashboardData
-    });
-  } catch (error) {
-    console.error("Dashboard loader error:", error);
-    return json({
-      currentUser: null,
-      dashboardData: { error: "Failed to load dashboard data" }
-    });
-  }
-};
+// Removed loader function - now using axios with useEffect
 
 const Admin = () => {
-  const { currentUser, dashboardData } = useLoaderData<typeof loader>();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const formData = new FormData();
+      formData.append("action", "getRoleDashboardData");
+
+      const response = await axios.post("/api/dashboard", formData);
+
+      if (response.data.success) {
+        setCurrentUser(response.data.currentUser);
+        setDashboardData(response.data.data);
+      } else {
+        throw new Error(response.data.error || "Failed to fetch dashboard data");
+      }
+    } catch (error: any) {
+      console.error("Dashboard fetch error:", error);
+      const errorMessage = error.response?.data?.error || error.message || "Failed to load dashboard data";
+      setError(errorMessage);
+      
+      if (error.response?.status === 401) {
+        // Redirect to login if unauthorized
+        window.location.href = "/addentech-login";
+        return;
+      }
+      
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Loader2 className="h-16 w-16 text-blue-500 mx-auto mb-4 animate-spin" />
+            <h1 className="text-2xl font-bold text-white">Loading Dashboard</h1>
+            <p className="text-gray-400 mt-2">Please wait while we fetch your dashboard data...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
   
-  if (!currentUser) {
+  if (error || !currentUser) {
     return (
       <AdminLayout>
         <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
-          <p className="text-gray-600 mt-2">Please log in to access the dashboard.</p>
+          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-red-600">
+            {error ? "Dashboard Error" : "Access Denied"}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            {error || "Please log in to access the dashboard."}
+          </p>
+          <Button
+            className="mt-4"
+            color="primary"
+            onClick={fetchDashboardData}
+            disabled={loading}
+          >
+            {loading ? "Retrying..." : "Retry"}
+          </Button>
         </div>
       </AdminLayout>
     );
@@ -96,6 +123,14 @@ const Admin = () => {
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-red-600">Dashboard Error</h1>
           <p className="text-gray-600 mt-2">{dashboardData.error}</p>
+          <Button
+            className="mt-4"
+            color="primary"
+            onClick={fetchDashboardData}
+            disabled={loading}
+          >
+            {loading ? "Retrying..." : "Retry"}
+          </Button>
         </div>
       </AdminLayout>
     );
