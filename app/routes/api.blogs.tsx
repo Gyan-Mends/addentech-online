@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import department from "~/controller/departments";
+import blog from "~/controller/blog";
 import { getSession } from "~/session";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             return json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { departments, totalPages } = await department.getDepartments({
+        const { user, blogs, totalPages } = await blog.getBlogs({
             request,
             page,
             search_term
@@ -25,7 +25,8 @@ export const loader: LoaderFunction = async ({ request }) => {
         return json({ 
             success: true,
             data: {
-                departments, 
+                user, 
+                blogs, 
                 totalPages, 
                 currentPage: page 
             }
@@ -33,7 +34,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     } catch (error: any) {
         return json({
             success: false,
-            message: error.message || "Failed to fetch departments"
+            message: error.message || "Failed to fetch blogs"
         }, { status: 500 });
     }
 };
@@ -46,29 +47,42 @@ export const action: ActionFunction = async ({ request }) => {
         switch (intent) {
             case "create":
                 const name = formData.get("name") as string;
+                const base64Image = formData.get("base64Image") as string;
+                const category = formData.get("category") as string;
                 const description = formData.get("description") as string;
-                const id = formData.get("id") as string;
+                const admin = formData.get("admin") as string;
 
-                const createDepartment = await department.CategoryAdd(request, name, description, intent, id);
-                return createDepartment;
+                const createBlog = await blog.BlogAdd({
+                    name,
+                    base64Image,
+                    category,
+                    description,
+                    admin
+                });
+                return createBlog;
 
             case "delete":
                 const deleteId = formData.get("id") as string;
-                const deleteDepartment = await department.DeleteCat(intent, deleteId);
-                return deleteDepartment;
+                const deleteBlog = await blog.DeleteBlog({ intent, id: deleteId });
+                return deleteBlog;
 
             case "update":
                 const updateId = formData.get("id") as string;
                 const updateName = formData.get("name") as string;
+                const updateBase64Image = formData.get("base64Image") as string;
+                const updateCategory = formData.get("category") as string;
                 const updateDescription = formData.get("description") as string;
+                const updateAdmin = formData.get("admin") as string;
 
-                const updateDepartment = await department.UpdateCat({
-                    intent,
-                    id: updateId,
+                const updateBlog = await blog.UpdateCat({
                     name: updateName,
-                    description: updateDescription
+                    base64Image: updateBase64Image,
+                    category: updateCategory,
+                    description: updateDescription,
+                    admin: updateAdmin,
+                    id: updateId
                 });
-                return updateDepartment;
+                return updateBlog;
 
             default:
                 return json({
@@ -82,4 +96,4 @@ export const action: ActionFunction = async ({ request }) => {
             message: error.message || "An error occurred"
         }, { status: 500 });
     }
-};
+}; 

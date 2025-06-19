@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import department from "~/controller/departments";
+import contactController from "~/controller/contact";
 import { getSession } from "~/session";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             return json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { departments, totalPages } = await department.getDepartments({
+        const { contacts, totalPages } = await contactController.getContacts({
             request,
             page,
             search_term
@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         return json({ 
             success: true,
             data: {
-                departments, 
+                contacts, 
                 totalPages, 
                 currentPage: page 
             }
@@ -33,7 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     } catch (error: any) {
         return json({
             success: false,
-            message: error.message || "Failed to fetch departments"
+            message: error.message || "Failed to fetch contacts"
         }, { status: 500 });
     }
 };
@@ -45,30 +45,27 @@ export const action: ActionFunction = async ({ request }) => {
 
         switch (intent) {
             case "create":
-                const name = formData.get("name") as string;
+                const firstName = formData.get("firstName") as string;
+                const lastName = formData.get("lastName") as string;
+                const middleName = formData.get("middleName") as string;
+                const number = formData.get("number") as string;
+                const company = formData.get("company") as string;
                 const description = formData.get("description") as string;
-                const id = formData.get("id") as string;
 
-                const createDepartment = await department.CategoryAdd(request, name, description, intent, id);
-                return createDepartment;
+                const createContact = await contactController.Create({
+                    firstName,
+                    lastName,
+                    middleName,
+                    number,
+                    company,
+                    description
+                });
+                return createContact;
 
             case "delete":
                 const deleteId = formData.get("id") as string;
-                const deleteDepartment = await department.DeleteCat(intent, deleteId);
-                return deleteDepartment;
-
-            case "update":
-                const updateId = formData.get("id") as string;
-                const updateName = formData.get("name") as string;
-                const updateDescription = formData.get("description") as string;
-
-                const updateDepartment = await department.UpdateCat({
-                    intent,
-                    id: updateId,
-                    name: updateName,
-                    description: updateDescription
-                });
-                return updateDepartment;
+                const deleteContact = await contactController.DeleteCat(deleteId);
+                return deleteContact;
 
             default:
                 return json({
@@ -82,4 +79,4 @@ export const action: ActionFunction = async ({ request }) => {
             message: error.message || "An error occurred"
         }, { status: 500 });
     }
-};
+}; 

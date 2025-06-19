@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import department from "~/controller/departments";
+import category from "~/controller/categoryController";
 import { getSession } from "~/session";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             return json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { departments, totalPages } = await department.getDepartments({
+        const { user, categories, totalPages } = await category.getCategories({
             request,
             page,
             search_term
@@ -25,7 +25,8 @@ export const loader: LoaderFunction = async ({ request }) => {
         return json({ 
             success: true,
             data: {
-                departments, 
+                user, 
+                categories, 
                 totalPages, 
                 currentPage: page 
             }
@@ -33,7 +34,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     } catch (error: any) {
         return json({
             success: false,
-            message: error.message || "Failed to fetch departments"
+            message: error.message || "Failed to fetch categories"
         }, { status: 500 });
     }
 };
@@ -46,29 +47,30 @@ export const action: ActionFunction = async ({ request }) => {
         switch (intent) {
             case "create":
                 const name = formData.get("name") as string;
+                const seller = formData.get("seller") as string;
                 const description = formData.get("description") as string;
                 const id = formData.get("id") as string;
 
-                const createDepartment = await department.CategoryAdd(request, name, description, intent, id);
-                return createDepartment;
+                const createCategory = await category.CategoryAdd(request, name, description, seller, intent, id);
+                return createCategory;
 
             case "delete":
                 const deleteId = formData.get("id") as string;
-                const deleteDepartment = await department.DeleteCat(intent, deleteId);
-                return deleteDepartment;
+                const deleteCategory = await category.DeleteCat(intent, deleteId);
+                return deleteCategory;
 
             case "update":
                 const updateId = formData.get("id") as string;
                 const updateName = formData.get("name") as string;
                 const updateDescription = formData.get("description") as string;
 
-                const updateDepartment = await department.UpdateCat({
+                const updateCategory = await category.UpdateCat({
                     intent,
                     id: updateId,
                     name: updateName,
                     description: updateDescription
                 });
-                return updateDepartment;
+                return updateCategory;
 
             default:
                 return json({
@@ -82,4 +84,4 @@ export const action: ActionFunction = async ({ request }) => {
             message: error.message || "An error occurred"
         }, { status: 500 });
     }
-};
+}; 

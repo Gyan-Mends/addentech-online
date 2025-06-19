@@ -1,33 +1,73 @@
-import { Button, Card, CardHeader, Input, Textarea } from "@nextui-org/react"
-import { ActionFunction, json } from "@remix-run/node"
-import { Form, Link, useActionData, useSubmit, useFormAction } from "@remix-run/react"
+import { Button, Card, Input, Textarea } from "@nextui-org/react"
+import { Link } from "@remix-run/react"
 import { CheckCircle, Users } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
+import axios from "axios"
 import ScrollAnimation from "~/components/animation"
 import { errorToast, successToast } from "~/components/toast"
-import contactController from "~/controller/contact"
 import PublicLayout from "~/layout/PublicLayout"
 
 
 
 const Contact = () => {
-    const actionData = useActionData<any>()
+    const [formData, setFormData] = useState({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        number: "",
+        company: "",
+        description: ""
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    useEffect(() => {
-        if (actionData) {
-            if (actionData.success) {
-                successToast(actionData.message)
+    const handleInputChange = (field: string, value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const formDataToSend = new FormData();
+            formDataToSend.append("firstName", formData.firstName);
+            formDataToSend.append("middleName", formData.middleName);
+            formDataToSend.append("lastName", formData.lastName);
+            formDataToSend.append("number", formData.number);
+            formDataToSend.append("company", formData.company);
+            formDataToSend.append("description", formData.description);
+            formDataToSend.append("intent", "create");
+
+            const response = await axios.post("/api/contacts", formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data.success) {
+                successToast(response.data.message);
                 // Reset form
-                const form = document.querySelector("form") as HTMLFormElement
-                if (form) {
-                    form.reset()
-                }
+                setFormData({
+                    firstName: "",
+                    middleName: "",
+                    lastName: "",
+                    number: "",
+                    company: "",
+                    description: ""
+                });
             } else {
-                errorToast(actionData.message)
+                errorToast(response.data.message);
             }
+        } catch (error: any) {
+            errorToast(error.response?.data?.message || "Failed to send message");
+        } finally {
+            setIsSubmitting(false);
         }
-    }, [actionData])
+    };
 
     return (
         <PublicLayout>
@@ -100,7 +140,7 @@ const Contact = () => {
                                                 <p className="font-nunito text-default-600">Fill out the form below to contact our team</p>
                                         </div>
                                         <div>
-                                            <Form method="post" className="w-full flex flex-col gap-6">
+                                            <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
                                                 <div className="flex gap-4">
                                                     <Input
                                                         name="firstName"
@@ -108,6 +148,8 @@ const Contact = () => {
                                                         placeholder=" Mends"
                                                         labelPlacement="outside"
                                                         className="h-10"
+                                                        value={formData.firstName}
+                                                        onChange={(e) => handleInputChange('firstName', e.target.value)}
                                                         classNames={{
                                                             inputWrapper: " flex-grow w-full border border-black/10 rounded-md ",
                                                             label: "!dark:text-white font-nunito text-md",
@@ -115,10 +157,12 @@ const Contact = () => {
                                                     />
                                                     <Input
                                                         name="middleName"
-                                                        label="Last Name"
+                                                        label="Middle Name"
                                                         placeholder="Gyan "
                                                         labelPlacement="outside"
                                                         className="h-10"
+                                                        value={formData.middleName}
+                                                        onChange={(e) => handleInputChange('middleName', e.target.value)}
                                                         classNames={{
                                                             inputWrapper: " flex-grow w-full border border-black/10 rounded-md ",
                                                             label: "!dark:text-white font-nunito text-md",
@@ -129,9 +173,11 @@ const Contact = () => {
                                                 <Input
                                                     name="lastName"
                                                     label="Last Name"
-                                                    placeholder="addentech@example.com "
+                                                    placeholder="Last name"
                                                     labelPlacement="outside"
                                                     className="h-10"
+                                                    value={formData.lastName}
+                                                    onChange={(e) => handleInputChange('lastName', e.target.value)}
                                                     classNames={{
                                                         inputWrapper: " flex-grow w-full border border-black/10 rounded-md ",
                                                         label: "!dark:text-white font-nunito text-md",
@@ -145,6 +191,8 @@ const Contact = () => {
                                                         placeholder=" 0593125184"
                                                         labelPlacement="outside"
                                                         className="h-10"
+                                                        value={formData.number}
+                                                        onChange={(e) => handleInputChange('number', e.target.value)}
                                                         classNames={{
                                                             inputWrapper: " flex-grow w-full border border-black/10 rounded-md ",
                                                             label: "!dark:text-white font-nunito text-md",
@@ -156,6 +204,8 @@ const Contact = () => {
                                                         placeholder="Addentech "
                                                         labelPlacement="outside"
                                                         className="h-10"
+                                                        value={formData.company}
+                                                        onChange={(e) => handleInputChange('company', e.target.value)}
                                                         classNames={{
                                                             inputWrapper: " flex-grow w-full border border-black/10 rounded-md ",
                                                             label: "!dark:text-white font-nunito text-md",
@@ -169,6 +219,8 @@ const Contact = () => {
                                                     labelPlacement="outside"
                                                     placeholder=" Let's get in touch "
                                                     maxRows={8}
+                                                    value={formData.description}
+                                                    onChange={(e) => handleInputChange('description', e.target.value)}
                                                     classNames={{
                                                         inputWrapper: "resize-y flex-grow w-full border !h-48 border-black/10 hover:bg-[#0b0e13] focus:bg-[#0b0e13]",
                                                         label: "!dark:text-white font-nunito text-md",
@@ -176,15 +228,14 @@ const Contact = () => {
                                                     }}
                                                 />
 
-                                                <input type="text" hidden value="create" name="intent" />
-
-
                                                 <button
-                                                        className="h-10 w-40 rounded-lg text-lg font-montserrat bg-pink-500 text-white  hover:transition hover:duration-500 hover:dark:text-white"
+                                                    type="submit"
+                                                    disabled={isSubmitting}
+                                                    className="h-10 w-40 rounded-lg text-lg font-montserrat bg-pink-500 text-white  hover:transition hover:duration-500 hover:dark:text-white disabled:opacity-50"
                                                 >
-                                                    Submit
+                                                    {isSubmitting ? "Submitting..." : "Submit"}
                                                 </button>
-                                            </Form>
+                                            </form>
                                         </div>
 
                                     </Card>
@@ -243,36 +294,3 @@ const Contact = () => {
 }
 
 export default Contact
-
-export const action: ActionFunction = async ({ request }) => {
-    const formData = await request.formData();
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
-    const middleName = formData.get("middleName") as string;
-    const number = formData.get("number") as string;
-    const company = formData.get("company") as string;
-    const description = formData.get("description") as string;
-    const intent = formData.get("intent") as string;
-
-
-    switch (intent) {
-        case "create":
-            const user = await contactController.Create({
-                firstName,
-                middleName,
-                lastName,
-                number,
-                company,
-                description,
-
-            })
-            return user
-
-        default:
-            return json({
-                message: "Bad request",
-                success: false,
-                status: 400
-            })
-    }
-}
