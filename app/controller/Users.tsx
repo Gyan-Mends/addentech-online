@@ -19,6 +19,7 @@ class UsersController {
         department,
         base64Image,
         bio,
+        employee,
     }: {
           firstName: string;
           middleName: string;
@@ -33,6 +34,7 @@ class UsersController {
           department: string;
           base64Image: string;
           bio?: string;
+          employee?: boolean;
       }) {
         try {
             if (intent === "create") {
@@ -68,6 +70,7 @@ class UsersController {
                     department,
                   image: base64Image,
                   bio,
+                  employee: employee !== undefined ? employee : true,
               });
 
                 // Save user details
@@ -141,6 +144,7 @@ class UsersController {
         department,
         base64Image,
         bio,
+        employee,
     }: {
     firstName: string;
     middleName?: string;
@@ -154,6 +158,7 @@ class UsersController {
     department?: string;
     base64Image?: string;
     bio?: string;
+    employee?: boolean;
 }) {
       try {
           // Find the user to update
@@ -183,6 +188,7 @@ class UsersController {
             department,
             image: updatedImage,
             bio,
+            employee: employee !== undefined ? employee : true,
         };
 
         // Remove undefined values from the payload
@@ -237,64 +243,87 @@ class UsersController {
         page = 1,
         search_term,
         limit = 7,
+        employee,
     }: {
         request?: Request;
             page?: number;
         search_term?: string;
         limit?: number;
+        employee?: boolean;
         }) {
         const skipCount = (page - 1) * (limit); 
 
-        const searchFilter = search_term
-            ? {
-                $or: [
-                    {
-                        firstName: {
-                            $regex: new RegExp(
-                                search_term
-                                    .split(" ")
-                                    .map((term) => `(?=.*${term})`)
-                                    .join(""),
-                                "i"
-                            ),
-                        },
+        // Build the combined filter
+        const combinedFilter: any = {};
+        
+        // Add search filter if specified
+        if (search_term) {
+            combinedFilter.$or = [
+                {
+                    firstName: {
+                        $regex: new RegExp(
+                            search_term
+                                .split(" ")
+                                .map((term) => `(?=.*${term})`)
+                                .join(""),
+                            "i"
+                        ),
                     },
-                    {
-                        lastName: {
-                            $regex: new RegExp(
-                                search_term
-                                    .split(" ")
-                                    .map((term) => `(?=.*${term})`)
-                                    .join(""),
-                                "i"
-                            ),
-                        },
+                },
+                {
+                    lastName: {
+                        $regex: new RegExp(
+                            search_term
+                                .split(" ")
+                                .map((term) => `(?=.*${term})`)
+                                .join(""),
+                            "i"
+                        ),
                     },
-                    {
-                        email: {
-                            $regex: new RegExp(
-                                search_term
-                                    .split(" ")
-                                    .map((term) => `(?=.*${term})`)
-                                    .join(""),
-                                "i"
-                            ),
-                        },
+                },
+                {
+                    email: {
+                        $regex: new RegExp(
+                            search_term
+                                .split(" ")
+                                .map((term) => `(?=.*${term})`)
+                                .join(""),
+                            "i"
+                        ),
                     },
-                    {
-                        phone: {
-                            $regex: new RegExp(
-                                search_term
-                                    .split(" ")
-                                    .map((term) => `(?=.*${term})`)
-                                    .join(""),
-                                "i"
-                            ),
-                        },
+                },
+                {
+                    phone: {
+                        $regex: new RegExp(
+                            search_term
+                                .split(" ")
+                                .map((term) => `(?=.*${term})`)
+                                .join(""),
+                            "i"
+                        ),
                     },
-                ],
+                },
+            ];
+        }
+        
+        // Add employee filter if specified
+        if (employee !== undefined) {
+            if (employee === true) {
+                // For employee = true, include users with employee: true OR users without the employee field
+                combinedFilter.$and = [
+                    ...(combinedFilter.$and || []),
+                    {
+                        $or: [
+                            { employee: true },
+                            { employee: { $exists: false } }
+                        ]
+                    }
+                ];
+            } else {
+                // For employee = false, only include users with employee: false
+                combinedFilter.employee = false;
             }
-            : {};
+        }
 
         try {
             // Get session and user information if request is provided
@@ -303,11 +332,11 @@ class UsersController {
             const user = token ? await Registration.findOne({ email: token }) : null;
 
             // Get total employee count and calculate total pages       
-            const totalEmployeeCount = await Registration.countDocuments(searchFilter).exec();
+            const totalEmployeeCount = await Registration.countDocuments(combinedFilter).exec();
             const totalPages = Math.ceil(totalEmployeeCount / (limit || 9));
 
             // Find users with pagination and search filter
-            const users = await Registration.find(searchFilter)
+            const users = await Registration.find(combinedFilter)
                 .populate("department")
                 .skip(skipCount)
                 .limit(limit || 9)

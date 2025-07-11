@@ -155,13 +155,19 @@ export default Team
 export const loader: LoaderFunction = async ({ request }) => {
     const { user, users, totalPages } = await usersController.FetchUsers({
         request,
+        employee: true,  // Only fetch users who are employees
     })
 
     return json({ user, users, totalPages })
 }
 
 // Enhanced Team Member component with the new styling
-function EnhancedTeamMember({ name, role, img, socials }) {
+function EnhancedTeamMember({ name, role, img, socials }: {
+    name: string;
+    role: string;
+    img: string;
+    socials: { platform: string; url: string }[];
+}) {
     return (
         <div className="border border-white/10  overflow-hidden group hover:border-pink-500/30 transition-all duration-300 h-full rounded-lg shadow-lg">
 
@@ -180,7 +186,7 @@ function EnhancedTeamMember({ name, role, img, socials }) {
                 <p className=" mb-4">{role}</p>
 
                 <div className="flex gap-3">
-                    {socials.map((social, index) => {
+                    {socials.map((social: { platform: string; url: string }, index: number) => {
                         const SocialIcon =
                             social.platform === "twitter"
                                 ? Twitter

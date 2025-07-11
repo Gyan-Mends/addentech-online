@@ -197,6 +197,12 @@ const Users = () => {
                                 </span>
                             </TableCell>
                             <TableCell>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.employee !== false ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
+                                    }`}>
+                                    {user.employee !== false ? 'Yes' : 'No'}
+                                </span>
+                            </TableCell>
+                            <TableCell>
                                 <div className="flex items-center gap-2">
                                     <button className="text-action-view hover:text-green-300" onClick={() => {
                                         setIsEditDrawerOpened(true)
@@ -417,6 +423,18 @@ const Users = () => {
                                 labelPlacement="outside"
                             />
                         </div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <input
+                                type="checkbox"
+                                name="employee"
+                                id="employee-edit"
+                                defaultChecked={dataValue.employee !== false}
+                                className="w-4 h-4 text-pink-600 bg-dashboard-secondary border-gray-300 rounded focus:ring-pink-500 focus:ring-2"
+                            />
+                            <label htmlFor="employee-edit" className="text-sm font-medium text-white">
+                                Is Employee (shows on team page)
+                            </label>
+                        </div>
                         <div className=" ">
                             <input name="base64Image" value={base64Image} type="hidden" />
                             <label className="font-nunito block text-sm !text-white" htmlFor="image">
@@ -608,6 +626,19 @@ const Users = () => {
                         />
                     </div>
 
+                    <div className="flex items-center gap-2 mb-4">
+                        <input
+                            type="checkbox"
+                            name="employee"
+                            id="employee-create"
+                            defaultChecked={true}
+                            className="w-4 h-4 text-pink-600 bg-dashboard-secondary border-gray-300 rounded focus:ring-pink-500 focus:ring-2"
+                        />
+                        <label htmlFor="employee-create" className="text-sm font-medium text-white">
+                            Is Employee (shows on team page)
+                        </label>
+                    </div>
+
                     <div className=" ">
                         <label className="font-nunito block text-sm text-white" htmlFor="">Image</label>
                         <div className="relative inline-block w-40 h-40 border-2 border-dashed border-gray-600 rounded-xl dark:border-white/30 mt-2">
@@ -690,6 +721,7 @@ export const action: ActionFunction = async ({ request }) => {
     const id = formData.get("id") as string;
     const bio = formData.get("bio") as string;
     const currentPage = formData.get("currentPage") as string;
+    const employee = formData.get("employee") === "on"; // checkbox value
 
     switch (intent) {
         case "create":
@@ -707,6 +739,7 @@ export const action: ActionFunction = async ({ request }) => {
                 department,
                 base64Image,
                 bio,
+                employee,
             });
             return user;
 
@@ -730,6 +763,7 @@ export const action: ActionFunction = async ({ request }) => {
                 base64Image,
                 id,
                 bio,
+                employee,
             })
             return updateUser
         case "logout":

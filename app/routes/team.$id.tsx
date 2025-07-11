@@ -52,16 +52,16 @@ export default function TeamMemberDetailPage() {
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
-                        <div className="w-full md:w-1/3">
+                        <div className="w-full md:w-1/2">
                             <div className="aspect-square overflow-hidden rounded-xl  hover:transform hover:perspective-[1000px] hover:rotate-x-6 hover:rotate-y-6 hover:scale-105 transition-transform duration-500">
                                 <ScrollAnimation>
                                     <img
-                                    src={userDetail.image || "/placeholder.svg"}
-                                    alt={userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
-                                    width={600}
-                                    height={600}
-                                    className="h-full w-full object-cover"
-                                />
+                                        src={userDetail.image || "/placeholder.svg"}
+                                        alt={userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
+                                        width={600}
+                                        height={600}
+                                        className="h-full w-full rounded-xl"
+                                    />
                                 </ScrollAnimation>
                             </div>
                         </div>
@@ -69,26 +69,26 @@ export default function TeamMemberDetailPage() {
                             <div className="w-full md:w-2/3">
 
                                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tighter mb-4">
-                                {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
-                            </h1>
-                            <div className="mb-6">
+                                    {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
+                                </h1>
+                                <div className="mb-6">
                                     <Chip className=" " variant="bordered">
-                                    {userDetail.role}
-                                </Chip>
-                            </div>
-                            <div dangerouslySetInnerHTML={{ __html: userDetail.bio }} />
-                            <div className="flex flex-wrap gap-4 mb-6 mt-4">
-                                <div className="flex items-center text-gray-400">
+                                        {userDetail.role}
+                                    </Chip>
+                                </div>
+                                <div dangerouslySetInnerHTML={{ __html: userDetail.bio || '' }} />
+                                <div className="flex flex-wrap gap-4 mb-6 mt-4">
+                                    <div className="flex items-center text-gray-400">
                                         <Mail className="h-4 w-4 mr-2 text-pink-500" />
-                                    <span>{userDetail.email}</span>
-                                </div>
-                                <div className="flex items-center text-gray-400">
+                                        <span>{userDetail.email}</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-400">
                                         <Phone className="h-4 w-4 mr-2 text-pink-500" />
-                                    <span>{userDetail.phone}</span>
-                                </div>
+                                        <span>{userDetail.phone}</span>
+                                    </div>
 
-                            </div>
-                            {/* <div className="flex gap-3">
+                                </div>
+                                {/* <div className="flex gap-3">
                                 <Button
                                     as={Link}
                                     // to={member.socialMedia.linkedin}
@@ -115,14 +115,14 @@ export default function TeamMemberDetailPage() {
                                         <Button className="   ml-2">Contact {member.name.split(" ")[0]}</Button>
                                 </Link>
                             </div> */}
-                        </div>
+                            </div>
                         </ScrollAnimation>
                     </div>
                 </div>
             </section>
 
             {/* Team Member Details Section */}
-            <section className="py-12 bg-gray-100">
+            {/* <section className="py-12 bg-gray-100">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <Tabs aria-label="Team member details" variant="underlined" className="mb-8 bg-white rounded-lg shadow-sm">
                         <Tab key="about" title="About">
@@ -131,7 +131,7 @@ export default function TeamMemberDetailPage() {
                                     <h2 className="text-2xl font-bold mb-4">About                                 {userDetail.firstName + " " + userDetail.middleName + " " + userDetail.lastName}
                                     </h2>
                                     <div className="space-y-4">
-                                        <div dangerouslySetInnerHTML={{ __html: userDetail.bio }} />
+                                        <div dangerouslySetInnerHTML={{ __html: userDetail.bio || '' }} />
 
                                     </div>
                                 </CardBody>
@@ -184,43 +184,32 @@ export default function TeamMemberDetailPage() {
 
                     </Tabs>
                 </div>
-            </section>
+            </section> */}
 
             {/* Other Team Members Section */}
             <section className="py-12  relative">
                 <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]"></div>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-                    <h2 className="text-2xl font-bold mb-8">Related Team Members</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <h2 className="text-2xl font-bold mb-8">Other Team Members</h2>
+                    <div className="flex flex-wrap gap-6">
                         {related?.map((otherMember, key) => (
-                            <ScrollAnimation>
-                                <Link to={`/team/${key}`} key={key}>
-                                    <Card className="border-blue-900/40  overflow-hidden group hover:border-blue-500/50 transition-all">
-                                    <div className="aspect-square overflow-hidden">
-                                        <img
-                                            src={otherMember.image || "/placeholder.svg"}
-                                            alt={`${otherMember.firstName} ${otherMember.middleName} ${otherMember.lastName}`}
-                                            width={300}
-                                            height={300}
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    </div>
-                                    <CardBody className="p-4">
+                            <ScrollAnimation key={key}>
+                                <Link className=" md:w-1/3" to={`/team/${otherMember._id}`}>
+                                    <Card className="border-blue-900/40 h-80 w-80   overflow-hidden group hover:border-blue-500/50 transition-all">
+                                        <div className="aspect-square overflow-hidden">
+                                            <img
+                                                src={otherMember.image || "/placeholder.svg"}
+                                                alt={`${otherMember.firstName} ${otherMember.middleName} ${otherMember.lastName}`}
+                                                
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        </div>
+                                        <div className="p-4">
                                             <h3 className="font-bold text-lg group-hover:text-pink-500 transition-colors">{otherMember.firstName} {otherMember.middleName} {otherMember.lastName}</h3>
-                                        <p className="text-gray-400 text-sm mb-3">{otherMember.role}</p>
-                                        <Link to={`/team/${otherMember._id}`} key={otherMember._id}>
-                                            <Button
-                                                variant="light"
-                                                size="sm"
-                                                    className="p-0 group-hover:text-pink-500"
-                                                endContent={<ChevronRight className="h-4 w-4" />}
-                                            >
-                                                View Profile
-                                            </Button>
-                                        </Link>
-                                    </CardBody>
-                                </Card>
-                            </Link>
+                                            <p className="text-gray-400 text-sm mb-3">{otherMember.role}</p>
+                                        </div>
+                                    </Card>
+                                </Link>
                             </ScrollAnimation>
                         ))}
 
@@ -247,9 +236,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             throw new Error("Blog not found");
         }
 
-        // Find related blogs with the same category, excluding the current blog
+        // Find related team members (employees only), excluding the current user
         const related = await Registration.find({
-            _id: { $ne: userDetail._id }, // Exclude the current blog
+            _id: { $ne: userDetail._id }, // Exclude the current user
+            $or: [
+                { employee: true },
+                { employee: { $exists: false } } // Include users where employee field doesn't exist (default behavior)
+            ]
         }).limit(3);
 
 

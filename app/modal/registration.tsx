@@ -112,6 +112,11 @@ const RegistrationSchema = new mongoose.Schema({
     required: false,
     type: String,
   },
+  // Employee flag to distinguish between employees and non-employees
+  employee: {
+    type: Boolean,
+    default: true,
+  },
 }, {
   timestamps: true
 });
