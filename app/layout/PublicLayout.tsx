@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button, Navbar, Spinner } from "@nextui-org/react";
 import { Link, useLocation } from "@remix-run/react";
+
+// Declare gtag as a global function
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
 import {
     ArrowRight,
     ExternalLink,
@@ -41,6 +48,16 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const usePageTracking = () => {
+        const location = useLocation();
+      
+        useEffect(() => {
+          window.gtag('config', 'G-9QRHMBT0GY', {
+            page_path: location.pathname + location.search,
+          });
+        }, [location]);
+      };
 
     const socialLinks = {
         twitter: { icon: Twitter, url: "https://twitter.com/yourprofile" },
