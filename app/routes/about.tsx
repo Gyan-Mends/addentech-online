@@ -240,7 +240,7 @@ const About = () => {
                                 },
                             }}
                         >
-                            {users.map((member, i) => (
+                            {users.filter(u => u.isEmployee).map((member, i) => (
                                 <ScrollAnimation>
                                     <motion.div key={member._id} variants={fadeInUpVariants}>
                                         <Link
